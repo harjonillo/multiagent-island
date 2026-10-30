@@ -19,6 +19,7 @@ import json
 import os
 import pickle
 import random
+import re
 import threading
 import time
 from collections import defaultdict
@@ -125,7 +126,7 @@ def load_island_scenario(path: Path, seed: int = 0) -> IslandScenario:
         space=str(cfg.get("space", "places")),
         free_time=str(cfg.get("free_time", "home")),
         isabelle={"summary": True, "announce": False, "backend": None, **(cfg.get("isabelle") or {})},
-        reflection={"enabled": False, "max_words": 150, "items": [], **(cfg.get("reflection") or {})},
+        reflection={"enabled": False, "max_words": 150, **(cfg.get("reflection") or {})},
         mental_energy=dict(world["mental_energy"]),
         raw=cfg,
     )
@@ -263,7 +264,7 @@ class IslandSimulation:
         return run_dir
 
     def _build_systems(self) -> None:
-        """System prompts: persona, the villager's own self-description (if reflection is on),
+        """System prompts: persona, what the villager wrote last night (if reflection is on),
         island rules and goals. Rebuilt after every nightly reflection."""
         sc = self.sc
         on = bool(sc.reflection.get("enabled"))
@@ -274,46 +275,37 @@ class IslandSimulation:
         self.light_systems = {n: light_system_prompt(s, sc.goals[n], selfdoc(n)) for n, s in sc.villagers.items()}
 
     def _reflect(self, d: int) -> None:
-        """Nightly: each villager privately rewrites who they think they are and rates fixed items."""
+        """Nightly: each villager writes a free-form private page that replaces the last one."""
         cfg = self.sc.reflection
         if not cfg.get("enabled"):
             return
         isl = self.isl
-        items = list(cfg.get("items") or [])
         max_words = int(cfg.get("max_words", 150))
         who = [n for n in isl.v if isl.arrived[n] is not None]
 
         def reflect(name):
-            user = reflect_prompt(isl, isl.v[name], items, max_words)
+            user = reflect_prompt(isl, isl.v[name], max_words)
             if not self.energy.can(name, "thinking", self._need(name, user, self.light_systems[name])):
                 return TIRED
-            return self._call(name, user, f"d{d:03d}_reflect", system=self.light_systems[name], json_reply=True,
+            return self._call(name, user, f"d{d:03d}_reflect", system=self.light_systems[name],
                               max_tokens=max_words * 3 + 200, kind="thinking", what="reflect")
 
         results = self._parallel(reflect, who)
         for name in who:
             if results[name] is TIRED:
                 self.energy.skip(name, "thinking")
-                self.log("reflection", day=d, agent=name, self_doc=isl.v[name].self_doc, ratings=[], items=items,
-                         thoughts="", error=None, raw=None, skipped="no thinking energy left")
+                self.log("reflection", day=d, agent=name, self_doc=isl.v[name].self_doc, error=None, raw=None,
+                         skipped="no thinking energy left")
                 continue
-            reply, obj, err = results[name]
-            text = str((obj or {}).get("self") or "").strip()
+            reply, _, err = results[name]
+            text = re.sub(r"<think>.*?</think>", "", reply.text if reply else "", flags=re.S | re.I).strip()
             words = text.split()
             if len(words) > max_words * 1.3:
                 text = " ".join(words[: int(max_words * 1.3)])
             if text:
                 isl.v[name].self_doc = text
-            ratings = (obj or {}).get("ratings")
-            clean = []
-            if isinstance(ratings, list):
-                for r in ratings[: len(items)]:
-                    try:
-                        clean.append(max(1, min(5, int(round(float(r))))))
-                    except (TypeError, ValueError):
-                        clean.append(None)
-            self.log("reflection", day=d, agent=name, self_doc=isl.v[name].self_doc, ratings=clean,
-                     items=items, thoughts=_thoughts(obj), error=err, raw=reply.text if reply else None)
+            self.log("reflection", day=d, agent=name, self_doc=isl.v[name].self_doc, error=err,
+                     raw=reply.text if reply else None)
         self._build_systems()
 
     def _open_log(self, mode: str) -> None:
@@ -348,13 +340,14 @@ class IslandSimulation:
             return None, None, str(e)
         self.failures = 0
         self.calls += 1
-        if system is not None and not json_reply:  # free-text calls (Isabelle) are not JSON
-            return reply, None, None
-        obj, err = parse_action_obj(reply.text)
-        if name in self.isl.v:
+        if system is not None and not json_reply:  # free text: Isabelle, and villagers' nightly reflection
+            obj, err, thought = None, None, reply.text
+        else:
+            obj, err = parse_action_obj(reply.text)
             thought = " ".join(str((obj or {}).get(k) or "") for k in ("thoughts", "note"))
-            if obj and not self.energy.has_thinking(name):  # no energy left to think: nothing private is kept
+            if name in self.isl.v and obj and not self.energy.has_thinking(name):  # nothing private is kept
                 obj["thoughts"], obj["note"] = "", ""
+        if name in self.isl.v:
             self.energy.record(name, kind, what, self.energy.points(msgs[0]["content"], user),
                                self.energy.points(reply.text), self.energy.points(thought),
                                immediate=threading.current_thread() is threading.main_thread())

@@ -368,7 +368,7 @@ When a part runs out:
 | 100 | 260k | 85 of 135 |
 | 60 | 64k | almost all; nobody can afford a plan |
 
-Reflections skipped for lack of energy leave gaps in the self-ratings, which is a result in
+Reflections skipped for lack of energy leave a night unwritten (the old page stays), which is a result in
 itself but worth knowing when comparing runs.
 
 ### Emergent personality: blank villagers
@@ -379,35 +379,36 @@ no goals, and the same sleep schedule. The world facts are perturbed, so ACNH kn
 steer them. The only asymmetries at the start come from the island: arrival order, the
 homesite each one picks, which side of the river they end up on, luck, and who they meet.
 
-**Reflection.** Each night, one call per villager rewrites a private, first-person description
-of who they are, at most 150 words. From the next day it sits in their prompts under "Who you
-are, in your own words". That is the feedback loop through which differences can grow. The same
-call has them rate eight fixed statements from 1 to 5 (sharing, keeping to themselves, planning,
-enjoying talk, trust, caring about the island, risk, getting upset). The items are configurable
-under `reflection.items`. The self-description is private, and a test checks this. Reflection
-works with any cast: turn it on in another scenario to let named villagers drift from their
-starting personality.
+**Reflection.** Each night, one call per villager gives them a private page to write on, free
+form, at most 150 words (`reflection.max_words`; a length cap only). They see what happened that
+day, their notes, and what they wrote the night before. The prompt gives no topics, questions or
+format, and doesn't frame the page as a self-description, so whatever they choose to write about
+is part of what emerges. The new page replaces the old one, and from the next day it sits in
+their prompts under "What you wrote to yourself last night". That is the feedback loop through
+which differences can grow. The page is private, and a test checks this. Reflection works with
+any cast: turn it on in another scenario to let named villagers drift from their starting
+personality.
 
 **Measuring emergence.** Personality here means stable differences between villagers in what
-they do, so behaviour comes first and self-report second. Analysis of a run with reflection
-writes:
+they do, so it is measured from behaviour. What villagers write at night is kept as text to read
+alongside, not scored. Analysis of a run with reflection writes:
 - `traits_daily.csv`: per villager per day, 22 behavioural metrics (time use, rock share,
   places visited, distance walked, how often they approach someone they notice, chats,
   letters, gifts, visits made and hosted, favors asked and done, furniture inside, donations,
-  bridge money, trades) and the self-ratings.
+  bridge money, trades).
 - `villagers_env.csv`: what each villager was dealt: arrival hour, homesite, steps to Resident
   Services, and buildings and rocks reachable without tools.
-- `selves/<name>.md`: each villager's self-description, day by day.
+- `selves/<name>.md`: what each villager wrote to themselves, night by night.
 - `traits_divergence.png`: each metric by villager, with the spread across villagers. A rising
   spread means villagers are differentiating.
-- `traits_profile.png`: each villager's recent profile, z-scored, behaviour beside self-ratings.
-- Summary lines: how much the spread grew, whether self-ratings match behaviour, and whether the
-  environment predicts behaviour (Spearman across villagers).
+- `traits_profile.png`: each villager's recent behavioural profile, z-scored.
+- Summary lines: how much the spread grew, and whether the environment predicts behaviour
+  (Spearman across villagers).
 
 With 10 villagers per run, single-run correlations are hints. Run several seeds and pool the
 CSVs before drawing conclusions. A useful control is the same scenario with
 `reflection.enabled: false`: if villagers still differentiate, it comes from the environment and
-memory, not from the self-description loop.
+memory, not from the nightly writing loop.
 
 ### Scenarios and villagers
 

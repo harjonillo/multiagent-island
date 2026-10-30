@@ -88,13 +88,11 @@ def _energy_rule(world: dict) -> str:
 
 
 def self_section(self_doc: str | None) -> str | None:
-    """The villager's own, private description of themselves (from nightly reflection).
-    None means reflection is off; an empty string means they haven't written one yet."""
-    if self_doc is None:
+    """What the villager last wrote to themselves at night (free-form, private).
+    None when reflection is off or they haven't written anything yet."""
+    if not (self_doc or "").strip():
         return None
-    if not self_doc.strip():
-        return "## Who you are, in your own words\n(You haven't formed a view of yourself yet.)"
-    return "## Who you are, in your own words\n" + self_doc.strip()
+    return "## What you wrote to yourself last night\n" + self_doc.strip()
 
 
 def system_prompt(spec: AgentSpec, world: dict, n_villagers: int, goals: list[str] | None, brief: str,
@@ -353,22 +351,15 @@ def notice_prompt(isl: Island, vil: Villager, place: str, hour: int, nearby: lis
     )
 
 
-def reflect_prompt(isl: Island, vil: Villager, items: list[str], max_words: int) -> str:
+def reflect_prompt(isl: Island, vil: Villager, max_words: int) -> str:
+    """Free-form and deliberately open: no topics, questions or format beyond a length cap."""
     today = "\n".join(f"- {r}" for r in vil.today) or "(nothing)"
     notes = "\n".join(f"- (day {d}) {n}" for d, n in vil.notes) or "(none)"
-    current = vil.self_doc.strip() or "(none yet)"
-    scale = "\n".join(f"{i + 1}. {it}" for i, it in enumerate(items))
+    last = vil.self_doc.strip() or "(nothing yet)"
     return (
-        f"PHASE: reflect\nIt is the end of day {isl.day}. You are {vil.name}, at home before sleep.\n"
-        f"Bells: {vil.bells}. Loan: {vil.loan}. Carrying {vil.items()} items.\n\n"
-        f"What you did and what happened today:\n{today}\n\nYour notes:\n{notes}\n\n"
-        f"How you described yourself until now:\n{current}\n\n"
-        f"Write a new description of yourself, in the first person and at most {max_words} words: what kind of "
-        "person you are, what you care about, how you like to spend your days, and how you see the other "
-        "villagers you know. Base it on what has actually happened to you; it's fine if it is still vague. "
-        "Nobody else will read it.\n\n"
-        "Then rate how true each statement is of you, from 1 (not at all) to 5 (very much):\n"
-        f"{scale}\n\n"
-        "Respond with one JSON object and nothing else:\n"
-        '{"thoughts": "<private>", "self": "<your description>", "ratings": [<one number per statement, in order>]}'
+        f"PHASE: reflect\nIt is the end of day {isl.day}. You are {vil.name}, at home before sleep.\n\n"
+        f"What happened today:\n{today}\n\nYour notes:\n{notes}\n\n"
+        f"What you wrote last night:\n{last}\n\n"
+        f"This page is private; nobody else will read it. Write whatever you like, in any form, up to "
+        f"{max_words} words. It replaces what you wrote last night, and you will see it again tomorrow."
     )

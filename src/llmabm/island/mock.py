@@ -181,9 +181,7 @@ def notice_reply(prompt: str, rng: random.Random) -> str:
 
 
 def reflect_reply(prompt: str, rng: random.Random) -> str:
-    n_items = len(re.findall(r"^\d+\. ", prompt, re.M))
     busy = prompt.count("\n- ") > 8
     me = rng.choice(["I keep busy and like getting things done.", "I take things slowly and enjoy quiet days.",
                      "I like chatting with whoever I run into.", "I mostly look after myself for now."])
-    return json.dumps({"thoughts": "thinking about the day", "self": me + (" Today was a full day." if busy else ""),
-                       "ratings": [rng.randint(1, 5) for _ in range(n_items)]})
+    return me + (" Today was a full day." if busy else "")

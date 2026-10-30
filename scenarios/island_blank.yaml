@@ -17,21 +17,12 @@ arrivals:
   mode: trickle
   window: [5, 18]
 
-# The nightly reflection. One call per villager after the day ends: they rewrite their
-# self-description (private; it becomes part of their prompt from the next day) and
-# rate themselves on the fixed items below, 1 (not at all) to 5 (very much).
+# The nightly reflection. One call per villager after the day ends: they write whatever
+# they like, free-form and private, with no topics or questions given. It replaces the
+# previous night's page and is in their prompt from the next day. max_words caps length only.
 reflection:
   enabled: true
   max_words: 150
-  items:
-    - I like sharing what I have with others.
-    - I prefer to keep to myself.
-    - I make plans and stick to them.
-    - I enjoy talking with the other villagers.
-    - I trust the other villagers.
-    - I care about the island as a whole, not just about myself.
-    - I'm willing to take risks for a bigger reward.
-    - I get upset when things don't go my way.
 
 # Mental energy: a daily token budget each villager divides between planning, private
 # thinking and talking (see mental_energy in the world file). Everyone starts with the same

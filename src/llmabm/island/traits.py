@@ -1,15 +1,16 @@
-"""Emergent personality: behavioural traits per villager per day, self-reports, and the
-environment each villager was dealt.
+"""Emergent personality: behavioural traits per villager per day, their free-form nightly
+writing, and the environment each villager was dealt.
 
 The idea is to measure personality as stable individual differences in behaviour, and to
-check it against what villagers say about themselves and against where they ended up.
+check it against where villagers ended up. What they write at night is kept as text to read
+alongside, not scored.
 
 Outputs (written by `write_traits`):
-  traits_daily.csv    one row per villager per day: behavioural metrics and self-ratings
+  traits_daily.csv    one row per villager per day: behavioural metrics
   villagers_env.csv   what each villager was dealt: arrival hour, homesite, reachability
-  selves/<name>.md    each villager's self-description, day by day
+  selves/<name>.md    what each villager wrote to themselves, night by night
   traits_divergence.png   how far apart villagers are on each metric, day by day
-  traits_profile.png      each villager's recent profile (z-scored behaviour and self-ratings)
+  traits_profile.png      each villager's recent behavioural profile, z-scored
 """
 
 from __future__ import annotations
@@ -156,15 +157,6 @@ def _val(m, d, n, k):
     return v
 
 
-def _ratings(run: Run) -> tuple[list[str], dict[tuple[int, str], list]]:
-    items: list[str] = []
-    out = {}
-    for e in run.of("reflection"):
-        items = e.get("items") or items
-        out[(e["day"], e["agent"])] = e.get("ratings") or []
-    return items, out
-
-
 def _env(run: Run) -> dict[str, dict]:
     """What each villager was dealt, before any choices beyond picking a homesite."""
     names = list(run.manifest["villagers"])
@@ -234,27 +226,18 @@ def _std(xs):
     return math.sqrt(sum((x - mu) ** 2 for x in xs) / (len(xs) - 1))
 
 
-def recent_profile(run: Run, window: int = 5) -> tuple[dict[str, dict], list[str]]:
-    """Each villager's mean behaviour and self-ratings over the last `window` days."""
+def recent_profile(run: Run, window: int = 5) -> dict[str, dict]:
+    """Each villager's mean behaviour over the last `window` days."""
     m = _profile_metrics(run)
-    items, rat = _ratings(run)
     days = sorted({d for d, _ in m})
     recent = days[-window:]
-    names = list(run.manifest["villagers"])
-    prof = {}
-    for n in names:
-        row = {k: _nanmean([_val(m, d, n, k) for d in recent]) for k in METRICS}
-        for i, it in enumerate(items):
-            row[f"self: {it}"] = _nanmean([(rat.get((d, n)) or [None] * len(items))[i]
-                                           if i < len(rat.get((d, n)) or []) else None for d in recent])
-        prof[n] = row
-    return prof, items
+    return {n: {k: _nanmean([_val(m, d, n, k) for d in recent]) for k in METRICS} for n in run.manifest["villagers"]}
 
 
 def summary_lines(run: Run) -> list[str]:
     if not run.of("reflection") and run.manifest.get("scenario_config", {}).get("reflection", {}).get("enabled") is not True:
         return []
-    prof, items = recent_profile(run)
+    prof = recent_profile(run)
     names = list(prof)
     env = _env(run)
     L = ["", "Emergent traits (last 5 days). Spread across villagers, first day -> last day:"]
@@ -264,13 +247,6 @@ def summary_lines(run: Run) -> list[str]:
         first = _std([_val(m, days[0], n, k) for n in names])
         last = _std([_val(m, days[-1], n, k) for n in names])
         L.append(f"  {k:<14} {first:7.2f} -> {last:7.2f}")
-    if items:
-        L.append("Do they act the way they describe themselves? Spearman across villagers:")
-        pairs = [(0, "gifts"), (0, "donations"), (1, "chats"), (3, "chats"), (3, "approach_rate"), (5, "bridge_bells")]
-        for i, metric in pairs:
-            if i < len(items):
-                r = spearman([prof[n][f"self: {items[i]}"] for n in names], [prof[n][metric] for n in names])
-                L.append(f"  '{items[i]}' vs {metric}: {r:+.2f}")
     feats = [f for f in ("arrival_hour", "steps_to_resident_services", "buildings_reachable_without_tools",
                          "rocks_reachable_without_tools") if any(env[n].get(f) is not None for n in names)]
     if feats:
@@ -288,7 +264,6 @@ def summary_lines(run: Run) -> list[str]:
 def write_traits(run: Run, out_dir: Path) -> list[Path]:
     out_dir = Path(out_dir)
     m = _profile_metrics(run)
-    items, rat = _ratings(run)
     names = list(run.manifest["villagers"])
     days = sorted({d for d, _ in m})
     paths = []
@@ -296,12 +271,10 @@ def write_traits(run: Run, out_dir: Path) -> list[Path]:
     p = out_dir / "traits_daily.csv"
     with open(p, "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["day", "villager", *METRICS, *[f"self_{i + 1}" for i in range(len(items))]])
+        w.writerow(["day", "villager", *METRICS])
         for d in days:
             for n in names:
-                r = rat.get((d, n)) or []
-                w.writerow([d, n, *[_val(m, d, n, k) for k in METRICS],
-                            *[(r[i] if i < len(r) else "") for i in range(len(items))]])
+                w.writerow([d, n, *[_val(m, d, n, k) for k in METRICS]])
     paths.append(p)
 
     env = _env(run)
@@ -320,21 +293,18 @@ def write_traits(run: Run, out_dir: Path) -> list[Path]:
     for e in run.of("reflection"):
         by[e["agent"]].append(e)
     for n, evs in by.items():
-        lines = [f"# {n}: self-descriptions, day by day", ""]
+        lines = [f"# {n}: what they wrote to themselves, night by night", ""]
         for e in evs:
             lines += [f"## Day {e['day']}", "", e.get("self_doc") or "(none)", ""]
-            if e.get("ratings") and items:
-                lines.append("Self-ratings: " + "; ".join(f"{it} {r}" for it, r in zip(items, e["ratings"])))
-                lines.append("")
         (sdir / f"{n}.md").write_text("\n".join(lines))
     if by:
         paths.append(sdir)
 
-    paths += _plots(run, out_dir, m, items, rat, names, days)
+    paths += _plots(run, out_dir, m, names, days)
     return paths
 
 
-def _plots(run, out_dir, m, items, rat, names, days) -> list[Path]:
+def _plots(run, out_dir, m, names, days) -> list[Path]:
     import matplotlib
 
     matplotlib.use("Agg")
@@ -368,26 +338,18 @@ def _plots(run, out_dir, m, items, rat, names, days) -> list[Path]:
     plt.close(fig)
     out.append(p)
 
-    prof, _ = recent_profile(run)
-    cols_ = keys + [f"self: {it}" for it in items]
-    grid = np.array([[prof[n].get(c, math.nan) for c in cols_] for n in names], dtype=float)
+    prof = recent_profile(run)
+    grid = np.array([[prof[n].get(c, math.nan) for c in keys] for n in names], dtype=float)
     mu, sd = np.nanmean(grid, axis=0), np.nanstd(grid, axis=0)
     sd[sd == 0] = 1
     z = (grid - mu) / sd
     cmap = LinearSegmentedColormap.from_list("div", ["#2a78d6", "#f4f3f0", "#eb6834"])
-    fig, ax = plt.subplots(figsize=(0.55 * len(cols_) + 2.5, 0.42 * len(names) + 3.0))
+    fig, ax = plt.subplots(figsize=(0.55 * len(keys) + 2.5, 0.42 * len(names) + 3.0))
     im = ax.imshow(np.nan_to_num(z), cmap=cmap, vmin=-2, vmax=2, aspect="auto")
-    labels = keys + [f"self {i + 1}" for i in range(len(items))]
-    ax.set_xticks(range(len(cols_)), labels, rotation=60, ha="right", fontsize=8)
+    ax.set_xticks(range(len(keys)), keys, rotation=60, ha="right", fontsize=8)
     ax.set_yticks(range(len(names)), names, fontsize=9)
-    if items:
-        ax.axvline(len(keys) - 0.5, color="#52514e", lw=1)
-    ax.set_title("Recent profile (last 5 days), z-scored across villagers\nleft: behaviour, right: self-ratings",
-                 fontsize=10)
+    ax.set_title("Recent behaviour (last 5 days), z-scored across villagers", fontsize=10)
     ax.grid(False)
-    if items:
-        fig.text(0.01, 0.005, "  ".join(f"self {i + 1}: {it}" for i, it in enumerate(items)), fontsize=7,
-                 color="#52514e", wrap=True)
     fig.colorbar(im, ax=ax, fraction=0.03, label="z")
     fig.tight_layout()
     p = Path(out_dir) / "traits_profile.png"

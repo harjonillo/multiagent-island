@@ -514,10 +514,9 @@ def day_log(run: Run, day: int, private: bool = True) -> str:
                    + f". Bridge: {snap['bridge_fund']}" + (" (built)" if snap["bridge_built"] else "") + ".")
     refl = [e for e in ev if e["type"] == "reflection"]
     if refl and private:
-        out += ["", "## Night: how each villager now sees themselves (private)", ""]
+        out += ["", "## Night: what each villager wrote to themselves (private)", ""]
         for e in refl:
-            out.append(f"- 🔒 **{e['agent']}**: {e.get('self_doc') or '(nothing yet)'}"
-                       + (f"  \n  ratings: {e['ratings']}" if e.get("ratings") else ""))
+            out.append(f"- 🔒 **{e['agent']}**: {e.get('self_doc') or '(nothing yet)'}")
     return "\n".join(out) + "\n"
 
 

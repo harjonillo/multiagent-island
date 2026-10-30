@@ -263,12 +263,12 @@ def test_blank_villagers_reflect_privately():
         run = load_run(Path(d) / "run")
         refl = run.of("reflection")
         assert len(refl) == 30
-        assert all(len(e["ratings"]) == len(sc.reflection["items"]) for e in refl if not e.get("skipped"))
+        assert all(e["self_doc"] and "ratings" not in e for e in refl if not e.get("skipped"))
         assert sum(not e.get("skipped") for e in refl) >= 20  # a few may run out of thinking energy
         # Identical villagers at the start: same persona apart from the name, same schedule.
         personas = {s.persona.replace(n, "NAME") for n, s in sc.villagers.items()}
         assert len(personas) == 1
-        # A villager's own self-description is in their own prompt the next day, and in nobody else's.
+        # What a villager wrote is in their own prompt the next day, and in nobody else's.
         prompts = Path(d) / "run" / "prompts"
         for e in [x for x in refl if x["day"] == 1]:
             mine = (prompts / f"d002_p0_{e['agent']}.txt")
@@ -283,7 +283,7 @@ def test_blank_villagers_reflect_privately():
             for who, doc in tagged.items():
                 if (who != owner and list(tagged.values()).count(doc) == 1 and doc in f.read_text()
                         and doc not in tagged.get(owner, "")):
-                    raise AssertionError(f"{who}'s self-description leaked into {f.name}")
+                    raise AssertionError(f"{who}'s nightly page leaked into {f.name}")
         from llmabm.island.traits import write_traits
 
         paths = write_traits(run, Path(d) / "run")
