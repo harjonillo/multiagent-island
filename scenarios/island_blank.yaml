@@ -1,0 +1,55 @@
+type: island
+name: blank villagers
+description: >
+  Ten identical villagers with no stated personality, no goals and the same schedule.
+  Each night they write a private description of who they are, which shapes the next
+  day. Does personality emerge, and does it follow the environment (homesite, river
+  side, luck, who they meet) or just noise?
+
+world: data/island_world.yaml
+world_facts: perturbed          # invented species and prices, so ACNH knowledge doesn't steer them
+space: grid
+free_time: wander
+days: 30
+start_bells: 1000
+
+arrivals:
+  mode: trickle
+  window: [5, 18]
+
+# The nightly reflection. One call per villager after the day ends: they rewrite their
+# self-description (private; it becomes part of their prompt from the next day) and
+# rate themselves on the fixed items below, 1 (not at all) to 5 (very much).
+reflection:
+  enabled: true
+  max_words: 150
+  items:
+    - I like sharing what I have with others.
+    - I prefer to keep to myself.
+    - I make plans and stick to them.
+    - I enjoy talking with the other villagers.
+    - I trust the other villagers.
+    - I care about the island as a whole, not just about myself.
+    - I'm willing to take risks for a bigger reward.
+    - I get upset when things don't go my way.
+
+# Mental energy: a daily token budget each villager divides between planning, private
+# thinking and talking (see mental_energy in the world file). Everyone starts with the same
+# split; whether some become "talkers" and others "planners" is part of what emerges.
+mental_energy:
+  enabled: true
+  daily: 150
+
+isabelle:
+  summary: true
+  announce: false
+  backend: null
+memory_size: 15
+
+villagers: villagers/blank_cast.yaml
+villager_template: villagers/blank.md
+brief: ""
+
+llm:
+  temperature: 0.8
+  max_tokens: 700

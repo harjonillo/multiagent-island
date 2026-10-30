@@ -1,0 +1,63 @@
+# LLM backends. Every entry speaks the OpenAI chat-completions API.
+# Agents pick one with `model: <name>` in their frontmatter; `default` is used otherwise.
+# `--backend <name>` on the command line overrides every agent.
+#
+# Free-tier model names and rate limits change often. Check each provider's
+# model list before a real run, and set `rpm` a little under your actual limit.
+# Put keys in .env (see .env.example), never in this file.
+
+default: groq
+
+backends:
+  groq:
+    base_url: https://api.groq.com/openai/v1
+    model: llama-3.1-8b-instant
+    api_key_env: GROQ_API_KEY
+    rpm: 25
+
+  groq-big:
+    base_url: https://api.groq.com/openai/v1
+    model: llama-3.3-70b-versatile
+    api_key_env: GROQ_API_KEY
+    rpm: 25
+
+  # Free tier: prompts may be used for training outside the EU/UK/EEA.
+  gemini:
+    base_url: https://generativelanguage.googleapis.com/v1beta/openai
+    model: gemini-2.5-flash
+    api_key_env: GEMINI_API_KEY
+    rpm: 8
+
+  # ~1M tokens/day free in mid-2026 reports; the model list changes without notice.
+  cerebras:
+    base_url: https://api.cerebras.ai/v1
+    model: gpt-oss-120b
+    api_key_env: CEREBRAS_API_KEY
+    rpm: 25
+
+  # Free "experiment" tier requires opting in to your data being used for training.
+  mistral:
+    base_url: https://api.mistral.ai/v1
+    model: mistral-small-latest
+    api_key_env: MISTRAL_API_KEY
+    rpm: 20
+
+  nvidia:
+    base_url: https://integrate.api.nvidia.com/v1
+    model: meta/llama-3.3-70b-instruct
+    api_key_env: NVIDIA_API_KEY
+    rpm: 30
+
+  # Free models cap at about 50 requests/day, or 1,000/day after a one-time $10 top-up.
+  openrouter:
+    base_url: https://openrouter.ai/api/v1
+    model: meta-llama/llama-3.3-70b-instruct:free
+    api_key_env: OPENROUTER_API_KEY
+    rpm: 15
+
+  # Local, no key, no rate limit. `ollama pull llama3.2:3b` first.
+  ollama:
+    base_url: http://localhost:11434/v1
+    model: llama3.2:3b
+
+# `mock` is always available and needs no entry here.

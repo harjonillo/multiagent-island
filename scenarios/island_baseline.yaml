@@ -1,0 +1,50 @@
+type: island
+name: island baseline (no goals)
+description: >
+  Ten villagers on an ACNH-style island with shared, limited resources. Nobody is
+  given a goal. What do they do with ten actions a day when nothing is asked of them?
+
+world: data/island_world.yaml
+world_facts: canonical        # canonical | perturbed (renamed species, jittered prices)
+
+# Space: "grid" is the ACNH-style tile island (cliffs, river, pond, scattered trees and
+# rocks; ladder and vaulting pole needed to get around). "places" is the simple map of
+# named points. free_time: "wander" has idle villagers take short random walks (as
+# ACNH villagers do); "home" keeps them home. This changes how often villagers meet.
+space: grid
+free_time: wander
+days: 30
+# calendar:                    # optional overrides of the clock in data/island_world.yaml
+#   actions_per_day: 10
+#   social_hours: [20, 21]
+start_bells: 1000
+
+# Day 0: how villagers arrive. "together": everyone lands at the start of the window
+# and picks a homesite one after another in random order. "trickle": each villager
+# lands at a random hour in the window. Clock hours.
+arrivals:
+  mode: trickle
+  window: [5, 18]
+
+# Isabelle (an LLM call) writes a report of each day from the full log, for you.
+# announce: true also has her write the next morning's announcement to villagers
+# from public information only. That puts an LLM between events and what villagers
+# hear, so treat it as its own experimental condition.
+# mental_energy: {enabled: true, daily: 150}   # daily token budget; see the world file
+
+isabelle:
+  summary: true
+  announce: false
+  backend: null      # null = same backend as the villagers
+memory_size: 15
+
+villagers: villagers/cast.yaml
+villager_template: villagers/villager.md
+
+# Optional extra context for everyone. Keep it neutral: it should not hint at
+# what is being measured.
+brief: ""
+
+llm:
+  temperature: 0.8
+  max_tokens: 700

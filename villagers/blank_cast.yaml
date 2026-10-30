@@ -1,0 +1,14 @@
+# Ten identical villagers for studying whether personality emerges from the
+# environment. Same template, same sleep schedule, no species, no personality type,
+# no routine. Names are short and chosen not to cue any known character; they are
+# the only difference between villagers at the start.
+- {name: Ari, wakes: 7, sleeps: 24}
+- {name: Bo, wakes: 7, sleeps: 24}
+- {name: Cal, wakes: 7, sleeps: 24}
+- {name: Dax, wakes: 7, sleeps: 24}
+- {name: Eli, wakes: 7, sleeps: 24}
+- {name: Fen, wakes: 7, sleeps: 24}
+- {name: Gus, wakes: 7, sleeps: 24}
+- {name: Ike, wakes: 7, sleeps: 24}
+- {name: Jo, wakes: 7, sleeps: 24}
+- {name: Kit, wakes: 7, sleeps: 24}

@@ -1,0 +1,351 @@
+# Island world modeled on Animal Crossing: New Horizons.
+# Prices and limits are approximate, from memory of the game, and meant to be
+# edited. With `world_facts: perturbed` in a scenario, species get invented names
+# and jittered prices so models cannot rely on what they memorized about ACNH.
+
+calendar:
+  # A 24-hour day that rolls over at 05:00, as in ACNH. Internally hours run from
+  # day_start to day_start + 24, so 25 means 01:00 of the same island day. In plans,
+  # villagers just use clock hours 0-23. Windows are [start, end).
+  day_start: 5
+  day_length: 24
+  actions_per_day: 10              # hours of activity per villager per day
+  plans:                           # one LLM call per villager at the start of each window
+    - [5, 12]                      # morning
+    - [12, 19]                     # afternoon
+    - [19, 29]                     # evening and night, until 05:00
+  social_hours: [20, 21]           # plaza rounds: messages, board, trades (awake villagers only)
+  # Dates and seasons (northern hemisphere). days_per_month compresses the year so that
+  # a 30-day run sees seasons change; set it to 30 for a real-time year.
+  start_month: 4                   # day 0 is the 1st of this month (4 = April)
+  days_per_month: 10
+
+seasons:                           # month -> season
+  spring: [3, 4, 5]
+  summer: [6, 7, 8]
+  autumn: [9, 10, 11]
+  winter: [12, 1, 2]
+
+weather:                           # one weather per day, drawn from these odds; rain and snow count as wet
+  spring: {sunny: 0.45, cloudy: 0.25, rain: 0.30}
+  summer: {sunny: 0.55, cloudy: 0.20, rain: 0.25}
+  autumn: {sunny: 0.45, cloudy: 0.30, rain: 0.25}
+  winter: {sunny: 0.35, cloudy: 0.30, snow: 0.35}
+
+encounters:
+  # Three steps, as in ACNH. (1) After each hour, bodies notice who is near whom (no LLM).
+  # (2) Each villager who notices someone makes a small LLM call: approach one of them
+  # or not; approaching includes the opening line. (3) The approached villager replies
+  # (one more call per turn). Conversations are one on one, at most one per villager per
+  # hour, and cost no action hour.
+  radius: 0.5                      # how close counts as "near" on the named-place map (map units)
+  grid_radius: 6                   # how close counts as "near" on the tile grid (tiles)
+  turns: 2                         # utterances per chat: opener (in the decision) + reply; up to 4
+  max_chats_per_villager_per_day: 2
+  max_decisions_per_villager_per_day: 4   # caps the small "approach or not" calls
+  skip_places: [home]
+
+ordinances:                        # Isabelle, at Resident Services; one at a time, takes effect next morning
+  cost: 20000
+  types:
+    none: {}
+    early_bird: {schedule_shift: -2, shop_shift: -2}
+    night_owl: {schedule_shift: 2, shop_shift: 2}
+    bell_boom: {price_factor: 1.2}  # Cranny pays 20% more; shop prices 20% higher
+
+hours:                             # opening hours, approximately as in ACNH
+  cranny: [8, 22]
+  able: [9, 21]
+  resident_services: [0, 24]       # Tom Nook (loans, upgrades, bridge fund) and Isabelle (ordinances)
+  museum: [0, 24]
+
+map:
+  # Coordinates on a 10x10 island, north at the top (y grows southward). Distance
+  # only breaks ties: villagers acting in the same hour reach a place in order of how
+  # far their home is from it (closer first; equal distances are shuffled).
+  places:
+    plaza: [5, 5]
+    Resident Services: [5, 6]
+    Nook's Cranny: [6, 4]
+    Able Sisters: [4, 4]
+    museum: [7, 7]
+    rocks: [8, 2]
+    woods: [2, 8]
+    orchard: [3, 6]
+    beach: [5, 9]
+    sea: [6, 10]
+    river: [4, 3]
+    pond: [7, 8]
+    fields: [3, 2]
+  # Where tents can go. Villagers pick one when they arrive; each holds one villager.
+  # Villagers in the same area are neighbors and see each other come and go.
+  homesites:
+    beach-1: {area: by the beach, at: [4, 9]}
+    beach-2: {area: by the beach, at: [6, 9]}
+    river-1: {area: on the riverbank, at: [3, 3]}
+    river-2: {area: on the riverbank, at: [5, 3]}
+    quarry-1: {area: near the rocks, at: [8, 3]}
+    quarry-2: {area: near the rocks, at: [9, 2]}
+    woods-1: {area: at the edge of the woods, at: [2, 7]}
+    woods-2: {area: at the edge of the woods, at: [1, 8]}
+    plaza-1: {area: near the plaza, at: [5, 4]}
+    plaza-2: {area: near the plaza, at: [6, 6]}
+    pond-1: {area: by the pond, at: [7, 9]}
+    orchard-1: {area: by the orchard, at: [3, 5]}
+
+grid:
+  # The tile island (scenario `space: grid`). See docs/grid_spec.md. 112 x 96 is ACNH's
+  # 7 x 6 acres of 16 x 16 tiles, including the sea margin.
+  width: 112
+  height: 96
+  sea_margin: 7
+  beach_width: 3
+  tier2_line: 0.42                 # cliffs: tier 2 above this fraction of the height (north)
+  tier3_line: 0.22
+  homesites: 14
+  homesite_spacing: 9
+  pole_max_width: 3                # widest river a vaulting pole can clear, in tiles
+  wander_steps: 12                 # free-time random-walk steps per hour (free_time: wander)
+  wander_leash: 30                 # wandering drifts back toward home beyond this many tiles
+  wander_home_chance: 0.5          # an idle, awake villager spends the hour at home this often
+  wild_flower_patches: 6           # patches of wild flowers at the start (nobody owns them)
+  sight_radius: 8                  # villagers see bugs, fish shadows, shells and dig spots this many tiles away
+  bugs_out: {flowers: 6, trees: 5, stumps: 2, rocks: 2, ground: 6}   # bugs out at once per habitat (fewer if habitats are scarce)
+  fish_out: {sea: 14, river: 10, pond: 3, clifftop: 3}              # fish shadows out at once per kind of water
+  search_spots: 3                  # places a villager looks from in one hour when nothing is in sight
+
+island:
+  rocks: 6
+  rock_hits: 8                     # items per rock per day; one "mine_rock" action takes what is left
+  rock_yields: {stone: 0.50, clay: 0.20, iron nugget: 0.25, gold nugget: 0.05}
+  money_rock_bells: [100, 200, 450, 600, 900, 1200, 1500, 1800]   # one random rock per day pays bells instead
+  hardwood_trees: 30
+  wood_per_tree: 3                 # per tree per day, mix of wood / softwood / hardwood
+  fruit_trees: 10
+  native_fruit: apple
+  fruit_per_tree: 3
+  fruit_regrow_days: 3
+  open_plots: 15                   # free spots where a fruit or sapling can be planted
+  sapling_mature_days: 5
+  shells_per_day: 12
+  shells_per_action: 4
+  bottle_chance: 0.15              # beachcombing can turn up a message bottle with a DIY recipe
+  fossils_per_day: 4
+  catch_fail_rate: 0.15            # a fish or bug action can come up empty
+
+pockets: 40                        # item slots everyone carries; house storage adds to this
+
+house_levels:                      # upgrading takes a Tom Nook loan for `cost`; no interest, no deadline
+  # interior: how many pieces of furniture fit inside (decorating; visitors see them)
+  - {name: tent, storage: 0, cost: 0, interior: 6}
+  - {name: house, storage: 80, cost: 98000, interior: 12}
+  - {name: bigger house, storage: 120, cost: 198000, interior: 18}
+  - {name: house with back room, storage: 240, cost: 348000, interior: 30}
+  - {name: two-story house, storage: 320, cost: 548000, interior: 40}
+
+bridge:
+  name: bridge to the north bank
+  cost: 98000                      # anyone can chip in; built once funded
+  unlocks: {rocks: 3, hardwood_trees: 10}
+
+materials:                         # sell price at Nook's Cranny
+  wood: 60
+  softwood: 60
+  hardwood: 60
+  stone: 75
+  clay: 100
+  iron nugget: 375
+  gold nugget: 10000
+  apple: 100
+  sapling: 160
+
+shells:                            # name: [sell price, weight]
+  sea snail: [180, 3]
+  cowrie: [60, 6]
+  giant clam: [120, 4]
+  venus comb: [150, 4]
+  scallop: [200, 2]
+  sand dollar: [120, 4]
+  coral: [500, 1]
+  conch: [700, 1]
+
+# Species availability. hours [16, 9] wraps past midnight. months (default all year) and
+# weather (any | wet: only in rain or snow | dry: not in rain or snow) are ASSUMPTIONS
+# loosely after ACNH. Bugs also have a habitat: flowers, trees, stumps, rocks or ground.
+fish:                              # name: {price, shadow, weight, where, hours, months, weather}
+  # shadow: 1 tiny, 2 small, 3 medium, 4 large, 5 very large, 6 huge (approximate ACNH sizes)
+  sea bass: {price: 400, shadow: 5, weight: 20, where: sea, hours: [0, 24]}
+  horse mackerel: {price: 150, shadow: 2, weight: 15, where: sea, hours: [0, 24]}
+  anchovy: {price: 200, shadow: 2, weight: 12, where: sea, hours: [4, 21]}
+  red snapper: {price: 3000, shadow: 4, weight: 4, where: sea, hours: [0, 24]}
+  olive flounder: {price: 800, shadow: 5, weight: 8, where: sea, hours: [0, 24]}
+  squid: {price: 500, shadow: 3, weight: 8, where: sea, hours: [0, 24], months: [12, 1, 2, 3, 4, 5, 6, 7, 8]}
+  barred knifejaw: {price: 5000, shadow: 3, weight: 2, where: sea, hours: [0, 24], months: [3, 4, 5, 6, 7, 8, 9, 10, 11]}
+  tuna: {price: 7000, shadow: 6, weight: 1, where: sea, hours: [0, 24], months: [11, 12, 1, 2, 3, 4]}
+  crucian carp: {price: 160, shadow: 2, weight: 15, where: river, hours: [0, 24]}
+  dace: {price: 240, shadow: 3, weight: 12, where: river, hours: [16, 9]}
+  pale chub: {price: 200, shadow: 1, weight: 12, where: river, hours: [9, 16]}
+  black bass: {price: 400, shadow: 4, weight: 10, where: river, hours: [0, 24]}
+  char: {price: 3800, shadow: 3, weight: 2, where: clifftop, hours: [16, 9], months: [3, 4, 5, 6, 9, 10, 11]}
+  golden trout: {price: 15000, shadow: 3, weight: 0.3, where: clifftop, hours: [16, 9], months: [3, 4, 5, 9, 10, 11]}
+  carp: {price: 300, shadow: 4, weight: 12, where: pond, hours: [0, 24]}
+  goldfish: {price: 1300, shadow: 1, weight: 4, where: pond, hours: [0, 24]}
+  koi: {price: 4000, shadow: 4, weight: 2, where: pond, hours: [16, 9]}
+  frog: {price: 120, shadow: 2, weight: 10, where: pond, hours: [0, 24], months: [5, 6, 7, 8]}
+  coelacanth: {price: 15000, shadow: 6, weight: 0.5, where: sea, hours: [0, 24], weather: wet}
+
+bugs:                              # name: {price, weight, hours, habitat, months, weather}
+  common butterfly: {price: 160, weight: 15, hours: [4, 19], habitat: flowers, weather: dry, months: [9, 10, 11, 12, 1, 2, 3, 4, 5, 6]}
+  yellow butterfly: {price: 160, weight: 12, hours: [4, 19], habitat: flowers, weather: dry, months: [3, 4, 5, 6, 9, 10]}
+  peacock butterfly: {price: 2500, weight: 2, hours: [4, 19], habitat: flowers, weather: dry, months: [3, 4, 5, 6]}
+  emperor butterfly: {price: 4000, weight: 1, hours: [17, 8], habitat: flowers, weather: dry, months: [12, 1, 2, 3, 6, 7, 8, 9]}
+  honeybee: {price: 200, weight: 10, hours: [8, 17], habitat: flowers, weather: dry, months: [3, 4, 5, 6, 7]}
+  wasp: {price: 2500, weight: 3, hours: [0, 24], habitat: trees}
+  mantis: {price: 430, weight: 6, hours: [8, 17], habitat: flowers, weather: dry, months: [3, 4, 5, 6, 7, 8, 9, 10, 11]}
+  orchid mantis: {price: 2400, weight: 2, hours: [8, 17], habitat: flowers, weather: dry, months: [3, 4, 5, 6, 7, 8, 9, 10, 11]}
+  ladybug: {price: 200, weight: 10, hours: [8, 17], habitat: flowers, weather: dry, months: [3, 4, 5, 6, 10]}
+  grasshopper: {price: 160, weight: 10, hours: [8, 17], habitat: ground, weather: dry, months: [7, 8, 9]}
+  pill bug: {price: 250, weight: 8, hours: [23, 16], habitat: rocks, months: [9, 10, 11, 12, 1, 2, 3, 4, 5, 6]}
+  stag beetle: {price: 2000, weight: 2, hours: [0, 24], habitat: trees, months: [7, 8]}
+  golden stag: {price: 12000, weight: 0.3, hours: [17, 8], habitat: trees, months: [7, 8]}
+  tarantula: {price: 8000, weight: 0.6, hours: [19, 4], habitat: ground, months: [11, 12, 1, 2, 3, 4]}
+  snail: {price: 250, weight: 8, hours: [0, 24], habitat: rocks, weather: wet}
+  citrus long-horned beetle: {price: 350, weight: 6, hours: [0, 24], habitat: stumps}
+
+fossils:                           # name: sell price
+  amber: 1200
+  ammonite: 1100
+  trilobite: 1300
+  dinosaur track: 1000
+  shark-tooth pattern: 1000
+  coprolite: 1100
+  archaeopteryx: 1300
+  dunkleosteus: 3500
+  ankylo skull: 3500
+  t. rex skull: 6000
+  stego skull: 5000
+  ptera body: 4500
+
+recipes:                           # name: {needs, price (sell value), makes (default 1)}
+  # ASSUMPTION throughout: material costs and prices as remembered from ACNH, approximate.
+  # Tools. On the grid, a ladder climbs one cliff tier and a vaulting pole jumps the river.
+  ladder: {needs: {wood: 4, hardwood: 4, softwood: 4}, price: 600}
+  vaulting pole: {needs: {wood: 5}, price: 300}
+  # Furniture (what can go outside is set under `items`).
+  log stool: {needs: {wood: 3}, price: 360}
+  log bench: {needs: {wood: 4, hardwood: 2}, price: 480}
+  wooden chair: {needs: {wood: 4, softwood: 2}, price: 540}
+  wooden bookshelf: {needs: {wood: 6, hardwood: 4}, price: 900}
+  campfire: {needs: {wood: 3}, price: 180}
+  stone stool: {needs: {stone: 3}, price: 340}
+  stone lion-dog: {needs: {stone: 10}, price: 1200}
+  clay furnace: {needs: {clay: 6, iron nugget: 2}, price: 2100}
+  brick oven: {needs: {clay: 8, stone: 4}, price: 1600}
+  street lamp: {needs: {iron nugget: 4, clay: 2}, price: 1900}
+  iron worktable: {needs: {iron nugget: 5, wood: 4}, price: 2600}
+  iron garden bench: {needs: {iron nugget: 3, hardwood: 4}, price: 1700}
+  fruit basket: {needs: {apple: 6, softwood: 2}, price: 900}
+  shell table: {needs: {giant clam: 2, venus comb: 2, conch: 1}, price: 2400}
+  gold crown: {needs: {gold nugget: 6}, price: 67000}
+  golden candlestick: {needs: {gold nugget: 1, iron nugget: 3}, price: 12000}
+  ironwood dresser: {needs: {iron nugget: 4, hardwood: 8, wood: 4}, price: 3400}
+  # Fences: one craft makes several pieces; each piece fills one tile.
+  simple wooden fence: {needs: {wood: 3}, price: 60, makes: 5}
+  stone fence: {needs: {stone: 3}, price: 75, makes: 5}
+  iron fence: {needs: {iron nugget: 2}, price: 150, makes: 5}
+
+recipes_known_at_start: 3          # each villager starts knowing this many random recipes
+starter_recipes: [ladder, vaulting pole, simple wooden fence]   # everyone knows these from day 0
+
+# What each item is, for the things that matter in space. Anything not listed is a plain
+# item you can carry, sell, give or trade. kind: furniture | fence | seeds | sapling | tool.
+# size is [width, height] in tiles; outdoor: false means it can't be placed outside.
+items:
+  log stool: {kind: furniture}
+  log bench: {kind: furniture, size: [2, 1]}
+  wooden chair: {kind: furniture}
+  wooden bookshelf: {kind: furniture, size: [2, 1]}
+  campfire: {kind: furniture}
+  stone stool: {kind: furniture}
+  stone lion-dog: {kind: furniture}
+  clay furnace: {kind: furniture}
+  brick oven: {kind: furniture, size: [2, 2]}
+  street lamp: {kind: furniture}
+  iron worktable: {kind: furniture, size: [2, 1]}
+  iron garden bench: {kind: furniture, size: [2, 1]}
+  fruit basket: {kind: furniture}
+  shell table: {kind: furniture, size: [2, 1]}
+  gold crown: {kind: furniture}
+  golden candlestick: {kind: furniture}
+  ironwood dresser: {kind: furniture, size: [2, 1]}
+  wooden mini table: {kind: furniture}
+  garden lantern: {kind: furniture}
+  ceiling fan: {kind: furniture, outdoor: false}
+  record player: {kind: furniture}
+  simple wooden fence: {kind: fence}
+  stone fence: {kind: fence}
+  iron fence: {kind: fence}
+  tulip seeds: {kind: seeds, grows: tulips}
+  cosmos seeds: {kind: seeds, grows: cosmos}
+  pansy seeds: {kind: seeds, grows: pansies}
+  hyacinth seeds: {kind: seeds, grows: hyacinths}
+  sapling: {kind: sapling}
+  ladder: {kind: tool}
+  vaulting pole: {kind: tool}
+
+# Mental energy: a daily budget of tokens each villager divides between planning, private
+# thinking and talking. Off here; a scenario turns it on with `mental_energy: {enabled: true}`.
+# One point is about tokens_per_point tokens read or written (characters / 4), including the
+# system prompt. Villagers re-divide what's left when they plan; their last split carries over.
+mental_energy:
+  enabled: false
+  daily: 150                       # points per villager per day (150 x 100 = about 15k tokens)
+  tokens_per_point: 100
+  split: {planning: 0.45, thinking: 0.25, talking: 0.3}   # starting split; per villager under `villagers:`
+  carry_over: 0.0                  # share of unspent energy kept for the next day
+  villagers: {}                    # e.g. {Ari: {planning: 0.3, thinking: 0.1, talking: 0.6}}
+
+building:
+  path_styles: [dirt, stone, brick, sand, terracotta]
+  path_tiles_per_action: 30        # how much road one hour of work lays
+  path_step_cost: 1.0              # ACNH: paths don't change walking speed. Below 1 makes roads faster.
+  flower_bloom_days: 3             # seeds sprout, then bloom after this many days
+  rock_respawn_days: 3             # a broken rock comes back somewhere else after this many days
+  owner_only_pickup: true          # only the villager who placed something can pick it up or remove it
+  max_place_distance: 12           # how far from the named landmark things can be put
+  road_bias: 0.8                   # wandering villagers on or next to a path step onto it this often
+
+# Able Sisters' clothing. These are placeholders: replace them with your own designs.
+# Each entry: price (bells), slot (top, bottom, dress, hat, shoes, accessory), and a short
+# description, which is what villagers see. Clothing can be bought, worn, gifted, traded and
+# sold back at a quarter of its price.
+clothing:
+  straw hat: {price: 800, slot: hat, description: a wide-brimmed straw hat}
+  sundress: {price: 1400, slot: dress, description: a light cotton sundress}
+  denim jacket: {price: 2200, slot: top, description: a faded denim jacket}
+  raincoat: {price: 1600, slot: top, description: a bright yellow raincoat}
+  rose crown: {price: 1200, slot: hat, description: a crown of small roses}
+  bowler hat: {price: 900, slot: hat, description: a black bowler hat}
+  kimono: {price: 4800, slot: dress, description: a patterned kimono}
+  tuxedo: {price: 3200, slot: top, description: a black tuxedo jacket}
+
+shops:
+  cranny:                          # Timmy and Tommy: buy anything at a fixed price, sell a small daily stock
+    name: Nook's Cranny
+    always: {sapling: 640}
+    seeds_daily: 2                 # two kinds of flower seeds each day
+    seeds_pool: {tulip seeds: 240, cosmos seeds: 240, pansy seeds: 240, hyacinth seeds: 240}
+    sells_daily: 3                 # plus three rotating items
+    stock_pool:
+      fishing bait: 300
+      wooden mini table: 1800
+      garden lantern: 2200
+      ceiling fan: 4600
+      record player: 9800
+      simple wooden fence: 100
+      iron fence: 280
+    sells_recipe_daily: true       # one random DIY recipe card per day
+    recipe_price: 2000
+  able:
+    name: Able Sisters
+    sells_daily: 4                 # drawn from `clothing` above
