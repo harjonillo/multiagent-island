@@ -1,4 +1,4 @@
-"""Command line: run, analyze, trace."""
+"""Command line: run, resume, analyze."""
 
 from __future__ import annotations
 
@@ -11,10 +11,10 @@ from pathlib import Path
 
 import yaml
 
-from .analysis import build_viewer, cascade_text, load_run, plot_all, summary
+from .island import IslandSimulation, load_island_scenario
+from .island.analysis import analyze_island
+from .island.sim import RunAborted
 from .llm import LLMError, load_backends
-from .scenario import load_scenario
-from .world import Simulation
 
 
 def load_dotenv(path: Path = Path(".env")) -> None:
@@ -27,33 +27,17 @@ def load_dotenv(path: Path = Path(".env")) -> None:
             os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
 
-def analyze(run_dir: Path) -> None:
-    run_dir = Path(run_dir)
-    if json.loads((run_dir / "manifest.json").read_text()).get("type") == "island":
-        from .island.analysis import analyze_island
-
-        analyze_island(run_dir)
-        return
-    run = load_run(run_dir)
-    text = summary(run)
-    (run.dir / "summary.txt").write_text(text + "\n")
-    print(text)
-    for p in plot_all(run, run.dir):
-        print(f"wrote {p}")
-    print(f"wrote {build_viewer(run, run.dir / 'viewer.html')}")
-
-
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="llmabm", description="LLM agent-based models of information flow")
+    ap = argparse.ArgumentParser(prog="llmabm", description="LLM agent-based model of an island")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     r = sub.add_parser("run", help="run a scenario")
     r.add_argument("scenario", type=Path)
-    r.add_argument("--seed", type=int, default=0, help="controls network, traits, scheduling and the cache key")
-    r.add_argument("--steps", "--days", dest="steps", type=int, help="override the scenario's ticks (or days, for island scenarios)")
+    r.add_argument("--seed", type=int, default=0, help="controls the island, traits, scheduling and the cache key")
+    r.add_argument("--steps", "--days", dest="steps", type=int, help="override the scenario's days")
     r.add_argument("--backend", help="use this backend for every agent (e.g. mock, groq)")
     r.add_argument("--config", type=Path, default=Path("config/models.yaml"))
-    r.add_argument("--concurrency", type=int, default=1, help="parallel LLM calls within a tick")
+    r.add_argument("--concurrency", type=int, default=1, help="parallel LLM calls within an hour")
     r.add_argument("--no-cache", action="store_true")
     r.add_argument("--log-prompts", action="store_true", help="save every full prompt under the run dir")
     r.add_argument("--out", type=Path, default=Path("runs"))
@@ -69,26 +53,18 @@ def main(argv: list[str] | None = None) -> int:
     rs.add_argument("--no-cache", action="store_true")
     rs.add_argument("--no-analyze", action="store_true")
 
-    a = sub.add_parser("analyze", help="summary, plots and viewer for a run")
+    a = sub.add_parser("analyze", help="summary, plots and logs for a run")
     a.add_argument("run_dir", type=Path)
-
-    t = sub.add_parser("trace", help="print the cascade tree from one seed")
-    t.add_argument("run_dir", type=Path)
-    t.add_argument("seed_id")
 
     args = ap.parse_args(argv)
     load_dotenv()
 
     if args.cmd == "run":
-        is_island = (yaml.safe_load(args.scenario.read_text()) or {}).get("type") == "island"
-        if is_island:
-            from .island import IslandSimulation, load_island_scenario
-
-            sc = load_island_scenario(args.scenario, seed=args.seed)
-            models = {a.model for a in sc.villagers.values()}
-        else:
-            sc = load_scenario(args.scenario, seed=args.seed)
-            models = {a.model for a in sc.agents.values()}
+        if (yaml.safe_load(args.scenario.read_text()) or {}).get("type") != "island":
+            print(f"error: {args.scenario} is not an island scenario (missing `type: island`)", file=sys.stderr)
+            return 2
+        sc = load_island_scenario(args.scenario, seed=args.seed)
+        models = {a.model for a in sc.villagers.values()}
         cache = None if args.no_cache else Path(".cache/llm")
         try:
             backends = load_backends(args.config, cache, salt=str(args.seed))
@@ -111,24 +87,15 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: {run_dir} already has a run; use `llmabm resume {run_dir}`", file=sys.stderr)
             return 2
         common = dict(seed=args.seed, backend_override=args.backend, concurrency=args.concurrency, log_prompts=args.log_prompts)
-        if is_island:
-            print(f"{sc.name}: {len(sc.villagers)} villagers, {args.steps or sc.days} days -> {run_dir}")
-            from .island.sim import RunAborted
-
-            try:
-                IslandSimulation(sc, backends, run_dir, **common).run(args.steps)
-            except RunAborted as e:
-                print(f"stopped: {e}", file=sys.stderr)
-                return 3
-        else:
-            print(f"{sc.name}: {len(sc.agents)} agents, {sc.graph.number_of_edges()} edges, "
-                  f"{args.steps or sc.steps} ticks -> {run_dir}")
-            Simulation(sc, backends, run_dir, **common).run(args.steps)
+        print(f"{sc.name}: {len(sc.villagers)} villagers, {args.steps or sc.days} days -> {run_dir}")
+        try:
+            IslandSimulation(sc, backends, run_dir, **common).run(args.steps)
+        except RunAborted as e:
+            print(f"stopped: {e}", file=sys.stderr)
+            return 3
         if not args.no_analyze:
-            analyze(run_dir)
+            analyze_island(run_dir)
     elif args.cmd == "resume":
-        from .island.sim import IslandSimulation, RunAborted
-
         if not (args.run_dir / "checkpoint.pkl").exists():
             print(f"error: no checkpoint in {args.run_dir}", file=sys.stderr)
             return 2
@@ -142,11 +109,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"stopped: {e}", file=sys.stderr)
             return 3
         if not args.no_analyze:
-            analyze(args.run_dir)
+            analyze_island(args.run_dir)
     elif args.cmd == "analyze":
-        analyze(args.run_dir)
-    elif args.cmd == "trace":
-        print(cascade_text(load_run(args.run_dir), args.seed_id))
+        analyze_island(args.run_dir)
     return 0
 
 

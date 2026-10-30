@@ -31,7 +31,6 @@ import yaml
 
 from ..agent import AgentSpec, load_agent_file
 from ..llm import LLMError
-from ..world import EventLog
 from .prompts import (ISABELLE_SYSTEM, arrival_prompt, encounter_prompt, evening_prompt, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
                       isabelle_summary_prompt, plan_prompt, system_prompt)
@@ -39,6 +38,18 @@ from .energy import MentalEnergy
 from .body import Bodies
 from .space import PlaceSpace
 from .world import Island, clock, load_world, location_of, to_game_hour
+
+
+class EventLog:
+    def __init__(self, path: Path, mode: str = "w"):
+        self.f = open(path, mode, encoding="utf-8")
+
+    def __call__(self, type_: str, **data) -> None:
+        self.f.write(json.dumps({"type": type_, **data}, ensure_ascii=False) + "\n")
+        self.f.flush()
+
+    def close(self) -> None:
+        self.f.close()
 
 
 @dataclass
@@ -1017,7 +1028,8 @@ def _pools_delta(before: dict, after: dict) -> dict:
 
 
 def parse_action_obj(text: str):
-    """Pull the first JSON object out of a reply without imposing the network-sim schema."""
+    """Pull the first JSON object out of a reply. Free models are messy, so this tolerates
+    code fences, reasoning blocks and trailing chatter."""
     import re
 
     t = re.sub(r"<think>.*?</think>", "", text or "", flags=re.S | re.I)

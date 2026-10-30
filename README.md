@@ -3,20 +3,17 @@
 Agent-based models where the agents are LLMs. The main model is an island in the style of
 Animal Crossing: New Horizons (ACNH): ten villagers share limited, renewable resources, plan
 their days hour by hour, run into each other, talk, trade, give gifts and change the island.
-The second model is simpler: agents on a network passing information, with every message
-traced back to where it came from.
 
 The Python package is `llm-abm` and the command is `llmabm`.
 
 ## Quick start
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -e .            # or pip install -e ".[dev]" for pytest
+conda env create -f environment.yml     # Python 3.12, the package (editable) and pytest
+conda activate multiagent_island_env
 
 # Offline, no keys. The mock backend gives random but valid replies.
 llmabm run scenarios/island_baseline.yaml --backend mock --days 3
-llmabm run scenarios/class_suspension.yaml --backend mock --seed 0
 
 # Real models. Put the key in .env first, e.g. GROQ_API_KEY=...
 llmabm run scenarios/island_goals.yaml --backend groq --seed 0
@@ -27,7 +24,6 @@ llmabm run scenarios/island_goals.yaml --backend groq --seed 0
 | `llmabm run <scenario>` | run a scenario. `--seed`, `--days` (or `--steps`), `--backend`, `--concurrency N`, `--no-cache`, `--log-prompts`, `--run-dir`, `--no-analyze` |
 | `llmabm resume <run_dir>` | continue an island run from its last checkpoint. `--days`, `--backend` |
 | `llmabm analyze <run_dir>` | rebuild the summary, plots and logs, for example after you edit the analysis code |
-| `llmabm trace <run_dir> <seed_id>` | print the cascade tree for one seed (network model only) |
 
 Runs are written to `runs/<timestamp>_<scenario>_s<seed>/`.
 
@@ -491,67 +487,6 @@ runs it every morning:
 The script also mentions a GitHub Actions workflow (`.github/workflows/island-daily.yml`),
 which isn't in this repo yet.
 
-## Information-flow networks
-
-An agent's "rules" are its persona prompt, the documents it carries, a few numeric traits,
-and a short private memory. Agents sit on a network, exchange messages in discrete ticks, and
-every message records which earlier messages it was based on, so you can trace where
-information came from and how it changed on the way. `scenarios/class_suspension.yaml` is the
-example.
-
-**Agent = markdown file.** YAML frontmatter holds parameters, the body is the persona.
-`$name` and `$<trait>` in the body are filled in at load time.
-
-```markdown
----
-attention: 5        # messages read per tick; the rest are dropped (logged)
-memory_size: 10     # private notes kept, oldest dropped first
-activation: 0.05    # chance of acting with an empty inbox
-model: groq         # backend name from config/models.yaml
-placement: hub      # optional: take one of the best-connected nodes
-docs: [docs/verification-checklist.md]
-traits: {skepticism: 0.5}
----
-You are $name. Your skepticism is $skepticism ...
-```
-
-**Populations.** A scenario can instantiate a template many times and sample traits per
-instance (`{uniform: [0, 1]}`, `{normal: [mu, sd]}`, or a list to choose from). This is where
-the ABM-style heterogeneity lives.
-
-**Networks.** `watts_strogatz`, `barabasi_albert`, `erdos_renyi`, `complete`, or `explicit`
-with an `edges` list.
-
-**Tick protocol.** Updates are synchronous. At tick t an agent sees what was delivered by the
-end of t-1 plus any seeds injected at t, along with its contacts, current beliefs and notes.
-It replies with JSON: updated beliefs, an optional private note, and messages to contacts with
-`based_on` ids. Messages sent at t are read at t+1. Agents can only message their network
-neighbors.
-
-**Seeds** are exogenous information injected at a tick to chosen agents. They are the roots of
-provenance.
-
-**Probes** are private survey questions asked to every agent at chosen ticks with a fixed
-answer set. They do not enter memory or messages, so they work as a measurement of belief
-state, something like an order parameter.
-
-**Provenance.** A message's origin is the set of seeds reachable by following `based_on`
-links. Exposure means an agent has read something descended from a seed. Drift is text
-similarity (difflib ratio) between a message and its seed, by hop count.
-
-**Outputs.**
-
-| file | what it is |
-|---|---|
-| `events.jsonl` | every seed, turn (raw LLM reply included), message, drop and probe answer |
-| `manifest.json` | the exact agents, traits, network and scenario used, for reproducibility |
-| `summary.txt` | reach, drift by hop, probe answers over time, error counts |
-| `reach.png`, `drift.png`, `probes.png` | the same, as plots |
-| `viewer.html` | step through ticks: who knows what, which messages moved, what each agent believed |
-
-Cost per run is roughly (agents acting per tick) x ticks, plus agents x probe ticks. The
-example is 16 agents and 12 ticks, on the order of 100 to 250 calls.
-
 ## Models, free tiers and caching
 
 All backends use the OpenAI chat-completions format, so any compatible provider works by
@@ -574,7 +509,7 @@ cap, split it across days: the cache means a rerun with the same seed replays th
 part for free.
 
 `rpm` in the config spaces requests to stay under a rate limit, and 429s are retried with
-backoff. `--concurrency N` runs calls within a tick or hour in parallel. Responses are cached
+backoff. `--concurrency N` runs calls within an hour in parallel. Responses are cached
 in `.cache/llm/`, keyed on the prompt and the run seed. Re-running the same seed replays for
 free; a new seed resamples. Use `--no-cache` to force fresh calls. `--log-prompts` saves
 every full prompt, which is the fastest way to see what an agent actually saw.
@@ -591,31 +526,24 @@ reading anything into a run.
 - Outputs depend on prompt wording as much as on traits. Treat prompt variants as
   experimental conditions and run several seeds per condition.
 - Names and labels cue behaviour. ACNH villager names and species cue the model's memory of
-  those characters; a seed's `source` (for example "official advisory") cues trust.
+  those characters.
 - Prices, yields and species tables are from memory of ACNH and approximate. Lines marked
   ASSUMPTION in `data/island_world.yaml` and `docs/grid_spec.md` are the ones to check.
-- In the network model, `based_on` is self-reported. It can omit a source the model actually
-  used or cite one it did not. Ids the agent never saw are dropped and counted as
-  `unverifiable based_on ids`.
 
 ## Layout
 
 ```
-agents/                 network-model personas; agents/templates/ for population templates
-docs/                   documents agents carry, the grid spec and island images
-scenarios/              network and island scenarios
+docs/                   the grid spec and island images
+scenarios/              island scenarios
 villagers/              island villager templates and casts
 data/island_world.yaml  island rules: calendar, weather, resources, species, recipes, shops, houses
 config/models.yaml      LLM backends (all OpenAI-compatible)
 scripts/daily.sh        start or resume an island run by one day
 src/llmabm/
-  cli.py                run, resume, analyze, trace
-  agent.py              file format, prompt construction, reply parsing
-  scenario.py           loading, trait sampling, network generation, placement
-  world.py              the network tick loop and event log
+  cli.py                run, resume, analyze
+  agent.py              villager file format (frontmatter + persona)
   llm.py                backends, rate limiting, retries, disk cache, mock
-  analysis.py           provenance, exposure, drift, probes, plots, viewer data
-  viewer_template.html
+  analysis.py           loading a run back from disk
   island/
     world.py            island state and the rules for every action
     sim.py              the day loop: plans, hours, encounters, visits, plaza, Isabelle, checkpoints
@@ -638,10 +566,6 @@ tests/
 - New island rule: an action is a `_do_<name>` method on `Island` in `island/world.py`, plus
   a line in `ACTION_MENU` in `island/prompts.py`. If it happens somewhere specific, teach
   `GridSpace.resolve` where.
-- New network scenario: copy `scenarios/class_suspension.yaml`, swap agents, seeds and probes.
-- New network: add a case in `scenario._build_graph`, or use `type: explicit` with an `edges`
-  list.
 - New measurement: everything is in `events.jsonl`; `analysis.load_run` gives you the events
   and manifest to work from.
-- Not built yet: directed networks, agents joining or leaving mid-run, broadcast channels, and
-  agents rewriting their own docs.
+- Not built yet: villagers joining or leaving mid-run, and villagers rewriting their own docs.

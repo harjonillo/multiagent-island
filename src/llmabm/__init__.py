@@ -1,8 +1,7 @@
-"""LLM agent-based models: agents are prompts and documents on a network."""
+"""LLM agent-based models: villagers on an island, each one an LLM prompt."""
 
-from .agent import AgentSpec, Message
+from .agent import AgentSpec
 from .analysis import load_run
-from .scenario import load_scenario
-from .world import Simulation
+from .island import IslandSimulation, load_island_scenario
 
-__all__ = ["AgentSpec", "Message", "Simulation", "load_run", "load_scenario"]
+__all__ = ["AgentSpec", "IslandSimulation", "load_island_scenario", "load_run"]

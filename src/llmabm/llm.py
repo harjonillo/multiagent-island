@@ -11,7 +11,6 @@ import hashlib
 import json
 import os
 import random
-import re
 import threading
 import time
 import urllib.error
@@ -122,55 +121,22 @@ class OpenAICompatible:
 
 
 class MockBackend:
-    """Offline stand-in. Reads the tick prompt, forwards a received message to a
-    random contact or two with small word-level mutations, and answers probes at
-    random from the allowed options. Deterministic given the prompt."""
+    """Offline stand-in. Routes each island prompt by its PHASE line to a canned but
+    valid random reply. Deterministic given the prompt."""
 
     name = "mock"
     model_id = "mock"
-    _INBOX = re.compile(r"^\[([\w:.-]+)\] from [^:]+: (.*)$", re.M)
-    _HEDGES = ["reportedly", "apparently", "I heard", "maybe", "confirmed:"]
 
     def complete(self, messages: list[dict], temperature: float = 0.7, max_tokens: int = 600) -> Completion:
+        from .island import mock as island_mock
+
         prompt = messages[-1]["content"]
         rng = random.Random(hashlib.sha256(prompt.encode()).hexdigest())
-
-        if prompt.startswith("PHASE: "):  # island villager prompts
-            from .island import mock as island_mock
-
-            routes = {"PHASE: plan": island_mock.plan_reply, "PHASE: arrival": island_mock.arrival_reply,
-                      "PHASE: isabelle": island_mock.isabelle_reply, "PHASE: encounter": island_mock.encounter_reply,
-                      "PHASE: notice": island_mock.notice_reply, "PHASE: reflect": island_mock.reflect_reply}
-            fn = next((f for k, f in routes.items() if prompt.startswith(k)), island_mock.evening_reply)
-            return Completion(fn(prompt, rng))
-
-        if "PROBE" in prompt:
-            m = re.search(r"Answer with one of: (.+?)\.", prompt)
-            options = [o.strip() for o in m.group(1).split(",")] if m else ["unsure"]
-            has_beliefs = "Your current beliefs: (none yet)" not in prompt
-            return Completion(rng.choice(options) if has_beliefs else options[-1])
-
-        contacts_m = re.search(r"^Your contacts: (.*)$", prompt, re.M)
-        contacts = [c.strip() for c in contacts_m.group(1).split(",")] if contacts_m else []
-        inbox = self._INBOX.findall(prompt)
-        if not inbox or not contacts:
-            return Completion(json.dumps({"beliefs": "", "note": "", "messages": []}))
-
-        mid, content = rng.choice(inbox)
-        words = content.split()
-        if len(words) > 4 and rng.random() < 0.5:
-            words.pop(rng.randrange(len(words)))
-        if rng.random() < 0.4:
-            words.insert(0, rng.choice(self._HEDGES))
-        out = " ".join(words)
-        k = rng.choice([0, 1, 1, 2])
-        targets = rng.sample(contacts, min(k, len(contacts)))
-        action = {
-            "beliefs": f"Heard that {content[:140]}",
-            "note": f"{mid} seemed worth remembering" if rng.random() < 0.3 else "",
-            "messages": [{"to": t, "content": out, "based_on": [mid]} for t in targets],
-        }
-        return Completion(json.dumps(action))
+        routes = {"PHASE: plan": island_mock.plan_reply, "PHASE: arrival": island_mock.arrival_reply,
+                  "PHASE: isabelle": island_mock.isabelle_reply, "PHASE: encounter": island_mock.encounter_reply,
+                  "PHASE: notice": island_mock.notice_reply, "PHASE: reflect": island_mock.reflect_reply}
+        fn = next((f for k, f in routes.items() if prompt.startswith(k)), island_mock.evening_reply)
+        return Completion(fn(prompt, rng))
 
 
 class Cached:

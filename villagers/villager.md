@@ -1,5 +1,4 @@
 ---
-attention: 10
 traits:
   species: villager
   personality: normal
