@@ -390,9 +390,20 @@ class IslandSimulation:
         return self.run_dir
 
     def _run_days(self, days: int) -> None:
+        self._t0 = time.monotonic()
         for _ in range(days):
             self._day()
             self._checkpoint()
+
+    def _progress(self, what: str, quiet_ok: bool = False) -> None:
+        """One line of progress: island day and clock, what just happened, calls, tokens, time taken.
+        With quiet_ok, nothing is printed if no call was made since the last line."""
+        if not self.verbose or (quiet_ok and self.calls == getattr(self, "_last_calls", None)):
+            return
+        self._last_calls = self.calls
+        secs = int(time.monotonic() - getattr(self, "_t0", time.monotonic()))
+        print(f"  day {self.isl.day} {clock(self.hour)}  {what:<18} calls {self.calls:>4}  "
+              f"tokens {self.provider_tokens:>9,}  {secs // 60:>3}m{secs % 60:02d}s", flush=True)
 
     def _day(self) -> None:
         isl, log = self.isl, self.log
@@ -418,6 +429,8 @@ class IslandSimulation:
             ordinance=isl.ordinance, news=isl.yesterday_news, announcement=isl.announcement,
             month=isl.month, season=isl.season, weather=isl.weather, date=isl.date_text(),
             awake={n: list(isl.awake_window(n)) for n in isl.v})
+        if self.verbose:
+            print(f"day {d} ({isl.date_text()})", flush=True)
         if d == 0:
             self._settle_all(d)
         self._deliver_mail(d)
@@ -425,9 +438,11 @@ class IslandSimulation:
             self.hour = a
             self.window_end = b
             self._plan(d, i, a, b)
+            self._progress("plans made")
             for h in range(a, b):
                 self.hour = h
                 self._run_hour(d, h)
+                self._progress("hour over", quiet_ok=True)
         for n, vil in isl.v.items():
             self.yesterday[n] = list(vil.today)
             vil.notes = vil.notes[-self.sc.memory_size:]
@@ -436,9 +451,11 @@ class IslandSimulation:
         snap["objects"] = self.space.objects_snapshot(isl)
         log("snapshot", **snap)
         self._reflect(d)
+        self._progress("nightly pages")
         log("energy", day=d, enabled=self.energy.enabled, villagers=self.energy.day_record(),
             provider_tokens=self.provider_tokens, reasoning_tokens=self.reasoning_tokens)
         self._isabelle(d)
+        self._progress("Isabelle's report")
         if self.verbose:
             trades = sum(1 for o in self.offers.values() if o.day == d and o.status == "accepted")
             print(f"day {d:>3}: museum {sum(len(m) for m in isl.museum.values())}, "

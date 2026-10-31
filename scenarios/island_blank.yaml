@@ -27,6 +27,7 @@ reflection:
 mental_energy:
   enabled: true
   daily: 150
+  charge_reasoning: false   # true: a reasoning model's hidden thinking also costs energy (it is recorded either way)
 
 isabelle:
   summary: true
@@ -40,4 +41,4 @@ brief: ""
 
 llm:
   temperature: 0.8
-  max_tokens: 700
+  max_tokens: 1200
