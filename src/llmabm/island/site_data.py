@@ -19,7 +19,7 @@ from .analysis import (RESOURCES, _side, action_mix, extraction_shares, gini, hh
                        reply_errors, run_out, snapshots)
 from .world import CATEGORIES, clock
 
-VERSION = 2  # 2: per-day detail for the Days tab
+VERSION = 3  # 2: per-day detail for the Days tab; 3: interactions for the Social tab
 
 # Why actions failed, matched on the result text; the first match wins.
 FAIL_BUCKETS = [
@@ -282,6 +282,53 @@ def day_detail(run: Run) -> list[dict]:
     return out
 
 
+def social_data(run: Run) -> list[dict]:
+    """Every interaction between two villagers, oldest first, for the Social tab.
+
+    kinds: chat (a chance meeting; `a` approached `b`), visit (`a` knocked at `b`'s door; an answered
+    visit carries the conversation that followed, so it counts once), letter, parcel, gift (in person;
+    mailed gifts are the parcels), offer (`a` offered `b`), trade (`a` sold to `b`). Dialogue only:
+    private thoughts stay on the Days tab."""
+    names = set(run.manifest["villagers"])
+    done = {snap["day"] for snap in snapshots(run)}  # a day still under way is left out, as on the Days tab
+    final = {e["id"]: e for e in run.of("offer_update")}
+    visit_talk = {(e["day"], e["hour"], *e["villagers"]): e for e in run.of("encounter") if e.get("visit")}
+    lines = lambda e: [[t["speaker"], t.get("text") or "", t.get("act") or ""] for t in e["turns"]  # noqa: E731
+                       if t.get("text") or t.get("act")]
+    out = []
+    for e in run.events:
+        t, item = e["type"], None
+        if t == "encounter" and not e.get("visit"):
+            a, b = e["villagers"]
+            item = {"k": "chat", "a": a, "b": b, "where": e.get("location") or "", "lines": lines(e)}
+        elif t == "visit":
+            talk = visit_talk.get((e["day"], e["hour"], e["guest"], e["host"]))
+            inside = ", ".join(e.get("interior") or []) or "no furniture yet"
+            item = {"k": "visit", "a": e["guest"], "b": e["host"],
+                    "text": f"let in; inside: {inside}" if e["answered"] else "nobody answered",
+                    "lines": lines(talk) if talk else []}
+        elif t == "message":
+            item = {"k": "letter", "a": e["sender"], "b": e["recipient"], "text": e["content"]}
+        elif t == "parcel":
+            item = {"k": "parcel", "a": e["sender"], "b": e["recipient"],
+                    "text": _side(e["items"]) + (f': "{e["note"]}"' if e.get("note") else "")}
+        elif t == "gift" and e.get("how") == "in person":
+            item = {"k": "gift", "a": e["giver"], "b": e["receiver"],
+                    "text": _side(e["items"]) + ("" if e["ok"] else f" (failed: {e['result']})")}
+        elif t == "offer":
+            fin = final.get(e["id"])
+            item = {"k": "offer", "a": e["sender"], "b": e["recipient"],
+                    "text": _offer_text(e) + (f" · {fin['status']}" + (f": {fin['reason']}" if fin.get("reason") else "")
+                                              if fin else " · still open")}
+        elif t == "trade":
+            item = {"k": "trade", "a": e["seller"], "b": e["buyer"],
+                    "text": f"{_side(e['give'])} for {_side(e['want'])} (Cranny value {e.get('give_cranny_value', '?'):,} "
+                            f"for {e.get('want_cranny_value', '?'):,})"}
+        if item and e.get("day") in done and item["a"] in names and item["b"] in names and item["a"] != item["b"]:
+            out.append({"d": e["day"], "h": e["hour"], **item})
+    return out
+
+
 def build(run_dir: Path) -> dict:
     run = load_run(run_dir)
     m, snaps = run.manifest, snapshots(run)
@@ -298,6 +345,7 @@ def build(run_dir: Path) -> dict:
         "days": days_data(run),
         "home": home_data(run),
         "daylog": day_detail(run),
+        "social": social_data(run),
         "bridge_cost": m["world"]["bridge"]["cost"],
     }
 

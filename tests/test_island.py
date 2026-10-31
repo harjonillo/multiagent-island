@@ -931,6 +931,15 @@ def test_site_data_and_page_for_a_mock_run():
             assert set(x["pages"]) == set(names) and len(x["pools"]) == len(x["hours"]) + 1
             assert x["pools"][0]["rocks"] == sum(next(e for e in run.of("day_start") if e["day"] == x["day"])["pools"]["rocks"])
         assert sum(x["counts"]["board"] for x in L) == len(run.of("board"))
+        # Social: an answered visit and the talk that follows count once; no private thoughts.
+        S = data["social"]
+        kinds = Counter(x["k"] for x in S)
+        assert kinds["chat"] == sum(1 for e in run.of("encounter") if not e.get("visit"))
+        assert kinds["visit"] == len(run.of("visit")) and kinds["letter"] == len(run.of("message"))
+        assert kinds["gift"] == sum(1 for e in run.of("gift") if e["how"] == "in person")
+        assert kinds["offer"] == len(run.of("offer")) and kinds["trade"] == len(run.of("trade"))
+        assert all(x["a"] != x["b"] and x["a"] in names and x["b"] in names for x in S)
+        assert "thoughts" not in json.dumps(S)
         page = build_site(run_dir).read_text()
         assert "__DATA__" not in page and "__TITLE__" not in page
         blob = page.split('<script id="site-data" type="application/json">', 1)[1].split("</script>", 1)[0]

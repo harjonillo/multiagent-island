@@ -68,7 +68,6 @@ h1 { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 
 .cell details summary { cursor: pointer; list-style: none; } .cell details summary::-webkit-details-marker { display: none; }
 .cell details[open] summary { margin-bottom: 6px; }
 .commons { display: grid; grid-template-columns: 70px 44px minmax(0, 1fr); gap: 10px; font-size: 13px; padding: 5px 0; border-top: 1px solid var(--fill-soft); }
-.soon { margin: 20px 28px; }
 .legend { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-muted); }
 .legend .grp { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; align-items: baseline; }
 .legend .grp > b { font-family: var(--font-display); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
@@ -117,6 +116,29 @@ h1 { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 
 .empty { font-size: 14px; color: var(--ink-muted); }
 .talkgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
 .talkgrid .card { padding: 14px 16px; }
+/* Social */
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding: 10px 28px 14px; }
+.chip .n { color: var(--ink-muted); font-size: 12px; }
+.filters select { font: inherit; font-size: 14px; min-height: 44px; padding: 0 10px; border: 1px solid var(--border); background: var(--panel); color: var(--ink); }
+.net { position: relative; width: 100%; max-width: 600px; aspect-ratio: 1; margin: 0 auto; }
+.net svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.net svg .hit { stroke: transparent; stroke-width: 18; cursor: pointer; }
+.net .node { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; background: var(--panel); color: var(--ink); border: 2px solid var(--outline); z-index: 2; padding: 0; }
+.net .node.on { background: var(--ink); color: var(--on-ink); border-color: var(--selected-border); }
+.net .node b { font-size: 14px; } .net .node span { font-size: 11px; opacity: 0.8; }
+.net .badge { position: absolute; transform: translate(-50%, -50%); background: var(--ink); color: var(--on-ink); font-size: 12px; padding: 2px 7px; z-index: 1; pointer-events: none; }
+.ptitle { font-family: var(--font-display); font-size: 20px; }
+.plain { font-size: 13px; min-height: 44px; padding: 0 12px; border: 1px solid var(--border); background: var(--panel); }
+.item { padding: 10px 0; border-top: 1px solid var(--fill-soft); }
+.item .top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--ink-muted); }
+.item .dot { width: 8px; height: 8px; border-radius: 4px; display: inline-block; margin-right: 6px; }
+.item .ln { font-size: 14px; margin-top: 4px; line-height: 1.45; }
+.pair { width: 100%; min-height: 36px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 28px; gap: 10px; align-items: center;
+  padding: 4px 8px; border: none; background: none; text-align: left; font-size: 13px; }
+.pair.on { background: var(--fill-soft); }
+.pair .pbar { height: 8px; background: var(--fill-soft); } .pair.on .pbar { background: var(--panel); }
+.pair .pbar span { display: block; height: 8px; background: var(--ink-muted); }
 .talkgrid .said { font-size: 14px; margin-bottom: 4px; line-height: 1.4; }
 @media (max-width: 1000px) { .trends { grid-template-columns: minmax(0, 1fr); } }
 </style>
@@ -429,8 +451,123 @@ function days() {
   </section>`;
 }
 
-function soon(name) {
-  return `<section class="head"><h1>${name}</h1><div class="sub">Coming next.</div></section>`;
+// --- Social ------------------------------------------------------------------------
+const MODES = [  // kind of contact: the colours are the activity colours in tokens.css
+  ["meet", "Chance meetings", ["chat"], "#E58BB0"],
+  ["visit", "Visits (knocking on a door)", ["visit"], "#E9B949"],
+  ["mail", "Letters and parcels", ["letter", "parcel"], "#6C9BD2"],
+  ["gift", "Gifts in person", ["gift"], "#5DB08F"],
+  ["trade", "Offers and trades", ["offer", "trade"], "#F08C5A"],
+];
+const KIND = {chat: "chance meeting", visit: "visit", letter: "letter", parcel: "parcel", gift: "gift in person", offer: "trade offer", trade: "trade done"};
+const MODE_OF = {}, KCOL = {};
+MODES.forEach(([m, , ks, c]) => ks.forEach((k) => { MODE_OF[k] = m; KCOL[k] = c; }));
+const pairKey = (a, b) => [a, b].sort().join("|");
+
+function socialState() {
+  const q = new URLSearchParams(location.hash.slice(1).split("/").slice(1).join("/"));
+  const all = D.daylog.map((L) => L.day), lo0 = all[0], hi0 = all[all.length - 1];
+  const num = (k, dflt) => (q.has(k) && all.includes(Number(q.get(k))) ? Number(q.get(k)) : dflt);
+  const modes = q.has("k") ? q.get("k").split(",").filter((m) => MODES.some((x) => x[0] === m)) : MODES.map((m) => m[0]);
+  const node = D.run.villagers.includes(q.get("node")) ? q.get("node") : null;
+  return {modes, from: num("from", lo0), to: num("to", hi0), pair: q.get("pair") || null, node};
+}
+function socialHref(st) {
+  const q = new URLSearchParams();
+  q.set("k", st.modes.join(",")); q.set("from", st.from); q.set("to", st.to);
+  if (st.pair) q.set("pair", st.pair);
+  if (st.node) q.set("node", st.node);
+  return "#social/" + q.toString();
+}
+
+function itemHTML(it) {
+  const who = it.k === "chat" ? `${esc(it.a)} approached ${esc(it.b)}${it.where ? " at the " + esc(it.where) : ""}`
+    : it.k === "visit" ? `${esc(it.a)} knocked at ${esc(it.b)}'s door` : `${esc(it.a)} → ${esc(it.b)}`;
+  const lines = (it.lines || []).map(([w, t, act]) => `<div class="ln"><b>${esc(w)}:</b> ${t ? `“${text(t)}”` : ""}${act ? ` <span class="act">${esc(act)}</span>` : ""}</div>`).join("");
+  const body = it.k === "chat" ? (lines || '<div class="ln small">They just waved.</div>') : `<div class="ln">${text(it.text)}</div>${lines}`;
+  return `<div class="item"><div class="top"><span><span class="dot" style="background:${KCOL[it.k]}"></span>${KIND[it.k]} · ${who}</span><span>day ${it.d} · ${hh(it.h)}:00</span></div>${body}</div>`;
+}
+
+function social() {
+  const st = socialState(), names = D.run.villagers;
+  const lo = Math.min(st.from, st.to), hi = Math.max(st.from, st.to);
+  const inRange = D.social.filter((x) => x.d >= lo && x.d <= hi);
+  const rows = inRange.filter((x) => st.modes.includes(MODE_OF[x.k]));
+  const W = {}, tot = Object.fromEntries(names.map((n) => [n, 0]));
+  rows.forEach((x) => { const k = pairKey(x.a, x.b); W[k] = (W[k] || 0) + 1; tot[x.a]++; tot[x.b]++; });
+  const ranked = Object.keys(W).sort((a, b) => W[b] - W[a] || (a < b ? -1 : 1));
+  const pair = st.pair && W[st.pair] ? st.pair : st.node ? null : ranked[0] || null;  // default: the busiest pair
+  const node = st.node;
+  const go = (patch) => socialHref({...st, pair, ...patch});
+
+  const chips = MODES.map(([m, label, , c]) => {
+    const on = st.modes.includes(m), n = inRange.filter((x) => MODE_OF[x.k] === m).length;
+    const next = on ? st.modes.filter((x) => x !== m) : st.modes.concat([m]);
+    return `<button class="chip" aria-pressed="${on}" data-go="${go({modes: next})}"><span class="box" style="${on ? `background:${c};border-color:${c}` : ""}">${on ? CHECK : ""}</span>${label}<span class="n">${fmt(n)}</span></button>`;
+  }).join("");
+  const opts = (v) => D.daylog.map((L) => { const i = D.days.find((x) => x.day === L.day) || {}; return `<option value="${L.day}"${L.day === v ? " selected" : ""}>Day ${L.day} · ${esc(i.date || "")}</option>`; }).join("");
+
+  // The network: names on a circle, edges by number of interactions.
+  const C = 300, RAD = 230, pos = {};
+  names.forEach((n, i) => { const a = -Math.PI / 2 + i * 2 * Math.PI / names.length; pos[n] = [C + RAD * Math.cos(a), C + RAD * Math.sin(a)]; });
+  const maxW = Math.max(1, ...Object.values(W)), maxT = Math.max(1, ...Object.values(tot));
+  const edges = Object.keys(W).sort((a, b) => W[a] - W[b] || (a === pair) - (b === pair)).map((k) => {
+    const [a, b] = k.split("|"), [x1, y1] = pos[a], [x2, y2] = pos[b];
+    const sel = k === pair && !node, dim = node && a !== node && b !== node;
+    const th = 2 + (W[k] - 1) / Math.max(1, maxW - 1) * 8;
+    return `<g data-go="${go({pair: k, node: null})}"><title>${esc(a)} and ${esc(b)}: ${plural(W[k], "interaction")}</title>
+      <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${sel ? "#3B2F2A" : "#B59A82"}" stroke-width="${th.toFixed(1)}" opacity="${dim ? 0.15 : sel ? 1 : 0.75}"/>
+      <line class="hit" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/></g>`;
+  }).join("");
+  const P = (v) => (v / 600 * 100).toFixed(2) + "%";
+  const inPair = pair && !node ? pair.split("|") : [];
+  const nodes = names.map((n) => {
+    const d = 48 + tot[n] / maxT * 26, on = node === n || inPair.includes(n);
+    return `<button class="node${on ? " on" : ""}" style="left:${P(pos[n][0])};top:${P(pos[n][1])};width:${d.toFixed(0)}px;height:${d.toFixed(0)}px" data-go="${go({node: n})}" aria-label="${esc(n)}, ${plural(tot[n], "interaction")}. Show only ${esc(n)}'s links"><b>${esc(n)}</b><span>${fmt(tot[n])}</span></button>`;
+  }).join("");
+  const badge = pair && !node ? (() => { const [a, b] = pair.split("|"); return `<div class="badge" style="left:${P((pos[a][0] + pos[b][0]) / 2)};top:${P((pos[a][1] + pos[b][1]) / 2)}">${W[pair]}</div>`; })() : "";
+
+  // The side panel: one pair, or everything one villager did with anyone.
+  const range = lo === hi ? `day ${lo}` : `days ${lo} to ${hi}`;
+  let title, items;
+  if (node) { title = esc(node); items = rows.filter((x) => x.a === node || x.b === node); }
+  else if (pair) { const [a, b] = pair.split("|"); title = `${esc(a)} and ${esc(b)}`; items = rows.filter((x) => pairKey(x.a, x.b) === pair); }
+  else { title = "Nobody"; items = []; }
+  const pairsRows = ranked.map((k) => `<button class="pair${k === pair && !node ? " on" : ""}" data-go="${go({pair: k, node: null})}"><span>${k.split("|").map(esc).join(" – ")}</span><span class="pbar"><span style="width:${(W[k] / maxW * 100).toFixed(1)}%"></span></span><span class="num">${W[k]}</span></button>`);
+
+  return `
+  <section class="head"><h1>Who deals with whom</h1>
+    <div class="sub">Line thickness is the number of interactions between two villagers. Click a line, or a pair in the list, to read everything between them.</div></section>
+  <section class="filters">
+    <div class="chips"><span class="small" style="margin-right:4px">Kind of contact</span>${chips}</div>
+    <div style="display:flex; align-items:center; gap:8px; font-size:13px">
+      <label for="from-day" class="small">From</label><select id="from-day">${opts(st.from)}</select>
+      <label for="to-day" class="small">to</label><select id="to-day">${opts(st.to)}</select></div>
+  </section>
+  <main class="cols" style="padding-top:0">
+    <div class="col" style="flex: 1 1 560px">
+      <div class="card">
+        <div class="net"><svg viewBox="0 0 600 600" aria-hidden="true">${edges}</svg>${badge}${nodes}</div>
+        <div class="small" style="text-align:center; margin-top:6px">Number under each name: that villager's interactions in the current filter. Click a name to show only their links.</div>
+      </div>
+    </div>
+    <aside class="col" style="flex: 1 1 420px">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap">
+          <div class="ptitle">${title}</div>${node ? `<button class="plain" data-go="${go({node: null})}">Clear</button>` : ""}</div>
+        <div class="small" style="font-size:13px; margin-top:4px">${plural(items.length, "interaction")}, ${range}</div>
+        ${items.length ? `<div style="margin-top:10px">${capped(items.map(itemHTML))}</div>` : `<div class="empty" style="margin-top:14px">${rows.length ? "Nothing between them with the current filters." : "No interactions with the current filters."}</div>`}
+      </div>
+      <div class="card"><div class="label" style="margin-bottom:8px">Pairs, most contact first</div>
+        ${pairsRows.length ? capped(pairsRows) : '<div class="empty">None.</div>'}</div>
+    </aside>
+  </main>`;
+}
+function onSocialSelect(e) {
+  if (!e.target.matches("#from-day, #to-day")) return;
+  const st = socialState();
+  st[e.target.id === "from-day" ? "from" : "to"] = Number(e.target.value);
+  location.hash = socialHref(st);
 }
 
 // --- routing -----------------------------------------------------------------------
@@ -438,12 +575,13 @@ let shownTab = null;
 function show() {
   const tab = (location.hash.slice(1).split("/")[0] || "home");
   document.querySelectorAll(".tabs button").forEach((b) => { if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
-  $("#view").innerHTML = tab === "days" ? days() : tab === "social" ? soon("Who deals with whom") : home();
+  $("#view").innerHTML = tab === "days" ? days() : tab === "social" ? social() : home();
   if (tab !== shownTab) window.scrollTo(0, 0);
   shownTab = tab;
 }
 // Buttons that change the view carry the link they lead to.
 $("#view").addEventListener("click", (e) => { const b = e.target.closest("[data-go]"); if (b) location.hash = b.dataset.go; });
+$("#view").addEventListener("change", onSocialSelect);
 document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => { location.hash = b.dataset.tab; }));
 $("#runline").textContent = `${D.run.scenario} · seed ${D.run.seed} · ${D.run.model}`;
 window.addEventListener("hashchange", show);
