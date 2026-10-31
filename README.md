@@ -34,14 +34,15 @@ reasoning kept low), which has a free tier.
    ```
 4. Keep going later with `llmabm resume runs/test1 --days 1`.
 
-Always pass `--days` for a test: the scenarios default to 30. Two days is about 140 to 160 calls
-and 150k to 200k tokens. Groq's free tier allows 8,000 tokens a minute and 200,000 a day per
-model, so two days is about the most one run can do in a day, and each island day takes 10 to
-15 minutes because the backend paces itself to stay under the per-minute cap (`rpm` and `tpm`
-in `config/models.yaml`). The progress line after each day shows the tokens the provider
-reported so far. If a run stops on a rate or daily limit, rerun the same command with the same
-seed (or `llmabm resume` it the next day): cached replies replay the finished part for free. Small models sometimes return broken JSON; check the
-error count in `summary.txt` before reading much into a run. `--log-prompts` saves exactly what
+Always pass `--days` for a test: the scenarios default to 30. An island day for 10 villagers is
+about 65 to 70 calls and 100k tokens, and later days cost more. Groq's free tier allows 8,000
+tokens a minute and 200,000 a day per model, so two island days is about the most one run can do
+in a real day (the second may need finishing tomorrow), and each island day takes 10 to 15
+minutes because the backend paces itself to stay under the per-minute cap (`rpm` and `tpm` in
+`config/models.yaml`). The progress lines show the calls and tokens so far. If a run stops on a
+rate or daily limit, rerun the same command with the same seed (or `llmabm resume` it the next
+day): cached replies replay the finished part for free. Small models sometimes return broken
+JSON; check the error count in `summary.txt` before reading much into a run. `--log-prompts` saves exactly what
 each villager saw, which is worth having on a first run.
 
 Other providers (Gemini, Cerebras, Mistral, NVIDIA, OpenRouter, or a local model through Ollama
@@ -83,6 +84,11 @@ Runs are written to `runs/<timestamp>_<scenario>_s<seed>/`.
   the body is there.
 - **Space** (`space.py`, `grid.py`): where things are and how far apart they are. `GridSpace`
   is the tile island; `Space` is the interface bodies rely on.
+
+The split keeps the LLM's tokens for decisions: anything that is bookkeeping (routes, distances,
+who arrives first, what a rock gives, whether a shop is open) is done in code and never written
+into a prompt. Why it is built this way, with measurements, is in
+[docs/token_design.md](docs/token_design.md).
 
 ### A day on the island
 
@@ -281,7 +287,8 @@ adds:
   furniture and open requests
 - the recipes they know and the Cranny prices they have seen (they learn prices by selling)
 - the museum, the bridge fund and today's shop stock
-- their private notes (the last 15), yesterday's actions and today's so far
+- what they remember and their notes from the last 2 days (see [Long-term memory](#long-term-memory)),
+  yesterday's actions and today's so far
 - what they noticed today: neighbors heading out, someone who knocked while they were out
 - unread letters, what they spotted, and on the grid, where they are, what tools they carry
   and what they can reach
@@ -480,6 +487,14 @@ villagers:
 | 30 | 201k | 23 of 109 |
 
 Mock replies are short. Real models write longer replies and thoughts, so a budget binds sooner.
+On the first day of a real run (gpt-oss-20b, 10 blank villagers, budget 150) villagers spent
+33 to 76 points and nobody ran out, so 150 is generous; lower it to make the choices bite.
+
+Talking is one of the things energy goes on: noticing someone and deciding whether to go over,
+each line of a conversation, the plaza and letters. So how social a villager is (how often they
+approach people, skip the plaza, write letters) is a choice with a cost, and differences in it
+are one of the things that can emerge. `approach_rate`, `chats`, `messages` and `talk_energy` in
+the traits measure it.
 
 ### Emergent personality: blank villagers
 
@@ -590,12 +605,25 @@ Each island run directory has:
 
 ### Cost
 
-Up to 3 plan calls per awake villager per day, the encounter calls (mostly the cheap decision
+Two plan calls per awake villager per day, the encounter calls (mostly the cheap decision
 calls), the plaza rounds, one call per villager per night when they write, and one Isabelle
-call. In mock runs of `island_blank` that is about 55 villager calls and 65k villager tokens per
-island day, plus about 4k for Isabelle. Typical inputs: a plan about 1,800 tokens (700 of them
-the system prompt), a plaza round about 1,500, a line in a conversation about 1,200, a notice or
-a nightly page about 300 to 500. Real replies are longer than the mock's, so expect more.
+call. For 10 villagers, the first day of a real run was 67 calls and about 100k tokens (prompts
+plus replies, as the provider counted them), on both gpt-oss-20b and qwen3.8-27b:
+
+| call | share of the day's tokens |
+|---|---|
+| plans | 43% |
+| plaza | about 20% |
+| conversations | 12% |
+| noticing someone | 10% |
+| nightly pages | 9% |
+| Isabelle | 5% |
+
+A plan on day 1 was about 2,200 tokens in: about 730 of rules and action menu (the system
+prompt), 140 of the nightly page, and 1,370 of situation, of which yesterday's events were the
+largest part (about 355), then where they are and can reach (236), the instructions (188) and
+today so far (118). Later days cost more as villagers accumulate notes, mail and memories.
+Mock replies are shorter than real ones, so mock runs undercount.
 
 ### Checkpoints and one island day per real day
 
@@ -644,8 +672,18 @@ rate limits makes "which model" a hidden variable. If a run won't fit one provid
 cap, split it across days: the cache means a rerun with the same seed replays the finished
 part for free.
 
-`rpm` in the config spaces requests to stay under a rate limit, and 429s are retried with
-backoff. `--concurrency N` runs calls within an hour in parallel. Responses are cached
+`rpm` and `tpm` in the config keep under a provider's per-minute request and token caps: each
+request reserves its prompt plus its reply budget, then is corrected to what the provider says
+it used. 429s are retried with backoff, waiting at most 2 minutes, so a daily cap stops the run
+cleanly rather than sleeping for hours.
+
+Groq's free tier (October 2026) allows, per model, 30 requests and 8,000 tokens a minute, 1,000
+requests and 200,000 tokens a day. That is about two island days a day for 10 villagers, and the
+token pacing makes each island day take 10 to 15 minutes. Groq no longer serves Llama chat
+models; the config uses `openai/gpt-oss-20b` (reasoning kept low) and also has `gpt-oss-120b`
+and `qwen/qwen3.8-27b`, which didn't reason at all on Groq in our tests. Groq says cached prompt
+tokens don't count toward its limits, but repeating the same system prompt showed no caching in
+a test, so plan on paying for every token. `--concurrency N` runs calls within an hour in parallel. Responses are cached
 in `.cache/llm/`, keyed on the prompt and the run seed. Re-running the same seed replays for
 free; a new seed resamples. Use `--no-cache` to force fresh calls. `--log-prompts` saves
 every full prompt, which is the fastest way to see what an agent actually saw.
@@ -661,6 +699,9 @@ reading anything into a run.
   hidden variable.
 - Outputs depend on prompt wording as much as on traits. Treat prompt variants as
   experimental conditions and run several seeds per condition.
+- Reasoning models think in tokens nobody sees and, by default, nobody pays for. A model that
+  reasons more has more uncharged deliberation per decision, so model and reasoning effort are
+  conditions to hold fixed (see [Hidden reasoning](#mental-energy-a-token-budget)).
 - Names and labels cue behaviour. That's why the blank villagers have short neutral names and
   the species have invented ones.
 - Prices, yields and species tables are from memory of ACNH and approximate. Lines marked
@@ -669,7 +710,8 @@ reading anything into a run.
 ## Layout
 
 ```
-docs/                   day_flow.md (flowcharts of a run), world.md and island_grid.png (generated), the grid spec
+docs/                   day_flow.md (flowcharts of a run), token_design.md (why the token budget works as it does),
+                        world.md and island_grid.png (generated), the grid spec
 scenarios/              island scenarios
 villagers/              island villager templates and casts
 data/island_world.yaml  island rules: calendar, weather, resources, species, recipes, shops, houses
