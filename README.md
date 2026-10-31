@@ -20,8 +20,8 @@ replies, so this tests the plumbing and shows you the outputs, not real behaviou
 llmabm run scenarios/island_blank.yaml --backend mock --days 2
 ```
 
-**A short run with a real model.** The default backend is Groq (`llama-3.1-8b-instant`), which
-has a free tier.
+**A short run with a real model.** The default backend is Groq (`openai/gpt-oss-20b`, with
+reasoning kept low), which has a free tier.
 
 1. Get a key at console.groq.com.
 2. Create `.env` in the repo root (it is gitignored):
@@ -34,10 +34,13 @@ has a free tier.
    ```
 4. Keep going later with `llmabm resume runs/test1 --days 1`.
 
-Always pass `--days` for a test: the scenarios default to 30. Two days is on the order of 100 to
-200 calls, and at the configured 25 requests a minute each island day takes several minutes.
-If a run stops on a rate or daily limit, rerun the same command with the same seed: cached
-replies replay the finished part for free. Small models sometimes return broken JSON; check the
+Always pass `--days` for a test: the scenarios default to 30. Two days is about 140 to 160 calls
+and 150k to 200k tokens. Groq's free tier allows 8,000 tokens a minute and 200,000 a day per
+model, so two days is about the most one run can do in a day, and each island day takes 10 to
+15 minutes because the backend paces itself to stay under the per-minute cap (`rpm` and `tpm`
+in `config/models.yaml`). The progress line after each day shows the tokens the provider
+reported so far. If a run stops on a rate or daily limit, rerun the same command with the same
+seed (or `llmabm resume` it the next day): cached replies replay the finished part for free. Small models sometimes return broken JSON; check the
 error count in `summary.txt` before reading much into a run. `--log-prompts` saves exactly what
 each villager saw, which is worth having on a first run.
 
@@ -54,7 +57,7 @@ See [Models, free tiers and caching](#models-free-tiers-and-caching).
 | Isabelle's report | `days/day_NNN_isabelle.md` |
 | plans | the reasoning is in the day logs; the full scheduled and dropped lists are `plan` events in `events.jsonl` |
 | everything, raw | `events.jsonl`, including each model's raw reply |
-| prompts | `prompts/`, with `--log-prompts` |
+| prompts | `prompts/`, with `--log-prompts`: what each villager was shown, then the model's hidden reasoning and its reply |
 
 `llmabm analyze <run_dir>` rebuilds the logs, summary and plots from `events.jsonl` without any
 LLM calls. More under [Outputs](#outputs).
@@ -448,6 +451,17 @@ whether to approach someone, how long to talk and how much to write.
 **When it runs out** they can't make any call until the next morning: they follow habit instead
 of planning, only nod when spoken to, skip the plaza, and don't write. Their old page stays.
 
+**Hidden reasoning.** Reasoning models (gpt-oss on Groq, for example) think before they answer,
+in text the villager never writes down. That reasoning is always recorded: the provider's
+reasoning token count per villager and call type goes into each day's `energy` event and the
+summary, and with `--log-prompts` the reasoning text itself is saved after each prompt. By
+default it isn't charged, so a villager could deliberate at length and pay only for what it
+writes. Set `charge_reasoning: true` under `mental_energy` to charge it as thinking, like the
+`thoughts` field; villagers are then told that thinking things over costs energy too. How much
+a model reasons is set per backend (`params: {reasoning_effort: ...}` in `config/models.yaml`),
+so the backend and this switch are two settings to hold fixed, or vary, between experiments.
+The manifest records exactly which model and request settings each backend name meant.
+
 What it was spent on is still recorded by kind for analysis (planning, talking, and thinking for
 private thoughts, notes and the nightly page; reading other villagers' mail counts as talking,
 even inside a plan), along with what each villager chose to skip and
@@ -537,7 +551,9 @@ Each island run directory has:
 - weather: days of each kind, time use and catches per attempt by weather
 - sightings: how often a try came up empty, and how much each villager spotted
 - visits, gifts and favors per villager, and the most frequent gift pairs
-- estimated tokens per villager, and with mental energy on, what each villager spent it on, chose to skip, and how often they ran out
+- estimated tokens per villager, hidden reasoning tokens (by call type and per villager, and whether
+  they were charged), and with mental energy on, what each villager spent it on, chose to skip,
+  and how often they ran out
 
 ### Cost
 

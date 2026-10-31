@@ -66,7 +66,9 @@ def _energy_rule(world: dict) -> str:
         return ""
     return (f"- You have {me.get('daily', 150)} points of mental energy a day, and they come back every morning. "
             "Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide "
-            "what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or "
+            "what to spend them on"
+            + (", and so does thinking things over before you answer" if me.get("charge_reasoning") else "")
+            + ". When they run out, you can't plan (you repeat what you did yesterday), talk or "
             "write until the next morning.\n")
 
 

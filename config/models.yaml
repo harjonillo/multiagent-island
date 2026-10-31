@@ -9,17 +9,34 @@
 default: groq
 
 backends:
+  # Groq's free tier (October 2026): 30 requests/min, 1,000 requests/day, 8,000 tokens/min and
+  # 200,000 tokens/day per model. A 2-day island_blank run is roughly 150-200k tokens. Groq no
+  # longer serves Llama chat models; these are reasoning models, so keep reasoning short or it
+  # eats the reply budget (gpt-oss-20b at its default effort returned empty replies).
+  # `params` are sent with every request.
   groq:
     base_url: https://api.groq.com/openai/v1
-    model: llama-3.1-8b-instant
+    model: openai/gpt-oss-20b
+    params: {reasoning_effort: low}
     api_key_env: GROQ_API_KEY
     rpm: 25
+    tpm: 7500
 
   groq-big:
     base_url: https://api.groq.com/openai/v1
-    model: llama-3.3-70b-versatile
+    model: openai/gpt-oss-120b
+    params: {reasoning_effort: low}
     api_key_env: GROQ_API_KEY
     rpm: 25
+    tpm: 7500
+
+  groq-qwen:
+    base_url: https://api.groq.com/openai/v1
+    model: qwen/qwen3.8-27b
+    params: {reasoning_effort: none}
+    api_key_env: GROQ_API_KEY
+    rpm: 25
+    tpm: 7500
 
   # Free tier: prompts may be used for training outside the EU/UK/EEA.
   gemini:

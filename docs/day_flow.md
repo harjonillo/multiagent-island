@@ -226,7 +226,7 @@ All in the run directory, `runs/<timestamp>_<scenario>_s<seed>/` or `--run-dir`.
 | `events.jsonl` | as things happen, one JSON line each | everything: day_start, arrival, plan, action, sighting, seen, visit, encounter_decision, encounter, gift, favor_asked, favor_done, evening_turn, message, parcel, board, offer, offer_update, trade, tool_broke, hour_state, snapshot, reflection, energy, isabelle_summary, run_start, run_end, resume |
 | `checkpoint.pkl` | after each day | the whole simulation, for `llmabm resume` |
 | `days/day_NNN_isabelle.md` | end of each day | Isabelle's report |
-| `prompts/dNNN_*_<name>.txt` | each LLM call, with `--log-prompts` | the exact system and user prompt |
+| `prompts/dNNN_*_<name>.txt` | each LLM call, with `--log-prompts` | the exact system and user prompt, then the hidden reasoning (if any) and the reply |
 | `days/day_NNN.md` | analysis | the day hour by hour, private thoughts marked 🔒, end-of-day table, nightly pages |
 | `summary.txt` | analysis | resources, museum, trades, time use, weather, sightings, social ties, energy |
 | `hourly_villagers.csv`, `hourly_island.csv` | analysis | one row per villager per hour; one row per hour for the island |

@@ -15,6 +15,11 @@ ROOT = Path(__file__).resolve().parent.parent
 WORLD = ROOT / "data/island_world.yaml"
 
 
+def _seen(prompt_file: Path) -> str:
+    """What the villager was shown: a logged prompt file minus the reasoning and reply after it."""
+    return prompt_file.read_text().split("\n=== REASONING")[0]
+
+
 def _island(names=("A", "B")):
     isl = Island(load_world(WORLD), list(names), random.Random(0))
     for n in names:  # everyone already moved in; start on day 1
@@ -178,7 +183,7 @@ def test_day0_random_homes_and_private_thoughts():
         assert thoughts
         # ... and never appear in any prompt a villager sees.
         for f in (Path(d) / "run" / "prompts").glob("*.txt"):
-            text = f.read_text()
+            text = _seen(f)
             assert not any(t in text for t in thoughts), f.name
         assert (Path(d) / "run" / "days" / "day_000_isabelle.md").exists()
 
@@ -324,7 +329,7 @@ def test_blank_villagers_reflect_privately():
             owner = f.stem.split("_")[-1]
             # the mock writes from a small pool of sentences, so only check full self docs that are unique
             for who, doc in tagged.items():
-                if (who != owner and list(tagged.values()).count(doc) == 1 and doc in f.read_text()
+                if (who != owner and list(tagged.values()).count(doc) == 1 and doc in _seen(f)
                         and doc not in tagged.get(owner, "")):
                     raise AssertionError(f"{who}'s nightly page leaked into {f.name}")
         from llmabm.island.traits import write_traits
@@ -672,6 +677,37 @@ def test_mental_energy_budget_rules():
     assert off.can("A", 10 ** 6) and off.status_line("A") == ""
 
 
+def test_hidden_reasoning_is_recorded_and_optionally_charged():
+    from llmabm.island.energy import MentalEnergy
+    from llmabm.llm import Cached, Completion, split_reasoning
+
+    # Providers return reasoning in a field (gpt-oss on Groq) or inline as <think>...</think>.
+    assert split_reasoning({"content": "No", "reasoning": "91 = 7 x 13"},
+                           {"completion_tokens_details": {"reasoning_tokens": 28}}) == ("No", "91 = 7 x 13", 28)
+    assert split_reasoning({"content": "<think>hmm, 7 x 13</think>\nNo"}, {}) == ("No", "hmm, 7 x 13", 3)
+    assert split_reasoning({"content": "No"}, {}) == ("No", "", 0)
+    # Recorded either way; charged to the pool only with charge_reasoning.
+    for charge, left in ((False, 80), (True, 70)):
+        en = MentalEnergy({"enabled": True, "daily": 100, "tokens_per_point": 100, "charge_reasoning": charge}, ["A"])
+        en.new_day()
+        en.record("A", "planning", "plan", read=15, written=5, thought=0, immediate=True, hidden=10)
+        assert en.left["A"] == left and en.day_record()["A"]["reasoning"] == {"plan": 1000}
+        assert en.spent["A"]["thinking"] == (10 if charge else 0)
+    # A cached reply keeps its reasoning, so a replayed run charges the same.
+
+    class Fake:
+        name, model_id = "fake", "fake"
+
+        def complete(self, messages, temperature=0.7, max_tokens=600):
+            return Completion("hi", tokens=50, reasoning="thinking...", reasoning_tokens=12)
+
+    with tempfile.TemporaryDirectory() as d:
+        c = Cached(Fake(), Path(d))
+        first, again = c.complete([{"role": "user", "content": "x"}]), c.complete([{"role": "user", "content": "x"}])
+        assert again.cached and again.tokens == 0 and (again.reasoning, again.reasoning_tokens) == ("thinking...", 12)
+        assert first.reasoning_tokens == 12
+
+
 def test_spending_choices_are_read_from_plans():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:
@@ -747,7 +783,10 @@ def test_mental_energy_in_a_run():
         assert "Mental energy left today" in prompt and '"plaza": true | false' in prompt
         assert "25 points of mental energy a day" in prompt
         text = summary(run)
-        assert "Estimated villager tokens" in text and "ran out" in text
+        assert "Estimated villager tokens" in text and "ran out" in text and "hidden reasoning: 0 tokens" in text
+        assert "=== REASONING (0 tokens" in prompt or "=== REASONING (0 tokens" in next(
+            (Path(d) / "run" / "prompts").glob("d001_*.txt")).read_text()
+        assert run.manifest["backends"]["mock"] == "mock"
 
 
 def test_mental_energy_resume_matches():

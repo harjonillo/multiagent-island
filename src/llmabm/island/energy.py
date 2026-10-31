@@ -17,6 +17,11 @@ tonight, or follow habit at the next planning time (free). When the pool runs ou
 make any call until the next morning: they follow habit instead of planning, only nod when
 spoken to, skip the plaza, and don't write.
 
+Reasoning models also think before they answer, in text the villager never writes down.
+That hidden reasoning is always recorded (tokens per villager and call type, as the provider
+reports them). With `charge_reasoning: true` it is also charged to the pool, like any other
+thinking; by default it is free, so only what a villager reads and writes costs energy.
+
 Isabelle is an NPC and is not charged.
 """
 
@@ -36,10 +41,12 @@ class MentalEnergy:
         self.daily = float(cfg.get("daily", 150))
         self.tpp = float(cfg.get("tokens_per_point", 100))
         self.carry = float(cfg.get("carry_over", 0.0))
+        self.charge_reasoning = bool(cfg.get("charge_reasoning", False))
         self.left = {n: 0.0 for n in names}
         self.spent = {n: defaultdict(float) for n in names}
         self.skipped = {n: defaultdict(int) for n in names}
         self.tokens = defaultdict(float)       # estimated tokens sent and received per villager today, all of it
+        self.reasoning = {n: defaultdict(float) for n in names}  # hidden reasoning tokens today, by call type
         self.cost_sum = defaultdict(float)     # call type -> points, for "typical cost" hints
         self.cost_n = defaultdict(int)
         self.estimates = {"plan": 12, "notice": 3, "chat": 8, "evening": 12, "reflect": 5, **(cfg.get("estimates") or {})}
@@ -52,6 +59,8 @@ class MentalEnergy:
         return state
 
     def __setstate__(self, state):
+        state.setdefault("charge_reasoning", False)  # checkpoints from before reasoning was tracked
+        state.setdefault("reasoning", {n: defaultdict(float) for n in state["left"]})
         self.__dict__.update(state)
         self._lock = threading.Lock()
 
@@ -61,11 +70,13 @@ class MentalEnergy:
             self.left[n] = self.daily + self.carry * self.left[n]
             self.spent[n] = defaultdict(float)
             self.skipped[n] = defaultdict(int)
+            self.reasoning[n] = defaultdict(float)
         self.tokens = defaultdict(float)
 
     def day_record(self) -> dict:
         return {n: {"spent": {k: round(self.spent[n][k], 1) for k in KINDS}, "left": round(self.left[n], 1),
-                    "skipped": dict(self.skipped[n]), "tokens": round(self.tokens[n])} for n in self.left}
+                    "skipped": dict(self.skipped[n]), "tokens": round(self.tokens[n]),
+                    "reasoning": {k: round(v) for k, v in self.reasoning[n].items()}} for n in self.left}
 
     # --- costs -----------------------------------------------------------------------
     def points(self, *texts: str) -> float:
@@ -87,12 +98,13 @@ class MentalEnergy:
             self.skipped[name][kind] += 1
 
     def record(self, name: str, kind: str | None, what: str, read: float, written: float, thought: float,
-               immediate: bool, fixed: float = 0.0, social: float = 0.0) -> None:
+               immediate: bool, fixed: float = 0.0, social: float = 0.0, hidden: float = 0.0) -> None:
         """Queue (or apply) the charge for one call. `fixed` is the uncharged part of the prompt (rules
         and persona), counted only in `tokens`. `social` is the part of what was read that is other
-        villagers' mail, recorded as talking. Calls made in parallel are queued and applied in a
-        fixed order afterwards, so a resumed run charges exactly the same."""
-        item = (name, kind, what, read, written, thought, fixed, social)
+        villagers' mail, recorded as talking. `hidden` is the model's reasoning, in points: recorded
+        always, charged as thinking only with charge_reasoning. Calls made in parallel are queued and
+        applied in a fixed order afterwards, so a resumed run charges exactly the same."""
+        item = (name, kind, what, read, written, thought, fixed, social, hidden)
         if immediate:
             self._apply(item)
         else:
@@ -108,10 +120,14 @@ class MentalEnergy:
     def _apply(self, item) -> None:
         name, kind, what, read, written, thought, fixed, *rest = item
         social = min(rest[0] if rest else 0.0, read)
+        hidden = rest[1] if len(rest) > 1 else 0.0
         if name not in self.left:
             return
+        self.reasoning[name][what] += hidden * self.tpp
+        self.tokens[name] += (read + written + hidden + fixed) * self.tpp
+        if self.charge_reasoning:  # hidden reasoning counts as thinking the villager did
+            written, thought = written + hidden, thought + hidden
         total = read + written
-        self.tokens[name] += (total + fixed) * self.tpp
         self.cost_sum[what] += total
         self.cost_n[what] += 1
         if not kind:

@@ -320,14 +320,24 @@ def energy_lines(run: Run, names: list[str]) -> list[str]:
     tok = defaultdict(list)
     spent = defaultdict(Counter)
     skipped = defaultdict(Counter)
+    reason, reason_by = Counter(), Counter()
     for e in days:
         for n, v in e["villagers"].items():
             tok[n].append(v["tokens"])
             spent[n].update(v["spent"])
             skipped[n].update(v["skipped"])
+            reason[n] += sum((v.get("reasoning") or {}).values())
+            reason_by.update(v.get("reasoning") or {})
     total = sum(sum(t) for t in tok.values())
     L = ["", f"Estimated villager tokens (characters / 4): {total:,.0f} in all, "
          f"{total / max(1, len(days)):,.0f} per day" + (" (mental energy on)" if on else " (mental energy off)")]
+    hidden = sum(reason.values())
+    charged = bool((run.manifest.get("world") or {}).get("mental_energy", {}).get("charge_reasoning"))
+    L.append(f"  hidden reasoning: {hidden:,.0f} tokens ({hidden / max(1, total):.0%} of the above), "
+             + ("charged to mental energy" if charged else "not charged to mental energy"))
+    if hidden:
+        L.append("    by call: " + ", ".join(f"{k} {v:,.0f}" for k, v in reason_by.most_common()))
+        L.append("    per villager per day: " + ", ".join(f"{n} {reason[n] / len(tok[n]):,.0f}" for n in names if tok[n]))
     if not on:
         L.append("  per villager per day: " + ", ".join(f"{n} {sum(tok[n]) / len(tok[n]):,.0f}" for n in names if tok[n]))
         return L

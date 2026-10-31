@@ -64,7 +64,7 @@ class IslandScenario:
     start_bells: int = 1000
     memory_size: int = 15
     temperature: float = 0.8
-    max_tokens: int = 700
+    max_tokens: int = 1200
     free_time: str = "wander"    # "wander" (short random walks) or "home"
     isabelle: dict = field(default_factory=lambda: {"summary": True, "announce": False, "backend": None})
     reflection: dict = field(default_factory=lambda: {"enabled": False})
@@ -105,7 +105,7 @@ def load_island_scenario(path: Path, seed: int = 0) -> IslandScenario:
         start_bells=int(cfg.get("start_bells", 1000)),
         memory_size=int(cfg.get("memory_size", 15)),
         temperature=float(llm.get("temperature", 0.8)),
-        max_tokens=int(llm.get("max_tokens", 700)),
+        max_tokens=int(llm.get("max_tokens", 1200)),
         free_time=str(cfg.get("free_time", "wander")),
         isabelle={"summary": True, "announce": False, "backend": None, **(cfg.get("isabelle") or {})},
         reflection={"enabled": False, "max_words": 150, **(cfg.get("reflection") or {})},
@@ -179,6 +179,8 @@ class IslandSimulation:
         self.offers: dict[str, Offer] = {}
         self._oid = 0
         self.calls = 0
+        self.provider_tokens = 0  # what the providers say this run used (cached replies cost nothing)
+        self.reasoning_tokens = 0  # hidden reasoning in all replies, cached ones included
         self.failures = 0
         self.max_failures = 15  # consecutive failed calls before giving up on the run
         # Everyone lands together at the start of day 0, on a homesite drawn at random.
@@ -229,6 +231,10 @@ class IslandSimulation:
                 vil.wear = {}
         if not hasattr(sim.bodies, "broke"):
             sim.bodies.broke = []
+        if not hasattr(sim, "provider_tokens"):
+            sim.provider_tokens = 0
+        if not hasattr(sim, "reasoning_tokens"):
+            sim.reasoning_tokens = 0
         sim.verbose = verbose
         if backend_override:
             sim.override = backend_override
@@ -281,7 +287,7 @@ class IslandSimulation:
             if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             return self._call(name, user, f"d{d:03d}_reflect", system=self.light_systems[name], free_text=True,
-                              max_tokens=max_words * 3 + 200, kind="thinking", what="reflect")
+                              max_tokens=max_words * 3 + 500, kind="thinking", what="reflect")
 
         results = self._parallel(reflect, who)
         for name in who:
@@ -325,18 +331,28 @@ class IslandSimulation:
         if self.log_prompts:
             d = self.run_dir / "prompts"
             d.mkdir(exist_ok=True)
-            (d / f"{tag}_{name}.txt").write_text(f"=== SYSTEM ===\n{msgs[0]['content']}\n\n=== USER ===\n{user}\n")
+            prompt_file = d / f"{tag}_{name}.txt"
+            prompt_file.write_text(f"=== SYSTEM ===\n{msgs[0]['content']}\n\n=== USER ===\n{user}\n")
         try:
             reply = backend.complete(msgs, self.sc.temperature, max_tokens or self.sc.max_tokens)
         except LLMError as e:
             self.failures += 1
             if self.failures >= self.max_failures:
+                access = any(f"HTTP {c}" in str(e) for c in (401, 403, 404))
+                hint = ("The provider refused the request: check the API key, and that the model in "
+                        "config/models.yaml still exists and the key can use it." if access else "Likely a rate or daily cap.")
                 raise RunAborted(
-                    f"{self.failures} LLM calls in a row failed (last: {e}). Likely a rate or daily cap. "
+                    f"{self.failures} LLM calls in a row failed (last: {e}). {hint} "
                     "Rerun later with the same seed: cached replies replay the finished part for free.") from e
             return None, None, str(e)
         self.failures = 0
         self.calls += 1
+        self.provider_tokens += reply.tokens
+        self.reasoning_tokens += reply.reasoning_tokens
+        if self.log_prompts:
+            with prompt_file.open("a") as f:
+                f.write(f"\n=== REASONING ({reply.reasoning_tokens} tokens, hidden from everyone) ===\n"
+                        f"{reply.reasoning or '(none returned)'}\n\n=== REPLY ===\n{reply.text}\n")
         if free_text:  # Isabelle, and villagers' nightly page
             obj, err, thought = None, None, reply.text
         else:
@@ -347,7 +363,7 @@ class IslandSimulation:
             self.energy.record(name, kind, what, read, self.energy.points(reply.text), self.energy.points(thought),
                                immediate=threading.current_thread() is threading.main_thread(),
                                fixed=self.energy.points(msgs[0]["content"], user) - read,
-                               social=self.energy.points(social))
+                               social=self.energy.points(social), hidden=reply.reasoning_tokens / self.energy.tpp)
         return reply, obj, err
 
     def _parallel(self, fn, names):
@@ -368,7 +384,8 @@ class IslandSimulation:
             self._run_days(days)
         finally:
             self.hour = None
-            self.log("run_end", time=time.time(), calls=self.calls)
+            self.log("run_end", time=time.time(), calls=self.calls, provider_tokens=self.provider_tokens,
+                     reasoning_tokens=self.reasoning_tokens)
             self._raw_log.close()
         return self.run_dir
 
@@ -419,12 +436,14 @@ class IslandSimulation:
         snap["objects"] = self.space.objects_snapshot(isl)
         log("snapshot", **snap)
         self._reflect(d)
-        log("energy", day=d, enabled=self.energy.enabled, villagers=self.energy.day_record())
+        log("energy", day=d, enabled=self.energy.enabled, villagers=self.energy.day_record(),
+            provider_tokens=self.provider_tokens, reasoning_tokens=self.reasoning_tokens)
         self._isabelle(d)
         if self.verbose:
             trades = sum(1 for o in self.offers.values() if o.day == d and o.status == "accepted")
             print(f"day {d:>3}: museum {sum(len(m) for m in isl.museum.values())}, "
-                  f"bridge {isl.bridge_fund}, trades {trades}, calls so far {self.calls}", flush=True)
+                  f"bridge {isl.bridge_fund}, trades {trades}, calls so far {self.calls}, "
+                  f"provider tokens so far {self.provider_tokens:,} ({self.reasoning_tokens:,} reasoning)", flush=True)
 
     # --- mail ----------------------------------------------------------------
     def _deliver_mail(self, d: int) -> None:
@@ -501,7 +520,7 @@ class IslandSimulation:
             if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             return self._call(name, user, f"d{d:03d}_h{h % 24:02d}_notice", system=self.light_systems[name],
-                              max_tokens=250, kind="talking", what="notice")
+                              max_tokens=500, kind="talking", what="notice")
 
         results = self._parallel(decide, deciders)
         busy: set[str] = set()
@@ -633,7 +652,7 @@ class IslandSimulation:
         if cfg.get("summary"):
             digest = day_digest(events, self.isl)
             reply, _, err = self._call("isabelle", isabelle_summary_prompt(d, digest), f"d{d:03d}_isabelle",
-                                       system=ISABELLE_SYSTEM, backend_name=backend_name, max_tokens=700, free_text=True)
+                                       system=ISABELLE_SYSTEM, backend_name=backend_name, max_tokens=1200, free_text=True)
             text = (reply.text.strip() if reply else "") or f"(no summary: {err})"
             days_dir = self.run_dir / "days"
             days_dir.mkdir(exist_ok=True)
@@ -642,7 +661,7 @@ class IslandSimulation:
         if cfg.get("announce"):
             pub = public_digest(self.isl, events)
             reply, _, err = self._call("isabelle", isabelle_announce_prompt(d + 1, pub), f"d{d:03d}_announce",
-                                       system=ISABELLE_SYSTEM, backend_name=backend_name, max_tokens=300, free_text=True)
+                                       system=ISABELLE_SYSTEM, backend_name=backend_name, max_tokens=600, free_text=True)
             self.isl.announcement = reply.text.strip() if reply else None
             self.log("isabelle_announcement", day=d, for_day=d + 1, text=self.isl.announcement, error=err)
 
@@ -1040,6 +1059,8 @@ class IslandSimulation:
             "space": "grid",
             "free_time": self.sc.free_time,
             "backend_override": self.override,
+            # exactly which model and request settings each backend name meant for this run
+            "backends": {k: getattr(b, "model_id", k) for k, b in self.backends.items()},
             "villagers": {n: {"persona": s.persona, "traits": s.traits, "model": self.override or s.model,
                               "source": s.source} for n, s in self.sc.villagers.items()},
             "world": self.sc.world,
