@@ -196,4 +196,13 @@ def reflect_reply(prompt: str, rng: random.Random) -> str:
     busy = prompt.count("\n- ") > 8
     me = rng.choice(["I keep busy and like getting things done.", "I take things slowly and enjoy quiet days.",
                      "I like chatting with whoever I run into.", "I mostly look after myself for now."])
-    return me + (" Today was a full day." if busy else "")
+    page = me + (" Today was a full day." if busy else "")
+    if '"Remember:"' not in prompt:
+        return page
+    today = re.search(r"What happened today:\n(.*?)\n\n", prompt, re.S)
+    events = [ln[2:].split(" ", 1)[-1] for ln in (today.group(1).splitlines() if today else []) if ln.startswith("- ")]
+    known = re.findall(r"^(\d+)\. ", prompt, re.M)
+    picks = rng.sample(events, min(len(events), rng.randint(0, 2)))
+    if known and rng.random() < 0.5:
+        picks.append(rng.choice(known))
+    return page + ("\n\nRemember:\n" + "\n".join(f"- {p}" for p in picks) if picks else "")

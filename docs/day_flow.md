@@ -68,7 +68,7 @@ flowchart TD
         who["Villagers awake in the window with actions left"]
         habitq{"Chose 'next: habit'<br/>last time?"}
         afford{"Enough energy<br/>to read the prompt?"}
-        plan(["LLM: plan<br/>full rules + action menu<br/>status, memory, the 8 oldest unread letters<br/>Isabelle's announcement on the first plan"])
+        plan(["LLM: plan<br/>full rules + action menu<br/>status, memories and recent notes, the 8 oldest unread letters<br/>Isabelle's announcement on the first plan"])
         apply["Actions placed at their hours, one per hour, 10 a day<br/>dropped if asleep or no hour free<br/>note kept, choices for plaza, write, next updated"]
         habit["Repeat yesterday's actions for this window<br/>free, 'next' resets to plan"]
         tired["Repeat yesterday's actions<br/>counted as ran out"]
@@ -210,7 +210,7 @@ can't be afforded isn't made.
 | plaza | villagers who chose to go | 20:00; 21:00 only with new offers waiting | rules, no menu | JSON: thoughts, letters, board, offers, responses, parcels, note | skips the plaza | `evening_turn` and more |
 | notice | a villager with someone nearby, out of the house | any hour, up to 4 a day | short: persona, nightly page | JSON: thoughts, approach, opening line | too tired to talk | `encounter_decision` |
 | chat turn | the one who was approached, then back and forth | right after a notice or a visit | rules, no menu | JSON: thoughts, say, give, ask, note | just nods | `encounter` |
-| nightly page | villagers who chose to write | end of day | short: persona, nightly page | free text, up to 150 words | doesn't write; old page stays | `reflection` |
+| nightly page | villagers who chose to write | end of day | short: persona, nightly page | free text, up to 150 words, then optionally `Remember:` and up to 3 things to hold on to | doesn't write; old page stays, nothing new is remembered | `reflection` |
 | Isabelle's report | Isabelle (not charged) | end of day, if `isabelle.summary` (on) | Isabelle | free text, 150 to 300 words | always made | `isabelle_summary` |
 | Isabelle's announcement | Isabelle (not charged) | end of day, if `isabelle.announce` | Isabelle | free text, read in the next morning's plan | always made | `isabelle_announcement` |
 
@@ -223,7 +223,7 @@ All in the run directory, `runs/<timestamp>_<scenario>_s<seed>/` or `--run-dir`.
 | file | written | what it holds |
 |---|---|---|
 | `manifest.json` | at the start; `days_completed` after each day | scenario, perturbed world, villagers, system prompts |
-| `events.jsonl` | as things happen, one JSON line each | everything: day_start, arrival, plan, action, sighting, seen, visit, encounter_decision, encounter, gift, favor_asked, favor_done, evening_turn, message, parcel, board, offer, offer_update, trade, tool_broke, hour_state, snapshot, reflection, energy, isabelle_summary, run_start, run_end, resume |
+| `events.jsonl` | as things happen, one JSON line each | everything: day_start, arrival, plan, action, sighting, seen, visit, encounter_decision, encounter, gift, favor_asked, favor_done, evening_turn, message, parcel, board, offer, offer_update, trade, tool_broke, hour_state, snapshot, reflection, memory, energy, isabelle_summary, run_start, run_end, resume |
 | `checkpoint.pkl` | after each day | the whole simulation, for `llmabm resume` |
 | `days/day_NNN_isabelle.md` | end of each day | Isabelle's report |
 | `prompts/dNNN_*_<name>.txt` | each LLM call, with `--log-prompts` | the exact system and user prompt, then the hidden reasoning (if any) and the reply |

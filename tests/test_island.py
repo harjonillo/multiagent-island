@@ -759,6 +759,46 @@ def test_plans_follow_each_villagers_own_waking_hours():
         assert sorted(sim._plan_slots()) == [5, 12, 19]
 
 
+def test_memories_are_chosen_at_night_and_fade_unless_revisited():
+    from llmabm.island.memory import consolidate, forget, recalled, settings, split_picks, strength
+
+    cfg = settings({"mode": "consolidate"})
+    assert settings({}) is None  # without the block, the older rule: keep the last memory_size notes
+    page, picks = split_picks("A long day.\n\nRemember:\n- Bo gave me a ladder\n2. the money rock\n- 1")
+    assert page == "A long day." and picks == ["Bo gave me a ladder", "the money rock", "1"]
+    assert split_picks("No list tonight.") == ("No list tonight.", [])
+    mem = []
+    new, again = consolidate(mem, ["Bo gave me a ladder", "the money rock"], 0, cfg)
+    assert [m["text"] for m in new] == ["Bo gave me a ladder", "the money rock"] and not again
+    # Unvisited, a memory fades: still there after 5 days, gone after 6 (exp(-6/4) < 0.25).
+    assert len(recalled(mem, 5, cfg)) == 2 and not recalled(mem, 6, cfg)
+    # Coming back to one by its number doubles how long it lasts.
+    new, again = consolidate(mem, ["1", "#1"], 3, cfg)
+    assert not new and [m["text"] for m in again] == ["Bo gave me a ladder"] and again[0]["stability"] == 8
+    assert [m["text"] for m in forget(mem, 9, cfg)] == ["the money rock"]
+    assert [m["text"] for m in mem] == ["Bo gave me a ladder"] and strength(mem[0], 9) > 0.25
+    # Only `picks` a night, and at most `shown` in a prompt.
+    new, _ = consolidate(mem, [f"thing {i}" for i in range(9)], 4, cfg)
+    assert len(new) == 3 and len(recalled(mem, 4, {**cfg, "shown": 2})) == 2
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=7)
+    assert sc.memory["mode"] == "consolidate"
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=7, backend_override="mock",
+                               verbose=False, log_prompts=True)
+        sim.run(6)
+        run = load_run(Path(d) / "run")
+        kept = [t for e in run.of("reflection") for t in e.get("remembered") or []]
+        assert kept and len(run.of("memory")) == 6 * len(sc.villagers)
+        # What they held on to is in their next plans; notes older than notes_days are gone.
+        for n, vil in sim.isl.v.items():
+            assert all(nd > sim.isl.day - 2 for nd, _ in vil.notes)
+            prompt = next((Path(d) / "run" / "prompts").glob(f"d005_p0_{n}.txt"), None)
+            if prompt and vil.memories:
+                assert "Things you remember" in _seen(prompt)
+        assert "Long-term memory:" in summary(run)
+
+
 def test_spending_choices_are_read_from_plans():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:

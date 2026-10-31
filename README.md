@@ -270,7 +270,8 @@ building, their mental energy, and what is private. Everything else they learn o
 - **from each other**, at the plaza, in letters and in conversation.
 
 What they learn lasts as long as their memory does: today's and yesterday's events, their notes
-(the last 15) and their nightly page. The full world, as described in this README, is in
+from the last 2 days, what they chose to hold on to at night (see
+[Long-term memory](#long-term-memory)) and their nightly page. The full world, as described in this README, is in
 `data/island_world.yaml` for you; villagers never see it.
 
 The persona and these rules make up the system prompt. Plan calls add a compact action menu
@@ -498,6 +499,29 @@ their prompts under "What you wrote to yourself last night". That is the feedbac
 which differences can grow. The page is private, and a test checks this. Reflection works with
 any cast: turn it on in another scenario to let named villagers drift from their starting
 personality.
+
+### Long-term memory
+
+A basic model, loosely after how human memory works. Salience comes from the villagers, not from
+rules: after the nightly page, a villager can add a `Remember:` line and up to 3 short lines,
+each something from the day in their own words, or the number of a memory they already have
+that is still on their mind. That is the only way anything from the day lasts beyond tomorrow.
+
+- **Forgetting curve.** A memory's strength is `exp(-days since it was last recalled /
+  stability)`. New memories have a stability of 4 days, so one that is never revisited is gone
+  after about 6 days (below a strength of 0.25).
+- **Rehearsal.** Naming a memory again doubles its stability (4, 8, 16, 32 days...), so what a
+  villager keeps coming back to lasts longer and longer.
+- **Consolidation at night.** A villager who doesn't write that night, by choice or for lack of
+  energy, keeps nothing new from the day.
+- **What prompts show.** Up to 10 memories still above the threshold, strongest first, then in
+  the order they happened. Notes written during the day last 2 days unless held on to.
+
+Memories, what was revisited and what was forgotten overnight are in each day log and in
+`events.jsonl` (`reflection` and `memory` events), and `summary.txt` counts them per villager.
+The settings are under `memory:` in the scenario (`picks`, `shown`, `stability`, `threshold`,
+`notes_days`). Without that block, villagers keep their last `memory_size` notes instead, which
+is also what runs started before this keep when resumed.
 
 **Measuring emergence.** Personality here means stable differences between villagers in what
 they do, so it is measured from behaviour. What villagers write at night is kept as text to read

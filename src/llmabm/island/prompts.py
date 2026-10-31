@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import Counter
 
 from ..agent import AgentSpec
+from .memory import memory_lines
 from .world import ORDINANCE_TEXT, Island, Villager, _fmt, clock, fmt_window
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -116,7 +117,6 @@ def status_block(isl: Island, vil: Villager, when: str) -> str:
     inv = _fmt(vil.inventory) or "nothing"
     recipes = "; ".join(f"{r} ({_fmt(Counter(w['recipes'][r]['needs']))})" for r in sorted(vil.recipes)) or "none"
     prices = ", ".join(f"{k} {p}" for k, p in sorted(vil.prices_seen.items())) or "none yet"
-    notes = "\n".join(f"- (day {d}) {n}" for d, n in vil.notes) or "(none)"
     f = isl.price_factor()
     shops = (f"Nook's Cranny today ({fmt_window(isl.shop_hours('cranny'))}): "
              + ", ".join(f"{k} {round(p * f)}" for k, p in isl.cranny_stock.items())
@@ -140,7 +140,7 @@ def status_block(isl: Island, vil: Villager, when: str) -> str:
         f"Museum: {isl.museum_line()}\n"
         f"Bridge: {bridge}\n"
         f"{shops}\n"
-        f"Your notes, oldest first:\n{notes}"
+        + memory_block(isl, vil)
         + (f"\nGetting around: {isl.where_notes[vil.name]}" if isl.where_notes.get(vil.name) else "")
         + spotted_lines(isl, vil)
         + energy_lines(isl, vil)
@@ -314,13 +314,25 @@ def light_system_prompt(spec: AgentSpec, self_doc: str | None = None) -> str:
     return "\n\n".join(parts)
 
 
+def memory_block(isl: Island, vil: Villager, notes_limit: int | None = None, memories_limit: int | None = None) -> str:
+    """What a villager carries from earlier days: their notes, and with long-term memory on,
+    what they chose to hold on to at night."""
+    notes = vil.notes[-notes_limit:] if notes_limit else vil.notes
+    lines = "\n".join(f"- (day {d}) {n}" for d, n in notes) or "(none)"
+    cfg = getattr(isl, "memory", None)
+    if not cfg:
+        return (f"Your notes, oldest first:\n{lines}" if notes_limit is None else f"Your notes:\n{lines}")
+    return (f"Things you remember (anything you don't hold on to at night fades):\n"
+            f"{memory_lines(vil.memories, isl.day, cfg, memories_limit)}\n"
+            f"Your notes from the last {cfg['notes_days']} days:\n{lines}")
+
+
 def notice_prompt(isl: Island, vil: Villager, place: str, hour: int, nearby: list[str]) -> str:
-    notes = "\n".join(f"- (day {d}) {n}" for d, n in vil.notes[-6:]) or "(none)"
     today = "\n".join(f"- {r}" for r in vil.today[-5:]) or "(nothing yet)"
     return (
         f"PHASE: notice\nDay {isl.day} ({isl.date_text()}), {clock(hour)}. You are {vil.name}, at the {place}.\n"
         f"Nearby: {', '.join(n + (' (wearing ' + ', '.join(isl.v[n].wearing.values()) + ')' if isl.v[n].wearing else '') for n in nearby)}.\n"
-        f"Earlier today:\n{today}\nYour notes:\n{notes}\n"
+        f"Earlier today:\n{today}\n{memory_block(isl, vil, notes_limit=6, memories_limit=4)}\n"
         + (f"Mental energy left today: {round(isl.energy.left[vil.name])} "
            f"(about {isl.energy.typical('chat')} for each thing you say).\n" if getattr(isl, "energy", None) is not None
            and isl.energy.enabled else "")
@@ -331,15 +343,21 @@ def notice_prompt(isl: Island, vil: Villager, place: str, hour: int, nearby: lis
     )
 
 
-def reflect_prompt(isl: Island, vil: Villager, max_words: int) -> str:
-    """Free-form and deliberately open: no topics, questions or format beyond a length cap."""
+def reflect_prompt(isl: Island, vil: Villager, max_words: int, memory: dict | None = None) -> str:
+    """Free-form and deliberately open: no topics, questions or format beyond a length cap.
+    With long-term memory on, they can also name what to hold on to, and nothing more is asked."""
     today = "\n".join(f"- {r}" for r in vil.today) or "(nothing)"
     notes = "\n".join(f"- (day {d}) {n}" for d, n in vil.notes) or "(none)"
     last = vil.self_doc.strip() or "(nothing yet)"
-    return (
-        f"PHASE: reflect\nIt is the end of day {isl.day}. You are {vil.name}, at home before sleep.\n\n"
-        f"What happened today:\n{today}\n\nYour notes:\n{notes}\n\n"
-        f"What you wrote last night:\n{last}\n\n"
-        f"This page is private; nobody else will read it. Write whatever you like, in any form, up to "
-        f"{max_words} words. It replaces what you wrote last night, and you will see it again tomorrow."
-    )
+    head = (f"PHASE: reflect\nIt is the end of day {isl.day}. You are {vil.name}, at home before sleep.\n\n"
+            f"What happened today:\n{today}\n\nYour notes:\n{notes}\n\n")
+    page = (f"This page is private; nobody else will read it. Write whatever you like, in any form, up to "
+            f"{max_words} words. It replaces what you wrote last night, and you will see it again tomorrow.")
+    if not memory:
+        return head + f"What you wrote last night:\n{last}\n\n" + page
+    return (head + f"Things you remember, numbered:\n{memory_lines(vil.memories, isl.day, memory, numbered=True)}\n\n"
+            f"What you wrote last night:\n{last}\n\n" + page
+            + f"\n\nAfter the page, if you want to hold on to anything, add a line \"Remember:\" and then up to "
+            f"{memory['picks']} short lines, each something from today in your own words or the number of something "
+            "you already remember that is still on your mind. Anything you don't hold on to fades over the next "
+            "days; what you come back to stays longer.")

@@ -330,6 +330,7 @@ def summary(run: Run) -> str:
               f"  stumps left standing: {stumps}; rocks broken: {broken}"]
 
     L += weather_lines(run) + sight_lines(run, names) + social_ties_lines(run, names) + energy_lines(run, names)
+    L += memory_summary(run, names)
 
     L += ["", "When each villager acted (share of actions in each part of the day):"]
     parts = [("05-12", range(5, 12)), ("12-19", range(12, 19)), ("19-24", range(19, 24)), ("00-05", range(24, 29))]
@@ -479,6 +480,24 @@ def energy_lines(run: Run, names: list[str]) -> list[str]:
     habit = sum(1 for p in run.of("plan") if p.get("habit"))
     L.append(f"  plans replaced by habit: {habit} of {len(run.of('plan'))}")
     return L
+
+
+def memory_summary(run: Run, names: list[str]) -> list[str]:
+    """Long-term memory, when it is on: what was held on to, came back to, and forgotten."""
+    if not run.of("memory"):
+        return []
+    new, again, gone = Counter(), Counter(), Counter()
+    for e in run.of("reflection"):
+        new[e["agent"]] += len(e.get("remembered") or [])
+        again[e["agent"]] += len(e.get("rehearsed") or [])
+    kept = {}
+    for e in run.of("memory"):
+        gone[e["agent"]] += len(e.get("forgotten") or [])
+        kept[e["agent"]] = e.get("kept", 0)
+    return ["", f"Long-term memory: {sum(new.values())} held on to, {sum(again.values())} times coming back to one, "
+                f"{sum(gone.values())} forgotten",
+            "  per villager (new/again/forgotten, kept at the end): "
+            + ", ".join(f"{n} {new[n]}/{again[n]}/{gone[n]} ({kept.get(n, 0)})" for n in names)]
 
 
 def _reason(text: str) -> str:
@@ -673,6 +692,12 @@ def day_log(run: Run, day: int, private: bool = True) -> str:
         out += ["", "## Night: what each villager wrote to themselves (private)", ""]
         for e in refl:
             out.append(f"- 🔒 **{e['agent']}**: {e.get('self_doc') or '(nothing yet)'}")
+            held = [f"“{t}”" for t in e.get("remembered") or []] + [f"again: “{t}”" for t in e.get("rehearsed") or []]
+            if held:
+                out.append(f"  - 🧠 holds on to: " + "; ".join(held))
+        gone = [(e["agent"], t) for e in ev if e["type"] == "memory" for t in e.get("forgotten") or []]
+        if gone:
+            out.append("- 🌫️ forgotten overnight: " + "; ".join(f"{n}: “{t}”" for n, t in gone))
     return "\n".join(out) + "\n"
 
 

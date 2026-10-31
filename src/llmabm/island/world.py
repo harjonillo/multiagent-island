@@ -179,6 +179,7 @@ class Villager:
     wakes: int = 6        # clock hour the villager usually gets up
     sleeps: int = 24      # clock hour they go to bed; values past 24 or below `wakes` mean after midnight
     self_doc: str = ""    # private free-form page, rewritten nightly when reflection is on
+    memories: list = field(default_factory=list)  # what they chose to hold on to at night (see memory.py)
     wearing: dict = field(default_factory=dict)  # slot -> clothing item; others can see it
     wear: dict = field(default_factory=dict)  # tool -> uses so far of each one they carry, in-use first
     interior: list = field(default_factory=list)  # furniture inside their home; visitors see it

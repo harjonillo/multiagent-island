@@ -33,6 +33,19 @@ isabelle:
   summary: true
   announce: false
   backend: null
+# Long-term memory. Each night, after their page, villagers can name up to `picks` things to
+# hold on to: something from the day in their own words, or the number of an older memory still
+# on their mind. Memories fade along a forgetting curve (strength exp(-days / stability)); each
+# time one is picked again its stability doubles. Below `threshold` it is forgotten. Notes written
+# during the day last `notes_days` days unless picked. At most `shown` memories are in a prompt.
+# Without this block, villagers keep their last memory_size notes instead.
+memory:
+  mode: consolidate
+  picks: 3
+  shown: 10
+  stability: 4
+  threshold: 0.25
+  notes_days: 2
 memory_size: 15
 
 villagers: villagers/blank_cast.yaml

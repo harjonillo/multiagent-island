@@ -36,6 +36,7 @@ from .prompts import (BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, e
                       light_system_prompt, notice_prompt, reflect_prompt,
                       isabelle_summary_prompt, plan_prompt, system_prompt)
 from .energy import MentalEnergy
+from .memory import consolidate, forget, settings as memory_settings, split_picks
 from .grid import GridSpace
 from .body import Bodies
 from .world import Island, clock, load_world, to_game_hour
@@ -69,6 +70,7 @@ class IslandScenario:
     isabelle: dict = field(default_factory=lambda: {"summary": True, "announce": False, "backend": None})
     reflection: dict = field(default_factory=lambda: {"enabled": False})
     mental_energy: dict = field(default_factory=dict)
+    memory: dict = field(default_factory=dict)  # long-term memory settings; empty keeps the last memory_size notes
     raw: dict = field(default_factory=dict)
 
 
@@ -110,6 +112,7 @@ def load_island_scenario(path: Path, seed: int = 0) -> IslandScenario:
         isabelle={"summary": True, "announce": False, "backend": None, **(cfg.get("isabelle") or {})},
         reflection={"enabled": False, "max_words": 150, **(cfg.get("reflection") or {})},
         mental_energy=dict(world["mental_energy"]),
+        memory=dict(cfg.get("memory") or {}),
         raw=cfg,
     )
 
@@ -171,6 +174,7 @@ class IslandSimulation:
         # Mental energy: one daily token budget per villager, spent on whatever they choose.
         self.energy = MentalEnergy(sc.mental_energy, list(sc.villagers))
         self.isl.energy = self.energy
+        self.isl.memory = memory_settings(sc.memory)
         # Where each villager has chosen to spend energy next (set in their plans).
         self.choices = {n: {"plaza": True, "write": True, "next": "plan"} for n in sc.villagers}
         self.habits: dict[tuple[str, int], list[dict]] = {}
@@ -220,6 +224,10 @@ class IslandSimulation:
         elif any(isinstance(v, dict) for v in sim.energy.left.values()):  # from before energy was one pool
             sim.energy = MentalEnergy(sim.sc.mental_energy, list(sim.isl.v))
             sim.isl.energy = sim.energy
+        if not hasattr(sim.isl, "memory"):  # checkpoints from before long-term memory
+            sim.isl.memory = memory_settings(getattr(sim.sc, "memory", {}))
+            for vil in sim.isl.v.values():
+                vil.memories = []
         if not hasattr(sim, "choices"):
             sim.choices = {n: {"plaza": True, "write": True, "next": "plan"} for n in sim.isl.v}
         for attr, default in (("pending_moves", {}), ("moved_today", []), ("mail", [])):
@@ -282,7 +290,7 @@ class IslandSimulation:
         who = [n for n in who if self.choices[n]["write"]]
 
         def reflect(name):
-            user = reflect_prompt(isl, isl.v[name], max_words)
+            user = reflect_prompt(isl, isl.v[name], max_words, isl.memory)
             if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             return self._call(name, user, f"d{d:03d}_reflect", system=self.light_systems[name], free_text=True,
@@ -297,14 +305,27 @@ class IslandSimulation:
                 continue
             reply, _, err = results[name]
             text = re.sub(r"<think>.*?</think>", "", reply.text if reply else "", flags=re.S | re.I).strip()
+            kept = {}
+            if isl.memory:  # the page, then what they chose to hold on to
+                text, picks = split_picks(text)
+                new, again = consolidate(isl.v[name].memories, picks, d, isl.memory)
+                kept = {"remembered": [m["text"] for m in new], "rehearsed": [m["text"] for m in again]}
             words = text.split()
             if len(words) > max_words * 1.3:
                 text = " ".join(words[: int(max_words * 1.3)])
             if text:
                 isl.v[name].self_doc = text
             self.log("reflection", day=d, agent=name, self_doc=isl.v[name].self_doc, error=err,
-                     raw=reply.text if reply else None)
+                     raw=reply.text if reply else None, **kept)
         self._build_systems()
+
+    def _forget(self, d: int) -> None:
+        """Overnight, long-term memories that have faded below the threshold are gone."""
+        if not self.isl.memory:
+            return
+        for name, vil in self.isl.v.items():
+            gone = forget(vil.memories, d + 1, self.isl.memory)
+            self.log("memory", day=d, agent=name, kept=len(vil.memories), forgotten=[m["text"] for m in gone])
 
     def _open_log(self, mode: str) -> None:
         self._raw_log = EventLog(self.run_dir / "events.jsonl", mode)
@@ -443,12 +464,16 @@ class IslandSimulation:
             self._progress("hour over", quiet_ok=True)
         for n, vil in isl.v.items():
             self.yesterday[n] = list(vil.today)
-            vil.notes = vil.notes[-self.sc.memory_size:]
+            if isl.memory:  # notes last a few days unless picked at night
+                vil.notes = [(nd, t) for nd, t in vil.notes if nd > d - isl.memory["notes_days"]]
+            else:
+                vil.notes = vil.notes[-self.sc.memory_size:]
         self.hour = cal["day_start"] + cal.get("day_length", 24)
         snap = isl.snapshot()
         snap["objects"] = self.space.objects_snapshot(isl)
         log("snapshot", **snap)
         self._reflect(d)
+        self._forget(d)
         self._progress("nightly pages")
         log("energy", day=d, enabled=self.energy.enabled, villagers=self.energy.day_record(),
             provider_tokens=self.provider_tokens, reasoning_tokens=self.reasoning_tokens)
