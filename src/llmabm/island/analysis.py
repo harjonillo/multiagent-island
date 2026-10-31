@@ -102,9 +102,9 @@ def summary(run: Run) -> str:
     acts = run.of("action")
     failed = [a for a in acts if not a["ok"]]
     L = [
-        f"run: {run.dir.name}   scenario: {m['scenario']}   seed: {m['seed']}   facts: {m['world_facts']}",
+        f"run: {run.dir.name}   scenario: {m['scenario']}   seed: {m['seed']}",
         f"days: {len(snaps)}   villagers: {len(names)}   llm calls: "
-        f"{len(plans) - sum(1 for p in plans if p.get('phase') == 'arrival') + len(eves) + len(run.of('arrival')) + len(run.of('isabelle_summary')) + len(run.of('isabelle_announcement')) + sum(len(e['turns']) for e in run.of('encounter')) - len(run.of('encounter')) + len(run.of('encounter_decision'))}   "
+        f"{sum(1 for p in plans if not p.get('habit')) + sum(1 for e in eves if not e.get('skipped')) + sum(1 for e in run.of('reflection') if not e.get('skipped')) + len(run.of('isabelle_summary')) + len(run.of('isabelle_announcement')) + sum(1 for e in run.of('encounter') for t in e['turns'][1:] if not t.get('act', '').startswith('just nodded')) + sum(1 for e in run.of('encounter_decision') if e.get('raw') is not None)}   "
         f"parse/LLM errors: {sum(1 for p in plans + eves if p['error'])}",
         f"actions: {len(acts)}   failed: {len(failed)} ({len(failed) / max(1, len(acts)):.0%})",
         "",
@@ -290,8 +290,8 @@ def social_ties_lines(run: Run, names: list[str]) -> list[str]:
 
 
 def energy_lines(run: Run, names: list[str]) -> list[str]:
-    """Estimated tokens per villager (always), and with mental energy on, how each villager
-    divided it, what they spent it on and how often they ran out."""
+    """Estimated tokens per villager (always), and with mental energy on, what each villager
+    spent it on, what they chose to skip, and how often they ran out."""
     days = run.of("energy")
     if not days:
         return []
@@ -310,15 +310,23 @@ def energy_lines(run: Run, names: list[str]) -> list[str]:
     if not on:
         L.append("  per villager per day: " + ", ".join(f"{n} {sum(tok[n]) / len(tok[n]):,.0f}" for n in names if tok[n]))
         return L
-    last = days[-1]["villagers"]
+    chose = defaultdict(Counter)
+    for p in run.of("plan"):
+        if p.get("habit_reason") == "chosen":
+            chose[p["agent"]]["habit"] += 1
+    for e in run.of("evening_turn"):
+        if e.get("skipped", "").startswith("chose"):
+            chose[e["agent"]]["plaza"] += 1
+    for e in run.of("reflection"):
+        if e.get("skipped", "").startswith("chose"):
+            chose[e["agent"]]["write"] += 1
     L.append(f"  {'':<8} {'tokens/day':>10}  {'spent: plan':>11} {'think':>6} {'talk':>6}   "
-             f"{'split now: plan':>15} {'think':>6} {'talk':>6}   ran out: plan/think/talk")
+             f"chose to skip: plans/plaza/writing   ran out: plan/think/talk")
     for n in names:
         sp, tot = spent[n], sum(spent[n].values()) or 1
-        sl = last.get(n, {}).get("split", {})
         L.append(f"  {n:<8} {sum(tok[n]) / max(1, len(tok[n])):>10,.0f}  {sp['planning'] / tot:>11.0%} "
-                 f"{sp['thinking'] / tot:>6.0%} {sp['talking'] / tot:>6.0%}   {sl.get('planning', 0):>15.0%} "
-                 f"{sl.get('thinking', 0):>6.0%} {sl.get('talking', 0):>6.0%}   "
+                 f"{sp['thinking'] / tot:>6.0%} {sp['talking'] / tot:>6.0%}   "
+                 f"{chose[n]['habit']:>14}/{chose[n]['plaza']}/{chose[n]['write']:<14}"
                  f"{skipped[n]['planning']}/{skipped[n]['thinking']}/{skipped[n]['talking']}")
     habit = sum(1 for p in run.of("plan") if p.get("habit"))
     L.append(f"  plans replaced by habit: {habit} of {len(run.of('plan'))}")
@@ -430,8 +438,7 @@ def _social_lines(hev: list[dict]) -> list[str]:
         elif t == "sighting":
             out.append(f"{e['agent']} spotted " + "; ".join(e["seen"]))
         elif t == "arrival":
-            out.append(f"{e['agent']} arrived and settled {e['area']} ({e['homesite']})"
-                       + (f"; had asked for {e['wanted']}" if e.get("wanted") and e["wanted"] != e["homesite"] else ""))
+            out.append(f"{e['agent']} arrived; their tent is {e['area']} ({e['homesite']})")
     return out
 
 
@@ -504,10 +511,8 @@ def day_log(run: Run, day: int, private: bool = True) -> str:
         out += ["## End of day", "", "| villager | home | bells | loan | items | house | recipes |",
                 "|---|---|---:|---:|---:|---|---:|"]
         levels = run.manifest["world"]["house_levels"]
-        sites = (run.manifest["world"].get("map") or {}).get("homesites") or {}
         for n, v in snap["villagers"].items():
-            site = (snap.get("homes") or {}).get(n)
-            where = sites.get(site, {}).get("area", "-") if site else "-"
+            where = (snap.get("home_areas") or {}).get(n, "-")
             out.append(f"| {n} | {where} | {v['bells']} | {v['loan']} | {v['items']} | {levels[v['house']]['name']} | {len(v['recipes'])} |")
         out.append("")
         out.append("Museum: " + ", ".join(f"{c} {len(snap['museum'][c])}" for c in CATEGORIES)
@@ -709,55 +714,6 @@ def plot_all(run: Run, out_dir: Path) -> list[Path]:
     return paths
 
 
-def render_map(world: dict, out: Path, homes: dict | None = None, visits: Counter | None = None,
-               title: str = "Island map") -> Path:
-    """Draw the island: places (sized by visits, if given), homesites (labelled with residents)."""
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    from matplotlib.patches import Ellipse, Rectangle
-
-    from ..analysis import SERIES
-
-    mp = world.get("map") or {}
-    places, sites = mp.get("places", {}), mp.get("homesites", {})
-    homes = homes or {}
-    resident = {s: n for n, s in homes.items() if s}
-    fig, ax = plt.subplots(figsize=(7.5, 7.5))
-    ax.add_patch(Rectangle((-0.5, -0.5), 11, 11.5, color="#dbe9f4", zorder=0))          # sea
-    ax.add_patch(Ellipse((5, 4.9), 10.6, 10.2, color="#f1e3c4", zorder=1))             # sand
-    ax.add_patch(Ellipse((5, 4.6), 9.4, 8.8, color="#dcebd2", zorder=2))               # grass
-    vmax = max(visits.values()) if visits else 0
-    for name, (x, y) in places.items():
-        size = 60 + (500 * visits.get(name, 0) / vmax if vmax else 0)
-        ax.scatter([x], [y], s=size, color=SERIES[0], alpha=0.85, zorder=4, edgecolors="#fcfcfb", linewidths=1.5)
-        label = name + (f" ({visits.get(name, 0)})" if visits else "")
-        ax.annotate(label, (x, y), xytext=(0, 11), textcoords="offset points", ha="center", fontsize=9,
-                    color="#0b0b0b", zorder=6)
-    for sid, spec in sites.items():
-        x, y = spec["at"]
-        who = resident.get(sid)
-        ax.scatter([x], [y], marker="s", s=90, color=SERIES[1] if who else "#fcfcfb",
-                   edgecolors=SERIES[1], linewidths=1.5, zorder=5)
-        ax.annotate(who or sid, (x, y), xytext=(0, -14), textcoords="offset points", ha="center",
-                    fontsize=8, color="#52514e" if not who else "#0b0b0b", zorder=6)
-    ax.set_xlim(-0.5, 10.5)
-    ax.set_ylim(10.5, -0.5)  # north at the top
-    ax.set_aspect("equal")
-    ax.axis("off")
-    handles = [plt.Line2D([], [], marker="o", ls="", color=SERIES[0], label="place" + (" (size = visits)" if visits else "")),
-               plt.Line2D([], [], marker="s", ls="", color=SERIES[1], label="homesite, occupied"),
-               plt.Line2D([], [], marker="s", ls="", mfc="#fcfcfb", mec=SERIES[1], label="homesite, free")]
-    ax.legend(handles=handles, loc="lower left", frameon=False, fontsize=8)
-    ax.set_title(title)
-    fig.tight_layout()
-    out = Path(out)
-    fig.savefig(out, dpi=150)
-    plt.close(fig)
-    return out
-
-
 def render_grid_outputs(run: Run, day: int | None = None) -> list[Path]:
     """Rebuild the (seeded, deterministic) grid and draw the island and one day's movements."""
     from .grid import BRIDGE, GridSpace
@@ -809,11 +765,7 @@ def analyze_island(run_dir: Path) -> None:
         for p in write_traits(run, run.dir):
             print(f"wrote {p}")
     snaps = snapshots(run)
-    if snaps and run.manifest.get("space") == "grid":
+    if snaps:
         for p in render_grid_outputs(run):
             print(f"wrote {p}")
-    elif snaps:
-        visits = Counter(e["location"] for e in run.of("action") if e["location"] not in ("home", "around the island"))
-        print("wrote", render_map(run.manifest["world"], run.dir / "island_map.png", snaps[-1].get("homes"), visits,
-                                  title=f"Island map after day {snaps[-1]['day']}"))
     print(f"wrote {len(snapshots(run))} daily logs to {days_dir}")

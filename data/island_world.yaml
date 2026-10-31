@@ -1,7 +1,7 @@
 # Island world modeled on Animal Crossing: New Horizons.
 # Prices and limits are approximate, from memory of the game, and meant to be
-# edited. With `world_facts: perturbed` in a scenario, species get invented names
-# and jittered prices so models cannot rely on what they memorized about ACNH.
+# edited. Runs perturb it: species get invented names and prices are jittered, so
+# models cannot rely on what they memorized about ACNH.
 
 calendar:
   # A 24-hour day that rolls over at 05:00, as in ACNH. Internally hours run from
@@ -38,8 +38,7 @@ encounters:
   # or not; approaching includes the opening line. (3) The approached villager replies
   # (one more call per turn). Conversations are one on one, at most one per villager per
   # hour, and cost no action hour.
-  radius: 0.5                      # how close counts as "near" on the named-place map (map units)
-  grid_radius: 6                   # how close counts as "near" on the tile grid (tiles)
+  grid_radius: 6                   # how close counts as "near" (tiles)
   turns: 2                         # utterances per chat: opener (in the decision) + reply; up to 4
   max_chats_per_villager_per_day: 2
   max_decisions_per_villager_per_day: 4   # caps the small "approach or not" calls
@@ -59,42 +58,8 @@ hours:                             # opening hours, approximately as in ACNH
   resident_services: [0, 24]       # Tom Nook (loans, upgrades, bridge fund) and Isabelle (ordinances)
   museum: [0, 24]
 
-map:
-  # Coordinates on a 10x10 island, north at the top (y grows southward). Distance
-  # only breaks ties: villagers acting in the same hour reach a place in order of how
-  # far their home is from it (closer first; equal distances are shuffled).
-  places:
-    plaza: [5, 5]
-    Resident Services: [5, 6]
-    Nook's Cranny: [6, 4]
-    Able Sisters: [4, 4]
-    museum: [7, 7]
-    rocks: [8, 2]
-    woods: [2, 8]
-    orchard: [3, 6]
-    beach: [5, 9]
-    sea: [6, 10]
-    river: [4, 3]
-    pond: [7, 8]
-    fields: [3, 2]
-  # Where tents can go. Villagers pick one when they arrive; each holds one villager.
-  # Villagers in the same area are neighbors and see each other come and go.
-  homesites:
-    beach-1: {area: by the beach, at: [4, 9]}
-    beach-2: {area: by the beach, at: [6, 9]}
-    river-1: {area: on the riverbank, at: [3, 3]}
-    river-2: {area: on the riverbank, at: [5, 3]}
-    quarry-1: {area: near the rocks, at: [8, 3]}
-    quarry-2: {area: near the rocks, at: [9, 2]}
-    woods-1: {area: at the edge of the woods, at: [2, 7]}
-    woods-2: {area: at the edge of the woods, at: [1, 8]}
-    plaza-1: {area: near the plaza, at: [5, 4]}
-    plaza-2: {area: near the plaza, at: [6, 6]}
-    pond-1: {area: by the pond, at: [7, 9]}
-    orchard-1: {area: by the orchard, at: [3, 5]}
-
 grid:
-  # The tile island (scenario `space: grid`). See docs/grid_spec.md. 112 x 96 is ACNH's
+  # The tile island. See docs/grid_spec.md. 112 x 96 is ACNH's
   # 7 x 6 acres of 16 x 16 tiles, including the sea margin.
   width: 112
   height: 96
@@ -142,6 +107,8 @@ house_levels:                      # upgrading takes a Tom Nook loan for `cost`;
   - {name: bigger house, storage: 120, cost: 198000, interior: 18}
   - {name: house with back room, storage: 240, cost: 348000, interior: 30}
   - {name: two-story house, storage: 320, cost: 548000, interior: 40}
+
+move_house_cost: 10000             # Tom Nook moves your home to a free homesite overnight
 
 bridge:
   name: bridge to the north bank
@@ -293,17 +260,15 @@ items:
   ladder: {kind: tool}
   vaulting pole: {kind: tool}
 
-# Mental energy: a daily budget of tokens each villager divides between planning, private
-# thinking and talking. Off here; a scenario turns it on with `mental_energy: {enabled: true}`.
-# One point is about tokens_per_point tokens read or written (characters / 4), including the
-# system prompt. Villagers re-divide what's left when they plan; their last split carries over.
+# Mental energy: one daily budget of tokens per villager for everything they read, think and
+# say. Off here; a scenario turns it on with `mental_energy: {enabled: true}`. One point is about
+# tokens_per_point tokens (characters / 4) of what changes from call to call (the situation and
+# the villager's own nightly page) plus everything they write; the fixed rules aren't charged.
 mental_energy:
   enabled: false
   daily: 150                       # points per villager per day (150 x 100 = about 15k tokens)
   tokens_per_point: 100
-  split: {planning: 0.45, thinking: 0.25, talking: 0.3}   # starting split; per villager under `villagers:`
   carry_over: 0.0                  # share of unspent energy kept for the next day
-  villagers: {}                    # e.g. {Ari: {planning: 0.3, thinking: 0.1, talking: 0.6}}
 
 building:
   path_styles: [dirt, stone, brick, sand, terracotta]

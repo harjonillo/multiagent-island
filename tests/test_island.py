@@ -93,7 +93,7 @@ def test_perturbed_world_renames_species():
 
 
 def test_island_mock_run_end_to_end():
-    for scenario in ("island_baseline.yaml", "island_goals.yaml"):
+    for scenario in ("island_blank.yaml",):
         sc = load_island_scenario(ROOT / "scenarios" / scenario, seed=4)
         assert len(sc.villagers) == 10
         with tempfile.TemporaryDirectory() as d:
@@ -110,7 +110,7 @@ def test_island_mock_run_end_to_end():
             # Nobody acts while asleep.
             starts = {e["day"]: e["awake"] for e in run.of("day_start")}
             for e in run.of("action"):
-                if e["day"] == 0:  # arrival day: awake from landing, checked in the arrivals test
+                if e["day"] == 0:  # landing day: up from the moment they land at 05:00
                     continue
                 a, b = starts[e["day"]][e["agent"]]
                 assert a <= e["hour"] < b
@@ -125,7 +125,7 @@ def test_island_mock_run_end_to_end():
 
 def test_resume_matches_an_uninterrupted_run():
     import json
-    sc = lambda: load_island_scenario(ROOT / "scenarios/island_goals.yaml", seed=9)  # noqa: E731
+    sc = lambda: load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=9)  # noqa: E731
     with tempfile.TemporaryDirectory() as d:
         a, b = Path(d) / "a", Path(d) / "b"
         IslandSimulation(sc(), load_backends(None), a, seed=9, backend_override="mock", verbose=False).run(3)
@@ -137,8 +137,8 @@ def test_resume_matches_an_uninterrupted_run():
         assert clean(a / "events.jsonl") == clean(b / "events.jsonl")
 
 
-def test_arrivals_homesites_and_private_thoughts():
-    sc = load_island_scenario(ROOT / "scenarios/island_baseline.yaml", seed=2)
+def test_day0_random_homes_and_private_thoughts():
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=2)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=2, backend_override="mock",
                                log_prompts=True, verbose=False)
@@ -146,9 +146,11 @@ def test_arrivals_homesites_and_private_thoughts():
         homes = sim.isl.home
         assert all(homes.values()) and len(set(homes.values())) == len(homes)  # everyone housed, no sharing
         run = load_run(Path(d) / "run")
-        hours = {e["agent"]: e["hour"] for e in run.of("arrival")}
-        assert len(hours) == 10
-        assert not any(e["day"] == 0 and e["hour"] < hours[e["agent"]] for e in run.of("action"))
+        # Everyone lands together at the start of day 0 on a homesite drawn for them: no LLM call to choose.
+        arrivals = run.of("arrival")
+        assert len(arrivals) == 10 and {e["hour"] for e in arrivals} == {sc.world["calendar"]["day_start"]}
+        assert not list((Path(d) / "run" / "prompts").glob("*arrival*"))
+        assert {e["homesite"] for e in arrivals} == set(run.of("snapshot")[0]["homes"].values())
         # Thoughts are logged for the observer ...
         thoughts = {e["thoughts"] for e in run.of("plan") if e.get("thoughts")}
         thoughts |= {t["thoughts"] for e in run.of("encounter") for t in e["turns"] if t.get("thoughts")}
@@ -162,7 +164,7 @@ def test_arrivals_homesites_and_private_thoughts():
 
 
 def test_encounters_are_one_on_one_and_capped():
-    sc = load_island_scenario(ROOT / "scenarios/island_goals.yaml", seed=4)
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=4)
     with tempfile.TemporaryDirectory() as d:
         IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=4, backend_override="mock", verbose=False).run(3)
         run = load_run(Path(d) / "run")
@@ -178,7 +180,7 @@ def test_encounters_are_one_on_one_and_capped():
         assert {(e["day"], e["hour"], *e["villagers"]) for e in enc} == decided
         # Both villagers were really out and within the encounter radius of each other in that hour.
         import math
-        radius = sc.world["encounters"]["grid_radius" if sc.space == "grid" else "radius"]
+        radius = sc.world["encounters"]["grid_radius"]
         where = {(st["day"], st["hour"]): st["villagers"] for st in run.of("hour_state")}
         for e in enc:
             a, b = (where[(e["day"], e["hour"])][n] for n in e["villagers"])
@@ -187,20 +189,20 @@ def test_encounters_are_one_on_one_and_capped():
 
 
 def test_bodies_shorter_walk_gets_there_first():
-    from llmabm.island.body import Bodies
-    from llmabm.island.space import PlaceSpace
-
-    isl = _island(("Near", "Far"))
-    isl.home["Near"], isl.home["Far"] = "quarry-1", "beach-1"   # rocks are next to the quarry
-    bodies = Bodies(isl, PlaceSpace(isl.w))
-    for n in ("Near", "Far"):
-        bodies.place_at_home(n)
-    batch = [("Far", {"do": "mine_rock"}), ("Near", {"do": "mine_rock"})]
-    assert [n for n, _ in bodies.order(batch, random.Random(0))] == ["Near", "Far"]
-    ok, _ = bodies.perform("Far", {"do": "mine_rock"}, 8)
+    isl, g, bodies = _grid_island(("Near", "Far"))
+    rng = random.Random(0)
+    # Both go for the same rock; Near is standing next to it.
+    rock = next(i + 1 for i, c in enumerate(g.rock_cells)
+                if c and g.nearest(bodies.b["Far"].pos, bodies.tools_of("Far"), [c]))
+    act = {"do": "mine_rock", "rock": rock}
+    bodies.b["Near"].pos = g.approach_cells(g.rock_cells[rock - 1])[0]
+    batch = [("Far", act), ("Near", act)]
+    assert [n for n, _ in bodies.order(batch, rng)] == ["Near", "Far"]
+    ok, _ = bodies.perform("Far", act, 8, rng)
     assert ok and bodies.b["Far"].place == "rocks" and bodies.b["Far"].walked_today > 0
-    # Now Far is standing at the rocks, so Far is the one who is closer.
-    assert [n for n, _ in bodies.order(batch, random.Random(0))] == ["Far", "Near"]
+    # Now Far is standing at the rock and Near has gone home, so Far is the one who is closer.
+    bodies.go_home("Near")
+    assert [n for n, _ in bodies.order(batch, rng)] == ["Far", "Near"]
 
 
 def test_grid_tools_gate_movement():
@@ -240,7 +242,7 @@ def test_grid_tools_gate_movement():
 
 def test_grid_run_and_resume():
     import json
-    sc = lambda: load_island_scenario(ROOT / "scenarios/island_goals.yaml", seed=3)  # noqa: E731
+    sc = lambda: load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)  # noqa: E731
     with tempfile.TemporaryDirectory() as d:
         a, b = Path(d) / "a", Path(d) / "b"
         IslandSimulation(sc(), load_backends(None), a, seed=3, backend_override="mock", verbose=False).run(3)
@@ -264,7 +266,8 @@ def test_blank_villagers_reflect_privately():
         refl = run.of("reflection")
         assert len(refl) == 30
         assert all(e["self_doc"] and "ratings" not in e for e in refl if not e.get("skipped"))
-        assert sum(not e.get("skipped") for e in refl) >= 20  # a few may run out of thinking energy
+        assert sum(not e.get("skipped") for e in refl) >= 10  # some choose not to write, or run out
+        assert {e["skipped"] for e in refl if e.get("skipped")} <= {"chose not to write tonight", "no energy left"}
         # Identical villagers at the start: same persona apart from the name, same schedule.
         personas = {s.persona.replace(n, "NAME") for n, s in sc.villagers.items()}
         assert len(personas) == 1
@@ -476,7 +479,7 @@ def test_favors_are_settled_by_gifts():
 
 
 def test_visits_gifts_and_favors_in_a_run():
-    sc = load_island_scenario(ROOT / "scenarios/island_goals.yaml", seed=1)
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=1)
     with tempfile.TemporaryDirectory() as d:
         IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=1, backend_override="mock", verbose=False).run(10)
         run = load_run(Path(d) / "run")
@@ -497,54 +500,106 @@ def test_visits_gifts_and_favors_in_a_run():
 def test_mental_energy_budget_rules():
     from llmabm.island.energy import MentalEnergy
 
-    en = MentalEnergy({"enabled": True, "daily": 100, "tokens_per_point": 100,
-                       "split": {"planning": 2, "thinking": 1, "talking": 1}}, ["A", "B"])
+    en = MentalEnergy({"enabled": True, "daily": 100, "tokens_per_point": 100}, ["A", "B"])
     en.new_day()
-    assert en.left["A"] == {"planning": 50, "thinking": 25, "talking": 25}
+    assert en.left["A"] == 100
     assert en.points("x" * 4000) == 10  # 4000 characters ~ 1000 tokens ~ 10 points
-    assert en.can("A", "talking", 20) and not en.can("A", "talking", 25)
-    # A call is charged to its kind, except the private thoughts, which use thinking energy.
-    en.record("A", "talking", "chat", read=15, written=5, thought=3, immediate=True)
-    assert en.left["A"]["talking"] == 25 - 17 and en.left["A"]["thinking"] == 22
-    assert en.tokens["A"] == 2000
+    assert en.can("A", 99) and not en.can("A", 99.5)
+    # One pool: every call draws from it. What it went on is recorded by kind, with private
+    # thoughts counted as thinking. The fixed rules (`fixed`) count as tokens but aren't charged.
+    en.record("A", "talking", "chat", read=15, written=5, thought=3, immediate=True, fixed=20)
+    assert en.left["A"] == 80
+    assert en.spent["A"]["talking"] == 17 and en.spent["A"]["thinking"] == 3
+    assert en.tokens["A"] == 4000
     # Parallel calls are queued and settled in a fixed order.
     en.record("B", "planning", "plan", 10, 2, 0, immediate=False)
-    assert en.left["B"]["planning"] == 50
+    assert en.left["B"] == 100
     en.settle()
-    assert en.left["B"]["planning"] == 38
-    # Re-dividing what is left; the new split also sets tomorrow's energy.
-    left = sum(en.left["A"].values())
-    en.resplit("A", {"planning": 0, "thinking": 0, "talking": 1})
-    assert en.left["A"]["talking"] == left and en.left["A"]["planning"] == 0
-    assert en.resplit("A", {"planning": "lots"}) is None and en.resplit("A", {}) is None
+    assert en.left["B"] == 88
+    # Running out: nothing more can be afforded until the next morning.
+    en.record("A", "planning", "plan", 90, 5, 0, immediate=True)
+    assert en.left["A"] == 0 and not en.can("A", 0)
     en.new_day()
-    assert en.left["A"] == {"planning": 0, "thinking": 0, "talking": 100}
-    assert not en.has_thinking("A") and en.has_thinking("B")
+    assert en.left["A"] == 100 and en.day_record()["A"]["left"] == 100
     off = MentalEnergy({"enabled": False}, ["A"])
     off.new_day()
-    assert off.can("A", "talking", 10 ** 6) and off.status_line("A") == ""
+    assert off.can("A", 10 ** 6) and off.status_line("A") == ""
+
+
+def test_spending_choices_are_read_from_plans():
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=5, backend_override="mock", verbose=False)
+        ch = sim._apply_choices("Ari", {"plaza": False, "write": "no", "next": "habit"})
+        assert ch == {"plaza": False, "write": False, "next": "habit"} == sim.choices["Ari"]
+        assert sim._apply_choices("Ari", {"plaza": "maybe", "next": "later"}) == {}  # unreadable: kept
+        assert sim.choices["Ari"]["plaza"] is False
+        sim.run(4)
+        run = load_run(Path(d) / "run")
+        # Skipping the plaza means no plaza call that evening; habit means no plan call.
+        skipped = {(e["day"], e["agent"]) for e in run.of("evening_turn") if e.get("skipped", "").startswith("chose")}
+        went = {(e["day"], e["agent"]) for e in run.of("evening_turn") if not e.get("skipped")}
+        assert skipped and not skipped & went
+        chosen = [p for p in run.of("plan") if p.get("habit_reason") == "chosen"]
+        assert chosen and all(p["raw"] is None for p in chosen)
+        assert any(e.get("skipped") == "chose not to write tonight" for e in run.of("reflection"))
+
+
+def test_ask_npcs_and_move_house():
+    isl, g, bodies = _grid_island()
+    vil = isl.v["A"]
+    ok, msg = isl.act("A", {"do": "ask", "who": "Tom Nook"}, 10)
+    assert ok and "10000 bells" in msg and "Free homesites" in msg
+    free = [s for s in isl.free_sites()]
+    assert free[0] in msg
+    ok, msg = isl.act("A", {"do": "ask", "who": "Isabelle"}, 10)
+    assert ok and "20000 bells" in msg and "night owl" in msg
+    vil.inventory["wood"] = 3
+    ok, msg = isl.act("A", {"do": "ask", "who": "Timmy and Tommy"}, 10)
+    assert ok and "wood" in msg and vil.prices_seen["wood"] == isl.sell_price("wood")
+    assert not isl.act("A", {"do": "ask", "who": "Timmy"}, 23)[0]  # the Cranny is closed at night
+    assert not isl.act("A", {"do": "ask", "who": "Mabel"}, 10)[0]
+    # The body walks to the right building to ask.
+    _, _, _, err = g.resolve(isl, "A", {"do": "ask", "who": "Tom Nook"}, bodies.b["A"].pos, bodies.tools_of("A"),
+                             random.Random(0))
+    assert err is None
+    # Moving home: costs bells, needs a free homesite, happens overnight, and keeps the furniture inside.
+    taken = isl.home["B"]
+    ok, msg = isl.act("A", {"do": "move_house", "to": taken}, 10)
+    assert not ok and "free homesites" in msg
+    vil.bells = 5000
+    ok, msg = isl.act("A", {"do": "move_house", "to": free[0]}, 10)
+    assert not ok and "10000" in msg
+    vil.bells, vil.interior = 15000, ["log stool"]
+    old = isl.home["A"]
+    ok, msg = isl.act("A", {"do": "move_house", "to": free[0]}, 10)
+    assert ok and vil.bells == 5000 and isl.home["A"] == old
+    assert not isl.act("B", {"do": "move_house", "to": free[0]}, 10)[0]  # already promised to A
+    isl.new_day()
+    assert isl.home["A"] == free[0] and isl.moved_today == ["A"] and vil.interior == ["log stool"]
+    assert any("A moved home" in n for n in isl.yesterday_news)
 
 
 def test_mental_energy_in_a_run():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=2)
     assert sc.mental_energy["enabled"]
-    sc.mental_energy["daily"] = sc.world["mental_energy"]["daily"] = 70
+    sc.mental_energy["daily"] = sc.world["mental_energy"]["daily"] = 25
     with tempfile.TemporaryDirectory() as d:
         IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=2, backend_override="mock", verbose=False,
                          log_prompts=True).run(3)
         run = load_run(Path(d) / "run")
         days = run.of("energy")
         assert len(days) == 3 and all(e["enabled"] for e in days)
-        # Running out shows up as habit plans and skipped talk, and the budget caps tokens:
+        # Running out shows up as habit plans, and the budget caps what is charged:
         # nobody goes over by more than the one call that was affordable when it started.
-        assert any(p.get("habit") for p in run.of("plan"))
+        assert any(p.get("habit_reason") == "no energy left" for p in run.of("plan"))
         for e in days[1:]:
             for v in e["villagers"].values():
-                assert v["tokens"] <= 70 * 100 + 4000
-        # Villagers see their energy and can re-divide it.
+                assert sum(v["spent"].values()) <= 25 + 40
+        # Villagers see their energy and choose where it goes.
         prompt = next((Path(d) / "run" / "prompts").glob("d001_p0_*.txt")).read_text()
-        assert "Mental energy left today" in prompt and '"energy"' in prompt
-        assert "limited amount of mental energy" in prompt
+        assert "Mental energy left today" in prompt and '"plaza": true | false' in prompt
+        assert "25 points of mental energy a day" in prompt
         text = summary(run)
         assert "Estimated villager tokens" in text and "ran out" in text
 
@@ -642,7 +697,7 @@ def test_shells_and_dig_spots_are_known_only_once_seen():
 
 
 def test_minds_cannot_set_body_targets():
-    sc = load_island_scenario(ROOT / "scenarios/island_goals.yaml", seed=0)
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=0)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=0, backend_override="mock", verbose=False)
         name = next(iter(sim.isl.v))

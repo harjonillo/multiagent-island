@@ -11,13 +11,53 @@ The Python package is `llm-abm` and the command is `llmabm`.
 ```bash
 conda env create -f environment.yml     # Python 3.12, the package (editable) and pytest
 conda activate multiagent_island_env
-
-# Offline, no keys. The mock backend gives random but valid replies.
-llmabm run scenarios/island_baseline.yaml --backend mock --days 3
-
-# Real models. Put the key in .env first, e.g. GROQ_API_KEY=...
-llmabm run scenarios/island_goals.yaml --backend groq --seed 0
 ```
+
+**Check that everything runs (offline, no keys).** The mock backend gives random but valid
+replies, so this tests the plumbing and shows you the outputs, not real behaviour.
+
+```bash
+llmabm run scenarios/island_blank.yaml --backend mock --days 2
+```
+
+**A short run with a real model.** The default backend is Groq (`llama-3.1-8b-instant`), which
+has a free tier.
+
+1. Get a key at console.groq.com.
+2. Create `.env` in the repo root (it is gitignored):
+   ```
+   GROQ_API_KEY=your-key-here
+   ```
+3. Run two days:
+   ```bash
+   llmabm run scenarios/island_blank.yaml --seed 0 --days 2 --run-dir runs/test1 --log-prompts
+   ```
+4. Keep going later with `llmabm resume runs/test1 --days 1`.
+
+Always pass `--days` for a test: the scenarios default to 30. Two days is on the order of 100 to
+200 calls, and at the configured 25 requests a minute each island day takes several minutes.
+If a run stops on a rate or daily limit, rerun the same command with the same seed: cached
+replies replay the finished part for free. Small models sometimes return broken JSON; check the
+error count in `summary.txt` before reading much into a run. `--log-prompts` saves exactly what
+each villager saw, which is worth having on a first run.
+
+Other providers (Gemini, Cerebras, Mistral, NVIDIA, OpenRouter, or a local model through Ollama
+with no key) are in `config/models.yaml`: put their key in `.env` and pass `--backend <name>`.
+See [Models, free tiers and caching](#models-free-tiers-and-caching).
+
+**Where to look afterwards.** In the run directory:
+
+| what | where |
+|---|---|
+| daily logs and conversations | `days/day_NNN.md`, hour by hour; private thoughts are marked 🔒 |
+| reflections | `selves/<name>.md`, night by night, and at the end of each day log |
+| Isabelle's report | `days/day_NNN_isabelle.md` |
+| plans | the reasoning is in the day logs; the full scheduled and dropped lists are `plan` events in `events.jsonl` |
+| everything, raw | `events.jsonl`, including each model's raw reply |
+| prompts | `prompts/`, with `--log-prompts` |
+
+`llmabm analyze <run_dir>` rebuilds the logs, summary and plots from `events.jsonl` without any
+LLM calls. More under [Outputs](#outputs).
 
 | command | what it does |
 |---|---|
@@ -39,7 +79,7 @@ Runs are written to `runs/<timestamp>_<scenario>_s<seed>/`.
 - **World** (`world.py`): resources, shops, NPCs, and the rules that resolve an action once
   the body is there.
 - **Space** (`space.py`, `grid.py`): where things are and how far apart they are. `GridSpace`
-  is the tile island (the default); `PlaceSpace` is an older map of named points.
+  is the tile island; `Space` is the interface bodies rely on.
 
 ### A day on the island
 
@@ -59,18 +99,18 @@ The day runs on a 24-hour clock and rolls over at 05:00, when resources refill.
   fit, or fall while the villager is asleep, are dropped and logged.
 - Villagers who are asleep for a whole window, or out of actions, are not called.
 - **Sleep is a hard constraint.** Each villager has `wakes` and `sleeps` hours in the cast
-  file, and a `routine` line, which is a soft preference the model sees but nothing enforces.
+  file.
 - **Who gets there first.** Actions in the same hour are taken in order of how far each
   villager has to walk from where they are. Equal distances are shuffled. Whoever gets to a
   rock, tree, shell or dig spot first takes what is there.
 
 **Day 0: arrivals.** Every villager starts in a tent with 1,000 bells, empty pockets, no
 loan and three random DIY recipes, plus the starter recipes everyone knows (ladder, vaulting
-pole, simple wooden fence). With `arrivals.mode: trickle` (the default) each villager lands
-at a random hour between 05:00 and 18:00; with `together` everyone lands at 05:00 and they
-choose one after another in random order. On arrival a villager makes one call: pick a
-homesite from the free ones, then plan the rest of that window. A taken or invalid choice
-falls back to the nearest free site.
+pole, simple wooden fence). Everyone lands together at 05:00, and Tom Nook has a tent ready
+for each of them on a homesite drawn at random; nobody chooses. On landing day they are up
+from 05:00. Later, a villager can move home with `move_house` at Resident Services for 10,000
+bells (`move_house_cost` in the world file). The move happens overnight, and the furniture
+inside comes along.
 
 ### Environmental conditions
 
@@ -98,8 +138,7 @@ or any weather setting: butterflies need dry days; snails and the coelacanth nee
 snow. Nothing else changes in the rain, so whether villagers care is an open question.
 `summary.txt` compares time use and catch rates by weather.
 
-**The map.** `space: grid` (the default) is a tile island, 112 x 96 by default, generated
-from the seed:
+**The map.** The island is a tile grid, 112 x 96 by default, generated from the seed:
 - a sea margin, a beach three tiles wide, and grass on three cliff tiers that rise toward
   the north
 - a river from a clifftop source that splits into two mouths, a pond, and a rocky stretch
@@ -117,10 +156,6 @@ built. The pond and the sea can't be crossed. Everyone knows both recipes from t
 has to gather the wood and craft them. Bodies pathfind with the tools the villager carries,
 and each villager's prompt says which rocks and buildings are within reach and how many steps
 away. Placed furniture and fences block walking, so villagers can wall off space.
-
-`space: places` is the older map: 13 named places on a 10 x 10 square with straight-line
-distances, and 12 homesites in 7 areas. Building actions (paths, placing furniture, fences,
-flower seeds) need the grid.
 
 The full design, with the rules I wasn't sure of marked, is in `docs/grid_spec.md`.
 `docs/island_grid.png` shows the island for seed 0.
@@ -144,13 +179,14 @@ what the villager spotted today, so a rare bug can be shared or kept quiet.
 | fossils | 4 dig spots per day | |
 | fish | 19 species in the sea, river, pond and clifftop river | by hour, month and weather. 15% of tries get away |
 | bugs | 16 species on flowers, trees, stumps, rocks and the ground | by hour, month and weather. 15% of tries get away |
-| planting | grid: anywhere the spacing rules allow; places map: 15 open plots | saplings and fruit grow into trees in 5 days; flower seeds bloom in 3 |
+| planting | anywhere the spacing rules allow, up to 15 new trees (`open_plots`); digging up a stump frees a spot | saplings and fruit grow into trees in 5 days; flower seeds bloom in 3 |
 | trees cut down | permanent | leaves a stump until someone digs it out |
 | broken rocks | come back elsewhere after 3 days | breaking one takes eating an apple first |
 
-With `world_facts: perturbed`, every species gets an invented name, prices are jittered by
-0.6 to 1.6x, and fish locations and hours are reshuffled, so models can't fall back on what
-they remember about ACNH.
+Runs perturb these facts: every species gets an invented name, prices are jittered by 0.6 to
+1.6x, and fish locations and hours are reshuffled, so models can't fall back on what they
+remember about ACNH. `data/island_world.yaml` holds the unperturbed version the tables above
+describe.
 
 **Buildings, NPCs and opening hours.** The NPCs are rules, not agents (except Isabelle's
 writing, below).
@@ -194,8 +230,24 @@ One villager can change everyone else's schedule.
 
 ### What villagers know
 
-Every villager's system prompt has their persona, the island rules, the action menu and
-(in the goals scenario) their goals. Each planning call adds:
+Villagers are told only what they can't find out by trying: the clock and planning times, the
+10 actions a day, when the plaza meets, that they can talk to whoever is nearby, who runs which
+building, their mental energy, and what is private. Everything else they learn on the island:
+- **by trying.** What rocks, trees and the beach give, how many there are, when shops open,
+  what a fish is: a failed or empty action uses the hour and says why ("Nook's Cranny is closed
+  at 06:00 (open 08:00-22:00)", "there is no rock you can reach from here").
+- **by asking.** `ask` an NPC at their building: Tom Nook (house upgrades and loans, moving
+  home and the free homesites, the bridge), Isabelle (ordinances and their cost), Blathers (the
+  museum), Timmy and Tommy (what they'd pay for what you're carrying) or the Able Sisters.
+- **from each other**, at the plaza, in letters and in conversation.
+
+What they learn lasts as long as their memory does: today's and yesterday's events, their notes
+(the last 15) and their nightly page. The full world, as described in this README, is in
+`data/island_world.yaml` for you; villagers never see it.
+
+The persona and these rules make up the system prompt. Plan calls add a compact action menu
+(verbs and their fields only); conversations and the plaza leave it out. Each planning call
+adds:
 - the date, weather, ordinance, their bells, loan, home, neighbors, inventory, clothes,
   furniture and open requests
 - the recipes they know and the Cranny prices they have seen (they learn prices by selling)
@@ -248,6 +300,8 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 | `pay_loan` | `bells` | Resident Services | |
 | `contribute_bridge` | `bells` | Resident Services | |
 | `set_ordinance` | `ordinance`: early_bird, night_owl, bell_boom, none | Resident Services | pay Isabelle 20,000 bells; starts tomorrow |
+| `move_house` | `to`: a free homesite | Resident Services | pay Tom Nook 10,000 bells; the home moves overnight, furniture and all |
+| `ask` | `who`: Tom Nook, Isabelle, Blathers, Timmy and Tommy, Able Sisters | their building | hear what they do and what it costs (open hours apply) |
 | `decorate` / `undecorate` | `item` | home | put furniture in or take it out; visitors see it |
 | `visit` | `who` | their home | see the next section |
 | `rest` | | home | |
@@ -278,7 +332,6 @@ of villager pairs within sight of each other:
 
 | setup | pairs |
 |---|---|
-| named places (everyone at the same point) | 136 |
 | grid, idle at home | 45 |
 | grid, wandering | 72 |
 
@@ -297,8 +350,8 @@ of villager pairs within sight of each other:
 - **Shaping space.** Paths, fences and furniture outside change where everyone can walk.
 
 **Encounters** (no action hour), in three steps as in ACNH:
-1. **Notice** (no LLM). After each hour, bodies check who is within 6 tiles of whom (on the
-   places map, at the same place). Homes don't count.
+1. **Notice** (no LLM). After each hour, bodies check who is within 6 tiles of whom. Homes
+   don't count.
 2. **Decide** (a small LLM call, about 300 tokens). Each villager who notices someone
    chooses whether to approach one of them, and if so, their opening line.
 3. **Talk.** Approaches are taken in random order. Conversations are one on one, each
@@ -341,43 +394,53 @@ experimental condition of its own. Otherwise the announcement is a fixed templat
 
 ### Mental energy (a token budget)
 
-Turn it on with `mental_energy: {enabled: true}` in a scenario. Each villager gets `daily`
-points every morning (150 by default; a point is about 100 tokens read or written, counted as
-characters / 4) and divides them between three kinds of thinking:
-- planning: the plan calls
-- thinking: the private thoughts and notes in every reply, and the nightly reflection
-- talking: deciding whether to approach someone, each line in a conversation, and the plaza
+Turn it on with `mental_energy: {enabled: true}` in a scenario. Each villager gets one pool of
+`daily` points every morning (150 by default; a point is about 100 tokens, counted as
+characters / 4) for every call they make: plans, deciding whether to approach someone, each
+line in a conversation, the plaza, and writing at night.
 
-Everything a villager reads counts, including its system prompt, so a plan costs about 30
-points and a line in a conversation about 18. Villagers see what they have left and the
-typical costs. Each time they plan they can re-divide what is left, and the split they last
-chose is how the next day's energy is divided, so a talker or a planner can emerge. Isabelle
-isn't charged.
+A call is charged for what changes from call to call (the situation in the prompt, and their
+own nightly page) plus everything they write back. The fixed rules and persona in the system
+prompt aren't charged: they are the same every time, and charging them would mostly measure
+how often a villager re-reads the rulebook. Villagers see what they have left and the typical
+cost of each kind of call. Isabelle isn't charged.
 
-When a part runs out:
-- no planning energy: they do what they did yesterday at that time of day (habit)
-- no talking energy: they don't approach anyone, only nod when spoken to, and skip the plaza
-- no thinking energy: their replies keep no thoughts or notes, and they skip reflecting
+**Choosing where it goes.** Deciding whether to spend energy can't itself cost a call, so
+villagers decide ahead, in each plan reply:
+- `"plaza": true | false`: go to the plaza this evening
+- `"write": true | false`: write the private page tonight
+- `"next": "plan" | "habit"`: at the next planning time, plan again, or repeat what they did
+  yesterday at that time, which is free. Habit covers one planning time; they plan again after.
 
-`island_blank.yaml` has it on. Mock runs of 5 days with 10 blank villagers used these totals:
+Each choice keeps its value until they change it, and the prompt shows the current value. The
+plaza and writing default to on, and the next plan to "plan". In the moment they also choose
+whether to approach someone, how long to talk and how much to write.
 
-| daily budget | tokens | plans replaced by habit |
+**When it runs out** they can't make any call until the next morning: they follow habit instead
+of planning, only nod when spoken to, skip the plaza, and don't write. Their old page stays.
+
+What it was spent on is still recorded by kind for analysis (planning, talking, and thinking for
+private thoughts, notes and the nightly page), along with what each villager chose to skip and
+how often they ran out. `island_blank.yaml` has it on. Mock runs of 5 days with 10 blank
+villagers:
+
+| daily budget | villager tokens (incl. system prompts) | plans replaced by habit (ran out) |
 |---|---|---|
-| off | 604k | 0 |
-| 150 | 408k | 23 of 102 |
-| 100 | 260k | 85 of 135 |
-| 60 | 64k | almost all; nobody can afford a plan |
+| off | 343k | 0 of 100 |
+| 150 | 318k | 0 of 101 |
+| 60 | 296k | 0 of 104 |
+| 30 | 201k | 23 of 109 |
 
-Reflections skipped for lack of energy leave a night unwritten (the old page stays), which is a result in
-itself but worth knowing when comparing runs.
+Mock replies are short. Real models write longer replies and thoughts, so a budget binds sooner.
 
 ### Emergent personality: blank villagers
 
 `scenarios/island_blank.yaml` starts ten identical villagers. They share one persona
 ("you have just moved to this island"), have neutral names, no species, no personality type,
 no goals, and the same sleep schedule. The world facts are perturbed, so ACNH knowledge doesn't
-steer them. The only asymmetries at the start come from the island: arrival order, the
-homesite each one picks, which side of the river they end up on, luck, and who they meet.
+steer them, and they are told only what they can't find out by trying. The only asymmetries at
+the start come from the island: the homesite drawn for each of them, which side of the river
+that is, luck, and who they meet.
 
 **Reflection.** Each night, one call per villager gives them a private page to write on, free
 form, at most 150 words (`reflection.max_words`; a length cap only). They see what happened that
@@ -396,8 +459,8 @@ alongside, not scored. Analysis of a run with reflection writes:
   places visited, distance walked, how often they approach someone they notice, chats,
   letters, gifts, visits made and hosted, favors asked and done, furniture inside, donations,
   bridge money, trades).
-- `villagers_env.csv`: what each villager was dealt: arrival hour, homesite, steps to Resident
-  Services, and buildings and rocks reachable without tools.
+- `villagers_env.csv`: what each villager was dealt: homesite, steps to Resident Services, and
+  buildings and rocks reachable without tools.
 - `selves/<name>.md`: what each villager wrote to themselves, night by night.
 - `traits_divergence.png`: each metric by villager, with the spread across villagers. A rising
   spread means villagers are differentiating.
@@ -412,19 +475,9 @@ memory, not from the nightly writing loop.
 
 ### Scenarios and villagers
 
-| scenario | villagers | what's different |
-|---|---|---|
-| `island_baseline.yaml` | `villagers/cast.yaml` | no goals. What do they do with ten actions a day when nothing is asked of them? |
-| `island_goals.yaml` | `villagers/cast.yaml` | a shared wish for a full museum, plus one personal goal per villager sampled from a pool (or set under `goals.personal`) |
-| `island_blank.yaml` | `villagers/blank_cast.yaml` | identical villagers, perturbed facts, nightly reflection and mental energy on |
-
-All three use the grid, free-time wandering, trickle arrivals and 30 days.
-
-In the cast, all ten villagers share `villagers/villager.md`. Only the traits in
-`villagers/cast.yaml` differ: species, personality type, a one-line temperament, sleep hours
-loosely following their ACNH personality type (lazy villagers go to bed at 23:00, cranky and
-sisterly ones stay up until 03:00), and a routine. Swap in original names before anything
-public; real names also cue the model's memory of those characters.
+`scenarios/island_blank.yaml` is the scenario: `villagers/blank_cast.yaml` with
+`villagers/blank.md`, perturbed facts, the grid, free-time wandering, everyone landing together,
+nightly reflection, mental energy on, and 30 days.
 
 ### Outputs
 
@@ -447,27 +500,29 @@ Each island run directory has:
 - who took each resource, with a concentration index (HHI), and net worth with its Gini
 - museum completeness, donors, and how often a villager sold a species the museum still lacked
 - bridge contributors, trades and the median price relative to Nook's Cranny, recipes taught
-- each villager's action mix, and when they acted across the day compared with their routine
+- each villager's action mix, and when they acted across the day
 - what hour the rocks, shells and fossil spots typically run out
 - ordinances and who set them
 - weather: days of each kind, time use and catches per attempt by weather
 - sightings: how often a try came up empty, and how much each villager spotted
 - visits, gifts and favors per villager, and the most frequent gift pairs
-- estimated tokens per villager, and with mental energy on, how each villager split and spent it
+- estimated tokens per villager, and with mental energy on, what each villager spent it on, chose to skip, and how often they ran out
 
 ### Cost
 
-Up to 3 plan calls per awake villager per day, about 25 encounter calls (mostly the cheap
-decision calls), the plaza rounds, one Isabelle call, and with reflection one call per villager
-per night (about 1,000 tokens each). Without encounters that was roughly 35 to 45 calls and 50
-to 60k input tokens per in-game day with the default cast.
+Up to 3 plan calls per awake villager per day, the encounter calls (mostly the cheap decision
+calls), the plaza rounds, one call per villager per night when they write, and one Isabelle
+call. In mock runs of `island_blank` that is about 55 villager calls and 65k villager tokens per
+island day, plus about 4k for Isabelle. Typical inputs: a plan about 1,800 tokens (700 of them
+the system prompt), a plaza round about 1,500, a line in a conversation about 1,200, a notice or
+a nightly page about 300 to 500. Real replies are longer than the mock's, so expect more.
 
 ### Checkpoints and one island day per real day
 
 After every day the whole simulation is saved to `checkpoint.pkl` in the run directory:
 
 ```bash
-llmabm run scenarios/island_goals.yaml --run-dir runs/live --days 1   # day 0
+llmabm run scenarios/island_blank.yaml --run-dir runs/live --days 1   # day 0
 llmabm resume runs/live                                                # day 1, 2, ...
 llmabm resume runs/live --days 3 --backend cerebras                    # three more, another model
 ```
@@ -526,8 +581,8 @@ reading anything into a run.
   hidden variable.
 - Outputs depend on prompt wording as much as on traits. Treat prompt variants as
   experimental conditions and run several seeds per condition.
-- Names and labels cue behaviour. ACNH villager names and species cue the model's memory of
-  those characters.
+- Names and labels cue behaviour. That's why the blank villagers have short neutral names and
+  the species have invented ones.
 - Prices, yields and species tables are from memory of ACNH and approximate. Lines marked
   ASSUMPTION in `data/island_world.yaml` and `docs/grid_spec.md` are the ones to check.
 
@@ -550,7 +605,7 @@ src/llmabm/
     sim.py              the day loop: plans, hours, encounters, visits, plaza, Isabelle, checkpoints
     prompts.py          what villagers are told, and the action menu
     body.py             position, tools, walking, who arrives first
-    space.py            the Space interface and the named-places map
+    space.py            the Space interface
     grid.py             the tile island: generation, pathfinding, sight, building
     energy.py           mental energy
     traits.py           emergence metrics for reflection runs
@@ -562,8 +617,8 @@ tests/
 
 ## Extending
 
-- New island scenario: copy `scenarios/island_baseline.yaml` and change the cast, goals,
-  calendar, arrivals or world file.
+- New island scenario: copy `scenarios/island_blank.yaml` and change the cast, calendar or
+  world file.
 - New island rule: an action is a `_do_<name>` method on `Island` in `island/world.py`, plus
   a line in `ACTION_MENU` in `island/prompts.py`. If it happens somewhere specific, teach
   `GridSpace.resolve` where.

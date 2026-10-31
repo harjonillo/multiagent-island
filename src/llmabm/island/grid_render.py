@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .grid import BRIDGE, GRASS, POND, RIVER, ROCKY, SAND, SEA, GridSpace
+from .grid import BRIDGE, POND, RIVER, ROCKY, SAND, SEA, GridSpace
 
 COLORS = {
     "sea": (0.62, 0.79, 0.90), "sand": (0.95, 0.89, 0.77), "river": (0.44, 0.69, 0.88),

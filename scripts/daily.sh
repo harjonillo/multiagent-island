@@ -5,7 +5,7 @@
 #
 # Settings, all optional, via environment variables:
 #   RUN_DIR   where the run lives            (default: runs/live)
-#   SCENARIO  scenario for a new run         (default: scenarios/island_goals.yaml)
+#   SCENARIO  scenario for a new run         (default: scenarios/island_blank.yaml)
 #   SEED      seed for a new run             (default: 0)
 #   BACKEND   backend name from config       (default: the config's default)
 #   DAYS      island days to add per call    (default: 1)
@@ -13,7 +13,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 RUN_DIR="${RUN_DIR:-runs/live}"
-SCENARIO="${SCENARIO:-scenarios/island_goals.yaml}"
+SCENARIO="${SCENARIO:-scenarios/island_blank.yaml}"
 SEED="${SEED:-0}"
 DAYS="${DAYS:-1}"
 BACKEND_ARG=()

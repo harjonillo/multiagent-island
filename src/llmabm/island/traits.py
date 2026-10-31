@@ -7,7 +7,7 @@ alongside, not scored.
 
 Outputs (written by `write_traits`):
   traits_daily.csv    one row per villager per day: behavioural metrics
-  villagers_env.csv   what each villager was dealt: arrival hour, homesite, reachability
+  villagers_env.csv   what each villager was dealt: homesite and reachability
   selves/<name>.md    what each villager wrote to themselves, night by night
   traits_divergence.png   how far apart villagers are on each metric, day by day
   traits_profile.png      each villager's recent behavioural profile, z-scored
@@ -45,7 +45,7 @@ METRICS = {
     "favors_done": "requests from others they fulfilled",
     "interior": "furniture inside their home (end of day)",
     "talk_energy": "share of mental energy spent talking (mental energy runs only)",
-    "habit_plans": "plans skipped for habit because planning energy ran out",
+    "habit_plans": "plans replaced by habit because mental energy ran out",
     "donations": "museum donations",
     "bridge_bells": "bells put toward the bridge",
     "trades": "completed trades",
@@ -158,31 +158,29 @@ def _val(m, d, n, k):
 
 
 def _env(run: Run) -> dict[str, dict]:
-    """What each villager was dealt, before any choices beyond picking a homesite."""
+    """What each villager was dealt: the homesite drawn for them on day 0, and what it gives access to."""
+    from .grid import GridSpace
+
     names = list(run.manifest["villagers"])
     arr = {e["agent"]: e for e in run.of("arrival")}
-    env = {n: {"arrival_hour": arr.get(n, {}).get("hour"), "homesite": arr.get(n, {}).get("homesite"),
-               "home_area": arr.get(n, {}).get("area")} for n in names}
-    if run.manifest.get("space") == "grid":
-        from .grid import GridSpace
-
-        g = GridSpace(run.manifest["world"], run.manifest["seed"])
-        snaps = snapshots(run)
-        rocks = [tuple(r) for r in (snaps[0].get("objects") or {}).get("rocks", []) if r] if snaps else []
-        rs = g.coords_of_place("Resident Services")
-        for n in names:
-            site = env[n]["homesite"]
-            door = g.coords_of_home(site) if site else None
-            if door is None:
-                continue
-            bare = g.distances(door, frozenset())
-            # With a pole, everything on the lower ground is reachable: a fair measure of how central home is.
-            env[n]["steps_to_resident_services"] = g.distances(door, frozenset({"vaulting pole"})).get(rs)
-            env[n]["buildings_reachable_without_tools"] = sum(
-                1 for b in g.buildings.values() if b["door"] in bare)
-            env[n]["rocks_reachable_without_tools"] = sum(
-                1 for r in rocks if any(a in bare for a in g.approach_cells(r)))
-            env[n]["home_x"], env[n]["home_y"] = door
+    env = {n: {"homesite": arr.get(n, {}).get("homesite"), "home_area": arr.get(n, {}).get("area")} for n in names}
+    g = GridSpace(run.manifest["world"], run.manifest["seed"])
+    snaps = snapshots(run)
+    rocks = [tuple(r) for r in (snaps[0].get("objects") or {}).get("rocks", []) if r] if snaps else []
+    rs = g.coords_of_place("Resident Services")
+    for n in names:
+        site = env[n]["homesite"]
+        door = g.coords_of_home(site) if site else None
+        if door is None:
+            continue
+        bare = g.distances(door, frozenset())
+        # With a pole, everything on the lower ground is reachable: a fair measure of how central home is.
+        env[n]["steps_to_resident_services"] = g.distances(door, frozenset({"vaulting pole"})).get(rs)
+        env[n]["buildings_reachable_without_tools"] = sum(
+            1 for b in g.buildings.values() if b["door"] in bare)
+        env[n]["rocks_reachable_without_tools"] = sum(
+            1 for r in rocks if any(a in bare for a in g.approach_cells(r)))
+        env[n]["home_x"], env[n]["home_y"] = door
     return env
 
 
@@ -247,7 +245,7 @@ def summary_lines(run: Run) -> list[str]:
         first = _std([_val(m, days[0], n, k) for n in names])
         last = _std([_val(m, days[-1], n, k) for n in names])
         L.append(f"  {k:<14} {first:7.2f} -> {last:7.2f}")
-    feats = [f for f in ("arrival_hour", "steps_to_resident_services", "buildings_reachable_without_tools",
+    feats = [f for f in ("steps_to_resident_services", "buildings_reachable_without_tools",
                          "rocks_reachable_without_tools") if any(env[n].get(f) is not None for n in names)]
     if feats:
         L.append("Does where they landed predict how they behave? Spearman across villagers:")

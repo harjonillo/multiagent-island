@@ -120,22 +120,15 @@ ORDINANCE_TEXT = {
 }
 
 
-LOCATION = {
-    "mine_rock": "rocks", "chop_wood": "woods", "shake_tree": "orchard", "plant": "woods",
-    "chop_down_tree": "woods", "catch_bug": "fields", "beachcomb": "beach", "dig_fossil": "fields",
-    "craft": "home", "sell": "Nook's Cranny", "donate": "museum", "upgrade_house": "Resident Services",
-    "pay_loan": "Resident Services", "contribute_bridge": "Resident Services", "set_ordinance": "Resident Services",
-    "rest": "home", "decorate": "home", "undecorate": "home", "wear": "home",
-}
+# Who you can ask, and where to find them.
+NPCS = {"tom nook": ("Resident Services", "resident_services"), "isabelle": ("Resident Services", "resident_services"),
+        "blathers": ("museum", "museum"), "timmy": ("Nook's Cranny", "cranny"), "tommy": ("Nook's Cranny", "cranny"),
+        "timmy and tommy": ("Nook's Cranny", "cranny"), "able sisters": ("Able Sisters", "able"),
+        "the able sisters": ("Able Sisters", "able")}
 
 
-def location_of(action: dict) -> str:
-    do = str(action.get("do", "")).lower()
-    if do == "fish":
-        return str(action.get("where", "river")).lower()
-    if do == "buy":
-        return "Able Sisters" if str(action.get("shop", "")).lower() == "able" else "Nook's Cranny"
-    return LOCATION.get(do, "around the island")
+def npc_of(action: dict) -> str | None:
+    return str(action.get("who", "")).strip().lower() or None
 
 
 def category_of(w: dict, item: str) -> str | None:
@@ -161,7 +154,6 @@ class Villager:
     today: list[str] = field(default_factory=list)  # results of today's actions, in order
     wakes: int = 6        # clock hour the villager usually gets up
     sleeps: int = 24      # clock hour they go to bed; values past 24 or below `wakes` mean after midnight
-    routine: str = ""     # soft preference for when they are out and about
     self_doc: str = ""    # private free-form page, rewritten nightly when reflection is on
     wearing: dict = field(default_factory=dict)  # slot -> clothing item; others can see it
     interior: list = field(default_factory=list)  # furniture inside their home; visitors see it
@@ -214,15 +206,15 @@ class Island:
         self.collected: dict[str, Counter] = {n: Counter() for n in villager_names}  # resource class -> count
         self.ordinance = "none"
         self.pending_ordinance: tuple[str, str] | None = None  # (ordinance, who set it), effective next morning
+        self.pending_moves: dict[str, str] = {}  # villager -> homesite Tom Nook moves them to overnight
+        self.moved_today: list[str] = []
         self.news: list[str] = []            # today's public happenings, for Isabelle's announcement
         self.yesterday_news: list[str] = []
         self.announcement: str | None = None  # LLM-written morning announcement, when enabled
         self.favors: list[dict] = []          # requests villagers made of each other
         self.favors_done_today: list[dict] = []
         self.where_notes: dict[str, str] = {}  # per villager: getting around (tools, what is reachable)
-        self.space_desc: str = ""
-        self.sites: dict = dict((world.get("map") or {}).get("homesites") or {})
-        self.places: dict = dict((world.get("map") or {}).get("places") or {})
+        self.sites: dict = {}  # homesite id -> {area, at}; filled in from the tile island
         self.home: dict[str, str | None] = {n: None for n in villager_names}       # homesite id
         self.arrived: dict[str, int | None] = {n: None for n in villager_names}    # game hour of arrival (day 0)
 
@@ -315,6 +307,12 @@ class Island:
         self.day += 1
         self.yesterday_news, self.news = self.news, []
         self._set_date_and_weather()
+        self.moved_today = []
+        for name, site in sorted(self.pending_moves.items()):
+            self.home[name] = site
+            self.moved_today.append(name)
+            self.yesterday_news.append(f"{name} moved home to {self.sites[site]['area']}")
+        self.pending_moves = {}
         if self.pending_ordinance:
             self.ordinance, who = self.pending_ordinance
             self.pending_ordinance = None
@@ -392,7 +390,8 @@ class Island:
 
     # --- actions -----------------------------------------------------------
     _NEEDS_OPEN = {"sell": "cranny", "upgrade_house": "resident_services", "pay_loan": "resident_services",
-                   "contribute_bridge": "resident_services", "donate": "museum", "set_ordinance": "resident_services"}
+                   "contribute_bridge": "resident_services", "donate": "museum", "set_ordinance": "resident_services",
+                   "move_house": "resident_services"}
 
     def shop_hours(self, place: str) -> list[int]:
         a, b = self.w.get("hours", {}).get(place, [0, 24])
@@ -412,6 +411,10 @@ class Island:
         place = self._NEEDS_OPEN.get(do)
         if do == "buy":
             place = "able" if str(action.get("shop", "")).lower() == "able" else "cranny"
+        if do == "ask":
+            if npc_of(action) not in NPCS:
+                return False, f"nobody called '{action.get('who', '')}' to ask; try Tom Nook, Isabelle, Blathers, Timmy and Tommy or the Able Sisters"
+            place = NPCS[npc_of(action)][1]
         if place and not self.is_open(place, hour):
             names = {"cranny": "Nook's Cranny", "able": "the Able Sisters", "resident_services": "Resident Services", "museum": "the museum"}
             return False, f"{names[place]} is closed at {clock(hour)} (open {fmt_window(self.shop_hours(place))})"
@@ -731,7 +734,7 @@ class Island:
 
     # --- building: these need the grid, which works out the tiles ------------
     def _needs_grid(self, a):
-        return None if "cells" in a or "path" in a else (False, "you can only do that on the tile island (space: grid)")
+        return None if "cells" in a or "path" in a else (False, "you can only do that somewhere on the tile island")
 
     def _do_lay_path(self, vil, a, hour):
         if self._needs_grid(a):
@@ -927,6 +930,67 @@ class Island:
         self.news.append(f"{vil.name} paid Isabelle to set the ordinance to {o.replace('_', ' ')} from tomorrow")
         return True, f"paid Isabelle {cost} bells; the {o.replace('_', ' ')} ordinance starts tomorrow at {clock(self.w['calendar']['day_start'])}"
 
+    def _do_move_house(self, vil, a, hour):
+        cost = int(self.w.get("move_house_cost", 10000))
+        site = str(a.get("to", "")).strip()
+        free = [s for s in self.free_sites() if s not in self.pending_moves.values()]
+        if vil.name in self.pending_moves:
+            return False, f"Tom Nook is already moving you to {self.pending_moves[vil.name]} tonight"
+        if site not in free:
+            opts = ", ".join(f"{s} ({self.sites[s]['area']})" for s in free) or "none"
+            return False, f"Tom Nook can't move you to '{site}'; free homesites: {opts}"
+        if vil.bells < cost:
+            return False, f"Tom Nook says moving your home costs {cost} bells; you have {vil.bells}"
+        vil.bells -= cost
+        self.pending_moves[vil.name] = site
+        self.news.append(f"{vil.name} is moving home to {self.sites[site]['area']}")
+        return True, (f"paid Tom Nook {cost} bells; your home moves to {self.sites[site]['area']} ({site}) overnight, "
+                      "with everything inside it")
+
+    def _do_ask(self, vil, a, hour):
+        """Talk to an island NPC: what they do, and what it costs. Takes the hour, costs nothing else."""
+        who = npc_of(a)
+        w = self.w
+        if who == "tom nook":
+            levels = w["house_levels"]
+            if vil.house + 1 < len(levels):
+                nxt = levels[vil.house + 1]
+                up = (f"I can build you a {nxt['name']} (storage {nxt['storage']}, room for {nxt['interior']} pieces "
+                      f"of furniture inside) right away, on a loan of {nxt['cost']} bells with no interest and no deadline")
+            else:
+                up = "Your house is as big as it gets"
+            if vil.loan:
+                up += f". You still owe {vil.loan} bells, and that needs paying off before the next upgrade"
+            else:
+                up += ". A loan has to be paid off before the next upgrade"
+            free = [s for s in self.free_sites() if s not in self.pending_moves.values()]
+            sites = ", ".join(f"{s} ({self.sites[s]['area']})" for s in free) or "none right now"
+            br = w["bridge"]
+            bridge = ("The bridge is built." if self.bridge_built else
+                      f"The {br['name']} costs {br['cost']} bells, {self.bridge_fund} raised so far; anyone can chip in, "
+                      "and it opens more rocks and trees to everyone.")
+            text = (f"Tom Nook: {up}. I can also move your home to a free homesite overnight for "
+                    f"{w.get('move_house_cost', 10000)} bells. Free homesites: {sites}. {bridge}")
+        elif who == "isabelle":
+            ords = w.get("ordinances", {})
+            opts = "; ".join(f"{k.replace('_', ' ')}: {ORDINANCE_TEXT.get(k, k).split(': ', 1)[-1]}"
+                             for k in ords.get("types", {}) if k != "none")
+            text = (f"Isabelle: The ordinance now is {ORDINANCE_TEXT.get(self.ordinance, self.ordinance).split(':')[0].lower()}. "
+                    f"Anyone can pay me {ords.get('cost', 0)} bells to set one for the whole island from the next "
+                    f"morning, or to lift it (none). Options: {opts}.")
+        elif who == "blathers":
+            text = ("Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for "
+                    f"everyone to see; I don't pay for donations. So far: {self.museum_line()}.")
+        elif who in ("timmy", "tommy", "timmy and tommy"):
+            mine = {k: self.sell_price(k) for k in sorted(vil.inventory) if vil.inventory[k] > 0}
+            vil.prices_seen.update(mine)
+            offer = ", ".join(f"{k} {p}" for k, p in mine.items()) or "nothing, your pockets are empty"
+            text = (f"Timmy and Tommy: We buy almost anything at a fixed price, and sell a small stock that changes "
+                    f"every day. For what you're carrying we'd pay: {offer}.")
+        else:
+            text = "The Able Sisters: We sell clothes, a few different ones every day. Others see what you wear."
+        return True, f"asked {text}"
+
     def _build_bridge(self):
         self.bridge_built = True
         u = self.w["bridge"]["unlocks"]
@@ -973,6 +1037,7 @@ class Island:
             "bridge_built": self.bridge_built,
             "collected": {n: dict(c) for n, c in self.collected.items()},
             "homes": dict(self.home),
+            "home_areas": {n: self.sites[s]["area"] for n, s in self.home.items() if s in self.sites},
             "ordinance": self.ordinance,
         }
 

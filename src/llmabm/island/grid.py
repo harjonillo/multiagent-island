@@ -477,7 +477,7 @@ class GridSpace(Space):
     # --- what bodies ask of the grid ---------------------------------------------
     _BUILDING_FOR = {"sell": "Nook's Cranny", "donate": "museum", "upgrade_house": "Resident Services",
                      "pay_loan": "Resident Services", "contribute_bridge": "Resident Services",
-                     "set_ordinance": "Resident Services"}
+                     "set_ordinance": "Resident Services", "move_house": "Resident Services"}
 
     def __getstate__(self):
         state = dict(self.__dict__)
@@ -585,6 +585,12 @@ class GridSpace(Space):
         if do == "buy":
             b = "Able Sisters" if str(action.get("shop", "")).lower() == "able" else "Nook's Cranny"
             return self._to_building(b, start, tools)
+        if do == "ask":
+            from .world import NPCS, npc_of
+
+            if npc_of(action) not in NPCS:
+                return "around the island", None, {}, None  # the world explains who can be asked
+            return self._to_building(NPCS[npc_of(action)][0], start, tools)
         if do in self._BUILDING_FOR:
             return self._to_building(self._BUILDING_FOR[do], start, tools)
         if do in ("craft", "rest", "wear", "decorate", "undecorate"):
@@ -920,15 +926,6 @@ class GridSpace(Space):
         if not hasattr(self, "critters"):  # grids pickled before sight existed
             self.critters, self.known, self.looked, self.seen_ids = [], {}, {}, {}
         return self.critters
-
-    def rules_text(self) -> str:
-        r = round(self.sight)
-        return (f"- You only see what is within about {r} tiles of you. Bugs sit on flowers, trees, stumps, rocks or "
-                "the grass until someone catches them or they leave; fish show as shadows (tiny to huge) and you "
-                "only learn what a fish is once you catch it. You can only go after a bug or shadow you can see "
-                "from where you are or from where you go to look. Shells and fossil dig spots are new every "
-                "morning, and you only know the ones you have seen, so finding them means going to look "
-                "(say \"near\": \"<place>\", which can also be a part of the island like \"north beach\").")
 
     def _habitat_cells(self, island, kind: str, hab: str) -> list[Cell]:
         if kind == "bug":

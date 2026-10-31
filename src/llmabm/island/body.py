@@ -12,7 +12,7 @@ Nothing here calls an LLM, so all of it is deterministic given the RNG.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from .space import Point, Space
 from .world import Island

@@ -87,6 +87,12 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
             acts.append({"do": "visit", "who": rng.choice(_neighbors(prompt))})
         elif 0.60 <= r < 0.62 and any(k in inv for k in _FURNITURE):
             acts.append({"do": "decorate", "item": next(k for k in _FURNITURE if k in inv)})
+        elif 0.62 <= r < 0.66:
+            acts.append({"do": "ask", "who": rng.choice(["Tom Nook", "Isabelle", "Blathers", "Timmy and Tommy",
+                                                         "Able Sisters", "Mabel"])})
+        elif 0.66 <= r < 0.68 and bells > 10000:
+            sites = re.findall(r"\b(site-\d+) \(", prompt)
+            acts.append({"do": "move_house", "to": rng.choice(sites) if sites else "site-1"})
         elif r < 0.375 and bells > 25000:
             acts.append({"do": "set_ordinance", "ordinance": rng.choice(["early_bird", "night_owl", "bell_boom", "none"])})
         elif r < 0.39 and "apple" in inv:
@@ -96,8 +102,13 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
     acts = [{"hour": h, **act} for h, act in zip(hours, acts)]
     out = {"thoughts": "rocks first, then fishing", "actions": acts,
            "note": "" if rng.random() < 0.8 else "the rocks went fast today"}
-    if "Mental energy left today" in prompt and rng.random() < 0.25:
-        out["energy"] = {"planning": rng.randint(1, 6), "thinking": rng.randint(0, 3), "talking": rng.randint(0, 6)}
+    if '"plaza": true | false' in prompt:
+        if rng.random() < 0.2:
+            out["plaza"] = rng.random() < 0.5
+        if rng.random() < 0.2:
+            out["write"] = rng.random() < 0.6
+        if rng.random() < 0.15:
+            out["next"] = rng.choice(["plan", "habit"])
     return json.dumps(out)
 
 
@@ -129,15 +140,6 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
             out["offers"].append({"to": rng.choice(others), "give": {k: 1}, "want": {"bells": rng.choice([100, 400, 900, 2000])}, "note": "fair price?"})
         if recipes and rng.random() < 0.2:
             out["teach"].append({"to": rng.choice(others), "recipe": rng.choice(recipes)})
-    return json.dumps(out)
-
-
-def arrival_reply(prompt: str, rng: random.Random) -> str:
-    sites = re.findall(r"^- ([\w-]+): ", prompt.split("Free homesites:")[1], re.M)
-    out = {"thoughts": "somewhere quiet would be nice", "homesite": rng.choice(sites) if sites else "", "actions": []}
-    if "Then plan up to" in prompt:
-        out = {**json.loads(plan_reply(prompt.replace("Then plan up to", "Plan up to"), rng)), **{k: out[k] for k in ("homesite",)},
-               "thoughts": out["thoughts"]}
     return json.dumps(out)
 
 

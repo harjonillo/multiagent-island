@@ -22,7 +22,6 @@ import random
 import re
 import threading
 import time
-from collections import defaultdict
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
@@ -32,13 +31,13 @@ import yaml
 
 from ..agent import AgentSpec, load_agent_file
 from ..llm import LLMError
-from .prompts import (ISABELLE_SYSTEM, arrival_prompt, encounter_prompt, evening_prompt, isabelle_announce_prompt,
+from .prompts import (ISABELLE_SYSTEM, encounter_prompt, evening_prompt, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
                       isabelle_summary_prompt, plan_prompt, system_prompt)
 from .energy import MentalEnergy
+from .grid import GridSpace
 from .body import Bodies
-from .space import PlaceSpace
-from .world import Island, clock, load_world, location_of, to_game_hour
+from .world import Island, clock, load_world, to_game_hour
 
 
 class EventLog:
@@ -58,18 +57,14 @@ class IslandScenario:
     name: str
     description: str
     world: dict
-    world_facts: str
     days: int
     villagers: dict[str, AgentSpec]
-    goals: dict[str, list[str]]
     brief: str = ""
     start_bells: int = 1000
     memory_size: int = 15
     temperature: float = 0.8
     max_tokens: int = 700
-    arrivals: dict = field(default_factory=lambda: {"mode": "trickle", "window": [5, 18]})
-    space: str = "places"        # "places" (named points) or "grid" (tile island)
-    free_time: str = "home"      # "home" or "wander" (random walk; grid only)
+    free_time: str = "wander"    # "wander" (short random walks) or "home"
     isabelle: dict = field(default_factory=lambda: {"summary": True, "announce": False, "backend": None})
     reflection: dict = field(default_factory=lambda: {"enabled": False})
     mental_energy: dict = field(default_factory=dict)
@@ -80,12 +75,11 @@ def load_island_scenario(path: Path, seed: int = 0) -> IslandScenario:
     path = Path(path)
     root = path.parent.parent if path.parent.name == "scenarios" else path.parent
     cfg = yaml.safe_load(path.read_text())
-    rng = random.Random(f"goals|{seed}")
     villagers = {}
     entries = cfg["villagers"]
     if isinstance(entries, str):  # path to a cast file: a list of {name, <traits>...}
         entries = yaml.safe_load((root / entries).read_text())
-    template = cfg.get("villager_template", "villagers/villager.md")
+    template = cfg.get("villager_template", "villagers/blank.md")
     for v in entries:
         v = dict(v)
         name = v.pop("name")
@@ -93,17 +87,8 @@ def load_island_scenario(path: Path, seed: int = 0) -> IslandScenario:
         overrides = {**v.pop("set", {}), "trait_values": v}
         spec = load_agent_file(root / file, root, name=name, overrides=overrides)
         villagers[spec.name] = spec
-    goals: dict[str, list[str]] = {n: [] for n in villagers}
-    g = cfg.get("goals") or {}
-    for n in villagers:
-        goals[n] += list(g.get("shared", []))
-        personal = (g.get("personal") or {}).get(n)
-        if personal:
-            goals[n] += personal if isinstance(personal, list) else [personal]
-        elif g.get("personal_pool"):
-            goals[n].append(rng.choice(g["personal_pool"]))
-    facts = cfg.get("world_facts", "canonical")
-    world = load_world(root / cfg.get("world", "data/island_world.yaml"), facts, seed)
+    # Species get invented names and prices are jittered, so ACNH knowledge doesn't steer anyone.
+    world = load_world(root / cfg.get("world", "data/island_world.yaml"), "perturbed", seed)
     world["calendar"].update(cfg.get("calendar") or {})  # scenario can override the clock
     world.setdefault("encounters", {}).update(cfg.get("encounters") or {})
     world.setdefault("grid", {}).update(cfg.get("grid") or {})
@@ -113,18 +98,14 @@ def load_island_scenario(path: Path, seed: int = 0) -> IslandScenario:
         name=cfg.get("name", path.stem),
         description=cfg.get("description", ""),
         world=world,
-        world_facts=facts,
         days=int(cfg.get("days", 30)),
         villagers=villagers,
-        goals=goals,
         brief=cfg.get("brief", ""),
         start_bells=int(cfg.get("start_bells", 1000)),
         memory_size=int(cfg.get("memory_size", 15)),
         temperature=float(llm.get("temperature", 0.8)),
         max_tokens=int(llm.get("max_tokens", 700)),
-        arrivals={"mode": "trickle", "window": [5, 18], **(cfg.get("arrivals") or {})},
-        space=str(cfg.get("space", "places")),
-        free_time=str(cfg.get("free_time", "home")),
+        free_time=str(cfg.get("free_time", "wander")),
         isabelle={"summary": True, "announce": False, "backend": None, **(cfg.get("isabelle") or {})},
         reflection={"enabled": False, "max_words": 150, **(cfg.get("reflection") or {})},
         mental_energy=dict(world["mental_energy"]),
@@ -177,26 +158,20 @@ class IslandSimulation:
         self.verbose = verbose
         self.rng = random.Random(f"island|{seed}")
         self.isl = Island(sc.world, list(sc.villagers), self.rng, sc.start_bells)
-        # The mind (LLM) plans; bodies walk and act in space; the world applies the rules.
-        if sc.space == "grid":
-            from .grid import GridSpace
-
-            self.space = GridSpace(sc.world, seed)
-            # Homesites come from the generated island instead of the named-place map.
-            self.isl.sites = {sid: {"area": v["area"], "at": list(v["door"])} for sid, v in self.space.sites.items()}
-        else:
-            self.space = PlaceSpace(sc.world)
+        # The mind (LLM) plans; bodies walk and act on the tile island; the world applies the rules.
+        self.space = GridSpace(sc.world, seed)
+        self.isl.sites = {sid: {"area": v["area"], "at": list(v["door"])} for sid, v in self.space.sites.items()}
         self.space.attach(self.isl)
-        self.isl.space_desc = self.space.describe()
         self.bodies = Bodies(self.isl, self.space)
         for n, spec in sc.villagers.items():  # schedules come from the cast traits
             vil = self.isl.v[n]
             vil.wakes = int(spec.traits.get("wakes", vil.wakes))
             vil.sleeps = int(spec.traits.get("sleeps", vil.sleeps))
-            vil.routine = str(spec.traits.get("routine", ""))
-        # Mental energy: a daily token budget each villager splits between planning, thinking and talking.
+        # Mental energy: one daily token budget per villager, spent on whatever they choose.
         self.energy = MentalEnergy(sc.mental_energy, list(sc.villagers))
         self.isl.energy = self.energy
+        # Where each villager has chosen to spend energy next (set in their plans).
+        self.choices = {n: {"plaza": True, "write": True, "next": "plan"} for n in sc.villagers}
         self.habits: dict[tuple[str, int], list[dict]] = {}
         self._build_systems()
         self.yesterday: dict[str, list[str]] = {n: [] for n in sc.villagers}
@@ -205,14 +180,9 @@ class IslandSimulation:
         self.calls = 0
         self.failures = 0
         self.max_failures = 15  # consecutive failed calls before giving up on the run
-        # Arrival hours on day 0, in game hours.
+        # Everyone lands together at the start of day 0, on a homesite drawn at random.
         start = sc.world["calendar"]["day_start"]
-        a, b = (to_game_hour(x, start) if x < 24 else x for x in sc.arrivals.get("window", [5, 18]))
-        arng = random.Random(f"arrivals|{seed}")
-        if sc.arrivals.get("mode", "trickle") == "together":
-            self.arrival_hour = {n: a for n in sc.villagers}
-        else:
-            self.arrival_hour = {n: arng.randrange(a, max(a + 1, b)) for n in sc.villagers}
+        self.arrival_hour = {n: start for n in sc.villagers}
         self.noticed: dict[str, list[str]] = {n: [] for n in sc.villagers}
         self.window_end = start
 
@@ -245,6 +215,14 @@ class IslandSimulation:
         if not hasattr(sim, "energy"):  # checkpoints from before mental energy existed
             sim.energy = MentalEnergy({"enabled": False}, list(sim.isl.v))
             sim.isl.energy, sim.habits = sim.energy, {}
+        elif any(isinstance(v, dict) for v in sim.energy.left.values()):  # from before energy was one pool
+            sim.energy = MentalEnergy(sim.sc.mental_energy, list(sim.isl.v))
+            sim.isl.energy = sim.energy
+        if not hasattr(sim, "choices"):
+            sim.choices = {n: {"plaza": True, "write": True, "next": "plan"} for n in sim.isl.v}
+        for attr, default in (("pending_moves", {}), ("moved_today", [])):
+            if not hasattr(sim.isl, attr):
+                setattr(sim.isl, attr, default)
         sim.verbose = verbose
         if backend_override:
             sim.override = backend_override
@@ -264,30 +242,39 @@ class IslandSimulation:
         return run_dir
 
     def _build_systems(self) -> None:
-        """System prompts: persona, what the villager wrote last night (if reflection is on),
-        island rules and goals. Rebuilt after every nightly reflection."""
+        """System prompts: persona, what the villager wrote last night (if reflection is on) and
+        the island rules. Plans also get the action menu; conversations and the plaza don't.
+        Rebuilt after every nightly reflection."""
         sc = self.sc
-        on = bool(sc.reflection.get("enabled"))
-        selfdoc = lambda n: self.isl.v[n].self_doc if on else None  # noqa: E731
-        extra = self.space.rules_text() if hasattr(self.space, "rules_text") else ""
-        self.systems = {n: system_prompt(s, sc.world, len(sc.villagers), sc.goals[n], sc.brief, selfdoc(n), extra)
+        selfdoc = self._self_doc
+        self.systems = {n: system_prompt(s, sc.world, len(sc.villagers), sc.brief, selfdoc(n))
                         for n, s in sc.villagers.items()}
-        self.light_systems = {n: light_system_prompt(s, sc.goals[n], selfdoc(n)) for n, s in sc.villagers.items()}
+        self.talk_systems = {n: system_prompt(s, sc.world, len(sc.villagers), sc.brief, selfdoc(n), menu=False)
+                             for n, s in sc.villagers.items()}
+        self.light_systems = {n: light_system_prompt(s, selfdoc(n)) for n, s in sc.villagers.items()}
+
+    def _self_doc(self, name: str) -> str | None:
+        return self.isl.v[name].self_doc if self.sc.reflection.get("enabled") else None
 
     def _reflect(self, d: int) -> None:
-        """Nightly: each villager writes a free-form private page that replaces the last one."""
+        """Nightly: each villager writes a free-form private page that replaces the last one,
+        unless they chose not to write tonight."""
         cfg = self.sc.reflection
         if not cfg.get("enabled"):
             return
         isl = self.isl
         max_words = int(cfg.get("max_words", 150))
         who = [n for n in isl.v if isl.arrived[n] is not None]
+        for name in [n for n in who if not self.choices[n]["write"]]:
+            self.log("reflection", day=d, agent=name, self_doc=isl.v[name].self_doc, error=None, raw=None,
+                     skipped="chose not to write tonight")
+        who = [n for n in who if self.choices[n]["write"]]
 
         def reflect(name):
             user = reflect_prompt(isl, isl.v[name], max_words)
-            if not self.energy.can(name, "thinking", self._need(name, user, self.light_systems[name])):
+            if not self.energy.can(name, self._need(name, user)):
                 return TIRED
-            return self._call(name, user, f"d{d:03d}_reflect", system=self.light_systems[name],
+            return self._call(name, user, f"d{d:03d}_reflect", system=self.light_systems[name], free_text=True,
                               max_tokens=max_words * 3 + 200, kind="thinking", what="reflect")
 
         results = self._parallel(reflect, who)
@@ -295,7 +282,7 @@ class IslandSimulation:
             if results[name] is TIRED:
                 self.energy.skip(name, "thinking")
                 self.log("reflection", day=d, agent=name, self_doc=isl.v[name].self_doc, error=None, raw=None,
-                         skipped="no thinking energy left")
+                         skipped="no energy left")
                 continue
             reply, _, err = results[name]
             text = re.sub(r"<think>.*?</think>", "", reply.text if reply else "", flags=re.S | re.I).strip()
@@ -315,12 +302,13 @@ class IslandSimulation:
         self.log = lambda type_, **k: self._raw_log(type_, **{"hour": self.hour, **k})
 
     # --- llm plumbing ------------------------------------------------------
-    def _need(self, name: str, user: str, system: str | None = None) -> float:
-        """Points of mental energy it takes to read this prompt."""
-        return self.energy.points(system or self.systems[name], user)
+    def _need(self, name: str, user: str) -> float:
+        """Points of mental energy it takes to read this prompt: what changes from call to call
+        (the situation, and the villager's own nightly page), not the fixed rules and persona."""
+        return self.energy.points(self._self_doc(name) or "", user)
 
     def _call(self, name: str, user: str, tag: str, system: str | None = None, backend_name: str | None = None,
-              max_tokens: int | None = None, json_reply: bool = False, kind: str | None = None, what: str = "other"):
+              max_tokens: int | None = None, free_text: bool = False, kind: str | None = None, what: str = "other"):
         if backend_name is None:
             backend_name = self.override or self.sc.villagers[name].model
         backend = self.backends[backend_name]
@@ -340,17 +328,16 @@ class IslandSimulation:
             return None, None, str(e)
         self.failures = 0
         self.calls += 1
-        if system is not None and not json_reply:  # free text: Isabelle, and villagers' nightly reflection
+        if free_text:  # Isabelle, and villagers' nightly page
             obj, err, thought = None, None, reply.text
         else:
             obj, err = parse_action_obj(reply.text)
             thought = " ".join(str((obj or {}).get(k) or "") for k in ("thoughts", "note"))
-            if name in self.isl.v and obj and not self.energy.has_thinking(name):  # nothing private is kept
-                obj["thoughts"], obj["note"] = "", ""
         if name in self.isl.v:
-            self.energy.record(name, kind, what, self.energy.points(msgs[0]["content"], user),
-                               self.energy.points(reply.text), self.energy.points(thought),
-                               immediate=threading.current_thread() is threading.main_thread())
+            read = self._need(name, user)
+            self.energy.record(name, kind, what, read, self.energy.points(reply.text), self.energy.points(thought),
+                               immediate=threading.current_thread() is threading.main_thread(),
+                               fixed=self.energy.points(msgs[0]["content"], user) - read)
         return reply, obj, err
 
     def _parallel(self, fn, names):
@@ -388,6 +375,8 @@ class IslandSimulation:
         self.space.new_day(isl, self.rng)
         self.space.sync(isl)
         self.bodies.new_day()
+        for n in isl.moved_today:  # Tom Nook moved their home overnight
+            self.bodies.place_at_home(n)
         d = isl.day
         self.hour = cal["day_start"]
         self.first_plan = {n: True for n in isl.v}
@@ -402,6 +391,8 @@ class IslandSimulation:
             ordinance=isl.ordinance, news=isl.yesterday_news, announcement=isl.announcement,
             month=isl.month, season=isl.season, weather=isl.weather, date=isl.date_text(),
             awake={n: list(isl.awake_window(n)) for n in isl.v})
+        if d == 0:
+            self._settle_all(d)
         for i, (a, b) in enumerate(cal["plans"]):
             self.hour = a
             self.window_end = b
@@ -414,8 +405,7 @@ class IslandSimulation:
             vil.notes = vil.notes[-self.sc.memory_size:]
         self.hour = cal["day_start"] + cal.get("day_length", 24)
         snap = isl.snapshot()
-        if self.sc.space == "grid":
-            snap["objects"] = self.space.objects_snapshot(isl)
+        snap["objects"] = self.space.objects_snapshot(isl)
         log("snapshot", **snap)
         self._reflect(d)
         log("energy", day=d, enabled=self.energy.enabled, villagers=self.energy.day_record())
@@ -426,42 +416,25 @@ class IslandSimulation:
                   f"bridge {isl.bridge_fund}, trades {trades}, calls so far {self.calls}", flush=True)
 
     # --- arrivals ----------------------------------------------------------
-    def _arrive(self, d: int, h: int) -> None:
-        """Villagers landing this hour pick a homesite and plan the rest of the window.
-        Same-hour arrivals choose one after another, so later ones see earlier picks."""
-        isl, log = self.isl, self.log
-        names = [n for n, hh in self.arrival_hour.items() if hh == h and isl.arrived[n] is None]
+    def _settle_all(self, d: int) -> None:
+        """Day 0: everyone lands at once, and Tom Nook has a tent ready for each of them on a
+        homesite drawn at random. Moving later costs bells (move_house)."""
+        isl, h = self.isl, self.hour
+        names = sorted(isl.v)
         self.rng.shuffle(names)
-        budget = self.sc.world["calendar"]["actions_per_day"]
         for name in names:
+            site, _ = isl.settle(name, self.rng.choice(isl.free_sites()) if isl.free_sites() else None)
             isl.arrived[name] = h
-            vil = isl.v[name]
-            awake = [x for x in range(h + 1, self.window_end) if isl.is_awake(name, x)]
-            user = arrival_prompt(isl, vil, h, awake, min(budget, len(awake)))
-            reply, obj, err = self._call(name, user, f"d{d:03d}_arrival", kind="planning", what="plan")
-            self.energy.resplit(name, (obj or {}).get("energy"))
-            site, msg = isl.settle(name, (obj or {}).get("homesite"))
             self.bodies.place_at_home(name)
-            vil.today.append(f"{clock(h)} arrived on the island and {msg}")
-            log("arrival", day=d, agent=name, wanted=(obj or {}).get("homesite"), homesite=site, thoughts=_thoughts(obj),
-                area=isl.sites[site]["area"] if site else None, result=msg, error=err,
-                raw=reply.text if reply else None)
-            acts = [x for x in (obj or {}).get("actions", []) if isinstance(x, dict)] if obj else []
-            if awake:
-                scheduled, dropped = self._assign_hours(name, acts, awake[0], awake[-1] + 1)
-                for hh, act in scheduled:
-                    self.schedule.setdefault(hh, []).append((name, act))
-                log("plan", day=d, phase="arrival", agent=name, window=[h, self.window_end],
-                    scheduled=[{"at": hh, **act} for hh, act in scheduled], dropped=dropped,
-                    note="", error=err, raw=None, cached=reply.cached if reply else False)
-            note = str((obj or {}).get("note") or "").strip()
-            if note:
-                vil.notes.append((d, note))
+            area = isl.sites[site]["area"] if site else None
+            isl.v[name].today.append(f"{clock(h)} arrived on the island; Tom Nook had set up your tent "
+                                     + (f"{area} ({site})" if site else "nowhere: there were no homesites left"))
+            self.log("arrival", day=d, agent=name, homesite=site, area=area)
 
     # --- encounters --------------------------------------------------------
     def _radius(self) -> float:
         cfg = self.sc.world.get("encounters") or {}
-        return float(cfg.get("grid_radius", 6) if self.sc.space == "grid" else cfg.get("radius", 0.5))
+        return float(cfg.get("grid_radius", 6))
 
     def _encounters(self, d: int, h: int, out: list[str], near: dict[str, list[str]]) -> None:
         """(1) Bodies notice who is near whom. (2) Each such villager decides, in a small LLM
@@ -484,10 +457,10 @@ class IslandSimulation:
         def decide(name):
             place = self.bodies.b[name].place
             user = notice_prompt(isl, isl.v[name], place, h, near[name])
-            if not self.energy.can(name, "talking", self._need(name, user, self.light_systems[name])):
+            if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             return self._call(name, user, f"d{d:03d}_h{h % 24:02d}_notice", system=self.light_systems[name],
-                              json_reply=True, max_tokens=250, kind="talking", what="notice")
+                              max_tokens=250, kind="talking", what="notice")
 
         results = self._parallel(decide, deciders)
         busy: set[str] = set()
@@ -533,12 +506,13 @@ class IslandSimulation:
             speaker, other = (a, b) if i % 2 == 0 else (b, a)
             role = None if not visit else ("guest" if speaker == a else "host")
             user = encounter_prompt(isl, isl.v[speaker], other, place, h, turns, opener=(i == 0), visit=role)
-            if not self.energy.can(speaker, "talking", self._need(speaker, user)):
+            if not self.energy.can(speaker, self._need(speaker, user)):
                 self.energy.skip(speaker, "talking")
                 turns.append({"speaker": speaker, "text": "", "thoughts": "", "error": None,
                               "act": "just nodded (too tired to talk)"})
                 break
-            reply, obj, err = self._call(speaker, user, f"d{d:03d}_h{h % 24:02d}_chat", kind="talking", what="chat")
+            reply, obj, err = self._call(speaker, user, f"d{d:03d}_h{h % 24:02d}_chat", system=self.talk_systems[speaker],
+                                         kind="talking", what="chat")
             say = str((obj or {}).get("say") or "").strip()[:500]
             turn = {"speaker": speaker, "text": say, "thoughts": _thoughts(obj), "error": err}
             self._chat_acts(d, speaker, other, obj or {}, turn)
@@ -618,7 +592,7 @@ class IslandSimulation:
         if cfg.get("summary"):
             digest = day_digest(events, self.isl)
             reply, _, err = self._call("isabelle", isabelle_summary_prompt(d, digest), f"d{d:03d}_isabelle",
-                                       system=ISABELLE_SYSTEM, backend_name=backend_name, max_tokens=700)
+                                       system=ISABELLE_SYSTEM, backend_name=backend_name, max_tokens=700, free_text=True)
             text = (reply.text.strip() if reply else "") or f"(no summary: {err})"
             days_dir = self.run_dir / "days"
             days_dir.mkdir(exist_ok=True)
@@ -627,13 +601,14 @@ class IslandSimulation:
         if cfg.get("announce"):
             pub = public_digest(self.isl, events)
             reply, _, err = self._call("isabelle", isabelle_announce_prompt(d + 1, pub), f"d{d:03d}_announce",
-                                       system=ISABELLE_SYSTEM, backend_name=backend_name, max_tokens=300)
+                                       system=ISABELLE_SYSTEM, backend_name=backend_name, max_tokens=300, free_text=True)
             self.isl.announcement = reply.text.strip() if reply else None
             self.log("isabelle_announcement", day=d, for_day=d + 1, text=self.isl.announcement, error=err)
 
     def _plan(self, d: int, phase: int, a: int, b: int) -> None:
         """One LLM call per awake villager to schedule actions in hours [a, b).
-        Villagers asleep for the whole window, or out of energy, are not called."""
+        Villagers asleep for the whole window are not called. Those who chose habit for this
+        planning time, or have no energy left, repeat what they did yesterday at this time."""
         isl, log = self.isl, self.log
         budget = self.sc.world["calendar"]["actions_per_day"]
         who = []
@@ -649,9 +624,12 @@ class IslandSimulation:
             vil = isl.v[name]
             awake = [h for h in range(a, b) if isl.is_awake(name, h)]
             left = budget - self.used[name]
+            if self.choices[name]["next"] == "habit":
+                return HABIT
             user = plan_prompt(isl, vil, awake[0], awake[-1] + 1, min(left, len(awake)), self.yesterday[name],
-                               announcement=self.first_plan[name], noticed=self.noticed[name][-8:])
-            if not self.energy.can(name, "planning", self._need(name, user)):
+                               announcement=self.first_plan[name], noticed=self.noticed[name][-8:],
+                               choices=self.choices[name])
+            if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             self.first_plan[name] = False
             vil.inbox = []
@@ -660,15 +638,21 @@ class IslandSimulation:
         results = self._parallel(plan, who)
         for name in who:
             awake = [h for h in range(a, b) if isl.is_awake(name, h)]
-            if results[name] is TIRED:  # no planning energy: do what they did yesterday at this time of day
-                self.energy.skip(name, "planning")
+            if results[name] in (TIRED, HABIT):  # do what they did yesterday at this time of day
+                chose = results[name] is HABIT
+                if chose:
+                    self.choices[name]["next"] = "plan"  # habit covers one planning time; they plan again after it
+                else:
+                    self.energy.skip(name, "planning")
                 acts = [dict(x) for x in self.habits.get((name, phase), [])]
                 scheduled, dropped = self._assign_hours(name, acts, awake[0], awake[-1] + 1)
                 for h, act in scheduled:
                     self.schedule.setdefault(h, []).append((name, act))
-                isl.v[name].today.append(f"{clock(a)} too tired to plan, so you "
+                why = "you went with habit" if chose else "too tired to plan"
+                isl.v[name].today.append(f"{clock(a)} {why}, so you "
                                          + ("did what you did yesterday" if scheduled else "took it easy"))
                 log("plan", day=d, phase=phase, agent=name, window=[a, b], thoughts="", habit=True,
+                    habit_reason="chosen" if chose else "no energy left",
                     scheduled=[{"at": h, **act} for h, act in scheduled], dropped=dropped, note="", error=None,
                     raw=None, cached=False)
                 continue
@@ -678,13 +662,29 @@ class IslandSimulation:
             for h, act in scheduled:
                 self.schedule.setdefault(h, []).append((name, act))
             self.habits[(name, phase)] = [{"hour": h % 24, **act} for h, act in scheduled]
-            split = self.energy.resplit(name, (obj or {}).get("energy"))
+            chosen = self._apply_choices(name, obj or {})
             note = str((obj or {}).get("note") or "").strip()
             if note:
                 isl.v[name].notes.append((d, note))
             log("plan", day=d, phase=phase, agent=name, window=[a, b], thoughts=_thoughts(obj),
                 scheduled=[{"at": h, **act} for h, act in scheduled], dropped=dropped, note=note, error=err,
-                energy_split=split, raw=reply.text if reply else None, cached=reply.cached if reply else False)
+                choices=chosen, raw=reply.text if reply else None, cached=reply.cached if reply else False)
+
+    def _apply_choices(self, name: str, obj: dict) -> dict:
+        """Read the spending choices from a plan reply. Anything missing or unreadable keeps its value."""
+        if not self.energy.enabled:
+            return {}
+        ch, changed = self.choices[name], {}
+        for key in ("plaza", "write"):
+            v = obj.get(key)
+            if isinstance(v, str) and v.strip().lower() in ("true", "false", "yes", "no"):
+                v = v.strip().lower() in ("true", "yes")
+            if isinstance(v, bool):
+                ch[key] = changed[key] = v
+        nxt = str(obj.get("next") or "").strip().lower()
+        if nxt in ("plan", "habit"):
+            ch["next"] = changed["next"] = nxt
+        return changed
 
     def _assign_hours(self, name: str, acts: list[dict], a: int, b: int):
         """Place each action at its requested hour, or the next free hour in the window.
@@ -723,8 +723,6 @@ class IslandSimulation:
         isl, log = self.isl, self.log
         cal = self.sc.world["calendar"]
         social = cal.get("social_hours", [])
-        if d == 0:
-            self._arrive(d, h)
         spoke = set()
         if h in social:
             spoke = self._social_round(d, social.index(h))
@@ -827,7 +825,11 @@ class IslandSimulation:
                     o.status = "expired"
                     log("offer_update", **asdict(o))
             self.speak = list(isl.v)
-        speak = [n for n in self.speak if isl.is_awake(n, self.hour)]
+            for n in isl.v:
+                if isl.is_awake(n, self.hour) and not self.choices[n]["plaza"]:
+                    log("evening_turn", day=d, round=r, agent=n, error=None, thoughts="", raw=None, cached=False,
+                        skipped="chose not to go to the plaza")
+        speak = [n for n in self.speak if isl.is_awake(n, self.hour) and self.choices[n]["plaza"]]
         if not speak:
             return set()
         before = set(self.offers)
@@ -836,10 +838,11 @@ class IslandSimulation:
             vil = isl.v[name]
             waiting = [o for o in self.offers.values() if o.recipient == name and o.status == "pending"]
             user = evening_prompt(isl, vil, r, self.hour, waiting, isl.board[-8:])
-            if not self.energy.can(name, "talking", self._need(name, user)):
+            if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             vil.inbox = []
-            return self._call(name, user, f"d{d:03d}_h{self.hour % 24:02d}", kind="talking", what="evening")
+            return self._call(name, user, f"d{d:03d}_h{self.hour % 24:02d}", system=self.talk_systems[name],
+                              kind="talking", what="evening")
 
         results = self._parallel(turn, speak)
         order = list(speak)
@@ -986,12 +989,12 @@ class IslandSimulation:
             "description": self.sc.description,
             "seed": self.seed,
             "days": days,
-            "world_facts": self.sc.world_facts,
-            "space": self.sc.space,
+            "world_facts": "perturbed",
+            "space": "grid",
             "free_time": self.sc.free_time,
             "backend_override": self.override,
             "villagers": {n: {"persona": s.persona, "traits": s.traits, "model": self.override or s.model,
-                              "goals": self.sc.goals[n], "source": s.source} for n, s in self.sc.villagers.items()},
+                              "source": s.source} for n, s in self.sc.villagers.items()},
             "world": self.sc.world,
             "scenario_config": self.sc.raw,
             "arrivals": {n: clock(h) for n, h in self.arrival_hour.items()},
@@ -1001,6 +1004,7 @@ class IslandSimulation:
 
 
 TIRED = ("tired",)  # marker: the villager had no energy for this call, so it wasn't made
+HABIT = ("habit",)  # marker: the villager chose habit for this planning time, so no call was made
 
 
 def _thoughts(obj) -> str:
