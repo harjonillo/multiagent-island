@@ -533,6 +533,7 @@ Each island run directory has:
 | `days/day_NNN.md` | one log per day, hour by hour: every action with its location, result and the state it changed, every letter, parcel, offer, trade and broken tool, the island's resources after each hour, and a table of everyone's state at the end |
 | `days/day_NNN_isabelle.md` | Isabelle's report |
 | `hourly_villagers.csv` | one row per villager per hour: activity, location, bells, loan, items, house |
+| `contributions.csv` | one row per villager: what they gave to the island (museum, bridge, public paths, decor, flowers, trees, ordinances), bells and hours it cost them, gifts to others, and their share of shared resources taken |
 | `hourly_island.csv` | one row per hour: rock hits left, wood, fruit, shells, fossil spots, trees, museum, bridge fund |
 | `networth.png`, `extraction.png`, `museum.png`, `commons.png`, `activity_by_hour.png` | plots |
 | `island_map.png`, `tracks_day_NNN.png` | the island, and where every villager was hour by hour on the last day (grid) |
@@ -544,6 +545,11 @@ Each island run directory has:
 - who took each resource, with a concentration index (HHI), and net worth with its Gini
 - museum completeness, donors, how often a villager sold a species the museum still lacked, and
   how many fossils were assessed or sold unassessed
+- who gave to the island, and at what cost to themselves: museum donations, bridge bells, paths,
+  decor and flowers in public places (more than 3 tiles from their own homesite) and trees
+  planted, as bells given up at Cranny prices and hours spent, next to gifts to other villagers
+  and each villager's share of the shared resources they took. Ordinances are listed apart.
+  Per villager in `contributions.csv`. It describes what they did, not why
 - bridge contributors, trades and the median price relative to Nook's Cranny, recipes taught
 - each villager's action mix, and when they acted across the day
 - what hour the rocks, shells and fossil spots typically run out

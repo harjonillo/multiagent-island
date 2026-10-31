@@ -708,6 +708,30 @@ def test_hidden_reasoning_is_recorded_and_optionally_charged():
         assert first.reasoning_tokens == 12
 
 
+def test_commons_contributions_split_public_from_home():
+    from llmabm.island.analysis import commons_contributions
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=4)
+    with tempfile.TemporaryDirectory() as d:
+        IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=4, backend_override="mock",
+                         verbose=False).run(3)
+        run = load_run(Path(d) / "run")
+        c = commons_contributions(run)
+        assert set(c) == set(sc.villagers)
+        donated = Counter(e["agent"] for e in run.of("action") if e["ok"] and e["action"].get("do") == "donate")
+        bridge = Counter()
+        for e in run.of("action"):
+            if e["ok"] and e["action"].get("do") == "contribute_bridge":
+                bridge[e["agent"]] -= e["delta"]["bells"]
+        snap = run.of("snapshot")[-1]
+        for n, o in c.items():
+            assert o["museum"] == donated[n] and o["bridge"] == bridge[n]
+            assert o["bells"] >= o["museum_bells"] + o["bridge"]
+            mine = [p for p in snap["objects"]["paths"] if p[3] == n]
+            assert o["paths_public"] + o["paths_home"] == len(mine)
+        assert abs(sum(o["took"] for o in c.values()) - 1.0) < 1e-9
+
+
 def test_spending_choices_are_read_from_plans():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:
@@ -784,6 +808,7 @@ def test_mental_energy_in_a_run():
         assert "25 points of mental energy a day" in prompt
         text = summary(run)
         assert "Estimated villager tokens" in text and "ran out" in text and "hidden reasoning: 0 tokens" in text
+        assert "Who gave to the island" in text
         assert "=== REASONING (0 tokens" in prompt or "=== REASONING (0 tokens" in next(
             (Path(d) / "run" / "prompts").glob("d001_*.txt")).read_text()
         assert run.manifest["backends"]["mock"] == "mock"

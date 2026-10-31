@@ -39,6 +39,97 @@ def extraction_shares(run: Run) -> dict[str, dict[str, float]]:
     return out
 
 
+YARD = 3  # tiles around a villager's own homesite that count as theirs; anything further out is public
+
+
+def commons_contributions(run: Run) -> dict[str, dict]:
+    """What each villager gave to the island as a whole, read from the logs after the fact.
+
+    Public means more than YARD tiles from the villager's own homesite (which could be next to
+    someone else's home). Measured two ways, with no view on motive:
+    - bells: what it cost them at Nook's Cranny prices: the sell price of what they donated to
+      the museum, bridge bells, and the value of trees, and of flowers and decor put in public
+    - hours: actions spent on the museum, the bridge, and planting or building in public places
+    Paths and decor are counted as they stand at the end of the run (a path someone later pulled
+    up no longer counts); everything else is counted when it happened. Ordinances are listed
+    apart: paying for an island-wide rule is spending on everyone, not necessarily for them.
+    Gifts to other villagers (in person or by mail) are kept apart too: generous, but to a
+    person rather than to the island.
+    """
+    from .grid import GridSpace
+    from .world import item_info, sell_prices
+
+    snaps = snapshots(run)
+    if not snaps:
+        return {}
+    world, last = run.manifest["world"], snaps[-1]
+    prices = sell_prices(world)
+    sites = GridSpace(world, run.manifest["seed"]).sites
+    homes_on = {sn["day"]: sn["homes"] for sn in snaps}
+
+    def public(name, cell, homes) -> bool:
+        site = sites.get(homes.get(name) or "")
+        if not site or cell is None:
+            return True
+        return min(max(abs(cell[0] - x), abs(cell[1] - y)) for x, y in site["cells"]) > YARD
+
+    names = list(last["villagers"])
+    keys = ("museum", "museum_bells", "bridge", "ordinance", "trees", "flowers_public", "flowers_home",
+            "paths_public", "paths_home", "decor_public", "decor_home", "gifts", "gift_bells", "bells", "hours")
+    out = {n: dict.fromkeys(keys, 0) for n in names}
+    for e in run.events:
+        if e["type"] == "gift" and e.get("ok") and e.get("giver") in out:
+            o = out[e["giver"]]
+            for k, q in (e.get("items") or {}).items():
+                o["gifts"] += q
+                o["gift_bells"] += q if k == "bells" else q * prices.get(k, 0)
+            continue
+        if e["type"] != "action" or not e.get("ok") or e.get("agent") not in out:
+            continue
+        o, a, do = out[e["agent"]], e["action"], e["action"].get("do")
+        homes = homes_on.get(e["day"], last["homes"])
+        if do == "donate":
+            o["museum"] += 1
+            o["museum_bells"] += prices.get(str(a.get("item", "")).lower(), 0)
+            o["hours"] += 1
+        elif do == "contribute_bridge":
+            o["bridge"] += -(e.get("delta") or {}).get("bells", 0)
+            o["hours"] += 1
+        elif do == "set_ordinance":
+            o["ordinance"] += -(e.get("delta") or {}).get("bells", 0)
+        elif do == "plant":
+            item = str(a.get("item", "")).lower()
+            out_there = public(e["agent"], e.get("at"), homes)
+            if item.endswith("seeds"):
+                o["flowers_public" if out_there else "flowers_home"] += 1
+                o["bells"] += prices.get(item, 0) if out_there else 0
+            else:  # a tree is anyone's to shake or chop, wherever it grows
+                o["trees"] += 1
+                o["bells"] += prices.get(item, 0)
+            o["hours"] += 1 if out_there or not item.endswith("seeds") else 0
+        elif do in ("lay_path", "place") and public(e["agent"], e.get("at"), homes):
+            o["hours"] += 1
+    objs = last.get("objects") or {}
+    for x, y, _style, owner, *_ in objs.get("paths", []):
+        if owner in out:
+            out[owner]["paths_public" if public(owner, (x, y), last["homes"]) else "paths_home"] += 1
+    tiles = Counter()
+    for x, y, item, kind, owner in objs.get("placed", []):
+        if owner in out and kind != "fence":
+            tiles[(owner, item, public(owner, (x, y), last["homes"]))] += 1
+    for (owner, item, pub), n in tiles.items():
+        w, h = item_info(world, item).get("size", [1, 1])
+        pieces = max(1, round(n / (w * h)))
+        out[owner]["decor_public" if pub else "decor_home"] += pieces
+        out[owner]["bells"] += pieces * prices.get(item, 0) if pub else 0
+    shares = extraction_shares(run)
+    used = [r for r in RESOURCES if any(shares[r].values())]
+    for n, o in out.items():
+        o["bells"] += o["museum_bells"] + o["bridge"]
+        o["took"] = sum(shares[r].get(n, 0) for r in used) / len(used) if used else 0.0
+    return out
+
+
 def hhi(shares: dict[str, float]) -> float:
     """Concentration: 1/N when evenly spread, 1 when one villager took everything."""
     return sum(s * s for s in shares.values())
@@ -66,6 +157,30 @@ def forgone_donations(run: Run) -> list[dict]:
                 if c and k not in museum[c] and k in e["result"]:
                     out.append({"day": e["day"], "agent": e["agent"], "item": k})
     return out
+
+
+def commons_lines(run: Run) -> list[str]:
+    c = commons_contributions(run)
+    if not c:
+        return []
+    n_vil = len(c)
+    L = ["", f"Who gave to the island (public = more than {YARD} tiles from their own homesite; bells = what it "
+             "cost them at Cranny prices; took = their average share of the shared resources, "
+             f"{1 / n_vil:.0%} is an even split):",
+         f"  {'':<8} {'museum':>6} {'bridge':>7} {'paths':>9} {'decor':>6} {'flowers':>7} {'trees':>5} "
+         f"{'bells':>8} {'hours':>5}   {'gifts to others':>15}   {'took':>4}",
+         f"  {'':<8} {'':>6} {'':>7} {'pub/home':>9} {'p/h':>6} {'p/h':>7} {'':>5} {'':>8} {'':>5}   "
+         f"{'items (bells)':>15}"]
+    for n, o in sorted(c.items(), key=lambda kv: (-kv[1]["bells"], -kv[1]["hours"], kv[0])):
+        gifts = f"{o['gifts']} ({o['gift_bells']:,})"
+        L.append(f"  {n:<8} {o['museum']:>6} {o['bridge']:>7,} {o['paths_public']:>4}/{o['paths_home']:<4} "
+                 f"{o['decor_public']:>3}/{o['decor_home']:<2} {o['flowers_public']:>4}/{o['flowers_home']:<2} "
+                 f"{o['trees']:>5} {o['bells']:>8,} {o['hours']:>5}   {gifts:>15}   {o['took']:>4.0%}")
+    ords = {n: o["ordinance"] for n, o in c.items() if o["ordinance"]}
+    if ords:
+        L.append("  paid for ordinances (island-wide, not counted above): "
+                 + ", ".join(f"{n} {b:,}" for n, b in sorted(ords.items(), key=lambda kv: -kv[1])))
+    return L
 
 
 def fossil_stats(run: Run) -> tuple[int, int]:
@@ -147,6 +262,8 @@ def summary(run: Run) -> str:
         top = sorted(shares[r].items(), key=lambda kv: -kv[1])[:3]
         if any(v for _, v in top):
             L.append(f"  {r:<8} HHI {hhi(shares[r]):.2f}   top: " + ", ".join(f"{n} {v:.0%}" for n, v in top))
+
+    L += commons_lines(run)
 
     nw = net_worth(last)
     L += ["", f"Net worth on the last day (bells + items at Cranny prices - loan); Gini {gini(list(nw.values())):.2f}"]
@@ -793,6 +910,17 @@ def analyze_island(run_dir: Path) -> None:
         print(f"wrote {p}")
     for p in write_hourly_csv(run, run.dir):
         print(f"wrote {p}")
+    contrib = commons_contributions(run)
+    if contrib:
+        import csv
+
+        with open(run.dir / "contributions.csv", "w", newline="") as f:
+            cols = list(next(iter(contrib.values())))
+            wr = csv.writer(f)
+            wr.writerow(["villager", *cols])
+            for n, o in contrib.items():
+                wr.writerow([n, *(round(o[k], 4) if isinstance(o[k], float) else o[k] for k in cols)])
+        print(f"wrote {run.dir / 'contributions.csv'}")
     if run.of("reflection"):
         from .traits import write_traits
 
