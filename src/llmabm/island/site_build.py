@@ -17,14 +17,13 @@ from .site_experiments import TOKENS, build_experiments, experiment_order, is_ru
 TEMPLATE = Path(__file__).with_name("site_template.html")
 
 def _crumb(run_dir: Path) -> str:
-    """`multiagent-island / [experiments] / exp NN`, numbered from 00 as on the Experiments page
-    (a mock run has no number: it isn't on that page)."""
+    """`multiagent-island / experiments / exp NN`, numbered from 00 as on the Experiments page (a mock
+    run has no number: it isn't on that page). The logo links back to the Experiments page."""
     runs = [p.resolve() for p in experiment_order(run_dir.parent)]
     n = runs.index(run_dir.resolve()) if run_dir.resolve() in runs else None
     home = "../../site/index.html"
-    return (f'<a href="{home}">multiagent-island</a><span class="sep">/</span>'
-            f'<a class="back" href="{home}">experiments</a>'
-            + (f'<span class="sep">/ exp {n:02d}</span>' if n is not None else ""))
+    return (f'<a href="{home}">multiagent-island</a><span class="sep">/ experiments'
+            + (f' / exp {n:02d}' if n is not None else "") + "</span>")
 
 
 def build_site(run_dir: Path, out_dir: Path | None = None) -> Path:

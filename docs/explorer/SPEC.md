@@ -28,9 +28,9 @@ to the experiments page in the top bar.
 ## Shared chrome
 
 - **Top bar:** inset to the page margins (28px), 20px above it, 2px `--tabbar-rule` lines above and below,
-  10px vertical padding. Left, on a run's pages: `multiagent-island / [experiments] / exp NN` in
-  Silkscreen 18px. The logo and the boxed "experiments" link (14px, 2px `--border`; in the repo no
-  arrow, and on hover it takes the active tab's fill and border) both go to the Experiments page. Then the run line in body font 13px muted:
+  10px vertical padding. Left, on a run's pages: `multiagent-island / experiments / exp NN` in
+  Silkscreen 18px, the logo in ink and linking to the Experiments page, the rest muted plain text (in the
+  repo; the handoff had a boxed "experiments" link with an arrow). Then the run line in body font 13px muted:
   `<scenario name> · seed <n> · <backend>`. On the Experiments page the left side is just the logo, and
   the right side says `N experiments`. Right: tabs Home, Days, Social. Active tab:
   2px `--tabbar-rule` border, `--tab-active-fill` background, ink text, weight 600. Inactive: 2px
