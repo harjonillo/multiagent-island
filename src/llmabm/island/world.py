@@ -530,6 +530,8 @@ class Island:
             place = "able" if str(action.get("shop", "")).lower() == "able" else "cranny"
         if do == "ask":
             if npc_of(action) not in NPCS:
+                if getattr(self, "prompt_version", 1) >= 2:
+                    return False, self.not_an_npc(str(action.get("who", "")))
                 return False, f"nobody called '{action.get('who', '')}' to ask; try Tom Nook, Isabelle, Blathers, Timmy and Tommy or the Able Sisters"
             place = NPCS[npc_of(action)][1]
         if place and not self.is_open(place, hour):
@@ -702,6 +704,32 @@ class Island:
         vil.interior.remove(item)
         vil.inventory[item] += 1
         return True, f"took the {item} out of your home"
+
+    def not_a_villager(self, who, verb: str = "visit") -> str:
+        """Why `visit` can't reach someone or somewhere, and what would (prompt version 2 on)."""
+        who = str(who or "").strip()
+        low = who.lower()
+        npcs = [n for n in NPCS if n in low and n not in ("timmy", "tommy", "the able sisters")]
+        if npcs:
+            where = sorted({("the " if NPCS[n][0] == "museum" else "") + NPCS[n][0] for n in npcs})
+            one = {"timmy and tommy": "Timmy and Tommy", "able sisters": "Able Sisters"}.get(npcs[0], npcs[0].title())
+            return (f"{who} {'don' if len(npcs) > 1 or ' and ' in low or 'sisters' in low else 'doesn'}'t live in a house you can visit; they work at "
+                    f"{' and '.join(where)}. To talk to " + ("one of them, use ask with one name at a time" if len(npcs) > 1
+                    else "them, use ask") + f" (who: {one}). Visiting is for other villagers' homes")
+        if low in {"resident services", "nook's cranny", "nooks cranny", "the cranny", "museum", "the museum",
+                   "able sisters", "plaza", "the plaza", "airport", "the airport"}:
+            return (f"{who} isn't anyone's home. You go somewhere by doing something there: buy or sell at Nook's "
+                    "Cranny, ask Tom Nook or Isabelle at Resident Services, donate or assess fossils at the museum. Visiting is for "
+                    "other villagers' homes")
+        return f"there is no villager called {who} to visit"
+
+    def not_an_npc(self, who: str) -> str:
+        """Why `ask` can't reach someone, and what would (prompt version 2 on)."""
+        if who in self.v:
+            return (f"{who} is a villager, not someone who runs a building, so ask doesn't reach them. To talk to "
+                    f"{who}, meet them around the island, visit their home, or write to them at the plaza")
+        return (f"nobody called '{who}' to ask; ask is for Tom Nook, Isabelle, Blathers, Timmy and Tommy or the "
+                "Able Sisters")
 
     def _do_visit(self, vil, a, hour):
         host = a.get("who")

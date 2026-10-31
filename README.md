@@ -338,9 +338,9 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 | `contribute_bridge` | `bells` | Resident Services | |
 | `set_ordinance` | `ordinance`: early_bird, night_owl, bell_boom, none | Resident Services | pay Isabelle 20,000 bells; starts tomorrow |
 | `move_house` | `to`: a free homesite | Resident Services | pay Tom Nook 10,000 bells; the home moves overnight, furniture and all |
-| `ask` | `who`: Tom Nook, Isabelle, Blathers, Timmy and Tommy, Able Sisters | their building | hear what they do and what it costs (open hours apply) |
+| `ask` | `who`: Tom Nook, Isabelle, Blathers, Timmy and Tommy, Able Sisters | their building | hear what they do and what it costs (open hours apply). Only for NPCs: to ask another villager something, talk to them |
 | `decorate` / `undecorate` | `item` | home | put furniture in or take it out; visitors see it |
-| `visit` | `who` | their home | see the next section |
+| `visit` | `who`: another villager | their home | knock, and talk if they're in; see the next section. Not for NPCs or buildings: villagers often try "visit Tom Nook" or "visit Nook's Cranny", and from prompt version 2 the failure says what to do instead |
 | `rest` | | home | |
 
 **Changing the island** (grid only, except planting trees)
@@ -636,9 +636,23 @@ llmabm resume runs/live --days 3 --backend cerebras                    # three m
 ```
 
 A resumed run is identical to an uninterrupted one with the same seed; a test checks this.
-Code and prompt changes take effect from the next resumed day, which lets you adjust the
-experiment as it goes. Note any changes you make, since they become part of the run's
-history. Only load checkpoints you made: pickle files can run code when loaded.
+If a day stopped partway (for example on a provider's daily limit), resuming replays it from the
+last checkpoint: what was logged of the unfinished day is moved to
+`events.unfinished-<time>.jsonl`, and its cached replies replay for free.
+
+**Changing things mid-experiment.** The world and scenario settings a run started with are saved
+in its checkpoint, so editing the YAML files doesn't affect a resumed run. Prompt wording has a
+version number (`PROMPT_CHANGES` in `prompts.py` lists what each changed), and a run keeps the
+version it started with, so its prompts and cached replies stay the same. To switch on purpose:
+
+```bash
+llmabm resume runs/live --prompt-version latest    # or a number
+```
+
+That is logged as an `intervention` event (from which day, and what changed), added to the
+manifest's `interventions`, and listed at the top of `summary.txt`. Changes to the code's rules
+(how actions resolve, what things cost) apply to resumed runs straight away and aren't recorded,
+so note them yourself. Only load checkpoints you made: pickle files can run code when loaded.
 
 `scripts/daily.sh` starts the run if it doesn't exist and otherwise resumes it by one day. It
 reads `RUN_DIR`, `SCENARIO`, `SEED`, `BACKEND` and `DAYS` from the environment. A cron line

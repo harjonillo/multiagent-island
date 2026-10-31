@@ -8,6 +8,15 @@ from ..agent import AgentSpec
 from .memory import memory_lines
 from .world import ORDINANCE_TEXT, Island, Villager, _fmt, clock, fmt_window
 
+# Prompt wording has versions so that a resumed run keeps the wording it started with, unless
+# it is switched on purpose (`llmabm resume --prompt-version`), which is logged as an intervention.
+PROMPT_VERSION = 2
+PROMPT_CHANGES = {
+    1: "the original wording",
+    2: "visit and ask: the action menu says who each is for, and visiting an NPC or a place, or asking a "
+       "villager, says how to reach them instead",
+}
+
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
 - mine_rock: rock?
 - chop_wood
@@ -42,6 +51,23 @@ ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour 
 - move_house: to (a homesite)
 - rest
 A place (for near, from, to) is "here", "home", "<villager>'s home", a building (Resident Services, Nook's Cranny, Able Sisters, museum, plaza, airport), "rock <number>", or a part of the island such as "north beach"."""
+
+
+_MENU_CHANGES = {
+    2: [("- visit: who\n", "- visit: who (another villager: walk to their home, knock, and talk if they're in)\n"),
+        ("- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters)\n",
+         "- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters: go to them and hear what "
+         "they do and what it costs)\n")],
+}
+
+
+def action_menu(version: int = PROMPT_VERSION) -> str:
+    menu = ACTION_MENU
+    for v in sorted(_MENU_CHANGES):
+        if v <= version:
+            for old, new in _MENU_CHANGES[v]:
+                menu = menu.replace(old, new)
+    return menu
 
 
 def island_rules(world: dict, n_villagers: int) -> str:
@@ -90,7 +116,7 @@ def self_section(self_doc: str | None) -> str | None:
 
 
 def system_prompt(spec: AgentSpec, world: dict, n_villagers: int, brief: str, self_doc: str | None = None,
-                  menu: bool = True) -> str:
+                  menu: bool = True, version: int = PROMPT_VERSION) -> str:
     """The villager's standing context. `menu` adds the action menu, which only plans need."""
     parts = [spec.persona]
     if self_section(self_doc):
@@ -100,7 +126,7 @@ def system_prompt(spec: AgentSpec, world: dict, n_villagers: int, brief: str, se
         parts.append("## About you\n" + "\n".join(f"- {k}: {v}" for k, v in about.items()))
     for fname, text in spec.docs:
         parts.append(f"## Something you know: {fname}\n{text}")
-    parts.append("## Your island\n" + island_rules(world, n_villagers) + (f"\n\n{ACTION_MENU}" if menu else ""))
+    parts.append("## Your island\n" + island_rules(world, n_villagers) + (f"\n\n{action_menu(version)}" if menu else ""))
     if brief:
         parts.append(brief.strip())
     return "\n\n".join(parts)

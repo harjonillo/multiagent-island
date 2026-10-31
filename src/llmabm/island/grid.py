@@ -618,6 +618,8 @@ class GridSpace(Space):
             host = action.get("who")
             site = island.home.get(host) if host in island.home else None
             if not site:
+                if getattr(island, "prompt_version", 1) >= 2:
+                    return "visiting", None, {}, island.not_a_villager(host, "visit")
                 return "visiting", None, {}, f"there is no home of {host} to visit"
             return self._to_building_door(f"{host}'s home", self.sites[site]["door"], start, tools)
         if do in ("beachcomb", "dig_fossil"):

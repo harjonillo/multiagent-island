@@ -218,6 +218,36 @@ def trade_stats(run: Run) -> dict:
             "counters": sum(1 for o in offers if o.get("parent")), "price_ratios": ratios, "pairs": pairs}
 
 
+def llm_calls(run: Run) -> int:
+    """LLM calls the run made, counted from the events (habit plans and nods made none)."""
+    return (sum(1 for p in run.of("plan") if not p.get("habit"))
+            + sum(1 for e in run.of("evening_turn") if not e.get("skipped"))
+            + sum(1 for e in run.of("reflection") if not e.get("skipped"))
+            + len(run.of("isabelle_summary")) + len(run.of("isabelle_announcement"))
+            + sum(1 for e in run.of("encounter") for t in e["turns"][1:] if not t.get("act", "").startswith("just nodded"))
+            + sum(1 for e in run.of("encounter_decision") if e.get("raw") is not None))
+
+
+def reply_errors(run: Run) -> int:
+    """Plans and plaza turns whose reply couldn't be read."""
+    return sum(1 for p in run.of("plan") + run.of("evening_turn") if p.get("error"))
+
+
+def run_out(run: Run) -> dict[str, tuple[int | None, int]]:
+    """For rocks, shells and fossil spots: (median hour they ran out, number of days they did)."""
+    gone = defaultdict(dict)
+    for st in run.of("hour_state"):
+        p = st["pools"]
+        for key, empty in (("rocks", sum(p["rocks"]) == 0), ("shells", p["shells_left"] == 0), ("fossils", p["fossils_left"] == 0)):
+            if empty and key not in gone[st["day"]]:
+                gone[st["day"]][key] = st["hour"]
+    out = {}
+    for key in ("rocks", "shells", "fossils"):
+        hs = sorted(g[key] for g in gone.values() if key in g)
+        out[key] = (hs[len(hs) // 2] if hs else None, len(hs))
+    return out
+
+
 def action_mix(run: Run) -> dict[str, Counter]:
     mix = defaultdict(Counter)
     for e in run.of("action"):
@@ -234,10 +264,11 @@ def summary(run: Run) -> str:
     failed = [a for a in acts if not a["ok"]]
     L = [
         f"run: {run.dir.name}   scenario: {m['scenario']}   seed: {m['seed']}",
-        f"days: {len(snaps)}   villagers: {len(names)}   llm calls: "
-        f"{sum(1 for p in plans if not p.get('habit')) + sum(1 for e in eves if not e.get('skipped')) + sum(1 for e in run.of('reflection') if not e.get('skipped')) + len(run.of('isabelle_summary')) + len(run.of('isabelle_announcement')) + sum(1 for e in run.of('encounter') for t in e['turns'][1:] if not t.get('act', '').startswith('just nodded')) + sum(1 for e in run.of('encounter_decision') if e.get('raw') is not None)}   "
-        f"parse/LLM errors: {sum(1 for p in plans + eves if p['error'])}",
+        f"days: {len(snaps)}   villagers: {len(names)}   llm calls: {llm_calls(run)}   "
+        f"parse/LLM errors: {reply_errors(run)}",
         f"actions: {len(acts)}   failed: {len(failed)} ({len(failed) / max(1, len(acts)):.0%})",
+        *[f"intervention from day {e['from_day']}: {e['what']} ({'; '.join(e.get('details') or [])})"
+          for e in run.of("intervention")],
         "",
         "Failed actions, most common reasons:",
     ]
@@ -245,16 +276,9 @@ def summary(run: Run) -> str:
     L += [f"  {n:>4}  {r}" for r, n in reasons.most_common(8)]
 
     # Timing: how early in the day do the scarce daily resources run out?
-    gone = defaultdict(dict)
-    for st in run.of("hour_state"):
-        p = st["pools"]
-        for key, empty in (("rocks", sum(p["rocks"]) == 0), ("shells", p["shells_left"] == 0), ("fossils", p["fossils_left"] == 0)):
-            if empty and key not in gone[st["day"]]:
-                gone[st["day"]][key] = st["hour"]
     L += ["", "When daily resources ran out (median hour, days it happened):"]
-    for key in ("rocks", "shells", "fossils"):
-        hs = sorted(g[key] for g in gone.values() if key in g)
-        L.append(f"  {key:<8} " + (f"{clock(hs[len(hs) // 2])} on {len(hs)}/{len(snaps)} days" if hs else "never ran out"))
+    for key, (hour, n) in run_out(run).items():
+        L.append(f"  {key:<8} " + (f"{clock(hour)} on {n}/{len(snaps)} days" if n else "never ran out"))
 
     L += ["", "Who took the shared resources (share of total; HHI 0.10 = perfectly even across 10):"]
     shares = extraction_shares(run)
@@ -935,6 +959,9 @@ def analyze_island(run_dir: Path) -> None:
         print(f"wrote {p}")
     for p in write_hourly_csv(run, run.dir):
         print(f"wrote {p}")
+    from .site_data import write as write_site_data
+
+    print(f"wrote {write_site_data(run.dir)}")
     contrib = commons_contributions(run)
     if contrib:
         import csv

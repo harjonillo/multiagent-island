@@ -864,6 +864,83 @@ def test_resume_sets_aside_a_day_that_did_not_finish():
         assert _set_aside_unfinished(run_dir, None, 0) is None and events.read_text() == day0
 
 
+def test_site_data_and_page_for_a_mock_run():
+    import json
+
+    from llmabm.island.analysis import analyze_island, llm_calls
+    from llmabm.island.site_build import build_site
+    from llmabm.island.site_data import fail_bucket
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=9)
+    with tempfile.TemporaryDirectory() as d:
+        run_dir = Path(d) / "run"
+        IslandSimulation(sc, load_backends(None), run_dir, seed=9, backend_override="mock", verbose=False).run(2)
+        analyze_island(run_dir)  # writes site_data.json alongside summary.txt
+        data = json.loads((run_dir / "site_data.json").read_text())
+        run = load_run(run_dir)
+        names = list(sc.villagers)
+        assert data["run"]["villagers"] == names and data["run"]["days"] == 2
+        assert data["run"]["llm_calls"] == llm_calls(run) and f"llm calls: {llm_calls(run)}" in summary(run)
+        assert [d["day"] for d in data["days"]] == [0, 1]
+        assert [v["name"] for v in data["home"]["villagers"]] == names
+        assert all(len(v["assets"]) == 2 for v in data["home"]["villagers"])
+        assert set(data["home"]["pages"]) == set(names) and all(len(p) == 2 for p in data["home"]["pages"].values())
+        M = data["map"]
+        assert len(M["tiles"]) == M["H"] and all(len(r) == M["W"] for r in M["tiles"])
+        assert sum(f["n"] for f in data["home"]["fails"]) == data["home"]["failed"]
+        page = build_site(run_dir).read_text()
+        assert "__DATA__" not in page and "__TITLE__" not in page
+        blob = page.split('<script id="site-data" type="application/json">', 1)[1].split("</script>", 1)[0]
+        assert json.loads(blob) == data  # nothing in the data closes the script tag early
+    assert fail_bucket("you have no axe") == "Has no tool for it" and fail_bucket("whatever") == "Other"
+
+
+def test_runs_keep_their_prompt_wording_unless_switched_on_purpose():
+    import json
+    import pickle
+
+    from llmabm.island.prompts import ACTION_MENU, PROMPT_VERSION, action_menu
+
+    assert action_menu(1) == ACTION_MENU and "another villager: walk to their home" in action_menu(2)
+    # Version 2 explains what visit and ask are for when they're used on the wrong one.
+    isl = _island(("Ari", "Bo"))
+    isl.prompt_version = 1
+    assert isl.act("Ari", {"do": "ask", "who": "Bo"}, 8)[1].startswith("nobody called 'Bo' to ask")
+    isl.prompt_version = 2
+    assert "visit their home" in isl.act("Ari", {"do": "ask", "who": "Bo"}, 8)[1]
+    assert "use ask (who: Tom Nook)" in isl.not_a_villager("Tom Nook")
+    assert "isn't anyone's home" in isl.not_a_villager("Nook's Cranny")
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=10)
+    with tempfile.TemporaryDirectory() as d:
+        run_dir = Path(d) / "run"
+        sim = IslandSimulation(sc, load_backends(None), run_dir, seed=10, backend_override="mock", verbose=False)
+        sim.run(1)
+        assert sim.prompt_version == PROMPT_VERSION and json.loads((run_dir / "manifest.json").read_text())["prompt_version"] == 2
+        # Pretend this run started on version 1, as runs before versions did.
+        ck = run_dir / "checkpoint.pkl"
+        old = pickle.loads(ck.read_bytes())
+        del old.prompt_version
+        ck.write_bytes(pickle.dumps(old))
+        kept = IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False)
+        run = load_run(kept)
+        assert not run.of("intervention") and run.of("resume")[-1]["prompt_version"] == 1
+        # Switching on purpose is logged, in the events and the manifest, from the next day.
+        IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False,
+                                prompt_version="latest")
+        run = load_run(run_dir)
+        (iv,) = run.of("intervention")
+        assert iv["from_day"] == 2 and iv["what"] == "prompt version 1 -> 2"
+        assert run.manifest["interventions"][0]["from_day"] == 2
+        assert "intervention from day 2: prompt version 1 -> 2" in summary(run)
+        try:
+            IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False,
+                                    prompt_version=99)
+            raise AssertionError("expected an unknown version to be refused")
+        except ValueError:
+            pass
+
+
 def test_spending_choices_are_read_from_plans():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:

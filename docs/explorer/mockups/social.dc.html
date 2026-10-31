@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Who deals with whom</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&amp;family=Silkscreen:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBF3E6}
+a{color:#3B2F2A}a:hover{color:#6E5D52}
+</style>
+</helmet>
+<div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #3B2F2A; background: #FBF3E6; min-height: 1100px; box-sizing: border-box">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin: 20px 28px 0; padding: 10px 2px; background: transparent; border-top: 2px solid #D9967A; border-bottom: 2px solid #D9967A">
+    <div style="display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap">
+      <div style="font-family: 'Silkscreen', monospace; font-size: 18px">multiagent-island</div>
+      <div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 13px; color: #6E5D52">blank villagers · seed 0 · mock backend</div>
+    </div>
+    <nav style="display: flex; gap: 4px" aria-label="Views">
+      <a href="Main.dc.html" style="text-decoration: none; padding: 8px 16px; border: 2px solid transparent; color: #3B2F2A; font-size: 14px">Home</a>
+      <a href="Days.dc.html" style="text-decoration: none; padding: 8px 16px; border: 2px solid transparent; color: #3B2F2A; font-size: 14px">Days</a>
+      <a href="Social.dc.html" style="text-decoration: none; padding: 8px 16px; border: 2px solid #D9967A; background: #E8B9A0; color: #3B2F2A; font-size: 14px; font-weight: 600">Social</a>
+    </nav>
+  </header>
+
+  <section style="padding: 20px 28px 8px">
+    <h1 style="margin: 0; font-family: 'Silkscreen', monospace; font-size: 30px; font-weight: 400; line-height: 1.15">Who deals with whom</h1>
+    <div style="font-size: 14px; color: #6E5D52; margin-top: 4px">Line thickness is the number of interactions between two villagers. Click a line, or a pair in the list, to read everything between them.</div>
+  </section>
+
+  <section style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding: 10px 28px 14px">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+      <span style="font-size: 13px; color: #6E5D52">Kind of contact</span>
+      <sc-for list="{{modeChips}}" as="m" hint-placeholder-count="5">
+        <button type="button" aria-pressed="{{m.pressed}}" onClick="{{m.pick}}" style="{{m.style}}">
+          <span style="{{m.box}}"><sc-if value="{{m.on}}" hint-placeholder-val="{{ true }}"><svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5l2.5 2.5L10 3.5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></sc-if></span>
+          <span>{{m.label}}</span>
+          <span style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #6E5D52; font-size: 12px">{{m.n}}</span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 13px">
+      <label for="from-day" style="color: #6E5D52">From</label>
+      <select id="from-day" value="{{fromVal}}" onChange="{{setFrom}}" style="font: inherit; font-size: 14px; min-height: 44px; padding: 0 10px; border: 1px solid #EADBC4; border-radius: 0; background: #FFFDF8; color: #3B2F2A">
+        <option value="0">Day 0 · Apr 1</option>
+        <option value="1">Day 1 · Apr 2</option>
+        <option value="2">Day 2 · Apr 3</option>
+      </select>
+      <label for="to-day" style="color: #6E5D52">to</label>
+      <select id="to-day" value="{{toVal}}" onChange="{{setTo}}" style="font: inherit; font-size: 14px; min-height: 44px; padding: 0 10px; border: 1px solid #EADBC4; border-radius: 0; background: #FFFDF8; color: #3B2F2A">
+        <option value="0">Day 0 · Apr 1</option>
+        <option value="1">Day 1 · Apr 2</option>
+        <option value="2">Day 2 · Apr 3</option>
+      </select>
+    </div>
+  </section>
+
+  <main style="display: flex; flex-wrap: wrap; gap: 20px; padding: 0 28px 28px; align-items: flex-start">
+    <div style="flex: 1 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 16px; overflow-x: auto">
+        <div style="position: relative; width: 600px; height: 600px; margin: 0 auto">
+          <sc-for list="{{edges}}" as="e" hint-placeholder-count="20">
+            <button type="button" onClick="{{e.pick}}" aria-label="{{e.aria}}" style="{{e.hit}}">
+              <span style="{{e.line}}"></span>
+            </button>
+          </sc-for>
+          <sc-for list="{{badges}}" as="b" hint-placeholder-count="1">
+            <div style="{{b.style}}">{{b.n}}</div>
+          </sc-for>
+          <sc-for list="{{nodes}}" as="n" hint-placeholder-count="10">
+            <button type="button" onClick="{{n.pick}}" aria-label="{{n.aria}}" style="{{n.style}}">
+              <span style="font-weight: 600; font-size: 14px">{{n.name}}</span>
+              <span style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 11px; opacity: 0.8">{{n.total}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="font-size: 12px; color: #6E5D52; text-align: center; margin-top: 6px">Number under each name: that villager's interactions in the current filter. Click a name to show only their links.</div>
+      </div>
+    </div>
+
+    <aside style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 18px 20px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap">
+          <div style="font-family: 'Silkscreen', monospace; font-size: 20px; font-weight: 400">{{detail.title}}</div>
+          <sc-if value="{{detail.canClear}}" hint-placeholder-val="{{ true }}">
+            <button type="button" onClick="{{clear}}" style="font: inherit; font-size: 13px; min-height: 44px; padding: 0 12px; border: 1px solid #EADBC4; border-radius: 0; background: #FFFDF8; color: #3B2F2A; cursor: pointer">Clear</button>
+          </sc-if>
+        </div>
+        <div style="font-size: 13px; color: #6E5D52; margin-top: 4px">{{detail.sub}}</div>
+        <sc-if value="{{detail.empty}}" hint-placeholder-val="{{ false }}">
+          <div style="font-size: 14px; color: #6E5D52; margin-top: 14px">Nothing between them with the current filters.</div>
+        </sc-if>
+        <div style="display: flex; flex-direction: column; margin-top: 10px">
+          <sc-for list="{{detail.items}}" as="it" hint-placeholder-count="5">
+            <div style="padding: 10px 0; border-top: 1px solid #F6EBDA">
+              <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: #6E5D52">
+                <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{it.c}}"></span>{{it.kind}} · {{it.who}}</span>
+                <span style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{it.when}}</span>
+              </div>
+              <sc-for list="{{it.lines}}" as="ln" hint-placeholder-count="2">
+                <div style="font-size: 14px; margin-top: 4px; line-height: 1.45"><span style="font-weight: 600">{{ln.who}}</span> {{ln.t}}</div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 16px 18px">
+        <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 8px">Pairs, most contact first</div>
+        <sc-for list="{{pairList}}" as="p" hint-placeholder-count="8">
+          <button type="button" onClick="{{p.pick}}" style="{{p.style}}">
+            <span>{{p.label}}</span>
+            <span style="height: 8px; background: #F6EBDA; border-radius: 0; display: block"><span style="display: block; height: 8px; width: {{p.w}}; background: #6E5D52; border-radius: 0"></span></span>
+            <span style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; text-align: right">{{p.n}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </aside>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() {
+const R = [[0,5,"chat","Eli","Dax","Nook's Cranny",[["Eli","Hi there."],["Dax","I'm saving up for a bigger house."]]],[0,5,"gift","Gus","Jo","","1 ladder"],[0,5,"chat","Jo","Gus","museum",[["Jo","Hey! Out early too?"],["Gus","Here, have this."]]],[0,7,"visit","Kit","Fen","","nobody answered"],[0,7,"chat","Jo","Eli","Nook's Cranny",[["Jo","Hi there."],["Eli","Morning! The rocks went fast today."]]],[0,9,"chat","Fen","Ike","museum",[["Fen","Hey! Out early too?"],["Ike","Have you seen who takes the money rock?"]]],[0,9,"gift","Ari","Bo","","1 moloru fossil"],[0,9,"chat","Bo","Ari","Nook's Cranny",[["Bo","Any luck today?"],["Ari","Here, have this."]]],[0,10,"visit","Gus","Jo","","nobody answered"],[0,10,"chat","Bo","Ike","Nook's Cranny",[["Bo","Hi there."],["Ike","Caught anything good?"]]],[0,11,"visit","Cal","Ike","","nobody answered"],[0,12,"chat","Cal","Ari","Nook's Cranny",[["Cal","Hey! Out early too?"],["Ari",""]]],[0,16,"visit","Dax","Jo","","nobody answered"],[0,17,"chat","Dax","Gus","museum",[["Dax","Hey! Out early too?"],["Gus","Caught anything good?"]]],[0,20,"letter","Eli","Gus","","the rocks were empty by the time I got there"],[0,20,"offer","Eli","Dax","","1 vaulting pole for 400 bells"],[0,20,"letter","Kit","Cal","","caught something nice in the river today"],[0,20,"offer","Kit","Bo","","1 hardwood for 2000 bells"],[0,20,"letter","Dax","Cal","","caught something nice in the river today"],[0,20,"offer","Dax","Kit","","1 axe for 100 bells"],[0,20,"offer","Fen","Gus","","1 stone for 900 bells"],[0,20,"letter","Ike","Eli","","does anyone know which rock gives bells?"],[0,21,"offer","Kit","Dax","","1 selit fish for 300 bells (counteroffer)"],[0,21,"trade","Eli","Dax","","1 vaulting pole for 400 bells"],[1,7,"chat","Dax","Fen","fields",[["Dax","Any luck today?"],["Fen","Caught anything good?"]]],[1,8,"chat","Dax","Jo","museum",[["Dax","Any luck today?"],["Jo","Ha, same here."]]],[1,9,"chat","Cal","Ike","rocks",[["Cal","Hi there."],["Ike","Caught anything good?"]]],[1,10,"chat","Kit","Cal","rocks",[["Kit","Hi there."],["Cal","I'm saving up for a bigger house."]]],[1,11,"chat","Ari","Kit","roadworks",[["Ari","Hey! Out early too?"],["Kit","Caught anything good?"]]],[1,12,"chat","Bo","Jo","out for a walk",[["Bo","Hey! Out early too?"],["Jo","Ha, same here."]]],[1,13,"chat","Eli","Bo","clifftop",[["Eli","Hi there."],["Bo",""]]],[1,20,"parcel","Eli","Jo","","1 softwood: thought you could use this"],[1,20,"offer","Eli","Dax","","1 fishing rod for 900 bells"],[1,20,"trade","Kit","Dax","","1 selit fish for 300 bells"],[1,20,"letter","Dax","Ike","","caught something nice in the river today"],[1,20,"letter","Fen","Bo","","does anyone know which rock gives bells?"],[2,9,"chat","Ari","Dax","Nook's Cranny",[["Ari","Hi there."],["Dax","Morning! The rocks went fast today."]]],[2,10,"visit","Kit","Fen","","nobody answered"],[2,10,"chat","Dax","Cal","museum",[["Dax","Hey! Out early too?"],["Cal","Nice weather for fishing."]]],[2,12,"chat","Jo","Cal","Nook's Cranny",[["Jo","Hey! Out early too?"],["Cal","Ha, same here."]]],[2,13,"chat","Ike","Kit","museum",[["Ike","Hey! Out early too?"],["Kit","Have you seen who takes the money rock?"]]],[2,16,"visit","Gus","Dax","","nobody answered"],[2,16,"chat","Ari","Jo","woods",[["Ari","Any luck today?"],["Jo","Nice weather for fishing."]]],[2,17,"visit","Gus","Jo","","nobody answered"],[2,20,"parcel","Cal","Kit","","1 iron nugget: thought you could use this"],[2,20,"letter","Eli","Bo","","the rocks were empty by the time I got there"],[2,20,"offer","Eli","Kit","","1 shovel for 900 bells"],[2,20,"letter","Bo","Dax","","want to trade?"],[2,20,"letter","Fen","Bo","","the rocks were empty by the time I got there"]];
+const MODES = [
+  ["meet", "Chance meetings", ["chat"], "#E58BB0"],
+  ["visit", "Visits (knocking on a door)", ["visit"], "#E9B949"],
+  ["mail", "Letters and parcels", ["letter", "parcel"], "#6C9BD2"],
+  ["gift", "Gifts in person", ["gift"], "#5DB08F"],
+  ["trade", "Offers and trades", ["offer", "trade"], "#F08C5A"]
+];
+const KIND = { chat: "chance meeting", visit: "visit", letter: "letter", parcel: "parcel", gift: "gift in person", offer: "trade offer", trade: "trade done" };
+const COLOR = {}; const MODE_OF = {};
+MODES.forEach((m) => m[2].forEach((k) => { COLOR[k] = m[3]; MODE_OF[k] = m[0]; }));
+const NAMES = ["Ari", "Bo", "Cal", "Dax", "Eli", "Fen", "Gus", "Ike", "Jo", "Kit"];
+const s = this.state || {};
+const modes = s.modes ?? ["meet", "visit", "mail", "gift", "trade"];
+const from = s.from ?? 0;
+const to = s.to ?? 2;
+const lo = Math.min(from, to), hi = Math.max(from, to);
+const pair = s.pair ?? "Dax|Eli";
+const node = s.node ?? null;
+const key = (a, b) => [a, b].sort().join("|");
+const inRange = (r) => r[0] >= lo && r[0] <= hi;
+const rows = R.filter((r) => inRange(r) && modes.indexOf(MODE_OF[r[2]]) >= 0);
+const modeChips = MODES.map((m) => {
+  const on = modes.indexOf(m[0]) >= 0;
+  const n = R.filter((r) => inRange(r) && MODE_OF[r[2]] === m[0]).length;
+  return { label: m[1], n: String(n), on, pressed: on ? "true" : "false",
+    pick: () => { const next = on ? modes.filter((x) => x !== m[0]) : modes.concat([m[0]]); this.setState({ modes: next }); },
+    style: "font: inherit; font-size: 14px; min-height: 44px; padding: 8px 12px; display: inline-flex; align-items: center; gap: 8px; border-radius: 0; cursor: pointer; color: #3B2F2A; " + (on ? "background: #FFFDF8; border: 2px solid #7FBCDB" : "background: #FFFDF8; border: 2px solid #EADBC4"),
+    box: "width: 16px; height: 16px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; " + (on ? "background: " + m[3] + "; border: 1px solid " + m[3] : "background: #FFFDF8; border: 1px solid #B59A82") };
+});
+const W = {}; const tot = {};
+NAMES.forEach((n) => { tot[n] = 0; });
+rows.forEach((r) => { const k = key(r[3], r[4]); W[k] = (W[k] || 0) + 1; tot[r[3]]++; tot[r[4]]++; });
+const C = 300, RAD = 230;
+const pos = {};
+NAMES.forEach((n, i) => { const a = -Math.PI / 2 + i * 2 * Math.PI / NAMES.length; pos[n] = [C + RAD * Math.cos(a), C + RAD * Math.sin(a)]; });
+const maxW = Math.max(1, ...Object.values(W));
+const edges = Object.keys(W).sort((a, b) => W[a] - W[b]).map((k) => {
+  const [a, b] = k.split("|");
+  const [x1, y1] = pos[a], [x2, y2] = pos[b];
+  const len = Math.hypot(x2 - x1, y2 - y1), ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+  const isSel = k === pair && !node;
+  const dim = node ? !(a === node || b === node) : false;
+  const th = 2 + (W[k] - 1) / Math.max(1, maxW - 1) * 8;
+  return { aria: a + " and " + b + ": " + W[k] + " interactions", pick: () => this.setState({ pair: k, node: null }),
+    hit: "position: absolute; left: " + x1 + "px; top: " + y1 + "px; width: " + len + "px; height: 18px; padding: 0; margin: 0; border: none; background: transparent; cursor: pointer; transform-origin: 0 50%; transform: translateY(-50%) rotate(" + ang + "deg); display: flex; align-items: center; z-index: " + (isSel ? 2 : 1),
+    line: "display: block; width: 100%; height: " + th.toFixed(1) + "px; border-radius: 0; background: " + (isSel ? "#3B2F2A" : "#B59A82") + "; opacity: " + (dim ? 0.15 : isSel ? 1 : 0.75) };
+});
+const badges = [];
+if (W[pair] && !node) { const [a, b] = pair.split("|"); const mx = (pos[a][0] + pos[b][0]) / 2, my = (pos[a][1] + pos[b][1]) / 2;
+  badges.push({ n: String(W[pair]), style: "position: absolute; left: " + mx + "px; top: " + my + "px; transform: translate(-50%, -50%); background: #3B2F2A; color: #FFFFFF; font-family: Atkinson Hyperlegible Mono, monospace; font-size: 12px; padding: 2px 7px; border-radius: 0; z-index: 3; pointer-events: none" }); }
+const maxT = Math.max(1, ...Object.values(tot));
+const inPair = pair.split("|");
+const nodes = NAMES.map((n) => {
+  const d = 48 + tot[n] / maxT * 26;
+  const hot = node === n || (!node && inPair.indexOf(n) >= 0);
+  return { name: n, total: String(tot[n]), aria: n + ", " + tot[n] + " interactions. Show only " + n + "’s links", pick: () => this.setState({ node: n }),
+    style: "position: absolute; left: " + pos[n][0] + "px; top: " + pos[n][1] + "px; width: " + d + "px; height: " + d + "px; transform: translate(-50%, -50%); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font: inherit; cursor: pointer; z-index: 4; " + (hot ? "background: #3B2F2A; color: #FFFFFF; border: 2px solid #7FBCDB" : "background: #FFFDF8; color: #3B2F2A; border: 2px solid #B59A82") };
+});
+const fmtItem = (r) => {
+  const lines = r[2] === "chat" ? r[6].map((t) => ({ who: t[0] + ":", t: t[1] ? "“" + t[1] + "”" : "(said nothing)" })) : [{ who: "", t: r[6] }];
+  return { kind: KIND[r[2]], c: COLOR[r[2]], when: "day " + r[0] + " · " + String(r[1]).padStart(2, "0") + ":00",
+    who: r[2] === "chat" ? (r[3] + " approached " + r[4] + (r[5] ? " at " + r[5] : "")) : r[3] + " → " + r[4], lines };
+};
+let detail;
+if (node) {
+  const items = rows.filter((r) => r[3] === node || r[4] === node).map(fmtItem);
+  detail = { title: node, sub: items.length + " interactions, days " + lo + " to " + hi, items, empty: items.length === 0, canClear: true };
+} else {
+  const [a, b] = inPair;
+  const items = rows.filter((r) => key(r[3], r[4]) === pair).map(fmtItem);
+  detail = { title: a + " and " + b, sub: items.length + " interactions, days " + lo + " to " + hi, items, empty: items.length === 0, canClear: false };
+}
+const pairList = Object.keys(W).sort((a, b) => W[b] - W[a] || (a < b ? -1 : 1)).slice(0, 12).map((k) => ({
+  label: k.replace("|", " – "), n: String(W[k]), w: (W[k] / maxW * 100) + "%", pick: () => this.setState({ pair: k, node: null }),
+  style: "font: inherit; font-size: 13px; width: 100%; min-height: 36px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 24px; gap: 10px; align-items: center; padding: 4px 8px; border: none; border-radius: 0; cursor: pointer; text-align: left; color: #3B2F2A; background: " + (k === pair && !node ? "#F6EBDA" : "transparent")
+}));
+return {
+  modeChips, edges, badges, nodes, detail, pairList,
+  fromVal: String(from), toVal: String(to),
+  setFrom: (e) => this.setState({ from: Number(e.target.value) }),
+  setTo: (e) => this.setState({ to: Number(e.target.value) }),
+  clear: () => this.setState({ node: null })
+};
+}
+}
+</script>
+</body>
+</html>

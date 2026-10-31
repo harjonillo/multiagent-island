@@ -52,9 +52,15 @@ def main(argv: list[str] | None = None) -> int:
     rs.add_argument("--concurrency", type=int)
     rs.add_argument("--no-cache", action="store_true")
     rs.add_argument("--no-analyze", action="store_true")
+    rs.add_argument("--prompt-version", help="switch the run's prompt wording from the next day on ('latest' or a "
+                                             "number); logged as an intervention. By default a run keeps its wording")
 
-    a = sub.add_parser("analyze", help="summary, plots and logs for a run")
+    a = sub.add_parser("analyze", help="summary, plots, logs and the site data for a run")
     a.add_argument("run_dir", type=Path)
+
+    st = sub.add_parser("site", help="build the static explorer page from a run's site_data.json")
+    st.add_argument("run_dir", type=Path)
+    st.add_argument("--out", type=Path, help="folder for index.html (default <run_dir>/site)")
 
     args = ap.parse_args(argv)
     load_dotenv()
@@ -104,7 +110,10 @@ def main(argv: list[str] | None = None) -> int:
         backends = load_backends(args.config, cache, salt=str(seed))
         try:
             IslandSimulation.resume(args.run_dir, backends, days=args.days, backend_override=args.backend,
-                                    concurrency=args.concurrency)
+                                    concurrency=args.concurrency, prompt_version=args.prompt_version)
+        except ValueError as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 2
         except RunAborted as e:
             print(f"stopped: {e}", file=sys.stderr)
             return 3
@@ -112,6 +121,14 @@ def main(argv: list[str] | None = None) -> int:
             analyze_island(args.run_dir)
     elif args.cmd == "analyze":
         analyze_island(args.run_dir)
+    elif args.cmd == "site":
+        from .island.site_build import build_site
+
+        try:
+            print(f"wrote {build_site(args.run_dir, args.out)}")
+        except FileNotFoundError as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 2
     return 0
 
 

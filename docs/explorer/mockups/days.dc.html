@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Days</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&amp;family=Silkscreen:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBF3E6}
+a{color:#3B2F2A}a:hover{color:#6E5D52}
+</style>
+</helmet>
+<div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #3B2F2A; background: #FBF3E6; min-height: 1560px; box-sizing: border-box">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin: 20px 28px 0; padding: 10px 2px; background: transparent; border-top: 2px solid #D9967A; border-bottom: 2px solid #D9967A">
+    <div style="display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap">
+      <div style="font-family: 'Silkscreen', monospace; font-size: 18px">multiagent-island</div>
+      <div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 13px; color: #6E5D52">blank villagers · seed 0 · mock backend</div>
+    </div>
+    <nav style="display: flex; gap: 4px" aria-label="Views">
+      <a href="Main.dc.html" style="text-decoration: none; padding: 8px 16px; border: 2px solid transparent; color: #3B2F2A; font-size: 14px">Home</a>
+      <a href="Days.dc.html" style="text-decoration: none; padding: 8px 16px; border: 2px solid #D9967A; background: #E8B9A0; color: #3B2F2A; font-size: 14px; font-weight: 600">Days</a>
+      <a href="Social.dc.html" style="text-decoration: none; padding: 8px 16px; border: 2px solid transparent; color: #3B2F2A; font-size: 14px">Social</a>
+    </nav>
+  </header>
+
+  <section style="padding: 18px 28px 8px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+      <span style="font-size: 13px; color: #6E5D52; margin-right: 4px">Days</span>
+      <sc-for list="{{dayChips}}" as="d" hint-placeholder-count="3">
+        <button type="button" aria-pressed="{{d.pressed}}" onClick="{{d.pick}}" style="{{d.style}}">
+          <span style="{{d.box}}"><sc-if value="{{d.on}}" hint-placeholder-val="{{ false }}"><svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5l2.5 2.5L10 3.5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></sc-if></span>
+          {{d.label}}
+        </button>
+      </sc-for>
+      <button type="button" onClick="{{selectAll}}" style="font: inherit; font-size: 13px; min-height: 44px; padding: 8px 12px; border: none; background: transparent; color: #3B2F2A; text-decoration: underline; cursor: pointer">All days</button>
+    </div>
+    <div>
+      <h1 style="margin: 0; font-family: 'Silkscreen', monospace; font-size: 30px; font-weight: 400; line-height: 1.15">{{dayTitle}}</h1>
+      <div style="font-size: 14px; color: #6E5D52; margin-top: 4px">{{daySub}}</div>
+    </div>
+  </section>
+  <main style="display: flex; flex-wrap: wrap; gap: 20px; padding: 8px 28px 20px; align-items: flex-start">
+    <div style="flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px">
+        <sc-for list="{{tiles}}" as="p" hint-placeholder-count="6">
+          <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 3px 3px 0 #F0DFC8; padding: 10px 14px">
+            <div style="font-size: 11px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em">{{p.label}}</div>
+            <div style="font-size: 18px; font-weight: 600; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; margin-top: 4px">{{p.v}}</div>
+            <div style="font-size: 11px; color: #6E5D52">{{p.sub}}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="position: relative; width: 100%; aspect-ratio: 112 / 96; border-radius: 0; overflow: hidden; border: 1px solid #EADBC4; background: #A9D3E3">
+        <img src="/_blob/714bc860b1218abaf1242be05568e75f" alt="Tile map of the island for seed 0, with each villager's home marked" style="position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0.92">
+        <sc-for list="{{buildings}}" as="b" hint-placeholder-count="6">
+          <div style="position: absolute; left: {{b.left}}; top: {{b.top}}; transform: translate(-50%, -100%); font-size: 11px; font-weight: 600; color: #3B2F2A; background: rgba(255,255,255,0.78); padding: 1px 6px; border-radius: 4px; white-space: nowrap">{{b.name}}</div>
+        </sc-for>
+        <sc-for list="{{markers}}" as="m" hint-placeholder-count="10">
+          <button type="button" onClick="{{m.pick}}" aria-label="{{m.aria}}" style="{{m.style}}">{{m.name}}</button>
+        </sc-for>
+      </div>
+      <div style="font-size: 12px; color: #6E5D52">Homes, as of the end of the day. Click a villager to read their day.</div>
+
+      <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 16px 18px">
+        <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 12px">The commons through the day, 07:00 to 23:00</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px">
+          <sc-for list="{{lines}}" as="k" hint-placeholder-count="4">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 13px"><span style="font-weight: 600">{{k.label}}</span><span style="color: #6E5D52; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{k.range}}</span></div>
+              <svg viewBox="0 0 160 56" preserveAspectRatio="none" role="img" aria-label="{{k.aria}}" style="width: 100%; height: 70px; margin-top: 6px; display: block">
+                <line x1="0" y1="54" x2="160" y2="54" stroke="#E3D3BC" stroke-width="1" vector-effect="non-scaling-stroke"></line>
+                <polyline points="{{k.pts}}" fill="none" stroke="#E07A4F" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+              </svg>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #6E5D52; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace"><span>07</span><span>15</span><span>23</span></div>
+              <div style="font-size: 12px; color: #6E5D52; margin-top: 4px">{{k.note}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <aside style="flex: 1 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; flex-wrap: wrap; gap: 6px" role="tablist" aria-label="Villagers">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="10">
+          <button type="button" role="tab" onClick="{{t.pick}}" style="{{t.style}}">{{t.name}}</button>
+        </sc-for>
+      </div>
+
+      <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 18px 20px; display: flex; flex-direction: column; gap: 18px">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px">
+            <div style="font-family: 'Silkscreen', monospace; font-size: 22px; font-weight: 400">{{v.name}}</div>
+            <div style="font-size: 13px; color: #6E5D52">{{v.home}}</div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 12px">
+            <sc-for list="{{v.stats}}" as="s" hint-placeholder-count="4">
+              <div><div style="font-size: 20px; font-weight: 600; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{s.n}}</div><div style="font-size: 12px; color: #6E5D52">{{s.label}}</div></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 8px">Plans</div>
+          <sc-for list="{{v.plans}}" as="p" hint-placeholder-count="2">
+            <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: 14px; padding: 4px 0">
+              <div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #6E5D52">{{p.h}}</div>
+              <div>
+                <div style="display: flex; gap: 6px; align-items: center; color: #6A4FB8">
+                  <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="#6A4FB8" stroke-width="1.5"></rect><path d="M5.5 7V5a2.5 2.5 0 015 0v2" fill="none" stroke="#6A4FB8" stroke-width="1.5"></path></svg>
+                  <span>{{p.thought}}</span>
+                </div>
+                <div style="font-size: 12px; color: #6E5D52; margin-top: 2px">{{p.meta}}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div>
+          <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 4px">Actions and attempts</div>
+          <sc-for list="{{v.acts}}" as="a" hint-placeholder-count="10">
+            <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr) 52px; gap: 8px; padding: 7px 0; border-top: 1px solid #F6EBDA; font-size: 13px; line-height: 1.4">
+              <div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #6E5D52">{{a.h}}</div>
+              <div><span style="color: #6E5D52">{{a.place}} · </span>{{a.result}}</div>
+              <div style="text-align: right; font-size: 12px; font-weight: 600; color: {{a.c}}">{{a.ok}}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div>
+          <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 4px">Discoveries</div>
+          <sc-if value="{{v.noSeen}}" hint-placeholder-val="{{ false }}"><div style="font-size: 14px; color: #6E5D52">Spotted nothing new today.</div></sc-if>
+          <sc-for list="{{v.seen}}" as="d" hint-placeholder-count="4">
+            <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; padding: 5px 0; font-size: 13px">
+              <div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #6E5D52">{{d.h}}</div>
+              <div>{{d.t}}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div>
+          <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 6px">Conversations and mail</div>
+          <sc-if value="{{v.noTalk}}" hint-placeholder-val="{{ false }}"><div style="font-size: 14px; color: #6E5D52">Talked to nobody today.</div></sc-if>
+          <sc-for list="{{v.talks}}" as="c" hint-placeholder-count="1">
+            <div style="padding: 8px 0; border-top: 1px solid #F6EBDA">
+              <div style="font-size: 12px; color: #6E5D52; margin-bottom: 6px">{{c.head}}</div>
+              <sc-for list="{{c.lines}}" as="ln" hint-placeholder-count="2">
+                <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: 14px; margin-bottom: 6px">
+                  <div style="font-weight: 600">{{ln.who}}</div>
+                  <div>
+                    <div>{{ln.said}}</div>
+                    <sc-if value="{{ln.hasThought}}" hint-placeholder-val="{{ true }}">
+                      <div style="display: flex; gap: 6px; align-items: center; color: #6A4FB8; font-size: 13px; margin-top: 2px">
+                        <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="#6A4FB8" stroke-width="1.5"></rect><path d="M5.5 7V5a2.5 2.5 0 015 0v2" fill="none" stroke="#6A4FB8" stroke-width="1.5"></path></svg>
+                        <span>{{ln.thought}}</span>
+                      </div>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background: #F1E9FA; border-radius: 0; padding: 14px 16px">
+          <div style="display: flex; gap: 6px; align-items: center; font-size: 12px; color: #6A4FB8; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 6px">
+            <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="#6A4FB8" stroke-width="1.5"></rect><path d="M5.5 7V5a2.5 2.5 0 015 0v2" fill="none" stroke="#6A4FB8" stroke-width="1.5"></path></svg>
+            Nightly page
+          </div>
+          <div style="font-size: 15px; line-height: 1.5">{{v.page}}</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <section style="padding: 0 28px 32px">
+    <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 10px">All conversations today</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px">
+      <sc-for list="{{allTalks}}" as="c" hint-placeholder-count="6">
+        <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 14px 16px">
+          <div style="display: flex; justify-content: space-between; font-size: 13px"><span style="font-weight: 600">{{c.who}}</span><span style="color: #6E5D52; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{c.h}}</span></div>
+          <div style="font-size: 12px; color: #6E5D52; margin: 2px 0 8px">{{c.where}}</div>
+          <sc-for list="{{c.lines}}" as="ln" hint-placeholder-count="2">
+            <div style="font-size: 14px; margin-bottom: 4px"><span style="font-weight: 600">{{ln.who}}:</span> {{ln.said}}</div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1560}}'>
+class Component extends DCLogic {
+renderVals() {
+const NAMES = ['Ari', 'Bo', 'Cal', 'Dax', 'Eli', 'Fen', 'Gus', 'Ike', 'Jo', 'Kit'];
+const HOME = { Ari: ['lower ground, southeast', 91, 78.5, 'house, 98,000 loan'], Bo: ['lower ground, southwest', 16, 70.5, 'house, 98,000 loan'], Cal: ['lower ground, east', 86, 60.5, 'tent'], Dax: ['lower ground, west', 23, 51.5, 'tent'], Eli: ['lower ground, south', 42, 77.5, 'house, 98,000 loan'], Fen: ['lower ground, centre', 41, 45.5, 'tent'], Gus: ['lower ground, west', 16, 57.5, 'tent'], Ike: ['lower ground, east', 93, 52.5, 'tent'], Jo: ['lower ground, west', 34, 55.5, 'house, 98,000 loan'], Kit: ['lower ground, centre', 64, 48.5, 'house, 98,000 loan'] };
+const A = {"7":[["Cal","home",0,"not enough materials for vaulting pole; short wood x5"],["Fen","home",0,"not enough materials for iron fence; short iron nugget x1"],["Bo","home",0,"not enough materials for fishing rod; short wood x4"],["Ike","home",0,"not enough materials for vaulting pole; short wood x3"],["Ari","home",0,"not enough materials for net; short softwood x4"],["Jo","museum",0,"Blathers only takes fish, bugs and fossils, not softwood"],["Kit","flowers",1,"went bug catching among the flowers: caught a lobas moth"],["Dax","Nook's Cranny",0,"Nook's Cranny is closed at 07:00 (open 08:00-22:00)"],["Eli","Nook's Cranny",0,"you can't get to Nook's Cranny from here with the tools you carry"],["Gus","Nook's Cranny",0,"you can't get to Nook's Cranny from here with the tools you carry"]],"8":[["Cal","around the island",0,"nobody called 'Mabel' to ask"],["Kit","Resident Services",1,"put 1202 bells toward the bridge (1202/98000)"],["Eli","woods",1,"chopped down a hardwood tree (got wood x2); a stump is left"],["Jo","home",0,"not enough materials for shell table"],["Ike","rocks",1,"hit rock 1: stone x4, iron nugget x1, clay x3"],["Bo","home",0,"you have no fishing rod"],["Ari","Resident Services",1,"Tom Nook upgraded you to a house; you now owe 98000 bells"],["Fen","Nook's Cranny",0,"cosmos seeds is not for sale there today"],["Dax","museum",1,"donated a loka fish to the museum"],["Gus","Resident Services",0,"you can't get to Resident Services from here with the tools you carry"]],"9":[["Gus","woods",1,"planted an apple; it will be a grown tree in 5 days"],["Ike","pond",1,"fished for a small shadow in the pond: caught a moitbas fish"],["Cal","fields",1,"looked around but saw no fossil dig spots there"],["Jo","woods",1,"chopped down a hardwood tree (got wood x2); a stump is left"],["Ari","Nook's Cranny",1,"sold ladder x1 for 570 bells"],["Kit","orchard",1,"shook a tree: apple x3"],["Fen","woods",1,"dug up a stump; the spot is clear now"],["Bo","beach",1,"picked up 4 shells"],["Dax","Nook's Cranny",1,"bought hyacinth seeds for 240 bells"],["Eli","Nook's Cranny",0,"you can't get to Nook's Cranny from here with the tools you carry"]],"10":[["Bo","beach",0,"you have no fishing rod"],["Jo","home",0,"not enough materials for street lamp"],["Gus","beach",1,"walked along the beach but saw no shells"],["Fen","woods",1,"chopped a tree: hardwood x2, wood x1"],["Ari","woods",1,"chopped down a hardwood tree (got wood x2); a stump is left"],["Ike","woods",1,"chopped a tree: softwood x1, hardwood x2"],["Kit","Fen's home",1,"knocked at Fen's home; nobody answered"],["Dax","museum",0,"Blathers only takes fish, bugs and fossils, not softwood"],["Cal","museum",1,"donated a tubas fish to the museum"],["Eli","Resident Services",0,"you can't get to Resident Services from here with the tools you carry"]],"11":[["Gus","woods",1,"planted an apple"],["Dax","fields",1,"looked around but saw no fossil dig spots there"],["Jo","woods",1,"chopped a tree: softwood x2, hardwood x1"],["Ike","woods",0,"pockets full"],["Ari","Nook's Cranny",1,"asked Timmy and Tommy what they buy and sell"],["Kit","river",1,"fished for a small shadow in the river: caught a gormo fish"],["Bo","rocks",1,"hit rock 6: stone x2, gold nugget x1, clay x1, iron nugget x4"],["Fen","pond",1,"fished for a tiny shadow in the pond: caught a vinmo fish"],["Cal","Nook's Cranny",1,"sold fishing rod x1 for 160 bells"],["Eli","Nook's Cranny",0,"you can't get to Nook's Cranny from here with the tools you carry"]],"12":[["Cal","Nook's Cranny",1,"bought the fishing rod recipe card for 500 bells"],["Kit","home",0,"not enough materials for ironwood dresser"],["Ike","home",0,"not enough materials for vaulting pole"],["Jo","Nook's Cranny",1,"sold moitbas fish x2 for 360 bells"],["Bo","home",0,"not enough materials for fishing rod"],["Gus","Nook's Cranny",0,"you can't get to Nook's Cranny from here with the tools you carry"],["Eli","Nook's Cranny",0,"you can't get to Nook's Cranny from here with the tools you carry"]],"13":[["Dax","home",0,"not enough materials for simple wooden fence"],["Ari","home",0,"not enough materials for net"],["Kit","museum",1,"donated a gormo fish to the museum"],["Gus","home",0,"not enough materials for simple wooden fence"],["Jo","woods",1,"chopped a tree: softwood x1, hardwood x1, wood x1"],["Fen","woods",1,"chopped a tree: hardwood x1, softwood x1, wood x1"],["Bo","rocks",1,"hit rock 4: iron nugget x3, gold nugget x1, stone x3 (pockets full)"],["Ike","museum",0,"Blathers only takes fish, bugs and fossils, not ladder"],["Eli","Nook's Cranny",0,"you can't get to Nook's Cranny from here with the tools you carry"]],"14":[["Ari","river",1,"caught a gormo fish"],["Jo","river",1,"fished for a very large shadow: caught a loka fish"],["Bo","Resident Services",1,"Tom Nook upgraded you to a house; you now owe 98000 bells"],["Fen","museum",0,"Blathers only takes fish, bugs and fossils, not fishing rod"],["Kit","woods",1,"chopped a tree: hardwood x1, wood x1, softwood x1"],["Cal","museum",0,"Blathers only takes fish, bugs and fossils, not apple"],["Eli","Nook's Cranny",0,"you can't get to Nook's Cranny from here with the tools you carry"]],"15":[["Gus","woods",1,"planted an apple"],["Ike","woods",1,"planted an apple"],["Ari","river",0,"you have no net"],["Jo","museum",0,"you have no moitbas fish"],["Cal","woods",1,"chopped down a hardwood tree; a stump is left"],["Dax","rocks",1,"hit rock 4: iron nugget x1"],["Kit","home",0,"not enough materials for iron garden bench"],["Eli","rocks",0,"no rocks you can reach from here with the tools you carry"]],"16":[["Fen","woods",1,"planted an apple"],["Gus","Dax's home",1,"knocked at Dax's home; nobody answered"],["Jo","sea",1,"caught a kalo fish"],["Cal","rocks",1,"hit rock 2: iron nugget x6, stone x2"],["Ari","woods",1,"chopped a tree: softwood x2, wood x1"],["Dax","Nook's Cranny",0,"sold nothing (no vaulting pole to sell)"]],"17":[["Fen","fields",1,"looked around but saw no fossil dig spots"],["Cal","woods",1,"chopped a tree: softwood x1, hardwood x1, wood x1"],["Ike","pond",1,"fished for a small shadow: it got away"],["Gus","Jo's home",1,"knocked at Jo's home; nobody answered"],["Bo","home",0,"you have no fishing rod"],["Ari","museum",0,"Blathers only takes fish, bugs and fossils, not axe"],["Dax","beach",1,"walked along the beach but saw no shells"],["Eli","rocks",0,"no rocks you can reach from here with the tools you carry"]],"18":[["Fen","woods",1,"planted an apple"],["Bo","beach",1,"walked along the beach but saw no shells"],["Kit","roadworks",1,"laid 15 tiles of brick path"],["Ike","Nook's Cranny",1,"sold wood x2 for 180 bells"],["Dax","museum",0,"Blathers only takes fish, bugs and fossils, not wood"]]};
+const E = [[9,"Nook's Cranny",[["Ari","Hi there.","might as well say hi"],["Dax","Morning! The rocks went fast today.","keep it friendly"]]],[10,"museum",[["Dax","Hey! Out early too?","might as well say hi"],["Cal","Nice weather for fishing.","keep it friendly"]]],[12,"Nook's Cranny",[["Jo","Hey! Out early too?","might as well say hi"],["Cal","Ha, same here.","keep it friendly"]]],[13,"museum",[["Ike","Hey! Out early too?","might as well say hi"],["Kit","Have you seen who takes the money rock?","keep it friendly"]]],[16,"woods",[["Ari","Any luck today?","might as well say hi"],["Jo","Nice weather for fishing.","keep it friendly"]]]];
+const MAIL = [[20,'letter','Eli','Bo','the rocks were empty by the time I got there'],[20,'letter','Bo','Dax','want to trade?'],[20,'letter','Fen','Bo','the rocks were empty by the time I got there'],[20,'parcel','Cal','Kit','1 iron nugget: thought you could use this'],[20,'offer','Eli','Kit','offers a shovel for 900 bells (Kit rejected it at 21:00)'],[20,'board','Bo','','Selling materials, ask me!'],[5,'parcel','Eli','Jo','1 softwood, sent yesterday']];
+const SEEN = {Ari:[[8,'medium fish shadow in the river, near Resident Services'],[10,'small fish shadow in the sea, south'],[18,'large fish shadow in the river, near Resident Services']],Bo:[[11,'small fish shadow in the pond'],[16,'a nevin moth on a tree, southwest']],Cal:[[7,'a selashren moth on a stump, near rock 1'],[13,'a phobasne moth on the flowers, near rock 6'],[16,'a lobas moth on the middle cliff, near rock 2'],[21,'large fish shadow in the pond, near rock 1']],Dax:[[7,"medium fish shadow in the river, near Nook's Cranny"],[12,'an itrusel beetle in the grass, west']],Eli:[[7,'a selashren moth on a stump, near the airport']],Fen:[[9,'an itrusel beetle in the grass, east'],[10,'a kaselzal moth on the middle cliff'],[13,'very large fish shadow in the clifftop river']],Gus:[[7,'a nevin moth on a tree, west']],Ike:[[8,'an ashrumo moth on a rock, near rock 5'],[17,'a phobasne moth on the flowers, near rock 6'],[23,'1 shell on the beach, near rock 5']],Jo:[[8,'a nevin moth on a tree, west'],[10,'an itrusel beetle in the grass, west'],[14,'a kaselzal moth near Resident Services']],Kit:[[7,'medium fish shadow in the river, near Resident Services'],[14,'an itrusel beetle on the middle cliff'],[16,'large fish shadow in the river, near Resident Services']]};
+const PAGE = {Ari:'I like chatting with whoever I run into. Today was a full day.',Bo:'I take things slowly and enjoy quiet days. Today was a full day.',Cal:'I like chatting with whoever I run into. Today was a full day.',Dax:'I keep busy and like getting things done. Today was a full day.',Eli:'I like chatting with whoever I run into. Today was a full day.',Fen:'I take things slowly and enjoy quiet days. Today was a full day.',Gus:'I keep busy and like getting things done. Today was a full day.',Ike:'I take things slowly and enjoy quiet days. Today was a full day.',Jo:'I mostly look after myself for now. Today was a full day.',Kit:'I keep busy and like getting things done. Today was a full day.'};
+const NOTE = {Ari:'the rocks went fast today',Cal:'the rocks went fast today',Fen:'the rocks went fast today'};
+const BUILD = [['Resident Services',62.5,56],['plaza',55,69],['museum',42.5,53],["Nook's Cranny",71,63],['Able Sisters',66,74],['airport',56.5,80]];
+const ROCK = [48,40,40,40,32,32,25,25,24,16,16,16,16,16,16,16,16];
+const WOOD = [72,69,66,57,54,54,48,45,45,42,39,39,39,39,39,39,39];
+const SHELL = [12,12,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8];
+const FRUIT = [12,12,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9];
+const pad = (n) => String(n).padStart(2, '0');
+const pct = (v, m) => ((v + 0.5) / m * 100).toFixed(2) + '%';
+const s = this.state || {};
+const sel = s.sel ?? 'Kit';
+const days = s.days ?? [2];
+const DAYINFO = [['April 1', 'arrival day'], ['April 2', ''], ['April 3', '']];
+const dayChips = [0, 1, 2].map((d) => { const on = days.indexOf(d) >= 0; return { label: 'Day ' + d + ' · ' + DAYINFO[d][0], on, pressed: on ? 'true' : 'false',
+  pick: () => { const next = on ? days.filter((x) => x !== d) : days.concat([d]).sort(); this.setState({ days: next.length ? next : [d] }); },
+  style: 'font: inherit; font-size: 14px; min-height: 44px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 8px; border-radius: 0; cursor: pointer; color: #3B2F2A; ' + (on ? 'background: #FFFDF8; border: 2px solid #7FBCDB' : 'background: #FFFDF8; border: 2px solid #EADBC4'),
+  box: 'width: 16px; height: 16px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; ' + (on ? 'background: #3B2F2A; border: 1px solid #3B2F2A' : 'background: #FFFDF8; border: 1px solid #B59A82') }; });
+const multi = days.length > 1;
+const dayTitle = multi ? 'Days ' + days.join(', ') + ' combined' : 'Day ' + days[0] + ' · ' + DAYINFO[days[0]][0] + ' · spring';
+const daySub = (days.length === 1 && days[0] === 2) ? '100 actions, 43 failed · 5 conversations · 4 letters and parcels · 1 board post' : 'Mockup note: only day 2 is filled in below. With several days picked, each section groups its entries by day and the charts run across the days picked.';
+const line = (label, arr, max, note) => ({ label, note, range: arr[0] + ' → ' + arr[arr.length - 1],
+  aria: label + ' fell from ' + arr[0] + ' to ' + arr[arr.length - 1] + ' over the day',
+  pts: arr.map((v, i) => (i * 10).toFixed(1) + ',' + (54 - v / max * 50).toFixed(1)).join(' ') });
+const tabs = NAMES.map((n) => ({ name: n, pick: () => this.setState({ sel: n }),
+  style: 'font: inherit; font-size: 14px; min-height: 44px; min-width: 52px; padding: 8px 12px; border-radius: 0; cursor: pointer; ' + (n === sel ? 'background: #3B2F2A; color: #FFFFFF; border: 2px solid #7FBCDB; font-weight: 600' : 'background: #FFFDF8; color: #3B2F2A; border: 2px solid #EADBC4') }));
+const markers = NAMES.map((n) => ({ name: n, aria: n + ' lives ' + HOME[n][0], pick: () => this.setState({ sel: n }),
+  style: 'position: absolute; left: ' + pct(HOME[n][1], 112) + '; top: ' + pct(HOME[n][2], 96) + '; transform: translate(-50%, -50%); padding: 4px 10px; min-height: 26px; border-radius: 0; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; ' + (n === sel ? 'background: #3B2F2A; color: #FFFFFF; border: 2px solid #7FBCDB; box-shadow: 0 2px 6px rgba(0,0,0,0.25); z-index: 2' : 'background: #FFFDF8; color: #3B2F2A; border: 1px solid rgba(59,47,42,0.3)') }));
+const acts = [];
+Object.keys(A).forEach((h) => A[h].forEach((a) => { if (a[0] === sel) acts.push({ h: pad(h), place: a[1], result: a[3], ok: a[2] ? 'ok' : 'failed', c: a[2] ? '#6E5D52' : '#B8452A', fail: !a[2] }); }));
+const talks = E.filter((e) => e[2].some((t) => t[0] === sel)).map((e) => ({ head: pad(e[0]) + ':00 at ' + e[1],
+  lines: e[2].map((t) => ({ who: t[0], said: '“' + t[1] + '”', thought: t[2], hasThought: t[0] === sel })) }));
+MAIL.filter((m) => m[2] === sel || m[3] === sel).forEach((m) => {
+  const head = pad(m[0]) + ':00 · ' + (m[1] === 'board' ? 'board post' : m[1] + (m[2] === sel ? ' to ' + m[3] : ' from ' + m[2]));
+  talks.push({ head, lines: [{ who: m[2], said: m[4], thought: '', hasThought: false }] });
+});
+const seen = (SEEN[sel] || []).map((d) => ({ h: pad(d[0]), t: d[1] }));
+const nFail = acts.filter((a) => a.fail).length;
+const v = {
+  name: sel, home: HOME[sel][0] + ' · ' + HOME[sel][3],
+  stats: [{ n: String(acts.length), label: 'actions' }, { n: String(nFail), label: 'failed' }, { n: String(seen.length), label: 'discoveries' }, { n: String(talks.length), label: 'talks and mail' }],
+  plans: [{ h: '05', thought: 'rocks first, then fishing', meta: '5 actions scheduled, 0 dropped' + (NOTE[sel] ? ' · note: “' + NOTE[sel] + '”' : '') }, { h: '12', thought: 'rocks first, then fishing', meta: '5 actions scheduled, 0 dropped' }],
+  acts, seen, noSeen: seen.length === 0, talks, noTalk: talks.length === 0, page: PAGE[sel]
+};
+const allTalks = E.map((e) => ({ who: e[2].map((t) => t[0]).join(' and '), h: pad(e[0]) + ':00', where: e[1], lines: e[2].map((t) => ({ who: t[0], said: t[1] })) }));
+allTalks.push({ who: 'Plaza', h: '20:00', where: 'board, letters, parcels and offers', lines: MAIL.filter((m) => m[0] === 20).map((m) => ({ who: m[2] + (m[3] ? ' → ' + m[3] : ''), said: m[4] })) });
+return {
+  tiles: [
+    { label: 'Rock hits', v: '48 → 16', sub: '4 of 6 rocks emptied' },
+    { label: 'Wood', v: '72 → 39', sub: '3 trees cut down' },
+    { label: 'Shells', v: '12 → 8', sub: 'of 12' },
+    { label: 'Fossil spots', v: '4 → 4', sub: 'none dug' },
+    { label: 'Museum', v: '0 → 3', sub: 'species' },
+    { label: 'Bridge fund', v: '1,202', sub: 'of 98,000' }
+  ],
+  buildings: BUILD.map((b) => ({ name: b[0], left: pct(b[1], 112), top: ((b[2] - 0.6) / 96 * 100).toFixed(2) + '%' })),
+  markers, tabs, v, allTalks, dayChips, dayTitle, daySub, selectAll: () => this.setState({ days: [0, 1, 2] }),
+  lines: [line('Rock hits left', ROCK, 48, 'Rock 1 empty by 08:00'), line('Wood on trees', WOOD, 72, 'Flat after 17:00'), line('Shells', SHELL, 12, 'Bo beachcombed at 09:00'), line('Fruit', FRUIT, 12, 'Kit shook a tree at 09:00')]
+};
+}
+}
+</script>
+</body>
+</html>

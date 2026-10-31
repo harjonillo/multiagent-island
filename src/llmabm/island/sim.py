@@ -31,7 +31,7 @@ import yaml
 
 from ..agent import AgentSpec, load_agent_file
 from ..llm import DailyLimit, LLMError
-from .prompts import (BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, encounter_prompt, evening_prompt,
+from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, encounter_prompt, evening_prompt,
                       inbox_text, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
                       isabelle_summary_prompt, plan_prompt, system_prompt)
@@ -175,6 +175,7 @@ class IslandSimulation:
         self.energy = MentalEnergy(sc.mental_energy, list(sc.villagers))
         self.isl.energy = self.energy
         self.isl.memory = memory_settings(sc.memory)
+        self.prompt_version = self.isl.prompt_version = PROMPT_VERSION
         # Where each villager has chosen to spend energy next (set in their plans).
         self.choices = {n: {"plaza": True, "write": True, "next": "plan"} for n in sc.villagers}
         self.habits: dict[tuple[str, int], list[dict]] = {}
@@ -199,6 +200,13 @@ class IslandSimulation:
             state.pop(k, None)
         return state
 
+    def _intervene(self, from_day: int, what: str, details: list[str]) -> None:
+        """Record a deliberate mid-run change, in the events and in the manifest."""
+        self.log("intervention", from_day=from_day, what=what, details=details, time=time.time())
+        m = json.loads((self.run_dir / "manifest.json").read_text())
+        m.setdefault("interventions", []).append({"from_day": from_day, "what": what, "details": details})
+        (self.run_dir / "manifest.json").write_text(json.dumps(m, indent=2, ensure_ascii=False))
+
     def _checkpoint(self) -> None:
         self._log_offset = self._raw_log.f.tell()  # where the log ends for this checkpoint
         tmp = self.run_dir / "checkpoint.pkl.tmp"
@@ -211,8 +219,10 @@ class IslandSimulation:
 
     @classmethod
     def resume(cls, run_dir: Path, backends: dict, days: int = 1, backend_override: str | None = None,
-               concurrency: int | None = None, verbose: bool = True) -> Path:
+               concurrency: int | None = None, verbose: bool = True, prompt_version: int | str | None = None) -> Path:
         """Continue a run from its last checkpoint for `days` more days, appending to the same logs.
+        The run keeps the prompt wording it started with; `prompt_version` (a number, or "latest")
+        switches it from the next day on, logged as an intervention.
         Only load checkpoints you made yourself: pickle files can run code when loaded."""
         run_dir = Path(run_dir)
         with open(run_dir / "checkpoint.pkl", "rb") as f:
@@ -243,6 +253,17 @@ class IslandSimulation:
             sim.provider_tokens = 0
         if not hasattr(sim, "reasoning_tokens"):
             sim.reasoning_tokens = 0
+        if not hasattr(sim, "prompt_version"):  # runs from before prompt versions used the original wording
+            sim.prompt_version = 1
+        sim.isl.prompt_version = sim.prompt_version
+        change = None
+        if prompt_version is not None:
+            new = PROMPT_VERSION if str(prompt_version) == "latest" else int(prompt_version)
+            if new not in PROMPT_CHANGES:
+                raise ValueError(f"no prompt version {new}; there are {sorted(PROMPT_CHANGES)}")
+            if new != sim.prompt_version:
+                change = (sim.prompt_version, new)
+                sim.prompt_version = sim.isl.prompt_version = new
         sim.verbose = verbose
         if backend_override:
             sim.override = backend_override
@@ -253,7 +274,11 @@ class IslandSimulation:
         sim._build_systems()
         _set_aside_unfinished(run_dir, getattr(sim, "_log_offset", None), sim.isl.day)
         sim._open_log("a")
-        sim.log("resume", from_day=sim.isl.day + 1, days=days, time=time.time())
+        sim.log("resume", from_day=sim.isl.day + 1, days=days, time=time.time(), prompt_version=sim.prompt_version)
+        if change:
+            sim._intervene(sim.isl.day + 1, f"prompt version {change[0]} -> {change[1]}",
+                           [PROMPT_CHANGES[v] for v in range(change[0] + 1, change[1] + 1) if v in PROMPT_CHANGES]
+                           if change[1] > change[0] else [f"back to: {PROMPT_CHANGES[change[1]]}"])
         try:
             sim._run_days(days)
         finally:
@@ -268,9 +293,11 @@ class IslandSimulation:
         Rebuilt after every nightly reflection."""
         sc = self.sc
         selfdoc = self._self_doc
-        self.systems = {n: system_prompt(s, sc.world, len(sc.villagers), sc.brief, selfdoc(n))
+        v = getattr(self, "prompt_version", 1)
+        self.systems = {n: system_prompt(s, sc.world, len(sc.villagers), sc.brief, selfdoc(n), version=v)
                         for n, s in sc.villagers.items()}
-        self.talk_systems = {n: system_prompt(s, sc.world, len(sc.villagers), sc.brief, selfdoc(n), menu=False)
+        self.talk_systems = {n: system_prompt(s, sc.world, len(sc.villagers), sc.brief, selfdoc(n), menu=False,
+                                              version=v)
                              for n, s in sc.villagers.items()}
         self.light_systems = {n: light_system_prompt(s, selfdoc(n)) for n, s in sc.villagers.items()}
 
@@ -1137,6 +1164,7 @@ class IslandSimulation:
             "space": "grid",
             "free_time": self.sc.free_time,
             "backend_override": self.override,
+            "prompt_version": self.prompt_version,
             # exactly which model and request settings each backend name meant for this run
             "backends": {k: getattr(b, "model_id", k) for k, b in self.backends.items()},
             "villagers": {n: {"persona": s.persona, "traits": s.traits, "model": self.override or s.model,

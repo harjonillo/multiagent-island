@@ -1,0 +1,69 @@
+/* Island Pixel: design tokens for the island explorer.
+   Warm pastel palette, all-monospace type, square corners, soft offset shadows. */
+
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Silkscreen:wght@400;700&display=swap");
+
+:root {
+  /* type */
+  --font-body: "Atkinson Hyperlegible Mono", ui-monospace, monospace; /* all text and numbers */
+  --font-display: "Silkscreen", monospace;  /* logo, page titles, card titles, section labels */
+  --title-size: 30px;        /* h1, Silkscreen 400, line-height 1.15 */
+  --card-title-size: 20px;   /* villager / pair names, Silkscreen 400 */
+  --label-size: 12px;        /* section labels: Silkscreen, uppercase, letter-spacing 0.02em */
+  --body-size: 14px;
+  --small-size: 12px;
+
+  /* surfaces */
+  --ground: #FBF3E6;         /* page */
+  --panel: #FFFDF8;          /* cards, tiles, unselected buttons */
+  --border: #EADBC4;         /* card and control borders */
+  --shadow: #F0DFC8;         /* offset shadow colour */
+  --fill-soft: #F6EBDA;      /* row dividers, empty bar tracks, selected list row */
+  --rule: #E3D3BC;           /* chart baselines */
+
+  /* ink */
+  --ink: #3B2F2A;            /* text, selected villager / node fill */
+  --ink-muted: #6E5D52;      /* secondary text (passes 4.5:1 on --panel and --ground) */
+  --outline: #B59A82;        /* unchecked checkbox outline, network edges */
+  --on-ink: #FFFFFF;         /* text on --ink */
+
+  /* top bar (tabs) */
+  --tabbar-rule: #D9967A;    /* 2px rules above and below the bar, and the active tab's border */
+  --tab-active-fill: #E8B9A0;
+
+  /* selected filters (chips, villager buttons, map names, network nodes) */
+  --selected-border: #7FBCDB; /* the river blue from the map; 2px */
+
+  /* private content (thoughts, notes, nightly pages) */
+  --private-ink: #6A4FB8;
+  --private-fill: #F1E9FA;
+  --private-accent: #9B7FE0;
+
+  /* activity categories (also the "kind of contact" legend on Social) */
+  --act-gather: #6C9BD2;     /* mine_rock, chop_wood, shake_tree, beachcomb, dig_fossil */
+  --act-shops: #F08C5A;      /* sell, buy, ask, donate, upgrade_house, pay_loan, contribute_bridge, set_ordinance, move_house */
+  --act-catch: #5DB08F;      /* fish, catch_bug */
+  --act-craft: #E9B949;      /* craft, wear, decorate, undecorate */
+  --act-social: #E58BB0;     /* visit, plaza (20:00-21:00), conversations */
+  --act-build: #8DB15A;      /* plant, chop_down_tree, dig_stump, break_rock, lay_path, remove_path, place, fence_off, pick_up */
+  --act-home: #E9DDCD;       /* free time at home, rest */
+  --act-wander: #D2C0AC;     /* wandering */
+  --act-asleep: #F6EBDA;
+
+  /* status */
+  --fail: #B8452A;           /* "failed" text and x marks; always paired with the word or icon */
+  --chart-line: #E07A4F;     /* single-series line charts and sparklines */
+
+  /* map (tile colours, used by export_map.py) */
+  --map-sea: #A9D3E3;
+  --map-river: #7FBCDB;
+  --map-sand: #F1E6C8;
+
+  /* shape */
+  --radius: 0;               /* everything square ... */
+  --radius-dot: 50%;         /* ... except activity dots, checkbox corners (4px) and network nodes */
+  --card-border: 2px solid var(--border);
+  --card-shadow: 4px 4px 0 var(--shadow);
+  --tile-shadow: 3px 3px 0 var(--shadow);
+  --tap-target: 44px;        /* minimum height for buttons and chips */
+}

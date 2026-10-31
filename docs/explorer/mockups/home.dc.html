@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Island home: the whole run</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&amp;family=Silkscreen:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBF3E6}
+a{color:#3B2F2A}a:hover{color:#6E5D52}
+</style>
+</helmet>
+<div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; color: #3B2F2A; background: #FBF3E6; min-height: 1500px; box-sizing: border-box">
+  <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin: 20px 28px 0; padding: 10px 2px; background: transparent; border-top: 2px solid #D9967A; border-bottom: 2px solid #D9967A">
+    <div style="display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap">
+      <div style="font-family: 'Silkscreen', monospace; font-size: 18px">multiagent-island</div>
+      <div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 13px; color: #6E5D52">blank villagers · seed 0 · mock backend</div>
+    </div>
+    <nav style="display: flex; gap: 4px" aria-label="Views">
+      <a href="Main.dc.html" style="text-decoration: none; padding: 8px 16px; border: 2px solid #D9967A; background: #E8B9A0; color: #3B2F2A; font-size: 14px; font-weight: 600">Home</a>
+      <a href="Days.dc.html" style="text-decoration: none; padding: 8px 16px; border: 2px solid transparent; color: #3B2F2A; font-size: 14px">Days</a>
+      <a href="Social.dc.html" style="text-decoration: none; padding: 8px 16px; border: 2px solid transparent; color: #3B2F2A; font-size: 14px">Social</a>
+    </nav>
+  </header>
+
+  <section style="padding: 20px 28px 8px">
+    <h1 style="margin: 0; font-family: 'Silkscreen', monospace; font-size: 30px; font-weight: 400; line-height: 1.15">everything everywhere all at once, so far...</h1>
+    <div style="font-size: 14px; color: #6E5D52; margin-top: 4px">3 days, April 1 to 3 · 10 villagers · 179 LLM calls, 0 unreadable replies</div>
+  </section>
+
+  <section style="padding: 8px 28px 0">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px">
+      <sc-for list="{{kpis}}" as="k" hint-placeholder-count="6">
+        <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 3px 3px 0 #F0DFC8; padding: 12px 14px">
+          <div style="font-size: 11px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em">{{k.label}}</div>
+          <div style="font-size: 22px; font-weight: 600; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; margin-top: 4px">{{k.v}}</div>
+          <div style="font-size: 12px; color: #6E5D52">{{k.sub}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <main style="display: flex; flex-wrap: wrap; gap: 20px; padding: 16px 28px 20px; align-items: flex-start">
+    <div style="flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="position: relative; width: 100%; aspect-ratio: 112 / 96; border-radius: 0; overflow: hidden; border: 1px solid #EADBC4; background: #A9D3E3">
+        <img src="/_blob/714bc860b1218abaf1242be05568e75f" alt="Tile map of the island after day 2, with homes, paths laid and trees" style="position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0.92">
+        <sc-for list="{{buildings}}" as="b" hint-placeholder-count="6">
+          <div style="position: absolute; left: {{b.left}}; top: {{b.top}}; transform: translate(-50%, -100%); font-size: 11px; font-weight: 600; color: #3B2F2A; background: rgba(255,255,255,0.78); padding: 1px 6px; border-radius: 4px; white-space: nowrap">{{b.name}}</div>
+        </sc-for>
+        <sc-for list="{{homes}}" as="m" hint-placeholder-count="10">
+          <a href="Days.dc.html" style="{{m.style}}">{{m.name}}</a>
+        </sc-for>
+      </div>
+      <div style="font-size: 12px; color: #6E5D52">The island now: homes, 75 tiles of path (Ari 30, Jo 30, Kit 15), 8 saplings planted, 10 trees cut down.</div>
+
+      <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 16px 18px">
+        <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 12px">Day by day</div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px">
+          <sc-for list="{{trends}}" as="k" hint-placeholder-count="4">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 13px"><span style="font-weight: 600">{{k.label}}</span><span style="color: #6E5D52; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{k.range}}</span></div>
+              <svg viewBox="0 0 100 50" preserveAspectRatio="none" role="img" aria-label="{{k.aria}}" style="width: 100%; height: 60px; margin-top: 6px; display: block; overflow: visible">
+                <line x1="0" y1="48" x2="100" y2="48" stroke="#E3D3BC" stroke-width="1" vector-effect="non-scaling-stroke"></line>
+                <polyline points="{{k.pts}}" fill="none" stroke="#E07A4F" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline>
+              </svg>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #6E5D52; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace"><span>day 0</span><span>day 1</span><span>day 2</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 16px 18px">
+        <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 10px">Why actions failed · 105 of 300</div>
+        <sc-for list="{{fails}}" as="f" hint-placeholder-count="5">
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr) 110px 30px; gap: 10px; align-items: center; font-size: 13px; padding: 4px 0">
+            <div>{{f.label}}</div>
+            <div style="height: 10px; background: #F6EBDA; border-radius: 0"><div style="height: 10px; width: {{f.w}}; background: #F08C5A; border-radius: 0"></div></div>
+            <div style="text-align: right; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{f.n}}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 16px 18px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 8px">
+          <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em">Villagers</div>
+          <div style="font-size: 12px; color: #6E5D52">Assets = bells + items at Cranny prices, loans not subtracted · net worth Gini 0.68</div>
+        </div>
+        <div style="overflow-x: auto">
+          <div style="min-width: 640px">
+            <div style="display: grid; grid-template-columns: 56px minmax(120px, 1.2fr) 150px 70px 80px minmax(0, 1fr); gap: 12px; font-size: 11px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; padding: 6px 0; border-bottom: 1px solid #EADBC4">
+              <div>Name</div><div>Home</div><div>Assets, day 0 to 2</div><div style="text-align: right">Spotted</div><div style="text-align: right">Talk share</div><div>Most done (3 days)</div>
+            </div>
+            <sc-for list="{{vrows}}" as="r" hint-placeholder-count="10">
+              <div style="display: grid; grid-template-columns: 56px minmax(120px, 1.2fr) 150px 70px 80px minmax(0, 1fr); gap: 12px; align-items: center; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #F6EBDA">
+                <a href="Days.dc.html" style="font-weight: 600; text-decoration: none">{{r.name}}</a>
+                <div><div>{{r.home}}</div><div style="font-size: 12px; color: #6E5D52">{{r.house}}</div></div>
+                <div style="display: flex; align-items: center; gap: 8px">
+                  <svg viewBox="0 0 60 24" preserveAspectRatio="none" role="img" aria-label="{{r.aria}}" style="width: 60px; height: 24px; flex: none"><polyline points="{{r.pts}}" fill="none" stroke="#E07A4F" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline></svg>
+                  <span style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{r.assets}}</span>
+                </div>
+                <div style="text-align: right; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{r.spotted}}</div>
+                <div style="text-align: right; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{r.talk}}</div>
+                <div style="color: #6E5D52">{{r.top}}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 16px 18px">
+        <div style="display: flex; gap: 6px; align-items: center; font-size: 12px; color: #6A4FB8; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 4px">
+          <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="#6A4FB8" stroke-width="1.5"></rect><path d="M5.5 7V5a2.5 2.5 0 015 0v2" fill="none" stroke="#6A4FB8" stroke-width="1.5"></path></svg>
+          Nightly pages, night by night
+        </div>
+        <div style="font-size: 12px; color: #6E5D52; margin-bottom: 10px">First line of what each villager wrote to themselves. Does a self-description settle, or keep changing?</div>
+        <div style="overflow-x: auto">
+          <div style="min-width: 640px">
+            <div style="display: grid; grid-template-columns: 56px repeat(3, minmax(0, 1fr)); gap: 8px; font-size: 11px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; padding-bottom: 6px">
+              <div></div><div>Night 0</div><div>Night 1</div><div>Night 2</div>
+            </div>
+            <sc-for list="{{pages}}" as="p" hint-placeholder-count="10">
+              <div style="display: grid; grid-template-columns: 56px repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 6px">
+                <div style="font-size: 13px; font-weight: 600; align-self: center">{{p.name}}</div>
+                <sc-for list="{{p.cells}}" as="c" hint-placeholder-count="3">
+                  <div style="{{c.style}}">{{c.t}}</div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 14px">
+        <div style="flex: 1 1 300px; min-width: 0; background: #FFFDF8; border: 2px solid #EADBC4; border-radius: 0; box-shadow: 4px 4px 0 #F0DFC8; padding: 16px 18px">
+          <div style="font-size: 12px; color: #6E5D52; font-family: 'Silkscreen', monospace; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 4px">Who took the commons</div>
+          <div style="font-size: 12px; color: #6E5D52; margin-bottom: 8px">Concentration (HHI; 0.10 is perfectly even) and the top three takers</div>
+          <sc-for list="{{commons}}" as="c" hint-placeholder-count="7">
+            <div style="display: grid; grid-template-columns: 64px 44px minmax(0, 1fr); gap: 10px; font-size: 13px; padding: 5px 0; border-top: 1px solid #F6EBDA">
+              <div style="font-weight: 600">{{c.what}}</div>
+              <div style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace">{{c.hhi}}</div>
+              <div style="color: #6E5D52">{{c.top}}</div>
+            </div>
+          </sc-for>
+          <div style="font-size: 13px; margin-top: 10px; line-height: 1.45">Rocks ran out around 15:00 on 2 of 3 days; shells by 09:00 on 1 day; fossil spots never.</div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+renderVals() {
+const V = [
+  ["Ari", "southeast", "house, 98,000 loan", [5210, 7340, 7930], 24, "33%", "craft 5, fish 4, chop down 3"],
+  ["Bo", "southwest", "house, 98,000 loan", [4660, 5440, 38080], 15, "49%", "fish 7, beachcomb 7, craft 4"],
+  ["Cal", "east", "tent", [32610, 35350, 38070], 39, "41%", "mine rock 5, sell 5, ask 3"],
+  ["Dax", "west", "tent", [3540, 6790, 6790], 20, "56%", "donate 6, sell 4, beachcomb 4"],
+  ["Eli", "south, across the river", "house, 98,000 loan", [4210, 4290, 4470], 10, "43%", "sell 7, upgrade house 4, buy 4"],
+  ["Fen", "centre", "tent", [4960, 13720, 15710], 22, "42%", "chop wood 5, catch bugs 4, donate 2"],
+  ["Gus", "west", "tent", [10610, 26540, 26270], 12, "26%", "buy 5, mine rock 4, sell 4"],
+  ["Ike", "east", "tent", [4710, 5250, 6640], 21, "45%", "craft 6, beachcomb 3, chop wood 3"],
+  ["Jo", "west", "house, 98,000 loan", [5480, 10440, 11880], 17, "36%", "fish 6, craft 5, chop wood 5"],
+  ["Kit", "centre", "house, 98,000 loan", [4160, 5230, 4898], 26, "52%", "fish 5, chop wood 3, sell 3"]
+];
+const HOME = { Ari: [91, 78.5], Bo: [16, 70.5], Cal: [86, 60.5], Dax: [23, 51.5], Eli: [42, 77.5], Fen: [41, 45.5], Gus: [16, 57.5], Ike: [93, 52.5], Jo: [34, 55.5], Kit: [64, 48.5] };
+const BUSY = "keeps busy, gets things done";
+const SLOW = "takes things slowly, quiet days";
+const CHAT = "likes chatting with whoever";
+const SELF = "looks after myself for now";
+const NONE = "chose not to write";
+const PG = {
+  Ari: [BUSY, BUSY, CHAT], Bo: [SLOW, BUSY, SLOW], Cal: [SLOW, BUSY, CHAT], Dax: [BUSY, BUSY, BUSY], Eli: [SELF, SLOW, CHAT],
+  Fen: [SELF, SLOW, SLOW], Gus: [SLOW, SLOW, BUSY], Ike: [NONE, NONE, SLOW], Jo: [CHAT, SELF, SELF], Kit: [BUSY, SLOW, BUSY]
+};
+const BUILD = [["Resident Services", 62.5, 56], ["plaza", 55, 69], ["museum", 42.5, 53], ["Nook’s Cranny", 71, 63], ["Able Sisters", 66, 74], ["airport", 56.5, 80]];
+const pct = (v, m) => ((v + 0.5) / m * 100).toFixed(2) + "%";
+const fmt = (n) => n.toLocaleString("en-US");
+const maxA = 40000;
+const vrows = V.map((r) => ({
+  name: r[0], home: r[1], house: r[2], spotted: String(r[4]), talk: r[5], top: r[6],
+  assets: fmt(r[3][2]), aria: r[0] + " assets: " + r[3].map(fmt).join(", "),
+  pts: r[3].map((v, i) => (i * 30) + "," + (22 - v / maxA * 20).toFixed(1)).join(" ")
+}));
+const trend = (label, arr, max, unit) => ({ label, range: arr.join(" → ") + unit, aria: label + " by day: " + arr.join(", "),
+  pts: arr.map((v, i) => (i * 50) + "," + (48 - v / max * 44).toFixed(1)).join(" ") });
+const pages = Object.keys(PG).map((n) => ({ name: n, cells: PG[n].map((t, i) => ({ t,
+  style: "font-size: 13px; padding: 7px 10px; border-radius: 0; line-height: 1.35; " + (t === NONE ? "color: #6E5D52; font-style: italic; background: #FBF3E6" : (i > 0 && PG[n][i - 1] === t ? "background: #F1E9FA; color: #3B2F2A" : "background: #FFFDF8; color: #3B2F2A; border: 1px solid #EADBC4")) })) }));
+const F = [["Not enough materials to craft", 29], ["Can’t get there with the tools carried", 26], ["Museum only takes fish, bugs, fossils", 16], ["Has no tool for it", 9], ["Shop closed", 8], ["Rock or spot already empty", 6], ["Other", 11]];
+return {
+  kpis: [
+    { label: "Actions", v: "300", sub: "35% failed" },
+    { label: "Conversations", v: "20", sub: "from 53 times someone noticed someone" },
+    { label: "Letters and parcels", v: "11", sub: "plus 2 board posts" },
+    { label: "Trades", v: "2", sub: "from 7 offers" },
+    { label: "Museum", v: "3", sub: "of 47 species" },
+    { label: "Bridge fund", v: "1,202", sub: "of 98,000 · all from Kit" }
+  ],
+  buildings: BUILD.map((b) => ({ name: b[0], left: pct(b[1], 112), top: ((b[2] - 0.6) / 96 * 100).toFixed(2) + "%" })),
+  homes: Object.keys(HOME).map((n) => ({ name: n, style: "position: absolute; left: " + pct(HOME[n][0], 112) + "; top: " + pct(HOME[n][1], 96) + "; transform: translate(-50%, -50%); padding: 3px 9px; border-radius: 0; font-size: 12px; font-weight: 600; text-decoration: none; background: #FFFDF8; color: #3B2F2A; border: 1px solid rgba(59,47,42,0.3)" })),
+  trends: [trend("Failed actions", [27, 35, 43], 50, " of 100"), trend("Conversations", [8, 7, 5], 10, ""), trend("Letters and parcels", [4, 3, 4], 10, ""), trend("Houses on loan", [2, 3, 5], 10, " of 10")],
+  fails: F.map((f) => ({ label: f[0], n: String(f[1]), w: (f[1] / 29 * 100) + "%" })),
+  vrows, pages,
+  commons: [
+    { what: "rocks", hhi: "0.15", top: "Cal 19%, Gus 19%, Bo 18%" },
+    { what: "wood", hhi: "0.14", top: "Fen 22%, Jo 22%, Kit 13%" },
+    { what: "fruit", hhi: "0.27", top: "Ike 43%, Cal 14%, Fen 14%" },
+    { what: "fish", hhi: "0.17", top: "Jo 26%, Kit 21%, Ari 16%" },
+    { what: "bugs", hhi: "0.31", top: "Kit 43%, Jo 29%, Fen 14%" },
+    { what: "shells", hhi: "0.22", top: "Bo 33%, Cal 17%, Dax 17%" },
+    { what: "fossils", hhi: "0.33", top: "Ari, Fen, Jo 33% each" }
+  ]
+};
+}
+}
+</script>
+</body>
+</html>

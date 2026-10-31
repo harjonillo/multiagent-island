@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>multiagent-island · __TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;600&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Island Pixel design tokens (docs/explorer/tokens.css) */
+:root {
+  --font-body: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+  --font-display: "Silkscreen", ui-monospace, monospace;
+  --ground: #FBF3E6; --panel: #FFFDF8; --border: #EADBC4; --shadow: #F0DFC8; --fill-soft: #F6EBDA; --rule: #E3D3BC;
+  --ink: #3B2F2A; --ink-muted: #6E5D52; --outline: #B59A82; --on-ink: #FFFFFF;
+  --tabbar-rule: #D9967A; --tab-active-fill: #E8B9A0; --selected-border: #7FBCDB;
+  --private-ink: #6A4FB8; --private-fill: #F1E9FA; --private-accent: #9B7FE0;
+  --act-shops: #F08C5A; --fail: #B8452A; --chart-line: #E07A4F;
+  --card-shadow: 4px 4px 0 var(--shadow); --tile-shadow: 3px 3px 0 var(--shadow);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--font-body); font-size: 14px; }
+a { color: var(--ink); } a:hover { color: var(--ink-muted); }
+button { font: inherit; color: inherit; cursor: pointer; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin: 20px 28px 0;
+  padding: 10px 2px; border-top: 2px solid var(--tabbar-rule); border-bottom: 2px solid var(--tabbar-rule); }
+.logo { font-family: var(--font-display); font-size: 18px; }
+.runline { font-size: 13px; color: var(--ink-muted); }
+.tabs { display: flex; gap: 4px; }
+.tabs button { min-height: 44px; padding: 8px 16px; border: 2px solid transparent; background: none; font-size: 14px; }
+.tabs button[aria-current="page"] { border-color: var(--tabbar-rule); background: var(--tab-active-fill); font-weight: 600; }
+.head { padding: 20px 28px 8px; }
+h1 { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 400; line-height: 1.15; }
+.sub { font-size: 14px; color: var(--ink-muted); margin-top: 4px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; padding: 8px 28px 0; }
+.kpi { background: var(--panel); border: 2px solid var(--border); box-shadow: var(--tile-shadow); padding: 12px 14px; }
+.kpi .v { font-size: 22px; font-weight: 600; margin-top: 4px; }
+.label { font-family: var(--font-display); font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-muted); }
+.kpi .label { font-size: 11px; }
+.small { font-size: 12px; color: var(--ink-muted); }
+.cols { display: flex; flex-wrap: wrap; gap: 20px; padding: 16px 28px 28px; align-items: flex-start; }
+.col { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.col.left { flex: 1 1 480px; } .col.right { flex: 999 1 640px; }
+.card { background: var(--panel); border: 2px solid var(--border); box-shadow: var(--card-shadow); padding: 16px 18px; }
+.card > .label { margin-bottom: 10px; }
+.scroll { overflow-x: auto; }
+.map { position: relative; width: 100%; border: 1px solid var(--border); background: #A9D3E3; overflow: hidden; }
+.map canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0.92; }
+.map .bld { position: absolute; transform: translate(-50%, -100%); font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.78);
+  padding: 1px 6px; border-radius: 4px; white-space: nowrap; pointer-events: none; }
+.map .who { position: absolute; transform: translate(-50%, -50%); padding: 3px 9px; font-size: 12px; font-weight: 600; text-decoration: none;
+  background: var(--panel); border: 1px solid rgba(59,47,42,0.3); }
+.trends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.trend-head { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.trend svg { width: 100%; height: 60px; margin-top: 6px; display: block; overflow: visible; }
+.axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-muted); }
+.barrow { display: grid; grid-template-columns: minmax(0, 1fr) 110px 36px; gap: 10px; align-items: center; font-size: 13px; padding: 4px 0; }
+.track { height: 10px; background: var(--fill-soft); } .track > div { height: 10px; background: var(--act-shops); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.vtable { min-width: 680px; }
+.vrow { display: grid; grid-template-columns: 56px minmax(120px, 1.2fr) 150px 70px 80px minmax(0, 1fr); gap: 12px; align-items: center;
+  font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--fill-soft); }
+.vrow.th { font-family: var(--font-display); font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-muted);
+  padding: 6px 0; border-bottom: 1px solid var(--border); }
+.vrow a { font-weight: 600; text-decoration: none; }
+.private { color: var(--private-ink); }
+.private .label, .label.private { color: var(--private-ink); display: flex; gap: 6px; align-items: center; }
+.pages { display: grid; gap: 6px 8px; align-items: stretch; }
+.pages .nm { font-size: 13px; font-weight: 600; align-self: center; }
+.cell { font-size: 13px; padding: 7px 10px; line-height: 1.35; background: var(--panel); border: 1px solid var(--border); min-width: 0; }
+.cell.same { background: var(--private-fill); border-color: transparent; }
+.cell.skip { color: var(--ink-muted); font-style: italic; background: var(--ground); border-color: transparent; }
+.cell details summary { cursor: pointer; list-style: none; } .cell details summary::-webkit-details-marker { display: none; }
+.cell details[open] summary { margin-bottom: 6px; }
+.commons { display: grid; grid-template-columns: 70px 44px minmax(0, 1fr); gap: 10px; font-size: 13px; padding: 5px 0; border-top: 1px solid var(--fill-soft); }
+.soon { margin: 20px 28px; }
+@media (max-width: 1000px) { .trends { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap">
+    <div class="logo">multiagent-island</div>
+    <div class="runline" id="runline"></div>
+  </div>
+  <nav class="tabs" aria-label="Views">
+    <button data-tab="home">Home</button><button data-tab="days">Days</button><button data-tab="social">Social</button>
+  </nav>
+</header>
+<div id="view"></div>
+<script id="site-data" type="application/json">__DATA__</script>
+<script>
+"use strict";
+const D = JSON.parse(document.getElementById("site-data").textContent);
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const fmt = (n) => Number(n).toLocaleString("en-US");
+const pct = (v) => Math.round(v * 100) + "%";
+const LOCK = '<svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+
+// --- the map -----------------------------------------------------------------------
+const TILE_COLOURS = {s: "#A9D3E3", a: "#F1E6C8", r: "#7FBCDB", k: "#A39C8E", b: "#B08A5A", "1": "#CFE3B4", "2": "#B5D49A",
+  "3": "#97C27E", B: "#8E8A80", P: "#E6DFCC"};
+const OBJ = {site: "#F7F5EE", home: "#E9C29B", path: "#B98A5E", hardwood: "#3E7A3A", fruit: "#D2553F", stump: "#8A5A2B",
+  sapling: "#6E9E4A", rock: "#5F5B55", placed: "#6250D6", flowers: "#E87BA4", bridge: "#B08A5A"};
+
+function mapHTML(day, onName) {
+  const M = D.map;
+  const id = "map" + Math.random().toString(36).slice(2, 8);
+  const homes = day.homes || {};
+  const labels = M.buildings.map((b) => `<div class="bld" style="left:${((b.x + 0.5) / M.W * 100).toFixed(2)}%;top:${((b.top - 0.6) / M.H * 100).toFixed(2)}%">${esc(b.name)}</div>`).join("");
+  const names = Object.entries(homes).filter(([, s]) => s && M.sites[s]).map(([n, s]) => {
+    const [x, y] = M.sites[s].centre;
+    return `<a class="who" href="#days/${encodeURIComponent(n)}" data-name="${esc(n)}" style="left:${((x + 0.5) / M.W * 100).toFixed(2)}%;top:${((y + 0.5) / M.H * 100).toFixed(2)}%">${esc(n)}</a>`;
+  }).join("");
+  setTimeout(() => paint(document.getElementById(id), day), 0);
+  return `<div class="map" style="aspect-ratio:${M.W} / ${M.H}"><canvas id="${id}" width="${M.W}" height="${M.H}" role="img" aria-label="Tile map of the island at the end of day ${day.day}, with homes, paths and trees"></canvas>${labels}${names}</div>`;
+}
+
+function paint(canvas, day) {
+  if (!canvas) return;
+  const M = D.map, g = canvas.getContext("2d"), o = day.objects;
+  const dot = (x, y, c) => { g.fillStyle = c; g.fillRect(x, y, 1, 1); };
+  M.tiles.forEach((row, y) => { for (let x = 0; x < row.length; x++) dot(x, y, TILE_COLOURS[row[x]] || "#CFE3B4"); });
+  if (o.bridge_open) M.bridge.forEach(([x, y]) => dot(x, y, OBJ.bridge));
+  const lived = new Set(Object.values(day.homes || {}));
+  Object.entries(M.sites).forEach(([sid, s]) => s.cells.forEach(([x, y]) => dot(x, y, lived.has(sid) ? OBJ.home : OBJ.site)));
+  o.paths.forEach(([x, y]) => dot(x, y, OBJ.path));
+  o.flowers.forEach(([x, y]) => dot(x, y, OBJ.flowers));
+  o.placed.forEach(([x, y]) => dot(x, y, OBJ.placed));
+  o.trees.forEach(([x, y, k]) => dot(x, y, OBJ[k] || OBJ.hardwood));
+  o.rocks.forEach((r) => r && dot(r[0], r[1], OBJ.rock));
+}
+
+// --- small charts ------------------------------------------------------------------
+function line(values, w, h, pad, max) {
+  const n = values.length, top = Math.max(max ?? Math.max(...values, 1), 1);
+  return values.map((v, i) => `${(n > 1 ? i / (n - 1) * w : w / 2).toFixed(1)},${(h - pad - v / top * (h - 2 * pad)).toFixed(1)}`).join(" ");
+}
+function trendHTML(t) {
+  const v = t.values, first = v[0] ?? 0, last = v[v.length - 1] ?? 0;
+  const unit = t.of ? ` of ${fmt(t.of[t.of.length - 1])}` : t.of_all ? ` of ${t.of_all}` : "";
+  const days = D.days.map((d) => d.day);
+  const ticks = days.length > 6 ? [days[0], days[Math.floor(days.length / 2)], days[days.length - 1]] : days;
+  return `<div class="trend"><div class="trend-head"><span style="font-weight:600">${esc(t.label)}</span><span class="small">${fmt(first)} → ${fmt(last)}${unit}</span></div>
+    <svg viewBox="0 0 100 50" preserveAspectRatio="none" role="img" aria-label="${esc(t.label)} by day: ${v.join(", ")}">
+      <line x1="0" y1="48" x2="100" y2="48" stroke="#E3D3BC" stroke-width="1" vector-effect="non-scaling-stroke"/>
+      <polyline points="${line(v, 100, 50, 2, t.of_all)}" fill="none" stroke="#E07A4F" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>
+    <div class="axis">${ticks.map((d) => `<span>day ${d}</span>`).join("")}</div></div>`;
+}
+
+// --- Home --------------------------------------------------------------------------
+function home() {
+  const H = D.home, R = D.run, last = D.days[D.days.length - 1];
+  const maxAssets = Math.max(...H.villagers.flatMap((v) => v.assets), 1);
+  const maxFail = Math.max(...H.fails.map((f) => f.n), 1);
+  const nights = D.days.map((d) => d.day);
+  const pageCell = (cells, i) => {
+    const c = cells[i];
+    if (!c) return `<div class="cell skip">–</div>`;
+    if (c.skipped) return `<div class="cell skip">${esc(c.skipped)}</div>`;
+    const prev = i > 0 ? cells[i - 1] : null;
+    const same = prev && !prev.skipped && prev.text === c.text;
+    const body = c.text && c.text !== c.first
+      ? `<details><summary>${esc(c.first)}</summary>${esc(c.text.slice(c.first.length)).trim().replace(/\n/g, "<br>")}</details>` : esc(c.first || "(blank)");
+    return `<div class="cell private${same ? " same" : ""}"${same ? ' title="Same as the night before"' : ""}>${body}</div>`;
+  };
+  const ro = H.run_out, roText = (k, name) => ro[k].days ? `${name} ran out around ${ro[k].hour} on ${ro[k].days} of ${R.days} days` : `${name} never`;
+  return `
+  <section class="head"><h1>everything everywhere all at once, so far...</h1>
+    <div class="sub">${R.days} day${R.days === 1 ? "" : "s"}, ${esc(R.dates)} · ${R.villagers.length} villagers · ${fmt(R.llm_calls)} LLM calls, ${fmt(R.errors)} unreadable replies</div></section>
+  <section class="kpis">${H.kpis.map((k) => `<div class="kpi"><div class="label">${esc(k.label)}</div><div class="v">${esc(k.v)}</div><div class="small">${esc(k.sub)}</div></div>`).join("")}</section>
+  <main class="cols">
+    <div class="col left">
+      ${mapHTML(last)}
+      <div class="small">${esc(H.caption)}</div>
+      <div class="card"><div class="label">Day by day</div><div class="trends">${H.trends.map(trendHTML).join("")}</div></div>
+      <div class="card"><div class="label">Why actions failed · ${fmt(H.failed)} of ${fmt(H.actions)}</div>
+        ${H.fails.map((f) => `<div class="barrow"><div>${esc(f.label)}</div><div class="track"><div style="width:${(f.n / maxFail * 100).toFixed(1)}%"></div></div><div class="num">${fmt(f.n)}</div></div>`).join("") || '<div class="small">No failed actions.</div>'}
+      </div>
+    </div>
+    <div class="col right">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px; margin-bottom:8px">
+          <div class="label">Villagers</div><div class="small">Assets = bells + items at Cranny prices, loans not subtracted · net worth Gini ${H.gini.toFixed(2)}</div></div>
+        <div class="scroll"><div class="vtable">
+          <div class="vrow th"><div>Name</div><div>Home</div><div>Assets, day ${nights[0]} to ${nights[nights.length - 1]}</div><div class="num">Spotted</div><div class="num">Talk share</div><div>Most done</div></div>
+          ${H.villagers.map((v) => `<div class="vrow"><a href="#days/${encodeURIComponent(v.name)}">${esc(v.name)}</a>
+            <div><div>${esc(v.home)}</div><div class="small">${esc(v.house)}</div></div>
+            <div style="display:flex; align-items:center; gap:8px"><svg viewBox="0 0 60 24" preserveAspectRatio="none" role="img" aria-label="${esc(v.name)} assets: ${v.assets.map(fmt).join(", ")}" style="width:60px;height:24px;flex:none"><polyline points="${line(v.assets, 60, 24, 2, maxAssets)}" fill="none" stroke="#E07A4F" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg><span>${fmt(v.assets[v.assets.length - 1])}</span></div>
+            <div class="num">${fmt(v.spotted)}</div><div class="num">${v.talk_share == null ? "–" : pct(v.talk_share)}</div>
+            <div class="small">${v.top.map(([k, n]) => `${esc(k)} ${n}`).join(", ")}</div></div>`).join("")}
+        </div></div>
+      </div>
+      <div class="card">
+        <div class="label private" style="margin-bottom:4px">${LOCK} Nightly pages, night by night</div>
+        <div class="small" style="margin-bottom:10px">First line of what each villager wrote to themselves (private; click a line for the rest). Tinted: the same as the night before.</div>
+        <div class="scroll"><div class="pages" style="grid-template-columns: 56px repeat(${nights.length}, minmax(180px, 1fr)); min-width:${56 + nights.length * 188}px">
+          <div></div>${nights.map((n) => `<div class="label" style="font-size:11px">Night ${n}</div>`).join("")}
+          ${R.villagers.map((n) => `<div class="nm">${esc(n)}</div>${nights.map((_, i) => pageCell(H.pages[n], i)).join("")}`).join("")}
+        </div></div>
+      </div>
+      <div class="card">
+        <div class="label" style="margin-bottom:4px">Who took the commons</div>
+        <div class="small" style="margin-bottom:8px">Concentration (HHI; ${(1 / R.villagers.length).toFixed(2)} is perfectly even) and the top three takers</div>
+        ${H.commons.map((c) => `<div class="commons"><div style="font-weight:600">${esc(c.what)}</div><div>${c.hhi.toFixed(2)}</div><div class="small">${c.top.map(([n, s]) => `${esc(n)} ${pct(s)}`).join(", ")}</div></div>`).join("")}
+        <div style="font-size:13px; margin-top:10px; line-height:1.45">${roText("rocks", "Rocks")}; ${roText("shells", "shells")}; ${roText("fossils", "fossil spots")}.</div>
+      </div>
+    </div>
+  </main>`;
+}
+
+function soon(name) {
+  return `<section class="head"><h1>${name}</h1><div class="sub">Coming next.</div></section>`;
+}
+
+// --- routing -----------------------------------------------------------------------
+function show() {
+  const tab = (location.hash.slice(1).split("/")[0] || "home");
+  document.querySelectorAll(".tabs button").forEach((b) => { if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+  $("#view").innerHTML = tab === "days" ? soon("Days") : tab === "social" ? soon("Who deals with whom") : home();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => { location.hash = b.dataset.tab; }));
+$("#runline").textContent = `${D.run.scenario} · seed ${D.run.seed} · ${D.run.model}`;
+window.addEventListener("hashchange", show);
+show();
+</script>
+</body>
+</html>

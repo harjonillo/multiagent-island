@@ -17,3 +17,6 @@ llmabm = "llmabm.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"llmabm.island" = ["site_template.html"]
