@@ -732,6 +732,33 @@ def test_commons_contributions_split_public_from_home():
         assert abs(sum(o["took"] for o in c.values()) - 1.0) < 1e-9
 
 
+def test_plans_follow_each_villagers_own_waking_hours():
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock", verbose=False)
+        sim.run(2)
+        isl = sim.isl
+        (isl.v["Ari"].wakes, isl.v["Ari"].sleeps), (isl.v["Bo"].wakes, isl.v["Bo"].sleeps) = (6, 22), (11, 27)
+        isl.v["Cal"].wakes, isl.v["Cal"].sleeps = 13, 4  # a night owl
+        slots = sim._plan_slots()
+        mine = {n: sorted((h, len(hours)) for h, lst in slots.items() for m, _, hours, _, _ in lst if m == n)
+                for n in ("Ari", "Bo", "Cal")}
+        # Two plans each, at waking and halfway through, each covering half of their waking hours.
+        assert mine["Ari"] == [(6, 8), (14, 8)] and mine["Bo"] == [(11, 8), (19, 8)]
+        assert mine["Cal"] == [(13, 7), (20, 8)]
+        # A plan can use an even share of the actions left: half of the 10 in the morning.
+        run = load_run(Path(d) / "run")
+        for e in run.of("plan"):
+            if e["day"] == 1 and e["phase"] == 0 and not e.get("habit"):
+                assert len(e["scheduled"]) <= 5
+                assert all("only 5" in x["why"] for x in e["dropped"] if "this plan" in x.get("why", ""))
+        prompt = sim.systems["Ari"]
+        assert "You plan twice a day: when you get up" in prompt
+        # Runs started with fixed windows keep them.
+        sim.sc.world["calendar"]["plans"] = [[5, 12], [12, 19], [19, 29]]
+        assert sorted(sim._plan_slots()) == [5, 12, 19]
+
+
 def test_spending_choices_are_read_from_plans():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:

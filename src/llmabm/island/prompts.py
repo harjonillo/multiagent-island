@@ -48,12 +48,20 @@ def island_rules(world: dict, n_villagers: int) -> str:
     opening hours, prices, what Tom Nook and Isabelle offer) is learned on the island."""
     cal = world["calendar"]
     social = " and ".join(clock(h) for h in cal.get("social_hours", []))
-    plan_times = ", ".join(clock(a) for a, _ in cal["plans"])
+    if "plans" in cal:  # fixed planning times, the same for everyone (older runs)
+        planning = f"You plan at {', '.join(clock(a) for a, _ in cal['plans'])}, each time for the hours until the next planning time."
+    else:
+        k = int(cal.get("plans_per_day", 2))
+        times = {1: "once", 2: "twice"}.get(k, f"{k} times")
+        planning = (f"You plan {times} a day: when you get up" + (", and again at even intervals through your waking hours" if k > 2 else
+                    ", and again halfway through your waking hours" if k == 2 else "")
+                    + ". Each plan covers the hours until your next one"
+                    + (", and can use an even share of the actions you have left; whatever it doesn't use carries over." if k > 1 else "."))
     return f"""You live on a small island with {n_villagers - 1} other villagers. Everyone shares what the island has.
 
 How it works:
 - A new day starts at {clock(cal['day_start'])}. Each action takes one hour, and you can do {cal['actions_per_day']} a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
-- You plan at {plan_times}, each time for the hours until the next planning time.
+- {planning}
 - Villagers meet at the plaza at {social}.
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.

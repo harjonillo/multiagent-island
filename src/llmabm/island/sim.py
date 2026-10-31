@@ -187,7 +187,6 @@ class IslandSimulation:
         start = sc.world["calendar"]["day_start"]
         self.arrival_hour = {n: start for n in sc.villagers}
         self.noticed: dict[str, list[str]] = {n: [] for n in sc.villagers}
-        self.window_end = start
 
     # --- persistence -------------------------------------------------------
     def __getstate__(self):
@@ -434,15 +433,14 @@ class IslandSimulation:
         if d == 0:
             self._settle_all(d)
         self._deliver_mail(d)
-        for i, (a, b) in enumerate(cal["plans"]):
-            self.hour = a
-            self.window_end = b
-            self._plan(d, i, a, b)
-            self._progress("plans made")
-            for h in range(a, b):
-                self.hour = h
-                self._run_hour(d, h)
-                self._progress("hour over", quiet_ok=True)
+        slots = self._plan_slots()
+        for h in range(cal["day_start"], cal["day_start"] + cal.get("day_length", 24)):
+            self.hour = h
+            if slots.get(h):
+                self._plan(d, h, slots[h])
+                self._progress("plans made")
+            self._run_hour(d, h)
+            self._progress("hour over", quiet_ok=True)
         for n, vil in isl.v.items():
             self.yesterday[n] = list(vil.today)
             vil.notes = vil.notes[-self.sc.memory_size:]
@@ -682,28 +680,56 @@ class IslandSimulation:
             self.isl.announcement = reply.text.strip() if reply else None
             self.log("isabelle_announcement", day=d, for_day=d + 1, text=self.isl.announcement, error=err)
 
-    def _plan(self, d: int, phase: int, a: int, b: int) -> None:
-        """One LLM call per awake villager to schedule actions in hours [a, b).
-        Villagers asleep for the whole window are not called. Those who chose habit for this
-        planning time, or have no energy left, repeat what they did yesterday at this time."""
+    def _plan_slots(self) -> dict[int, list[tuple]]:
+        """When each villager plans today: {hour: [(name, phase, hours covered, window, plans today)]}.
+
+        Each villager plans `plans_per_day` times, spread over their own waking hours: when they
+        get up, then at even intervals, each plan covering an equal share of the hours they are
+        awake. So early risers and late sleepers get the same number of plans of the same length.
+        Runs started before personal schedules have fixed windows (`plans: [[a, b], ...]`), the
+        same for everyone; they keep them, so a resumed run plans as it started."""
+        isl, cal = self.isl, self.sc.world["calendar"]
+        start = cal["day_start"]
+        slots: dict[int, list[tuple]] = {}
+        for n in isl.v:
+            awake = [h for h in range(start, start + cal.get("day_length", 24)) if isl.is_awake(n, h)]
+            if "plans" in cal:
+                for i, (a, b) in enumerate(cal["plans"]):
+                    hours = [h for h in awake if a <= h < b]
+                    if hours:
+                        slots.setdefault(a, []).append((n, i, hours, (a, b), len(cal["plans"])))
+                continue
+            k = min(int(cal.get("plans_per_day", 2)), len(awake))
+            for i in range(k):
+                hours = awake[len(awake) * i // k: len(awake) * (i + 1) // k]
+                slots.setdefault(hours[0], []).append((n, i, hours, (hours[0], hours[-1] + 1), k))
+        return slots
+
+    def _plan(self, d: int, at: int, slots: list[tuple]) -> None:
+        """One LLM call per villager whose planning time is `at`, to schedule actions in the hours
+        that plan covers. With personal schedules a plan may use at most an even share of the
+        actions left (half of them, with two plans a day); whatever it doesn't use carries over.
+        Those who chose habit for this planning time, or have no energy left, repeat what they
+        did yesterday at this time."""
         isl, log = self.isl, self.log
         budget = self.sc.world["calendar"]["actions_per_day"]
-        who = []
-        for n in isl.v:
-            awake = [h for h in range(a, b) if isl.is_awake(n, h)]
-            if awake and self.used[n] < budget:
-                who.append(n)
+        fixed = "plans" in self.sc.world["calendar"]
+        slot = {n: (phase, hours, window, k) for n, phase, hours, window, k in slots}
+        who = [n for n in slot if self.used[n] < budget]
 
         for n in who:
             isl.where_notes[n] = self.bodies.where_note(n)
 
+        # An even share of the actions left, rounded up; fixed windows had no shares.
+        shares = {n: None if fixed else -(-(budget - self.used[n]) // (slot[n][3] - slot[n][0])) for n in who}
+
         def plan(name):
             vil = isl.v[name]
-            awake = [h for h in range(a, b) if isl.is_awake(name, h)]
+            phase, awake, _, k = slot[name]
             left = budget - self.used[name]
             if self.choices[name]["next"] == "habit":
                 return HABIT
-            user = plan_prompt(isl, vil, awake[0], awake[-1] + 1, min(left, len(awake)), self.yesterday[name],
+            user = plan_prompt(isl, vil, awake[0], awake[-1] + 1, min(shares[name] or left, len(awake)), self.yesterday[name],
                                announcement=self.first_plan[name], noticed=self.noticed[name][-8:],
                                choices=self.choices[name])
             if not self.energy.can(name, self._need(name, user)):
@@ -715,7 +741,7 @@ class IslandSimulation:
 
         results = self._parallel(plan, who)
         for name in who:
-            awake = [h for h in range(a, b) if isl.is_awake(name, h)]
+            phase, awake, (a, b), _ = slot[name]
             if results[name] in (TIRED, HABIT):  # do what they did yesterday at this time of day
                 chose = results[name] is HABIT
                 if chose:
@@ -736,7 +762,7 @@ class IslandSimulation:
                 continue
             reply, obj, err = results[name]
             acts = [x for x in (obj or {}).get("actions", []) if isinstance(x, dict)] if obj else []
-            scheduled, dropped = self._assign_hours(name, acts, awake[0], awake[-1] + 1)
+            scheduled, dropped = self._assign_hours(name, acts, awake[0], awake[-1] + 1, cap=shares[name])
             for h, act in scheduled:
                 self.schedule.setdefault(h, []).append((name, act))
             self.habits[(name, phase)] = [{"hour": h % 24, **act} for h, act in scheduled]
@@ -764,9 +790,10 @@ class IslandSimulation:
             ch["next"] = changed["next"] = nxt
         return changed
 
-    def _assign_hours(self, name: str, acts: list[dict], a: int, b: int):
+    def _assign_hours(self, name: str, acts: list[dict], a: int, b: int, cap: int | None = None):
         """Place each action at its requested hour, or the next free hour in the window.
-        One action per hour; stops when the day's action budget runs out."""
+        One action per hour; stops when the day's action budget, or this plan's share of it
+        (`cap`), runs out."""
         budget = self.sc.world["calendar"]["actions_per_day"]
         taken = {h for h, lst in self.schedule.items() for n, _ in lst if n == name}
         out, dropped, cursor = [], [], a
@@ -775,6 +802,9 @@ class IslandSimulation:
             act = {k: v for k, v in act.items() if not str(k).startswith("_") and k not in ("none_seen", "none_out", "habitat")}
             if self.used[name] >= budget:
                 dropped.append({**act, "why": "no actions left today"})
+                continue
+            if cap is not None and len(out) >= cap:
+                dropped.append({**act, "why": f"this plan could use only {cap} of your actions; the rest are for later"})
                 continue
             want = act.pop("hour", None)
             start = self.sc.world["calendar"]["day_start"]

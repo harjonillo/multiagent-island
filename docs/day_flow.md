@@ -64,7 +64,7 @@ flowchart TD
     mail["Mail: yesterday's letters and parcels arrive<br/>new recipe cards are learned<br/>a parcel that doesn't fit waits"]
     mev[("events.jsonl: gift, by mail")]
 
-    subgraph window["Each planning window: 05-12, 12-19, 19-05"]
+    subgraph window["Each villager's planning times: on waking, and halfway through their waking hours"]
         who["Villagers awake in the window with actions left"]
         habitq{"Chose 'next: habit'<br/>last time?"}
         afford{"Enough energy<br/>to read the prompt?"}
@@ -206,7 +206,7 @@ can't be afforded isn't made.
 
 | call | who | when | system prompt | reply | if it can't be afforded | logged as |
 |---|---|---|---|---|---|---|
-| plan | each awake villager with actions left | 05:00, 12:00, 19:00, unless they chose habit | full rules + action menu | JSON: thoughts, actions, note, plaza / write / next | repeats yesterday | `plan` |
+| plan | each awake villager with actions left | on waking and halfway through their waking hours, unless they chose habit | full rules + action menu | JSON: thoughts, actions, note, plaza / write / next | repeats yesterday | `plan` |
 | plaza | villagers who chose to go | 20:00; 21:00 only with new offers waiting | rules, no menu | JSON: thoughts, letters, board, offers, responses, parcels, note | skips the plaza | `evening_turn` and more |
 | notice | a villager with someone nearby, out of the house | any hour, up to 4 a day | short: persona, nightly page | JSON: thoughts, approach, opening line | too tired to talk | `encounter_decision` |
 | chat turn | the one who was approached, then back and forth | right after a notice or a visit | rules, no menu | JSON: thoughts, say, give, ask, note | just nods | `encounter` |

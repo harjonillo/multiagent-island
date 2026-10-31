@@ -92,14 +92,17 @@ run, a day and an hour, with every LLM call and output file, are in
 
 | time | what happens |
 |---|---|
-| 05:00 | new day: resources refill, weather is drawn, shops restock, a pending ordinance takes effect. Each awake villager plans 05:00–11:00, starting with Isabelle's announcement |
+| 05:00 | new day: resources refill, weather is drawn, shops restock, a pending ordinance takes effect |
+| when each villager wakes up | their first plan, for the first half of their waking hours, starting with Isabelle's announcement |
 | 05:00–04:00 | the engine steps hour by hour. Each scheduled action takes one hour. Villagers with nothing scheduled are at home or wandering |
-| 12:00 | second plan, for 12:00–18:00 |
-| 19:00 | third plan, for 19:00 until 05:00 |
+| halfway through their waking hours | their second and last plan, until bedtime |
 | 20:00, 21:00 | the plaza: the bulletin board, trade offers, and letters and parcels (which arrive the next morning) |
 | end of day | snapshot, optional nightly reflection, Isabelle's report, checkpoint |
 
-- Each villager has **10 actions a day** (`calendar.actions_per_day`). A plan places each
+- Each villager plans **twice a day on their own clock** (`calendar.plans_per_day`), so early
+  risers and late sleepers get the same number of plans covering the same number of hours.
+- Each villager has **10 actions a day** (`calendar.actions_per_day`). The first plan can use
+  at most half of them; whatever it doesn't use carries over to the second. A plan places each
   action at the hour it asks for, or the next free hour in that window. Actions that don't
   fit, or fall while the villager is asleep, are dropped and logged.
 - Villagers who are asleep for a whole window, or out of actions, are not called.

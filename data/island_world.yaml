@@ -10,10 +10,11 @@ calendar:
   day_start: 5
   day_length: 24
   actions_per_day: 10              # hours of activity per villager per day
-  plans:                           # one LLM call per villager at the start of each window
-    - [5, 12]                      # morning
-    - [12, 19]                     # afternoon
-    - [19, 29]                     # evening and night, until 05:00
+  # Each villager plans this many times a day on their own schedule: when they get up, then at
+  # even intervals, each plan covering an equal share of their waking hours and able to use an
+  # even share of the actions left (unused ones carry over). Runs started before this used fixed
+  # windows (`plans: [[5, 12], [12, 19], [19, 29]]`) and keep them when resumed.
+  plans_per_day: 2
   social_hours: [20, 21]           # plaza rounds: messages, board, trades (awake villagers only)
   # Dates and seasons (northern hemisphere). days_per_month compresses the year so that
   # a 30-day run sees seasons change; set it to 30 for a real-time year.

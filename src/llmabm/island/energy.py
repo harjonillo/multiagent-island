@@ -3,7 +3,7 @@
 Every villager call draws from the same pool: plans, noticing someone and deciding whether to
 approach, each line in a conversation, the evening at the plaza, and writing at night. What it
 is spent on is still recorded in three kinds, for analysis only:
-- planning: the plan calls (05:00, 12:00, 19:00)
+- planning: the plan calls (05:00 and 15:00)
 - thinking: the private "thoughts" and "note" text in every reply, and the nightly page
 - talking: noticing someone, conversations, and the plaza
 
