@@ -83,7 +83,9 @@ Runs are written to `runs/<timestamp>_<scenario>_s<seed>/`.
 
 ### A day on the island
 
-The day runs on a 24-hour clock and rolls over at 05:00, when resources refill.
+The day runs on a 24-hour clock and rolls over at 05:00, when resources refill. Flowcharts of a
+run, a day and an hour, with every LLM call and output file, are in
+[docs/day_flow.md](docs/day_flow.md).
 
 | time | what happens |
 |---|---|
@@ -589,7 +591,7 @@ reading anything into a run.
 ## Layout
 
 ```
-docs/                   the grid spec and island images
+docs/                   day_flow.md (flowcharts of a run), the grid spec and island images
 scenarios/              island scenarios
 villagers/              island villager templates and casts
 data/island_world.yaml  island rules: calendar, weather, resources, species, recipes, shops, houses
