@@ -835,6 +835,35 @@ def test_a_daily_limit_stops_at_once_and_a_minute_limit_waits():
         assert up.call_count == 3  # retried
 
 
+def test_resume_sets_aside_a_day_that_did_not_finish():
+    import json
+    import pickle
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=8)
+    with tempfile.TemporaryDirectory() as d:
+        run_dir = Path(d) / "run"
+        IslandSimulation(sc, load_backends(None), run_dir, seed=8, backend_override="mock", verbose=False).run(1)
+        events = run_dir / "events.jsonl"
+        clean = events.read_text()
+        # A run that stopped partway through day 1: some day-1 events, then run_end.
+        partial = [{"type": "day_start", "day": 1, "hour": 5}, {"type": "action", "day": 1, "hour": 7, "agent": "Ari"},
+                   {"type": "run_end", "hour": None}]
+        events.write_text(clean + "".join(json.dumps(e) + "\n" for e in partial))
+        IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False)
+        ev = [json.loads(l) for l in events.read_text().splitlines()]
+        assert sum(1 for e in ev if e["type"] == "day_start" and e["day"] == 1) == 1
+        assert not any(e.get("agent") == "Ari" and e.get("hour") == 7 and e["type"] == "action" and "ok" not in e for e in ev)
+        aside = list(run_dir.glob("events.unfinished-*.jsonl"))
+        assert len(aside) == 1 and "day_start" in aside[0].read_text()
+        # Older checkpoints without the log position are cut after the last event of their day.
+        from llmabm.island.sim import _set_aside_unfinished
+        events.write_text(clean + "".join(json.dumps(e) + "\n" for e in partial))
+        day0 = "".join(l + "\n" for l in clean.splitlines() if json.loads(l)["type"] != "run_end")
+        assert _set_aside_unfinished(run_dir, None, 0) is not None and events.read_text() == day0
+        # A day that finished cleanly is left alone.
+        assert _set_aside_unfinished(run_dir, None, 0) is None and events.read_text() == day0
+
+
 def test_spending_choices_are_read_from_plans():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:

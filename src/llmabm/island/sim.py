@@ -200,6 +200,7 @@ class IslandSimulation:
         return state
 
     def _checkpoint(self) -> None:
+        self._log_offset = self._raw_log.f.tell()  # where the log ends for this checkpoint
         tmp = self.run_dir / "checkpoint.pkl.tmp"
         with open(tmp, "wb") as f:
             pickle.dump(self, f)
@@ -250,6 +251,7 @@ class IslandSimulation:
         sim.failures = 0
         # Rebuild system prompts from the saved specs with the current prompt code.
         sim._build_systems()
+        _set_aside_unfinished(run_dir, getattr(sim, "_log_offset", None), sim.isl.day)
         sim._open_log("a")
         sim.log("resume", from_day=sim.isl.day + 1, days=days, time=time.time())
         try:
@@ -1145,6 +1147,36 @@ class IslandSimulation:
             "system_prompts": self.systems,
         }
         (self.run_dir / "manifest.json").write_text(json.dumps(m, indent=2, ensure_ascii=False))
+
+
+def _set_aside_unfinished(run_dir: Path, offset: int | None, day: int) -> Path | None:
+    """Before a resume replays from the checkpoint at the end of `day`: move whatever was logged
+    after it (a day that didn't finish) out of events.jsonl into events.unfinished-<time>.jsonl,
+    so the replayed day isn't logged twice. Checkpoints from before the log position was saved
+    are cut after the last event of `day`. Returns the file the tail was moved to, if any."""
+    path = run_dir / "events.jsonl"
+    if not path.exists():
+        return None
+    data = path.read_bytes()
+    if offset is None:
+        offset, pos = None, 0
+        for line in data.splitlines(keepends=True):
+            pos += len(line)
+            try:
+                if json.loads(line).get("day") == day:
+                    offset = pos
+            except ValueError:
+                continue
+        if offset is None:
+            return None
+    tail = data[offset:]
+    later = [json.loads(ln) for ln in tail.splitlines() if ln.strip()]
+    if not any(isinstance(e.get("day"), int) and e["day"] > day for e in later):
+        return None  # nothing but bookkeeping after the checkpoint: the day finished cleanly
+    out = run_dir / f"events.unfinished-{int(time.time())}.jsonl"
+    out.write_bytes(tail)
+    path.write_bytes(data[:offset])
+    return out
 
 
 TIRED = ("tired",)  # marker: the villager had no energy for this call, so it wasn't made
