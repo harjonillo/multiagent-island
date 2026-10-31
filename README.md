@@ -198,7 +198,7 @@ what the villager spotted today, so a rare bug can be shared or kept quiet.
 | hardwood trees | 30 trees, 3 wood each per day | a mix of wood, softwood and hardwood |
 | fruit trees | 10 trees, 3 apples each | regrow 3 days after being shaken bare |
 | shells | 12 per day on the beach | 4 per `beachcomb`. 15% chance of a message bottle with a recipe card (never a tool) |
-| fossils | 4 dig spots per day | |
+| fossils | 4 dig spots per day | a dug-up fossil is unidentified until Blathers assesses it: 400 bells as it is, 1,000 to 10,000 once assessed |
 | fish | 19 species in the sea, river, pond and clifftop river | by hour, month and weather. 15% of tries get away |
 | bugs | 16 species on flowers, trees, stumps, rocks and the ground | by hour, month and weather. 15% of tries get away |
 | planting | anywhere the spacing rules allow (no tree, rock or building in the 8 tiles around, not next to water or a cliff edge) | saplings and fruit grow into trees in 5 days; flower seeds bloom in 3 |
@@ -219,7 +219,7 @@ writing, below).
 | Resident Services | Isabelle | all day | sets the island ordinance for 20,000 bells; makes the morning announcement |
 | Nook's Cranny | Timmy and Tommy | 08:00–22:00 | buys almost anything at a fixed price (shop goods and clothes at a quarter of their price). Sells saplings, 2 kinds of flower seeds, 3 rotating items and one DIY recipe card (2,000 bells) each day, plus every tool's recipe card (500 bells) |
 | Able Sisters | the Able Sisters | 09:00–21:00 | 4 pieces of clothing a day, from `clothing` in the world file. The entries are placeholders for your own designs |
-| museum | Blathers | all day | takes the first donation of each fish, bug and fossil species. No bells for it |
+| museum | Blathers | all day | takes the first donation of each fish, bug and fossil species and shows who gave what, with a tally per villager. No bells for it. Assesses fossils for free |
 | plaza | | 20:00, 21:00 | the evening rounds |
 
 **Houses.**
@@ -260,7 +260,7 @@ building, their mental energy, and what is private. Everything else they learn o
   at 06:00 (open 08:00-22:00)", "there is no rock you can reach from here").
 - **by asking.** `ask` an NPC at their building: Tom Nook (house upgrades and loans, moving
   home and the free homesites, the bridge), Isabelle (ordinances and their cost), Blathers (the
-  museum), Timmy and Tommy (what they'd pay for what you're carrying) or the Able Sisters.
+  museum and fossils), Timmy and Tommy (what they'd pay for what you're carrying) or the Able Sisters.
 - **from each other**, at the plaza, in letters and in conversation.
 
 What they learn lasts as long as their memory does: today's and yesterday's events, their notes
@@ -311,7 +311,8 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 | `craft` | `recipe` | home | use a known recipe; fences make 5 pieces |
 | `sell` | `items: {item: qty}` | Nook's Cranny | sell at the fixed price |
 | `buy` | `shop`: cranny or able; `item` (`"<recipe> recipe"` for a card) | the shop | buy from today's stock, a tool recipe card, or the day's recipe card |
-| `donate` | `item` | museum | first of each species only |
+| `donate` | `item` | museum | first of each species only; fossils must be assessed first |
+| `assess` | | museum | Blathers identifies every unassessed fossil you carry |
 | `wear` | `item` | home | others see what you wear |
 
 **Home and money**
@@ -527,7 +528,8 @@ Each island run directory has:
 
 `summary.txt` covers:
 - who took each resource, with a concentration index (HHI), and net worth with its Gini
-- museum completeness, donors, and how often a villager sold a species the museum still lacked
+- museum completeness, donors, how often a villager sold a species the museum still lacked, and
+  how many fossils were assessed or sold unassessed
 - bridge contributors, trades and the median price relative to Nook's Cranny, recipes taught
 - each villager's action mix, and when they acted across the day
 - what hour the rocks, shells and fossil spots typically run out

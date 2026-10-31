@@ -15,6 +15,7 @@ from pathlib import Path
 import yaml
 
 CATEGORIES = ("fish", "bugs", "fossils")
+FOSSIL = "fossil"  # a fossil nobody has assessed yet; Blathers says which species it is
 
 
 # --- world data ------------------------------------------------------------
@@ -54,7 +55,8 @@ def perturb(w: dict, rng: random.Random) -> dict:
     w["fish"] = fish
     w["bugs"] = {_fake_name(rng, taken, "beetle" if rng.random() < .5 else "moth"):
                  {**spec, "price": jitter(spec["price"]), "hours": rng.choice(windows)} for spec in w["bugs"].values()}
-    w["fossils"] = {_fake_name(rng, taken, "fossil"): jitter(p) for p in w["fossils"].values()}
+    lo, hi = _fossil_range(w)
+    w["fossils"] = {_fake_name(rng, taken, "fossil"): min(hi, max(lo, jitter(p))) for p in w["fossils"].values()}
     shell_map = {old: _fake_name(rng, taken, "shell") for old in w["shells"]}
     w["shells"] = {shell_map[o]: [jitter(p), wt] for o, (p, wt) in w["shells"].items()}
     for r in w["recipes"].values():
@@ -65,8 +67,14 @@ def perturb(w: dict, rng: random.Random) -> dict:
     return w
 
 
+def _fossil_range(w: dict) -> tuple[int, int]:
+    fa = w.get("fossil_assessment") or {}
+    return int(fa.get("min_price", 0)), int(fa.get("max_price", 10**9))
+
+
 def sell_prices(w: dict) -> dict[str, int]:
     p = dict(w["materials"])
+    p[FOSSIL] = int((w.get("fossil_assessment") or {}).get("unassessed_price", 400))
     p.update({k: v[0] for k, v in w["shells"].items()})
     p.update({k: v["price"] for k, v in w["fish"].items()})
     p.update({k: v["price"] for k, v in w["bugs"].items()})
@@ -497,7 +505,8 @@ class Island:
 
     # --- actions -----------------------------------------------------------
     _NEEDS_OPEN = {"sell": "cranny", "upgrade_house": "resident_services", "pay_loan": "resident_services",
-                   "contribute_bridge": "resident_services", "donate": "museum", "set_ordinance": "resident_services",
+                   "contribute_bridge": "resident_services", "donate": "museum", "assess": "museum",
+                   "set_ordinance": "resident_services",
                    "move_house": "resident_services"}
 
     def shop_hours(self, place: str) -> list[int]:
@@ -772,10 +781,19 @@ class Island:
         if self.space(vil) < 1:
             return False, "pockets full"
         self.fossils_left -= 1
-        f = self.rng.choice(sorted(self.w["fossils"]))
-        vil.inventory[f] += 1
+        vil.inventory[FOSSIL] += 1
         self.collected[vil.name]["fossils"] += 1
-        return True, f"dug up a fossil; Blathers says it is {_a(f)}"
+        return True, "dug up a fossil; nobody knows what it is until Blathers assesses it at the museum"
+
+    def _do_assess(self, vil, a, hour):
+        n = vil.inventory[FOSSIL]
+        if n < 1:
+            return False, "you have no unassessed fossils"
+        vil.inventory[FOSSIL] = 0
+        found = Counter(self.rng.choice(sorted(self.w["fossils"])) for _ in range(n))
+        for f, k in found.items():
+            vil.inventory[f] += k
+        return True, f"Blathers assessed {n} fossil{'s' if n > 1 else ''}: {_fmt(found)}"
 
     def _do_plant(self, vil, a, hour):
         item = str(a.get("item", "")).lower()
@@ -981,6 +999,8 @@ class Island:
     def _do_donate(self, vil, a, hour):
         item = str(a.get("item", "")).lower()
         cat = category_of(self.w, item)
+        if item == FOSSIL:
+            return False, "Blathers needs to assess a fossil before the museum can take it (assess)"
         if cat is None:
             return False, f"Blathers only takes fish, bugs and fossils, not {item}"
         if vil.inventory[item] < 1:
@@ -1094,7 +1114,9 @@ class Island:
                     f"morning, or to lift it (none). Options: {opts}.")
         elif who == "blathers":
             text = ("Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for "
-                    f"everyone to see; I don't pay for donations. So far: {self.museum_line()}.")
+                    "everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig "
+                    "up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay "
+                    f"{self.sell_price(FOSSIL)} bells for an unassessed one. So far: {self.museum_line()}.")
         elif who in ("timmy", "tommy", "timmy and tommy"):
             mine = {k: self.sell_price(k) for k in sorted(vil.inventory) if vil.inventory[k] > 0}
             vil.prices_seen.update(mine)
@@ -1121,6 +1143,9 @@ class Island:
             have, total = len(self.museum[c]), len(self.w[c])
             names = ", ".join(sorted(self.museum[c])) or "none"
             parts.append(f"{c} {have}/{total} ({names})")
+        donors = Counter(d for c in CATEGORIES for d in self.museum[c].values())
+        if donors:
+            parts.append("donated by " + ", ".join(f"{n} {k}" for n, k in sorted(donors.items(), key=lambda x: (-x[1], x[0]))))
         return "; ".join(parts)
 
     def pools(self) -> dict:

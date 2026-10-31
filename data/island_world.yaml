@@ -178,7 +178,13 @@ bugs:                              # name: {price, weight, hours, habitat, month
   snail: {price: 250, weight: 8, hours: [0, 24], habitat: rocks, weather: wet}
   citrus long-horned beetle: {price: 350, weight: 6, hours: [0, 24], habitat: stumps}
 
-fossils:                           # name: sell price
+# Dig up a fossil and you get a plain "fossil": Nook's Cranny pays unassessed_price for it as it
+# is. Blathers assesses fossils for free at the museum, which reveals the species; an assessed
+# fossil sells for its own price below, kept within [min_price, max_price] after perturbation,
+# and only an assessed fossil can be donated.
+fossil_assessment: {unassessed_price: 400, min_price: 1000, max_price: 10000}
+
+fossils:                           # name: sell price once assessed
   amber: 1200
   ammonite: 1100
   trilobite: 1300

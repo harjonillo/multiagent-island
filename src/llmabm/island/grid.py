@@ -506,7 +506,7 @@ class GridSpace(Space):
         return "; ".join(f"{n} ({self.region(b['door'])})" for n, b in self.buildings.items())
 
     # --- what bodies ask of the grid ---------------------------------------------
-    _BUILDING_FOR = {"sell": "Nook's Cranny", "donate": "museum", "upgrade_house": "Resident Services",
+    _BUILDING_FOR = {"sell": "Nook's Cranny", "donate": "museum", "assess": "museum", "upgrade_house": "Resident Services",
                      "pay_loan": "Resident Services", "contribute_bridge": "Resident Services",
                      "set_ordinance": "Resident Services", "move_house": "Resident Services"}
 

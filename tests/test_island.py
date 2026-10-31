@@ -54,6 +54,25 @@ def test_museum_takes_first_of_each_species_only():
     assert not ok and "already has" in msg
 
 
+def test_fossils_need_assessing_and_the_museum_keeps_a_tally():
+    isl = _island()
+    a = isl.v["A"]
+    a.inventory.clear()
+    assert isl.act("A", {"do": "dig_fossil"}, 8)[0] and isl.act("A", {"do": "dig_fossil"}, 8)[0]
+    assert a.inventory["fossil"] == 2 and not set(a.inventory) & set(isl.w["fossils"])
+    ok, msg = isl.act("A", {"do": "donate", "item": "fossil"}, 8)
+    assert not ok and "assess" in msg
+    assert isl.act("A", {"do": "sell", "items": {"fossil": 1}}, 8) == (True, "sold fossil x1 at Nook's Cranny for 400 bells")
+    ok, msg = isl.act("A", {"do": "assess"}, 8)
+    species = [k for k in a.inventory if a.inventory[k] and k in isl.w["fossils"]]
+    assert ok and a.inventory["fossil"] == 0 and len(species) == 1 and species[0] in msg
+    assert not isl.act("A", {"do": "assess"}, 8)[0]
+    assert isl.act("A", {"do": "donate", "item": species[0]}, 8)[0]
+    assert "donated by A 1" in isl.museum_line()
+    for seed in range(5):  # assessed fossils are worth 1,000 to 10,000 bells, whatever the perturbation
+        assert all(1000 <= p <= 10000 for p in load_world(WORLD, "perturbed", seed=seed)["fossils"].values())
+
+
 def test_shops_keep_opening_hours_and_fish_keep_their_hours():
     isl = _island()
     isl.v["A"].inventory["wood"] = 1

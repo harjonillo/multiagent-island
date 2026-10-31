@@ -210,13 +210,19 @@ Shop goods sell back for a quarter of their price.
 
 ### Collectibles (museum or Nook's Cranny)
 
-Blathers takes the first of each species. Names below are the unperturbed ones; see the last section.
+Blathers takes the first of each species, and the museum shows who donated each one and how many
+each villager has given. Names below are the unperturbed ones; see the last section.
+
+A dug-up fossil is a plain "fossil" until Blathers assesses it (free, at the museum, `assess`).
+Unassessed, Nook's Cranny pays 400 for it and the museum won't take it. Assessed, it
+becomes one species, picked at random, worth its price below; perturbation keeps fossil prices
+between 1,000 and 10,000.
 
 | kind | species | sells for | how |
 |---|---|---|---|
 | fish | 19 | 120-15,000 | fish, in the sea, river (also on cliffs) or pond |
 | bugs | 16 | 160-12,000 | catch_bug on flowers, trees, stumps, rocks or the ground |
-| fossils | 12 | 1,000-6,000 | dig_fossil |
+| fossils | 12 | 1,000-6,000 | dig_fossil, then assess at the museum |
 | shells | 8 | 60-700 | beachcomb |
 
 <details><summary>Every fish, bug, fossil and shell</summary>
@@ -298,7 +304,7 @@ Blathers takes the first of each species. Names below are the unperturbed ones; 
 | Isabelle | Resident Services | all day | sets an ordinance for 20,000 bells, from the next morning |
 | Timmy and Tommy | Nook's Cranny | 08:00-22:00 | buy almost anything at a fixed price; sell a small daily stock |
 | the Able Sisters | Able Sisters | 09:00-21:00 | sell clothes |
-| Blathers | museum | all day | takes the first of each fish, bug and fossil; pays nothing |
+| Blathers | museum | all day | takes the first of each fish, bug and fossil and keeps a public tally of donors; pays nothing; assesses fossils for free |
 
 Everyone carries 40 items; a bigger house adds storage.
 

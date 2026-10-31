@@ -32,6 +32,7 @@ ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour 
 - sell: items ({"<item>": <qty>})
 - buy: shop (cranny | able), item (or "<recipe> recipe" for a recipe card)
 - donate: item
+- assess (Blathers identifies every fossil you carry)
 - ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters)
 - upgrade_house
 - pay_loan: bells

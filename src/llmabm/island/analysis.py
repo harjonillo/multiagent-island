@@ -3,11 +3,12 @@ recipe spread, plots and a readable diary."""
 
 from __future__ import annotations
 
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
 from ..analysis import Run, load_run
-from .world import CATEGORIES, ORDINANCE_TEXT, category_of, clock
+from .world import CATEGORIES, FOSSIL, ORDINANCE_TEXT, category_of, clock
 
 RESOURCES = ["rocks", "wood", "fruit", "fish", "bugs", "shells", "fossils"]
 
@@ -65,6 +66,21 @@ def forgone_donations(run: Run) -> list[dict]:
                 if c and k not in museum[c] and k in e["result"]:
                     out.append({"day": e["day"], "agent": e["agent"], "item": k})
     return out
+
+
+def fossil_stats(run: Run) -> tuple[int, int]:
+    """How many fossils Blathers assessed, and how many were sold to Nook's Cranny without asking him."""
+    assessed = unassessed = 0
+    for e in run.events:
+        if e["type"] != "action" or not e["ok"]:
+            continue
+        a = e["action"]
+        if a.get("do") == "assess":
+            assessed += int(e["result"].split("assessed ", 1)[1].split()[0])
+        elif a.get("do") == "sell" and FOSSIL in (a.get("items") or {a.get("item"): a.get("qty", 1)}):
+            m = re.search(rf"(?:^sold |, ){FOSSIL} x(\d+)", e["result"])  # not "<species> fossil x1"
+            unassessed += int(m.group(1)) if m else 0
+    return assessed, unassessed
 
 
 def trade_stats(run: Run) -> dict:
@@ -142,11 +158,13 @@ def summary(run: Run) -> str:
     mus = last["museum"]
     donors = Counter(d for c in CATEGORIES for d in mus[c].values())
     fd = forgone_donations(run)
+    assessed, unassessed = fossil_stats(run)
     L += ["", "Museum: " + ", ".join(f"{c} {len(mus[c])}/{len(m['world'][c])}" for c in CATEGORIES),
           "  donors: " + (", ".join(f"{n} {k}" for n, k in donors.most_common()) or "nobody"),
           f"  sold instead of donated (species the museum lacked at the time): {len(fd)}"]
     if fd:
         L.append("  by villager: " + ", ".join(f"{n} {k}" for n, k in Counter(x["agent"] for x in fd).most_common()))
+    L.append(f"  fossils assessed by Blathers: {assessed}   sold unassessed: {unassessed}")
 
     bridge_by = {n: c.get("bridge_bells", 0) for n, c in last["collected"].items()}
     L += ["", f"Bridge: {'built' if last['bridge_built'] else 'not built'}, {last['bridge_fund']}/{m['world']['bridge']['cost']} raised",
@@ -351,7 +369,7 @@ ACTIVITY_GROUPS = {
     "bugs": {"catch_bug"},
     "crafting": {"craft"},
     "shopping": {"sell", "buy"},
-    "museum & Nook": {"donate", "upgrade_house", "pay_loan", "contribute_bridge", "set_ordinance"},
+    "museum & Nook": {"donate", "assess", "upgrade_house", "pay_loan", "contribute_bridge", "set_ordinance"},
     "home & visits": {"visit", "decorate", "undecorate", "wear"},
     "building": {"lay_path", "remove_path", "place", "fence_off", "pick_up", "dig_stump", "break_rock", "chop_down_tree"},
     "socializing": {"socializing"},

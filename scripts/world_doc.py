@@ -239,7 +239,7 @@ def items_section(w: dict) -> str:
 
     col = [["fish", len(w["fish"]), rng_(v["price"] for v in w["fish"].values()), "fish, in the sea, river (also on cliffs) or pond"],
            ["bugs", len(w["bugs"]), rng_(v["price"] for v in w["bugs"].values()), "catch_bug on flowers, trees, stumps, rocks or the ground"],
-           ["fossils", len(w["fossils"]), rng_(w["fossils"].values()), "dig_fossil"],
+           ["fossils", len(w["fossils"]), rng_(w["fossils"].values()), "dig_fossil, then assess at the museum"],
            ["shells", len(w["shells"]), rng_(v[0] for v in w["shells"].values()), "beachcomb"]]
     fish = table(["fish", "sells for", "shadow", "where", "hours", "months", "weather"],
                  [[k, n(v["price"]), v["shadow"], v["where"], fmt_window(v["hours"]),
@@ -250,6 +250,7 @@ def items_section(w: dict) -> str:
                    ", ".join(map(str, v["months"])) if v.get("months") else "all year", v.get("weather", "any")]
                   for k, v in w["bugs"].items()])
     fossils = table(["fossil", "sells for"], [[k, n(v)] for k, v in w["fossils"].items()])
+    fa = w["fossil_assessment"]
     shells = table(["shell", "sells for"], [[k, n(v[0])] for k, v in w["shells"].items()])
     return f"""## Items
 
@@ -276,7 +277,13 @@ Shop goods sell back for a quarter of their price.
 
 ### Collectibles (museum or Nook's Cranny)
 
-Blathers takes the first of each species. Names below are the unperturbed ones; see the last section.
+Blathers takes the first of each species, and the museum shows who donated each one and how many
+each villager has given. Names below are the unperturbed ones; see the last section.
+
+A dug-up fossil is a plain "fossil" until Blathers assesses it (free, at the museum, `assess`).
+Unassessed, Nook's Cranny pays {n(fa['unassessed_price'])} for it and the museum won't take it. Assessed, it
+becomes one species, picked at random, worth its price below; perturbation keeps fossil prices
+between {n(fa['min_price'])} and {n(fa['max_price'])}.
 
 {table(["kind", "species", "sells for", "how"], col)}
 
@@ -326,7 +333,7 @@ def services_section(w: dict) -> str:
 | Isabelle | Resident Services | {fmt_window(hrs['resident_services'])} | sets an ordinance for {n(ords['cost'])} bells, from the next morning |
 | Timmy and Tommy | Nook's Cranny | {fmt_window(hrs['cranny'])} | buy almost anything at a fixed price; sell a small daily stock |
 | the Able Sisters | Able Sisters | {fmt_window(hrs['able'])} | sell clothes |
-| Blathers | museum | {fmt_window(hrs['museum'])} | takes the first of each fish, bug and fossil; pays nothing |
+| Blathers | museum | {fmt_window(hrs['museum'])} | takes the first of each fish, bug and fossil and keeps a public tally of donors; pays nothing; assesses fossils for free |
 
 Everyone carries {w['pockets']} items; a bigger house adds storage.
 

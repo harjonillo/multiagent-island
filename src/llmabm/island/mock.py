@@ -54,6 +54,8 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
     missing = [t for t in _TOOLS if t not in inv]
     for t in missing[:1]:  # replace a broken tool: craft it if you know how, else buy the recipe card
         acts.append({"do": "craft", "recipe": t} if t in recipes else {"do": "buy", "shop": "cranny", "item": f"{t} recipe"})
+    if inv.get("fossil") and rng.random() < 0.6:  # usually take new fossils to Blathers first
+        acts.append({"do": "assess"})
     for _ in range(n - len(acts)):
         r = rng.random()
         if r < 0.12 and inv:
