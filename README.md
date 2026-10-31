@@ -395,14 +395,19 @@ above. Otherwise nobody answers, and the host later hears that the guest came by
 **The plaza** at 20:00 and 21:00 (no action hour). In the first round every awake villager
 gets a call. The second round only includes villagers with new offers waiting. A villager
 can:
-- post on the bulletin board, which everyone sees (the last 8 posts)
+- post on the bulletin board, which everyone sees (the last 8 posts; up to 250 characters)
 - offer a trade to another villager (`give` and `want`, with `"bells"` as an item for money)
 - accept, reject or counter offers waiting for them. Both villagers are at the plaza, so an
   accepted trade swaps on the spot. Unanswered offers expire after the next evening, and an
   accepted trade fails if either side no longer has the goods or room
-- write letters (`letters`) and send parcels of items, bells, spare tools or recipe cards
-  (`parcels`). The items leave right away, and both arrive the next morning, read in the first
-  plan. A parcel that doesn't fit in the recipient's pockets waits for them, and they are told.
+- write letters (`letters`, up to 350 characters; longer ones are cut) and send parcels of
+  items, bells, spare tools or recipe cards (`parcels`). The items leave right away, and both
+  arrive the next morning. A parcel that doesn't fit in the recipient's pockets waits for them,
+  and they are told.
+
+Letters, parcel slips and trade notices wait in the villager's inbox. Each plan or plaza prompt
+shows the 8 oldest unread items and says how many more are waiting; what was shown counts as
+read. Oldest first means nothing is starved by newer mail.
 
 ### Isabelle
 
@@ -443,7 +448,8 @@ whether to approach someone, how long to talk and how much to write.
 of planning, only nod when spoken to, skip the plaza, and don't write. Their old page stays.
 
 What it was spent on is still recorded by kind for analysis (planning, talking, and thinking for
-private thoughts, notes and the nightly page), along with what each villager chose to skip and
+private thoughts, notes and the nightly page; reading other villagers' mail counts as talking,
+even inside a plan), along with what each villager chose to skip and
 how often they ran out. `island_blank.yaml` has it on. Mock runs of 5 days with 10 blank
 villagers:
 

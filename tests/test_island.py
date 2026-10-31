@@ -563,6 +563,34 @@ def test_letters_and_parcels_arrive_the_next_morning():
         assert run.of("parcel") and any(g["how"] == "by mail" for g in run.of("gift")) and not run.of("teach")
 
 
+def test_mail_is_capped_paged_and_booked_as_talking():
+    from llmabm.island.energy import MentalEnergy
+    from llmabm.island.prompts import BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, inbox_text
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=7)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=7, backend_override="mock", verbose=False)
+        sim.run(1)
+        sim._open_log("a")
+        sim.hour = 20
+        isl = sim.isl
+        isl.mail = []
+        sim._apply_evening(isl.day, 0, "Ari", {"letters": [{"to": "Bo", "content": "x" * 1000}], "board": "y" * 1000})
+        assert len(isl.mail[0]["text"]) == LETTER_CHARS and len(isl.board[-1][2]) == BOARD_CHARS
+        sim._raw_log.close()
+    # Only the oldest few unread items are shown; the rest wait, and are said to be waiting.
+    isl = _island(("A",))
+    vil = isl.v["A"]
+    vil.inbox = [f"letter {i}" for i in range(INBOX_SHOWN + 3)]
+    text = inbox_text(vil)
+    assert "letter 0" in text and f"letter {INBOX_SHOWN}" not in text and "3 more waiting" in text
+    # Reading mail inside a plan is booked as talking, not planning; the pool pays the same either way.
+    en = MentalEnergy({"enabled": True, "daily": 100}, ["A"])
+    en.new_day()
+    en.record("A", "planning", "plan", read=10, written=2, thought=0, immediate=True, social=4)
+    assert en.spent["A"]["planning"] == 8 and en.spent["A"]["talking"] == 4 and en.left["A"] == 88
+
+
 def test_favors_are_settled_by_gifts():
     isl = _island(("A", "B"))
     isl.v["B"].inventory["wood"] = 5

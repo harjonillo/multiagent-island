@@ -31,7 +31,8 @@ import yaml
 
 from ..agent import AgentSpec, load_agent_file
 from ..llm import LLMError
-from .prompts import (ISABELLE_SYSTEM, encounter_prompt, evening_prompt, isabelle_announce_prompt,
+from .prompts import (BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, encounter_prompt, evening_prompt,
+                      inbox_text, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
                       isabelle_summary_prompt, plan_prompt, system_prompt)
 from .energy import MentalEnergy
@@ -313,7 +314,10 @@ class IslandSimulation:
         return self.energy.points(self._self_doc(name) or "", user)
 
     def _call(self, name: str, user: str, tag: str, system: str | None = None, backend_name: str | None = None,
-              max_tokens: int | None = None, free_text: bool = False, kind: str | None = None, what: str = "other"):
+              max_tokens: int | None = None, free_text: bool = False, kind: str | None = None, what: str = "other",
+              social: str = ""):
+        """One LLM call. `social` is the part of the prompt that is other villagers' mail: reading it
+        is booked as talking, whatever kind of call carries it."""
         if backend_name is None:
             backend_name = self.override or self.sc.villagers[name].model
         backend = self.backends[backend_name]
@@ -342,7 +346,8 @@ class IslandSimulation:
             read = self._need(name, user)
             self.energy.record(name, kind, what, read, self.energy.points(reply.text), self.energy.points(thought),
                                immediate=threading.current_thread() is threading.main_thread(),
-                               fixed=self.energy.points(msgs[0]["content"], user) - read)
+                               fixed=self.energy.points(msgs[0]["content"], user) - read,
+                               social=self.energy.points(social))
         return reply, obj, err
 
     def _parallel(self, fn, names):
@@ -668,8 +673,9 @@ class IslandSimulation:
             if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             self.first_plan[name] = False
-            vil.inbox = []
-            return self._call(name, user, f"d{d:03d}_p{phase}", kind="planning", what="plan")
+            mail = inbox_text(vil) if vil.inbox else ""
+            vil.inbox = vil.inbox[INBOX_SHOWN:]  # what was shown has been read
+            return self._call(name, user, f"d{d:03d}_p{phase}", kind="planning", what="plan", social=mail)
 
         results = self._parallel(plan, who)
         for name in who:
@@ -879,7 +885,7 @@ class IslandSimulation:
             user = evening_prompt(isl, vil, r, self.hour, waiting, isl.board[-8:])
             if not self.energy.can(name, self._need(name, user)):
                 return TIRED
-            vil.inbox = []
+            vil.inbox = vil.inbox[INBOX_SHOWN:]
             return self._call(name, user, f"d{d:03d}_h{self.hour % 24:02d}", system=self.talk_systems[name],
                               kind="talking", what="evening")
 
@@ -932,7 +938,7 @@ class IslandSimulation:
         for m in obj.get("letters") or obj.get("messages") or []:  # letters arrive tomorrow morning
             if not isinstance(m, dict):
                 continue
-            to, content = who(m.get("to")), str(m.get("content") or "").strip()
+            to, content = who(m.get("to")), str(m.get("content") or "").strip()[:LETTER_CHARS]
             if not to or to == name or not content:
                 log("invalid", day=d, agent=name, what="message", detail=m)
                 continue
@@ -955,7 +961,7 @@ class IslandSimulation:
             vil.today.append(f"{clock(self.hour)} sent {to} a parcel: {', '.join(f'{n} {k}' for k, n in items.items())}")
             log("parcel", day=d, round=r, sender=name, recipient=to, items=items, note=note, arrives_day=d + 1)
 
-        post = str(obj.get("board") or "").strip()
+        post = str(obj.get("board") or "").strip()[:BOARD_CHARS]
         if post:
             isl.board.append((d, name, post))
             log("board", day=d, round=r, author=name, content=post)

@@ -87,11 +87,12 @@ class MentalEnergy:
             self.skipped[name][kind] += 1
 
     def record(self, name: str, kind: str | None, what: str, read: float, written: float, thought: float,
-               immediate: bool, fixed: float = 0.0) -> None:
+               immediate: bool, fixed: float = 0.0, social: float = 0.0) -> None:
         """Queue (or apply) the charge for one call. `fixed` is the uncharged part of the prompt (rules
-        and persona), counted only in `tokens`. Calls made in parallel are queued and applied in a
+        and persona), counted only in `tokens`. `social` is the part of what was read that is other
+        villagers' mail, recorded as talking. Calls made in parallel are queued and applied in a
         fixed order afterwards, so a resumed run charges exactly the same."""
-        item = (name, kind, what, read, written, thought, fixed)
+        item = (name, kind, what, read, written, thought, fixed, social)
         if immediate:
             self._apply(item)
         else:
@@ -105,7 +106,8 @@ class MentalEnergy:
             self._apply(it)
 
     def _apply(self, item) -> None:
-        name, kind, what, read, written, thought, fixed = item
+        name, kind, what, read, written, thought, fixed, *rest = item
+        social = min(rest[0] if rest else 0.0, read)
         if name not in self.left:
             return
         total = read + written
@@ -115,7 +117,8 @@ class MentalEnergy:
         if not kind:
             return
         thought = min(thought, written)
-        self.spent[name][kind] += total - thought
+        self.spent[name][kind] += total - thought - social
+        self.spent[name]["talking"] += social
         self.spent[name]["thinking"] += thought
         if self.enabled:
             self.left[name] = max(0.0, self.left[name] - total)

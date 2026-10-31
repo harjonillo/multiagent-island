@@ -178,11 +178,23 @@ def choices_text(isl: Island, choices: dict) -> str:
             f'that time, which uses no energy; now "{choices["next"]}").')
 
 
+INBOX_SHOWN = 8       # unread items shown per prompt, oldest first; the rest wait for the next one
+LETTER_CHARS = 350    # longest letter; longer ones are cut
+BOARD_CHARS = 250     # longest board post
+
+
+def inbox_text(vil: Villager) -> str:
+    """The oldest unread letters and notices, and how many more are waiting."""
+    shown = vil.inbox[:INBOX_SHOWN]
+    more = len(vil.inbox) - len(shown)
+    return "\n".join(shown + ([f"({more} more waiting for later)"] if more else [])) or "(none)"
+
+
 def plan_prompt(isl: Island, vil: Villager, a: int, b: int, n_actions: int, yesterday: list[str],
                 announcement: bool = False, noticed: list[str] | None = None, choices: dict | None = None) -> str:
     done = "\n".join(f"- {r}" for r in vil.today) or "(nothing yet)"
     prev = "\n".join(f"- {r}" for r in yesterday) or "(nothing)"
-    inbox = "\n".join(vil.inbox) or "(none)"
+    inbox = inbox_text(vil)
     isabelle = f"Isabelle's morning announcement: {announcement_text(isl)}\n\n" if announcement else ""
     seen = "\n".join(f"- {x}" for x in (noticed or [])) or "(nothing)"
     return (
@@ -199,7 +211,7 @@ def plan_prompt(isl: Island, vil: Villager, a: int, b: int, n_actions: int, yest
 
 def evening_prompt(isl: Island, vil: Villager, round_: int, hour: int, offers: list, board: list) -> str:
     done = "\n".join(f"- {r}" for r in vil.today) or "(nothing)"
-    inbox = "\n".join(vil.inbox) or "(none)"
+    inbox = inbox_text(vil)
     others = ", ".join(n for n in isl.v if n != vil.name)
     board_txt = "\n".join(f"- (day {d}) {a}: {t}" for d, a, t in board) or "(empty)"
     offer_txt = "\n".join(
@@ -211,8 +223,9 @@ def evening_prompt(isl: Island, vil: Villager, round_: int, hour: int, offers: l
         f"Bulletin board, newest last:\n{board_txt}\n\nTrade offers waiting for your answer:\n{offer_txt}\n\n"
         f"Other villagers: {others}\n\n"
         "You can post on the board, offer trades to villagers here, answer offers (accept, reject or counter "
-        "with your own terms), write letters, and send parcels of things from your pockets. Letters and parcels "
-        "arrive tomorrow morning. Doing nothing is fine. Use \"bells\" as an item name for money. "
+        f"with your own terms), write letters (up to {LETTER_CHARS} characters each), and send parcels of things from "
+        f"your pockets. Letters and parcels arrive tomorrow morning. Board posts can be up to {BOARD_CHARS} characters. "
+        "Doing nothing is fine. Use \"bells\" as an item name for money. "
         "Respond with one JSON object and nothing else:\n"
         "{\n"
         '  "thoughts": "<your private reasoning; nobody else sees it>",\n'

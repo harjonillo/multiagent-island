@@ -68,7 +68,7 @@ flowchart TD
         who["Villagers awake in the window with actions left"]
         habitq{"Chose 'next: habit'<br/>last time?"}
         afford{"Enough energy<br/>to read the prompt?"}
-        plan(["LLM: plan<br/>full rules + action menu<br/>status, memory, letters, Isabelle's announcement on the first plan"])
+        plan(["LLM: plan<br/>full rules + action menu<br/>status, memory, the 8 oldest unread letters<br/>Isabelle's announcement on the first plan"])
         apply["Actions placed at their hours, one per hour, 10 a day<br/>dropped if asleep or no hour free<br/>note kept, choices for plaza, write, next updated"]
         habit["Repeat yesterday's actions for this window<br/>free, 'next' resets to plan"]
         tired["Repeat yesterday's actions<br/>counted as ran out"]
@@ -200,7 +200,8 @@ flowchart TD
 ## Every LLM call
 
 All villager calls draw on the villager's one daily energy pool. Each is charged for its
-prompt minus the fixed system prompt (the nightly page counts) plus the reply. A call that
+prompt minus the fixed system prompt (the nightly page counts) plus the reply. Reading other
+villagers' mail is booked as talking, even inside a plan. A call that
 can't be afforded isn't made.
 
 | call | who | when | system prompt | reply | if it can't be afforded | logged as |
