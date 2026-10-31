@@ -90,7 +90,6 @@ island:
   native_fruit: apple
   fruit_per_tree: 3
   fruit_regrow_days: 3
-  open_plots: 15                   # free spots where a fruit or sapling can be planted
   sapling_mature_days: 5
   shells_per_day: 12
   shells_per_action: 4
@@ -259,6 +258,7 @@ items:
   sapling: {kind: sapling}
   ladder: {kind: tool}
   vaulting pole: {kind: tool}
+  fishing bait: {kind: bait}       # fish with "bait": true and a fish is sure to appear (it can still get away)
 
 # Mental energy: one daily budget of tokens per villager for everything they read, think and
 # say. Off here; a scenario turns it on with `mental_energy: {enabled: true}`. One point is about

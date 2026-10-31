@@ -160,7 +160,8 @@ and each villager's prompt says which rocks and buildings are within reach and h
 away. Placed furniture and fences block walking, so villagers can wall off space.
 
 The full design, with the rules I wasn't sure of marked, is in `docs/grid_spec.md`.
-`docs/island_grid.png` shows the island for seed 0.
+[docs/world.md](docs/world.md) shows the island for seed 0 with a legend, what you can reach with
+each tool, and every item, recipe and price. `python scripts/world_doc.py` regenerates it.
 
 **Sight.** On the grid, villagers see about 8 tiles around them. Bugs and fish shadows are
 objects on the map that come and go by the hour, up to a set number per habitat. A villager
@@ -181,7 +182,7 @@ what the villager spotted today, so a rare bug can be shared or kept quiet.
 | fossils | 4 dig spots per day | |
 | fish | 19 species in the sea, river, pond and clifftop river | by hour, month and weather. 15% of tries get away |
 | bugs | 16 species on flowers, trees, stumps, rocks and the ground | by hour, month and weather. 15% of tries get away |
-| planting | anywhere the spacing rules allow, up to 15 new trees (`open_plots`); digging up a stump frees a spot | saplings and fruit grow into trees in 5 days; flower seeds bloom in 3 |
+| planting | anywhere the spacing rules allow (no tree, rock or building in the 8 tiles around, not next to water or a cliff edge) | saplings and fruit grow into trees in 5 days; flower seeds bloom in 3 |
 | trees cut down | permanent | leaves a stump until someone digs it out |
 | broken rocks | come back elsewhere after 3 days | breaking one takes eating an apple first |
 
@@ -279,7 +280,7 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 | `mine_rock` | `rock` (optional) | take what a rock has left today |
 | `chop_wood` | | take today's wood from the nearest tree that has some |
 | `shake_tree` | | take the fruit from a fruit tree |
-| `fish` | `where`: sea, river, pond (clifftop also works); `size` (optional) | go after a fish shadow |
+| `fish` | `where`: sea, river, pond (clifftop also works); `size` (optional); `bait: true` (optional) | go after a fish shadow; with fishing bait (Nook's Cranny, 300 bells), a fish is sure to appear, though it can still get away |
 | `catch_bug` | `where`: flowers, trees, stumps, rocks, ground; `species` (optional) | go after a bug |
 | `beachcomb` | `near` (optional) | collect shells; sometimes a message bottle |
 | `dig_fossil` | `near` (optional) | dig up a fossil spot |
@@ -491,7 +492,7 @@ Each island run directory has:
 | `days/day_NNN.md` | one log per day, hour by hour: every action with its location, result and the state it changed, every message, offer, trade and teaching, the island's resources after each hour, and a table of everyone's state at the end |
 | `days/day_NNN_isabelle.md` | Isabelle's report |
 | `hourly_villagers.csv` | one row per villager per hour: activity, location, bells, loan, items, house |
-| `hourly_island.csv` | one row per hour: rock hits left, wood, fruit, shells, fossil spots, plots, trees, museum, bridge fund |
+| `hourly_island.csv` | one row per hour: rock hits left, wood, fruit, shells, fossil spots, trees, museum, bridge fund |
 | `networth.png`, `extraction.png`, `museum.png`, `commons.png`, `activity_by_hour.png` | plots |
 | `island_map.png`, `tracks_day_NNN.png` | the island, and where every villager was hour by hour on the last day (grid) |
 | `events.jsonl` | every event with its day and hour. Each action has a `delta` (bells, loan, items, recipes, house) and a `pools_delta` (public resources it changed). An `hour_state` snapshot every hour |
@@ -591,12 +592,13 @@ reading anything into a run.
 ## Layout
 
 ```
-docs/                   day_flow.md (flowcharts of a run), the grid spec and island images
+docs/                   day_flow.md (flowcharts of a run), world.md and island_grid.png (generated), the grid spec
 scenarios/              island scenarios
 villagers/              island villager templates and casts
 data/island_world.yaml  island rules: calendar, weather, resources, species, recipes, shops, houses
 config/models.yaml      LLM backends (all OpenAI-compatible)
 scripts/daily.sh        start or resume an island run by one day
+scripts/world_doc.py    regenerate docs/world.md and docs/island_grid.png
 src/llmabm/
   cli.py                run, resume, analyze
   agent.py              villager file format (frontmatter + persona)

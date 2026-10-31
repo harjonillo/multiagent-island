@@ -71,7 +71,8 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
                 {"do": "lay_path", "style": rng.choice(["dirt", "stone", "brick"]), "from": "home", "to": "Resident Services"},
                 {"do": "chop_down_tree", "kind": "hardwood", "near": "home"},
                 {"do": "dig_stump", "near": "home"},
-                {"do": "buy", "shop": "cranny", "item": rng.choice(["tulip seeds", "cosmos seeds", "pansy seeds", "hyacinth seeds"])},
+                {"do": "buy", "shop": "cranny", "item": rng.choice(["tulip seeds", "cosmos seeds", "pansy seeds", "hyacinth seeds",
+                                                                    "fishing bait"])},
             ]))
         elif r < 0.48 and r >= 0.45 and any(k.endswith("seeds") for k in inv):
             acts.append({"do": "plant", "item": next(k for k in inv if k.endswith("seeds")), "near": "home"})
@@ -95,6 +96,8 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
             acts.append({"do": "move_house", "to": rng.choice(sites) if sites else "site-1"})
         elif r < 0.375 and bells > 25000:
             acts.append({"do": "set_ordinance", "ordinance": rng.choice(["early_bird", "night_owl", "bell_boom", "none"])})
+        elif r < 0.385 and "fishing bait" in inv:
+            acts.append({"do": "fish", "where": rng.choice(["sea", "river", "pond"]), "bait": True})
         elif r < 0.39 and "apple" in inv:
             acts.append({"do": "plant", "item": "apple"})
         else:

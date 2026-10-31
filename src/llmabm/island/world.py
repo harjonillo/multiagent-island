@@ -181,7 +181,6 @@ class Island:
         isl = world["island"]
         self.trees: list[Tree] = [Tree("hardwood") for _ in range(isl["hardwood_trees"])]
         self.trees += [Tree("fruit", fruit=isl["fruit_per_tree"]) for _ in range(isl["fruit_trees"])]
-        self.free_plots = isl["open_plots"]
         self.n_rocks = isl["rocks"]
         self.rocks: list[int] = []
         self.money_rock = 0
@@ -533,6 +532,15 @@ class Island:
             if a.get("none_out"):
                 return True, f"looked for fish in the {where}, but there seem to be no fish there at this time"
             return True, f"looked for fish in the {where}, but there were no fish shadows in sight"
+        if a.get("_baited"):  # set by the body once it has found the water; never by the mind
+            if not table:
+                return True, f"no fish come out in the {where} at this time, so you kept your bait"
+            from .grid import GridSpace
+
+            vil.inventory["fishing bait"] -= 1
+            sp = self.rng.choices(list(table), weights=[v["weight"] for v in table.values()])[0]
+            size = GridSpace.SIZES.get(int(table[sp].get("shadow", 3)), "medium")
+            return self._catch(vil, table, f"threw bait in the {where} and a {size} shadow appeared", "fish", sp)
         sp = a.get("_species") if a.get("_species") in self.w["fish"] else None  # set by the body, never the mind
         label = f"fished for a {a['_size']} shadow in the {where}" if a.get("_size") and sp else f"fished in the {where}"
         return self._catch(vil, table, label, "fish", sp)
@@ -686,10 +694,7 @@ class Island:
             return False, f"you can plant {_a(fruit)}, a sapling, or flower seeds"
         if vil.inventory[item] < 1:
             return False, f"you have no {item}"
-        if self.free_plots == 0:
-            return False, "there is no open spot left to plant"
         vil.inventory[item] -= 1
-        self.free_plots -= 1
         self.trees.append(Tree("sapling", mature_in=self.w["island"]["sapling_mature_days"],
                                becomes="fruit" if item == fruit else "hardwood",
                                pos=tuple(a["at"]) if a.get("at") else None))
@@ -711,7 +716,6 @@ class Island:
         if t is None:
             return False, "there is no stump to dig up"
         self.trees.remove(t)
-        self.free_plots += 1
         return True, "dug up a stump; the spot is clear now"
 
     def _do_break_rock(self, vil, a, hour):
@@ -1014,7 +1018,6 @@ class Island:
             "wood_left": sum(t.wood_left for t in self.trees if t.kind == "hardwood"),
             "fruit_on_trees": sum(t.fruit for t in self.trees if t.kind == "fruit"),
             "trees": dict(Counter(t.kind for t in self.trees)),
-            "free_plots": self.free_plots,
             "shells_left": self.shells_left,
             "fossils_left": self.fossils_left,
             "museum": sum(len(m) for m in self.museum.values()),
@@ -1032,7 +1035,6 @@ class Island:
             "weather": getattr(self, "weather", None),
             "museum": {c: dict(self.museum[c]) for c in CATEGORIES},
             "trees": Counter(t.kind for t in self.trees),
-            "free_plots": self.free_plots,
             "bridge_fund": self.bridge_fund,
             "bridge_built": self.bridge_built,
             "collected": {n: dict(c) for n, c in self.collected.items()},

@@ -11,7 +11,7 @@ ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour 
 - mine_rock: rock?
 - chop_wood
 - shake_tree
-- fish: where (sea | river | pond), size?
+- fish: where (sea | river | pond), size?, bait? (true to use fishing bait)
 - catch_bug: where (flowers | trees | stumps | rocks | ground), species?
 - beachcomb: near?
 - dig_fossil: near?

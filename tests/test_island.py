@@ -622,6 +622,28 @@ def test_mental_energy_resume_matches():
         assert clean(a / "events.jsonl") == clean(b / "events.jsonl")
 
 
+def test_fishing_bait_makes_a_fish_appear():
+    isl, g, bodies = _grid_island()
+    rng = random.Random(0)
+    isl.month, isl.weather = 4, "sunny"
+    isl.w["island"]["catch_fail_rate"] = 0.0
+    g.critters = []  # no shadows anywhere: without bait there is nothing to catch
+    ok, msg = bodies.perform("A", {"do": "fish", "where": "sea", "bait": True}, 10, rng)
+    assert not ok and "no fishing bait" in msg
+    isl.v["A"].inventory["fishing bait"] = 2
+    ok, msg = bodies.perform("A", {"do": "fish", "where": "sea", "bait": True}, 10, rng)
+    assert ok and "threw bait in the sea" in msg and "caught" in msg, msg
+    assert isl.v["A"].inventory["fishing bait"] == 1 and bodies.b["A"].place == "sea"
+    caught = [k for k, n in isl.v["A"].inventory.items() if n and k in isl.w["fish"]]
+    assert caught and isl.w["fish"][caught[0]]["where"] == "sea"
+    # No fish out in that water at this hour: the bait is kept.
+    for spec in isl.w["fish"].values():
+        if spec["where"] == "pond":
+            spec["hours"] = [0, 1]
+    ok, msg = bodies.perform("A", {"do": "fish", "where": "pond", "bait": True}, 10, rng)
+    assert ok and "kept your bait" in msg and isl.v["A"].inventory["fishing bait"] == 1, msg
+
+
 def test_bugs_and_fish_shadows_are_seen_before_caught():
     isl, g, bodies = _grid_island()
     rng = random.Random(0)

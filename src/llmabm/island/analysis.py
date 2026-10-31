@@ -151,7 +151,7 @@ def summary(run: Run) -> str:
     bridge_by = {n: c.get("bridge_bells", 0) for n, c in last["collected"].items()}
     L += ["", f"Bridge: {'built' if last['bridge_built'] else 'not built'}, {last['bridge_fund']}/{m['world']['bridge']['cost']} raised",
           "  contributors: " + (", ".join(f"{n} {b}" for n, b in sorted(bridge_by.items(), key=lambda kv: -kv[1]) if b) or "nobody"),
-          f"Trees: {dict(last['trees'])}, open plots {last['free_plots']}; planted "
+          f"Trees: {dict(last['trees'])}; planted "
           f"{sum(c.get('planted', 0) for c in last['collected'].values())}, chopped down "
           f"{sum(c.get('trees_removed', 0) for c in last['collected'].values())}"]
 
@@ -577,11 +577,11 @@ def write_hourly_csv(run: Run, out_dir: Path) -> tuple[Path, Path]:
     with open(ipath, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["day", "game_hour", "clock_hour", "rock_hits_left", "rocks_untouched", "wood_left", "fruit_on_trees", "shells_left",
-                    "fossils_left", "free_plots", "trees_total", "museum", "bridge_fund"])
+                    "fossils_left", "trees_total", "museum", "bridge_fund"])
         for s in states:
             p = s["pools"]
             w.writerow([s["day"], s["hour"], s["hour"] % 24, sum(p["rocks"]), sum(1 for r in p["rocks"] if r > 0), p["wood_left"],
-                        p["fruit_on_trees"], p["shells_left"], p["fossils_left"], p["free_plots"],
+                        p["fruit_on_trees"], p["shells_left"], p["fossils_left"],
                         sum(p["trees"].values()), p["museum"], p["bridge_fund"]])
     return vpath, ipath
 

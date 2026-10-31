@@ -89,14 +89,37 @@ def _objects(ax, g: GridSpace, trees: list, rocks: list, small: bool = False):
         ax.plot(*zip(*rocks), "s", ms=ms * 1.1, color="#6b6a66", ls="")
 
 
+def _legend(ax, g: GridSpace, homes: dict | None, bridge_site: bool) -> None:
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+
+    sq = lambda c, label: Patch(facecolor=c, edgecolor="#8a8984", label=label)  # noqa: E731
+    dot = lambda label, **k: Line2D([], [], ls="", label=label, **k)  # noqa: E731
+    h = [sq(COLORS["sea"], "sea"), sq(COLORS["sand"], "beach"), sq((0.55, 0.52, 0.47), "rocky beach (no walking)"),
+         sq(COLORS["river"], "river and pond"), sq(COLORS["tier1"], "lower ground"),
+         sq(COLORS["tier2"], "middle cliff (ladder)"), sq(COLORS["tier3"], "top cliff (ladder)"),
+         sq(COLORS["building"], "building"), sq(COLORS["plaza"], "plaza (walkable)"),
+         sq(COLORS["site"], "homesite, free")]
+    if any((homes or {}).values()):
+        h.append(sq(COLORS["home"], "homesite, lived in"))
+    if g.bridge_built:
+        h.append(sq(COLORS["bridge"], "bridge"))
+    h += [dot("hardwood tree", marker="o", color="#2f6b2f"), dot("fruit tree", marker="o", color="#2f6b2f", mfc="#e34948"),
+          dot("rock (numbered)", marker="s", color="#6b6a66"), dot("flowers", marker="*", color="#e87ba4")]
+    if bridge_site and not g.bridge_built and g.bridge_cells:
+        h.append(dot("where the bridge will go", marker="x", color="#5b3a1e"))
+    ax.legend(handles=h, loc="upper left", bbox_to_anchor=(1.01, 1), frameon=False, fontsize=8)
+
+
 def render_grid_map(g: GridSpace, out: Path, homes: dict | None = None, trees: list | None = None,
-                    rocks: list | None = None, title: str = "Island", objects: dict | None = None) -> Path:
+                    rocks: list | None = None, title: str = "Island", objects: dict | None = None,
+                    bridge_site: bool = False) -> Path:
     import matplotlib
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    fig, ax = plt.subplots(figsize=(11, 11 * g.H / g.W + 0.6))
+    fig, ax = plt.subplots(figsize=(13.5, 11 * g.H / g.W + 0.6))
     ax.imshow(_overlay_rgb(_rgb(g, homes), objects or {}), interpolation="nearest", origin="upper")
     _objects(ax, g, trees or [], rocks if rocks is not None else list(g.rock_cells))
     _built(ax, objects or {})
@@ -111,12 +134,15 @@ def render_grid_map(g: GridSpace, out: Path, homes: dict | None = None, trees: l
         xs, ys = zip(*s["cells"])
         ax.annotate(who.get(sid, sid), (sum(xs) / len(xs), max(ys) + 1.2), ha="center", va="top", fontsize=7,
                     color="#0b0b0b" if sid in who else "#52514e")
+    if bridge_site and not g.bridge_built and g.bridge_cells:
+        ax.plot(*zip(*g.bridge_cells), "x", ms=4, color="#5b3a1e", ls="")
+    _legend(ax, g, homes, bridge_site)
     ax.set_title(title)
     ax.set_xticks([])
     ax.set_yticks([])
     fig.tight_layout()
     out = Path(out)
-    fig.savefig(out, dpi=130)
+    fig.savefig(out, dpi=130, bbox_inches="tight")
     plt.close(fig)
     return out
 

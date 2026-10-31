@@ -289,7 +289,6 @@ class GridSpace(Space):
             self.blocked.add(c)
         if not getattr(self, "_wild_done", False):
             self._wild_flowers(island, grass, taken)
-        island.free_plots = 10 ** 6  # on the grid, room to plant is decided by spacing, not a count
         self._version += 1
 
     def _wild_flowers(self, island, grass: list, taken: set) -> None:
@@ -561,6 +560,14 @@ class GridSpace(Space):
         if do == "fish":
             where = str(action.get("where", "river")).lower()
             label = where if where in ("sea", "river", "pond", "clifftop") else "river"
+            if str(action.get("bait", "")).lower() in ("true", "yes", "1"):
+                # Bait makes a fish appear wherever you throw it: walk to the nearest spot on that water.
+                if island.v[name].inventory["fishing bait"] < 1:
+                    return label, None, {}, "you have no fishing bait"
+                best = self.nearest(start, tools, self._habitat_cells(island, "fish", label))
+                if best is None:
+                    return label, None, {}, f"there is no {label} to fish in you can reach from here with the tools you carry"
+                return label, best[1], {"_baited": True}, None
             return self._resolve_catch(island, name, "fish", label, self._habitat_cells(island, "fish", label),
                                        action, start, tools, rng, label, f"{label} to fish in")
         if do == "catch_bug":
