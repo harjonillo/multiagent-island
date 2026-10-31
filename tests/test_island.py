@@ -895,6 +895,7 @@ def test_resume_sets_aside_a_day_that_did_not_finish():
 
 
 def test_site_data_and_page_for_a_mock_run():
+    import html
     import json
 
     from llmabm.island.analysis import analyze_island, llm_calls
@@ -922,6 +923,34 @@ def test_site_data_and_page_for_a_mock_run():
         assert "__DATA__" not in page and "__TITLE__" not in page
         blob = page.split('<script id="site-data" type="application/json">', 1)[1].split("</script>", 1)[0]
         assert json.loads(blob) == data  # nothing in the data closes the script tag early
+        assert 'href="../../site/index.html"' in page and "/ exp " not in page  # a mock run isn't numbered
+
+        # The Experiments page over the folder: one door per run, numbered from 00, mock runs left out, each
+        # card opening to the initial conditions. A copy of the run marked as a real backend stands in for one.
+        import shutil
+
+        from llmabm.island.site_build import build_all
+        from llmabm.island.site_experiments import experiment, experiment_order
+
+        assert experiment_order(Path(d)) == []
+        real = Path(d) / "real"
+        shutil.copytree(run_dir, real)
+        m = json.loads((real / "manifest.json").read_text())
+        m["backend_override"] = "groq"
+        (real / "manifest.json").write_text(json.dumps(m))
+        assert experiment_order(Path(d)) == [real]
+        assert build_all(Path(d))[-1] == Path(d) / "site" / "index.html"
+        assert "/ exp 00" in (real / "site" / "index.html").read_text()
+        doors = (Path(d) / "site" / "index.html").read_text()
+        assert 'href="../real/site/index.html"' in doors and "../run/site" not in doors
+        assert "1 experiment<" in doors and "EXP 00" in doors and "EXP 01" in doors  # 01: the empty lot
+        e = experiment(real, 0)
+        assert e["agents"].startswith("groq · ") and e["days_done"] == 2
+        kit, island = dict(e["conditions"]["villager"]), dict(e["conditions"]["island"])
+        assert kit["bells"] == f"{sc.start_bells:,}" and "stone axe" in kit["tools"]
+        day0 = next(x for x in run.of("day_start") if x["day"] == 0)["pools"]
+        assert island["rocks"].startswith(f"{len(day0['rocks'])},") and island["shells"].startswith(f"{day0['shells_left']} ")
+        assert "initial conditions</summary>" in doors and html.escape(kit["tools"]) in doors
     assert fail_bucket("you have no axe") == "Has no tool for it" and fail_bucket("whatever") == "Other"
 
 

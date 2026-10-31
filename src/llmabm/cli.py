@@ -58,9 +58,9 @@ def main(argv: list[str] | None = None) -> int:
     a = sub.add_parser("analyze", help="summary, plots, logs and the site data for a run")
     a.add_argument("run_dir", type=Path)
 
-    st = sub.add_parser("site", help="build the static explorer page from a run's site_data.json")
-    st.add_argument("run_dir", type=Path)
-    st.add_argument("--out", type=Path, help="folder for index.html (default <run_dir>/site)")
+    st = sub.add_parser("site", help="build the static explorer: a run's page, or every run's plus the Experiments page")
+    st.add_argument("run_dir", type=Path, help="a run directory, or a runs folder (e.g. runs/) for all of them")
+    st.add_argument("--out", type=Path, help="folder for a single run's index.html (default <run_dir>/site)")
 
     args = ap.parse_args(argv)
     load_dotenv()
@@ -122,10 +122,17 @@ def main(argv: list[str] | None = None) -> int:
     elif args.cmd == "analyze":
         analyze_island(args.run_dir)
     elif args.cmd == "site":
-        from .island.site_build import build_site
+        from .island.site_build import build_all, build_site, is_run
 
         try:
-            print(f"wrote {build_site(args.run_dir, args.out)}")
+            if is_run(args.run_dir):
+                print(f"wrote {build_site(args.run_dir, args.out)}")
+            elif args.out:
+                print("error: --out only applies to a single run directory", file=sys.stderr)
+                return 2
+            else:
+                for out in build_all(args.run_dir):
+                    print(f"wrote {out}")
         except FileNotFoundError as e:
             print(f"error: {e}", file=sys.stderr)
             return 2

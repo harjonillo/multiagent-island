@@ -68,6 +68,8 @@ LLM calls. More under [Outputs](#outputs).
 | `llmabm run <scenario>` | run a scenario. `--seed`, `--days` (or `--steps`), `--backend`, `--concurrency N`, `--no-cache`, `--log-prompts`, `--run-dir`, `--no-analyze` |
 | `llmabm resume <run_dir>` | continue an island run from its last checkpoint. `--days`, `--backend` |
 | `llmabm analyze <run_dir>` | rebuild the summary, plots and logs, for example after you edit the analysis code |
+| `llmabm site <run_dir>` | build the run's explorer page, `<run_dir>/site/index.html` (from `site_data.json`, which `analyze` writes) |
+| `llmabm site runs/` | build every run's page and the Experiments page, `runs/site/index.html`: one door per run (numbered from 00; mock runs left out), each card opening to the run's initial conditions |
 
 Runs are written to `runs/<timestamp>_<scenario>_s<seed>/`.
 

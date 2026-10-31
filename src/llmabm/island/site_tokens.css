@@ -1,0 +1,11 @@
+/* Island Pixel design tokens (docs/explorer/tokens.css) */
+:root {
+  --font-body: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+  --font-display: "Silkscreen", ui-monospace, monospace;
+  --ground: #FBF3E6; --panel: #FFFDF8; --border: #EADBC4; --shadow: #F0DFC8; --fill-soft: #F6EBDA; --rule: #E3D3BC;
+  --ink: #3B2F2A; --ink-muted: #6E5D52; --outline: #B59A82; --on-ink: #FFFFFF;
+  --tabbar-rule: #D9967A; --tab-active-fill: #E8B9A0; --selected-border: #7FBCDB;
+  --private-ink: #6A4FB8; --private-fill: #F1E9FA; --private-accent: #9B7FE0;
+  --act-shops: #F08C5A; --fail: #B8452A; --chart-line: #E07A4F;
+  --card-shadow: 4px 4px 0 var(--shadow); --tile-shadow: 3px 3px 0 var(--shadow);
+}

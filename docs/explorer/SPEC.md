@@ -1,9 +1,13 @@
 # Island explorer: spec
 
-A read-only browser view of one island run, built from the files `llmabm run` already writes. Three
-tabs: **Home** (the whole run), **Days** (one or more days, per villager) and **Social** (who deals with
-whom). Visual style: "Island Pixel", see `tokens.css`. Interactive mockups of all three tabs are on the
-design canvas, and their full markup and logic are in `mockups/` (see "The mockups" below).
+A read-only browser view of island runs, built from the files `llmabm run` already writes. An
+**Experiments** page ("pick a door") lists every run as a pixel-art door; opening a door leads to that
+run's three tabs: **Home** (the whole run), **Days** (one or more days, per villager) and **Social** (who
+deals with whom). Visual style: "Island Pixel", see `tokens.css`. Interactive mockups of all four pages are
+on the design canvas, and their full markup and logic are in `mockups/` (see "The mockups" below).
+
+Updated Oct 31, 23:45: added the Experiments page, the door sprites (`door_sprites.py`) and the link back
+to the experiments page in the top bar.
 
 ## Recommended shape
 
@@ -13,6 +17,9 @@ design canvas, and their full markup and logic are in `mockups/` (see "The mocku
 - Build the data in Python from `analysis.load_run(run_dir)` and the existing island analysis helpers,
   so the numbers match `summary.txt`. Do not recompute anything differently from `island/analysis.py`.
 - Optionally call it at the end of `analyze_island` so every run gets an explorer.
+- Pointed at the runs folder instead (`llmabm explore runs/`), it also writes `runs/explorer/index.html`,
+  the Experiments page, with one door per run directory that has a `manifest.json`, each linking to that
+  run's `explorer/index.html` by relative path.
 - No LLM calls. Rebuilding is like `llmabm analyze`: from `events.jsonl` only.
 - Keep the page working offline except for the two Google Fonts (fall back to `ui-monospace`).
 - Add a test that builds the explorer for a short mock run and checks the embedded JSON has every
@@ -21,8 +28,11 @@ design canvas, and their full markup and logic are in `mockups/` (see "The mocku
 ## Shared chrome
 
 - **Top bar:** inset to the page margins (28px), 20px above it, 2px `--tabbar-rule` lines above and below,
-  10px vertical padding. Left: `multiagent-island` in Silkscreen 18px, then the run line in body font
-  13px muted: `<scenario name> · seed <n> · <backend>`. Right: tabs Home, Days, Social. Active tab:
+  10px vertical padding. Left, on a run's pages: `multiagent-island / [experiments] / exp NN` in
+  Silkscreen 18px. The logo and the boxed "experiments" link (14px, 2px `--border`; in the repo no
+  arrow, and on hover it takes the active tab's fill and border) both go to the Experiments page. Then the run line in body font 13px muted:
+  `<scenario name> · seed <n> · <backend>`. On the Experiments page the left side is just the logo, and
+  the right side says `N experiments`. Right: tabs Home, Days, Social. Active tab:
   2px `--tabbar-rule` border, `--tab-active-fill` background, ink text, weight 600. Inactive: 2px
   transparent border, no fill.
 - **Page title:** Silkscreen 30px, 20px below the bar. Muted subtitle line under it.
@@ -47,6 +57,47 @@ percent of the grid: `left = (x + 0.5) / W`, `top = (y + 0.5) / H`.
 - Building labels sit just above each building (centre x, min y of its cells).
 - Villager names sit on their homesite centre (`snapshot.homes` → `grid.sites[site]["cells"]`).
 - Clicking a name selects that villager (Days) or opens Days for them (Home).
+
+## Page 0: Experiments, "pick a door"
+
+The landing page. Title `pick a door` (Silkscreen 34px, centred), subtitle `Each door is one experiment.
+Open it to see everything that happened on that island.` Doors sit in a centred, wrapping row, 48px apart,
+each in a 300px column with its card below.
+
+- **One door per run directory**, oldest first, numbered `EXP 00`, `EXP 01`, ... in that order (in the
+  repo: from 00, the first test run, and mock-backend runs are left out).
+- **The door** is pixel art, 240px wide, built from the sprites in `door_sprites.py`: the frame (with a
+  dark doorway and a stone step), the door panel on top of it (mint planks, two braces, a sign board, a
+  handle backplate), and the lever handle on top of that. All sprites are SVG `<rect>`s with
+  `shape-rendering="crispEdges"`; never scale them with smooth transforms.
+- **The sign on the door:** `EXP NN` in Silkscreen 24px and the scenario name in Silkscreen 11px, dark
+  ink, centred on the sign board (`SIGN` in `door_sprites.py`). Shown on the closed door only.
+- **Hover or keyboard focus:** swap the handle to its turned-down sprite (`knob_svg(True)`) and draw a 3px
+  `--tabbar-rule` outline around the door panel. No rotation animation: it is a sprite swap.
+- **Click (or Enter):** play the opening as four sprite frames, about 110 ms apart (`door_svg(14)`,
+  `(9)`, `(5)`, `(2)`): the door narrows toward its left hinge with a dark edge for its thickness, and the
+  dark doorway shows through. About 300 ms after the last frame, go to that run's Home. Swap frames by
+  replacing the SVG; no CSS transitions or 3D transforms, so it stays pixel art. With
+  `prefers-reduced-motion`, skip straight to navigation. The whole door is one link (`<a href>` with an
+  `aria-label` such as `Open experiment 01: blank villagers, mock backend`), so it works without JS.
+- **The card under each door** (panel style, 13px): `Experiment NN` in Silkscreen 18px with a chip
+  `day X of Y` (2px `--selected-border`), then three rows, label muted on the left:
+  `agents` (backend and model, e.g. `groq · llama-3.1-8b-instant`, or `mock backend`),
+  `scenario` (`<scenario name> · seed <n>`), `started` (date of the run's first event).
+  Keep it to these: the card is for telling experiments apart at a glance.
+- **Initial conditions** (added Nov 1, in the repo): below the three rows, a closed `<details>` with the
+  summary `initial conditions` (Silkscreen 12px, uppercase, muted, a 5 x 5 pixel triangle pointing right,
+  down when open). Opened, two groups of the same label/value rows: `Each of the N villagers` (bells,
+  tools with their uses, recipes known) and `The island on day 0` (trees, wood, fruit, rocks, shells,
+  fossils, wild flower patches), then a muted note that wood, rocks, shells and fossils refill each
+  morning. Bells come from the scenario config, tools and recipes from the run's world in
+  `manifest.json`, the island's counts from day 0's `day_start` event (`pools`).
+- **An empty slot** after the last door: the same door faded (grayscale 60%, opacity 0.55, `EMPTY_DOOR`
+  colours), sign with the next number / `empty lot`, and a dashed card "Next experiment" with an example command
+  for starting another run. Not a link.
+
+Data: `manifest.json` per run (scenario name, seed, backend and model, scenario days, days completed;
+check the exact keys) and the `run_start` event or the directory's timestamp for the start date.
 
 ## Tab 1: Home, "everything everywhere all at once, so far..."
 
@@ -155,7 +206,8 @@ show each speaker's own thought under their own line only.
 
 ## The mockups
 
-`mockups/*.dc.html` are the canvas sources. They are not standalone pages (they need the canvas
+`mockups/*.dc.html` are the canvas sources (`doors` is the Experiments page, `home`, `days` and `social`
+are a run's tabs). They are not standalone pages (they need the canvas
 runtime), but all layout and styling is inline and readable, and the `renderVals()` script at the bottom
 of each shows the exact derived values and sample data from a 3-day mock run (`--backend mock`, seed 0).
 Treat them as the visual reference; implement in plain HTML/CSS/JS.
