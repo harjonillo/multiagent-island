@@ -30,7 +30,7 @@ from pathlib import Path
 import yaml
 
 from ..agent import AgentSpec, load_agent_file
-from ..llm import LLMError
+from ..llm import DailyLimit, LLMError
 from .prompts import (BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, encounter_prompt, evening_prompt,
                       inbox_text, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
@@ -355,6 +355,10 @@ class IslandSimulation:
             prompt_file.write_text(f"=== SYSTEM ===\n{msgs[0]['content']}\n\n=== USER ===\n{user}\n")
         try:
             reply = backend.complete(msgs, self.sc.temperature, max_tokens or self.sc.max_tokens)
+        except DailyLimit as e:
+            raise RunAborted(
+                f"{e}\nThe days finished so far are checkpointed and today's replies are cached. Once the limit "
+                f"resets, continue with: llmabm resume {self.run_dir} --days <days left>") from e
         except LLMError as e:
             self.failures += 1
             if self.failures >= self.max_failures:

@@ -799,6 +799,42 @@ def test_memories_are_chosen_at_night_and_fade_unless_revisited():
         assert "Long-term memory:" in summary(run)
 
 
+def test_a_daily_limit_stops_at_once_and_a_minute_limit_waits():
+    import io
+    import urllib.error
+    from unittest import mock
+
+    from llmabm.llm import DailyLimit, OpenAICompatible
+
+    def refuse(body, retry_after="0"):
+        def fn(req, timeout=None):
+            raise urllib.error.HTTPError(req.full_url, 429, "Too Many Requests", {"Retry-After": retry_after},
+                                         io.BytesIO(body.encode()))
+        return fn
+
+    import os
+    os.environ["X_TEST_KEY"] = "k"
+    b = OpenAICompatible(name="groq", base_url="https://x", model="m", api_key_env="X_TEST_KEY", max_retries=2)
+    daily = ('{"error":{"message":"Rate limit reached for model `m` on tokens per day (TPD): Limit 200000, '
+             'Used 199624, Requested 2412. Please try again in 14m45.6s."}}')
+    with mock.patch("urllib.request.urlopen", side_effect=refuse(daily)) as up:
+        try:
+            b.complete([{"role": "user", "content": "hi"}])
+            raise AssertionError("expected DailyLimit")
+        except DailyLimit as e:
+            assert "daily limit" in str(e)
+        assert up.call_count == 1  # no retries on a daily cap
+    minute = '{"error":{"message":"Rate limit reached for model `m` on tokens per minute (TPM): Limit 8000"}}'
+    with mock.patch("urllib.request.urlopen", side_effect=refuse(minute)) as up, mock.patch("time.sleep"):
+        try:
+            b.complete([{"role": "user", "content": "hi"}])
+        except DailyLimit:
+            raise AssertionError("a per-minute limit is not a daily one")
+        except Exception:
+            pass
+        assert up.call_count == 3  # retried
+
+
 def test_spending_choices_are_read_from_plans():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:

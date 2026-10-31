@@ -12,6 +12,7 @@ import json
 import os
 import random
 import re
+import sys
 import threading
 import time
 import urllib.error
@@ -24,6 +25,13 @@ import yaml
 
 class LLMError(RuntimeError):
     pass
+
+
+class DailyLimit(LLMError):
+    """The provider's daily cap for this model is used up: retrying today is pointless."""
+
+
+_DAILY = re.compile(r"per day|\b(TPD|RPD)\b", re.I)
 
 
 @dataclass
@@ -154,6 +162,8 @@ class OpenAICompatible:
             except urllib.error.HTTPError as e:
                 detail = e.read().decode(errors="replace")[:500]
                 self.limiter.settle(slot, 0)
+                if e.code == 429 and _DAILY.search(detail):
+                    raise DailyLimit(f"backend '{self.name}' ({self.model}): daily limit reached: {detail}") from e
                 if e.code in (429, 500, 502, 503, 504) and attempt < self.max_retries:
                     ra = e.headers.get("Retry-After", "")
                     try:
@@ -162,7 +172,11 @@ class OpenAICompatible:
                         delay = 2**attempt + random.random()
                     # A long Retry-After means a daily cap: give up soon and let the run stop
                     # cleanly rather than sleep for hours.
-                    time.sleep(min(delay, 120.0))
+                    delay = min(delay, 120.0)
+                    why = "rate limited" if e.code == 429 else f"HTTP {e.code}"
+                    print(f"    ({self.name}: {why}, waiting {delay:.0f}s, try {attempt + 2} of {self.max_retries + 1})",
+                          file=sys.stderr, flush=True)
+                    time.sleep(delay)
                     continue
                 raise LLMError(f"backend '{self.name}': HTTP {e.code}: {detail}") from e
             except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError) as e:
