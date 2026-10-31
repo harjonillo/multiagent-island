@@ -69,6 +69,55 @@ h1 { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 
 .cell details[open] summary { margin-bottom: 6px; }
 .commons { display: grid; grid-template-columns: 70px 44px minmax(0, 1fr); gap: 10px; font-size: 13px; padding: 5px 0; border-top: 1px solid var(--fill-soft); }
 .soon { margin: 20px 28px; }
+.legend { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-muted); }
+.legend .grp { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; align-items: baseline; }
+.legend .grp > b { font-family: var(--font-display); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
+.legend .items { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.legend .sw { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.legend .sw i { width: 12px; height: 12px; flex: none; border: 1px solid rgba(59,47,42,0.25); }
+.map .who.on { background: var(--ink); color: var(--on-ink); border: 2px solid var(--selected-border); box-shadow: 0 2px 6px rgba(0,0,0,0.25); z-index: 2; }
+/* Days */
+.dayhead { padding: 18px 28px 8px; display: flex; flex-direction: column; gap: 12px; }
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.chip { min-height: 44px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 8px; background: var(--panel); border: 2px solid var(--border); font-size: 14px; }
+.chip[aria-pressed="true"] { border-color: var(--selected-border); }
+.chip .box { width: 16px; height: 16px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background: var(--panel); border: 1px solid var(--outline); }
+.chip[aria-pressed="true"] .box { background: var(--ink); border-color: var(--ink); }
+.linkbtn { min-height: 44px; padding: 8px 12px; border: none; background: none; font-size: 13px; text-decoration: underline; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.tile { background: var(--panel); border: 2px solid var(--border); box-shadow: var(--tile-shadow); padding: 10px 14px; }
+.tile .label { font-size: 11px; } .tile .v { font-size: 18px; font-weight: 600; margin-top: 4px; }
+.lines4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+.lines4 svg { width: 100%; height: 70px; margin-top: 6px; display: block; overflow: visible; }
+.vtabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.vtabs button { min-height: 44px; min-width: 52px; padding: 8px 12px; background: var(--panel); border: 2px solid var(--border); font-size: 14px; }
+.vtabs button[aria-selected="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--selected-border); font-weight: 600; }
+.vcard { padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; }
+.vname { font-family: var(--font-display); font-size: 22px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.stats .n { font-size: 20px; font-weight: 600; }
+.sec > .label { margin-bottom: 6px; }
+.dlabel { font-size: 12px; font-weight: 600; color: var(--ink-muted); margin: 8px 0 2px; }
+.hrow { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: 13px; padding: 5px 0; line-height: 1.4; }
+.hrow .h, .arow .h { color: var(--ink-muted); }
+.arow { display: grid; grid-template-columns: 44px minmax(0, 1fr) 72px; gap: 8px; padding: 7px 0; border-top: 1px solid var(--fill-soft); font-size: 13px; line-height: 1.4; }
+.arow .ok { text-align: right; font-size: 12px; font-weight: 600; color: var(--ink-muted); }
+.arow .ok.bad { color: var(--fail); }
+.thought { display: flex; gap: 6px; align-items: flex-start; color: var(--private-ink); }
+.thought svg { flex: none; margin-top: 3px; }
+.meta { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+.talk { padding: 8px 0; border-top: 1px solid var(--fill-soft); }
+.talk .thead { font-size: 12px; color: var(--ink-muted); margin-bottom: 6px; }
+.tline { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: 14px; margin-bottom: 6px; line-height: 1.4; }
+.tline .who { font-weight: 600; }
+.act { font-size: 12px; color: var(--ink-muted); font-style: italic; }
+.nightly { background: var(--private-fill); padding: 14px 16px; }
+.nightly .text { font-size: 15px; line-height: 1.5; }
+.more summary { cursor: pointer; font-size: 13px; text-decoration: underline; padding: 6px 0; }
+.empty { font-size: 14px; color: var(--ink-muted); }
+.talkgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.talkgrid .card { padding: 14px 16px; }
+.talkgrid .said { font-size: 14px; margin-bottom: 4px; line-height: 1.4; }
 @media (max-width: 1000px) { .trends { grid-template-columns: minmax(0, 1fr); } }
 </style>
 </head>
@@ -99,17 +148,29 @@ const TILE_COLOURS = {s: "#A9D3E3", a: "#F1E6C8", r: "#7FBCDB", k: "#A39C8E", b:
 const OBJ = {site: "#F7F5EE", home: "#E9C29B", path: "#B98A5E", hardwood: "#3E7A3A", fruit: "#D2553F", stump: "#8A5A2B",
   sapling: "#6E9E4A", rock: "#5F5B55", placed: "#6250D6", flowers: "#E87BA4", bridge: "#B08A5A"};
 
-function mapHTML(day, onName) {
+// The map's key, drawn from the same colours the map is painted with.
+const LEGEND = [
+  ["Ground", [[TILE_COLOURS.s, "sea"], [TILE_COLOURS.a, "beach"], [TILE_COLOURS.k, "rocky shore"], [TILE_COLOURS.r, "river and pond"],
+    [TILE_COLOURS["1"], "lower ground"], [TILE_COLOURS["2"], "middle cliff"], [TILE_COLOURS["3"], "upper cliff"],
+    [TILE_COLOURS.B, "building"], [TILE_COLOURS.P, "plaza"]]],
+  ["On it", [[OBJ.site, "free homesite"], [OBJ.home, "home"], [OBJ.path, "path"], [OBJ.hardwood, "tree"], [OBJ.fruit, "fruit tree"],
+    [OBJ.sapling, "sapling"], [OBJ.stump, "stump"], [OBJ.rock, "rock"], [OBJ.flowers, "flowers"], [OBJ.placed, "furniture and fences"],
+    [OBJ.bridge, "bridge, once built"]]],
+];
+const legendHTML = () => `<div class="legend" aria-label="Map key">${LEGEND.map(([g, items]) => `<div class="grp"><b>${g}</b><div class="items">${items.map(([c, l]) => `<span class="sw"><i style="background:${c}"></i>${l}</span>`).join("")}</div></div>`).join("")}</div>`;
+
+function mapHTML(day, opts = {}) {
+  const href = opts.href || ((n) => `#days/${encodeURIComponent(n)}`);
   const M = D.map;
   const id = "map" + Math.random().toString(36).slice(2, 8);
   const homes = day.homes || {};
   const labels = M.buildings.map((b) => `<div class="bld" style="left:${((b.x + 0.5) / M.W * 100).toFixed(2)}%;top:${((b.top - 0.6) / M.H * 100).toFixed(2)}%">${esc(b.name)}</div>`).join("");
   const names = Object.entries(homes).filter(([, s]) => s && M.sites[s]).map(([n, s]) => {
     const [x, y] = M.sites[s].centre;
-    return `<a class="who" href="#days/${encodeURIComponent(n)}" data-name="${esc(n)}" style="left:${((x + 0.5) / M.W * 100).toFixed(2)}%;top:${((y + 0.5) / M.H * 100).toFixed(2)}%">${esc(n)}</a>`;
+    return `<a class="who${n === opts.sel ? " on" : ""}" href="${href(n)}" aria-label="${esc(n)} lives ${esc((day.home_areas || {})[n] || "")}" style="left:${((x + 0.5) / M.W * 100).toFixed(2)}%;top:${((y + 0.5) / M.H * 100).toFixed(2)}%">${esc(n)}</a>`;
   }).join("");
   setTimeout(() => paint(document.getElementById(id), day), 0);
-  return `<div class="map" style="aspect-ratio:${M.W} / ${M.H}"><canvas id="${id}" width="${M.W}" height="${M.H}" role="img" aria-label="Tile map of the island at the end of day ${day.day}, with homes, paths and trees"></canvas>${labels}${names}</div>`;
+  return `<div class="map" style="aspect-ratio:${M.W} / ${M.H}"><canvas id="${id}" width="${M.W}" height="${M.H}" role="img" aria-label="Tile map of the island at the end of day ${day.day}, with homes, paths and trees"></canvas>${labels}${names}</div>${legendHTML()}`;
 }
 
 function paint(canvas, day) {
@@ -205,17 +266,184 @@ function home() {
   </main>`;
 }
 
+// --- Days --------------------------------------------------------------------------
+const hh = (h) => String(h % 24).padStart(2, "0");
+const plural = (n, one, many) => `${fmt(n)} ${n === 1 ? one : (many || one + "s")}`;
+const text = (t) => esc(t).replace(/\n/g, "<br>");
+const CHECK = '<svg width="10" height="10" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5l2.5 2.5L10 3.5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const MAX_ROWS = 12;  // longer lists end in "show N more"
+
+function daysState() {
+  const [, who, ds] = location.hash.slice(1).split("/");
+  const all = D.daylog.map((d) => d.day);
+  let days = (ds || "").split(",").filter((x) => x !== "").map(Number).filter((d) => all.includes(d));
+  if (!days.length) days = [all[all.length - 1]];
+  const name = D.run.villagers.includes(decodeURIComponent(who || "")) ? decodeURIComponent(who) : D.run.villagers[0];
+  return {name, days: days.sort((a, b) => a - b)};
+}
+const daysHref = (name, days) => `#days/${encodeURIComponent(name)}/${days.join(",")}`;
+
+function capped(rows) {
+  if (rows.length <= MAX_ROWS) return rows.join("");
+  return rows.slice(0, MAX_ROWS).join("") + `<details class="more"><summary>show ${rows.length - MAX_ROWS} more</summary>${rows.slice(MAX_ROWS).join("")}</details>`;
+}
+
+// One section of the villager card: entries grouped by day when several days are picked.
+function byDay(sel, multi, rowsFor, none) {
+  const parts = sel.map((L) => {
+    const rows = rowsFor(L);
+    if (!multi) return rows.length ? capped(rows) : `<div class="empty">${none}</div>`;
+    return `<div class="dlabel">Day ${L.day}</div>` + (rows.length ? capped(rows) : `<div class="empty">${none}</div>`);
+  });
+  return parts.join("");
+}
+
+function commonsChart(label, key, sel, multi) {
+  const pts = sel.flatMap((L) => L.pools.map((p) => p[key]));
+  const max = Math.max(...sel.map((L) => L.pools[0] ? L.pools[0][key] : 0), ...pts, 1);
+  const n = pts.length, W = 160, Hh = 56;
+  const xy = pts.map((v, i) => `${(n > 1 ? i / (n - 1) * W : W / 2).toFixed(1)},${(Hh - 2 - v / max * (Hh - 6)).toFixed(1)}`).join(" ");
+  let ticks, note;
+  if (multi) {
+    ticks = sel.length > 4 ? [sel[0], sel[sel.length - 1]].map((L) => `day ${L.day}`) : sel.map((L) => `day ${L.day}`);
+    const out = sel.filter((L) => L.pools.some((p) => p[key] === 0)).length;
+    note = out ? `ran out on ${out} of ${sel.length} days` : "never ran out";
+  } else {
+    const L = sel[0], hs = L.hours;
+    // Point 0 is the morning (day_start, at the first hour); point i is the state after hour hs[i - 1].
+    ticks = hs.length ? [hs[0], hs[Math.floor(hs.length / 2)] + 1, hs[hs.length - 1] + 1].map(hh) : [];
+    const i = L.pools.findIndex((p) => p[key] === 0);
+    note = i > 0 ? `ran out by ${hh(hs[i - 1] + 1)}:00` : i === 0 ? "empty all day" : "never ran out";
+  }
+  const first = pts[0] ?? 0, last = pts[pts.length - 1] ?? 0;
+  return `<div><div class="trend-head"><span style="font-weight:600">${esc(label)}</span><span class="small">${fmt(first)} → ${fmt(last)}</span></div>
+    <svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="${esc(label)}: ${fmt(first)} to ${fmt(last)}">
+      <line x1="0" y1="${Hh - 2}" x2="${W}" y2="${Hh - 2}" stroke="#E3D3BC" stroke-width="1" vector-effect="non-scaling-stroke"/>
+      <polyline points="${xy}" fill="none" stroke="#E07A4F" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>
+    <div class="axis">${ticks.map((t) => `<span>${t}</span>`).join("")}</div><div class="small" style="margin-top:4px">${note}</div></div>`;
+}
+
+function days() {
+  const {name, days: picked} = daysState();
+  const sel = D.daylog.filter((L) => picked.includes(L.day));
+  const info = (d) => D.days.find((x) => x.day === d) || {};
+  const multi = sel.length > 1, lastDay = info(sel[sel.length - 1].day);
+  const sum = (f) => sel.reduce((a, L) => a + f(L), 0);
+
+  const chips = D.daylog.map((L) => {
+    const on = picked.includes(L.day);
+    const next = on ? picked.filter((d) => d !== L.day) : picked.concat([L.day]);
+    return `<button class="chip" aria-pressed="${on}" data-go="${daysHref(name, next.length ? next : [L.day])}"><span class="box">${on ? CHECK : ""}</span>Day ${L.day} · ${esc(info(L.day).date)}</button>`;
+  }).join("");
+  const title = multi ? `Days ${picked.join(", ")} combined` : `Day ${sel[0].day} · ${esc(info(sel[0].day).date)} · ${esc(info(sel[0].day).season)}`;
+  const c = (k) => sum((L) => L.counts[k]);
+  const sub = `${plural(c("actions"), "action")}, ${fmt(c("failed"))} failed · ${plural(c("talks"), "conversation")} · ${plural(c("mail"), "letter and parcel", "letters and parcels")} · ${plural(c("board"), "board post")}`;
+
+  // Commons tiles: start of the first day picked → end of the last.
+  const a = sel[0].pools[0], b = sel[sel.length - 1].pools[sel[sel.length - 1].pools.length - 1];
+  const refill = multi ? "refills each morning" : null;
+  const tiles = [
+    ["Rock hits", `${a.rocks} → ${b.rocks}`, refill || `${b.rocks_empty} of ${b.n_rocks} rocks emptied`],
+    ["Wood", `${a.wood} → ${b.wood}`, refill || plural(b.trees, "tree") + " standing"],
+    ["Shells", `${a.shells} → ${b.shells}`, refill || `of ${a.shells}`],
+    ["Fossil spots", `${a.fossils} → ${b.fossils}`, refill || (a.fossils - b.fossils ? `${a.fossils - b.fossils} dug` : "none dug")],
+    ["Museum", `${a.museum} → ${b.museum}`, "species"],
+    ["Bridge fund", fmt(b.bridge), `of ${fmt(D.bridge_cost)}`],
+  ];
+
+  // The selected villager's card.
+  const mine = (L, k) => L[k][name] || [];
+  const nActs = sum((L) => mine(L, "acts").length), nFail = sum((L) => mine(L, "acts").filter((x) => !x[3]).length);
+  const nSeen = sum((L) => mine(L, "seen").length);
+  const talksOf = (L) => L.talks.filter((t) => t.who.includes(name));
+  const mailOf = (L) => L.mail.filter((m) => m.from === name || m.to === name);
+  const nTalk = sum((L) => talksOf(L).length + mailOf(L).length);
+  const lastL = sel[sel.length - 1];
+
+  const plans = byDay(sel, multi, (L) => mine(L, "plans").map((p) => `<div class="hrow"><div class="h">${hh(p.h)}</div><div>
+      <div class="thought">${LOCK}<span>${p.thoughts ? text(p.thoughts) : "<i>no thoughts given</i>"}</span></div>
+      <div class="meta">${plural(p.n, "action")} scheduled, ${fmt(p.dropped)} dropped${p.error ? " · the reply could not be read" : ""}${p.note ? ` · note: “${esc(p.note)}”` : ""}</div></div></div>`), "No plans.");
+  const acts = byDay(sel, multi, (L) => mine(L, "acts").map(([h, place, result, ok]) => `<div class="arow"><div class="h">${hh(h)}</div>
+      <div>${place ? `<span class="small">${esc(place)} · </span>` : ""}${esc(result)}</div><div class="ok${ok ? "" : " bad"}">${ok ? "ok" : "✕ failed"}</div></div>`), "No actions.");
+  const seen = byDay(sel, multi, (L) => mine(L, "seen").map(([h, t]) => `<div class="hrow"><div class="h">${hh(h)}</div><div>${esc(t)}</div></div>`), "Spotted nothing new.");
+  const talks = byDay(sel, multi, (L) => {
+    const items = talksOf(L).map((t) => ({h: t.h, html: `<div class="talk"><div class="thead">${hh(t.h)}:00 · ${t.visit ? `${esc(t.who[0])} visited ${esc(t.who[1])} at home` : `at the ${esc(t.where)}`}</div>
+      ${t.lines.filter((l) => l[1] || l[3]).map(([who, said, thought, act]) => `<div class="tline"><div class="who">${esc(who)}</div><div>
+        ${said ? `<div>“${text(said)}”</div>` : ""}${act ? `<div class="act">${esc(act)}</div>` : ""}
+        ${who === name && thought ? `<div class="thought" style="font-size:13px; margin-top:2px">${LOCK}<span>${text(thought)}</span></div>` : ""}</div></div>`).join("") || '<div class="empty">They just waved.</div>'}</div>`}));
+    mailOf(L).forEach((m) => items.push({h: m.h, html: `<div class="talk"><div class="thead">${hh(m.h)}:00 · ${m.kind}${m.to ? (m.from === name ? ` to ${esc(m.to)}` : ` from ${esc(m.from)}`) : ""}</div>
+      <div style="font-size:14px; line-height:1.4">${text(m.text)}</div></div>`}));
+    return items.sort((x, y) => x.h - y.h).map((x) => x.html);
+  }, "Talked to nobody.");
+  const pages = sel.map((L) => {
+    const p = L.pages[name];
+    const body = !p ? "<i>No page (the night hasn't happened yet).</i>" : p.skipped ? `<i>Chose not to write (${esc(p.skipped)}).</i>` : p.text ? text(p.text) : "<i>(blank)</i>";
+    return `${multi ? `<div class="dlabel">Night ${L.day}</div>` : ""}<div class="text">${body}</div>`;
+  }).join("");
+
+  // Every conversation of the selection, then one card per plaza round (evening mail, posts, offers).
+  const all = sel.flatMap((L) => {
+    const cards = L.talks.map((t) => `<div class="card"><div class="trend-head"><span style="font-weight:600">${t.who.map(esc).join(" and ")}</span><span class="small">${multi ? `day ${L.day} · ` : ""}${hh(t.h)}:00</span></div>
+      <div class="small" style="margin:2px 0 8px">${t.visit ? "a visit at home" : esc(t.where)}</div>
+      ${t.lines.filter((l) => l[1]).map(([who, said]) => `<div class="said"><b>${esc(who)}:</b> ${text(said)}</div>`).join("") || '<div class="small">They just waved.</div>'}</div>`);
+    const rounds = {};
+    L.mail.filter((m) => !m.in_person).forEach((m) => (rounds[m.h] = rounds[m.h] || []).push(m));
+    Object.keys(rounds).sort((x, y) => x - y).forEach((h) => cards.push(`<div class="card"><div class="trend-head"><span style="font-weight:600">Plaza</span><span class="small">${multi ? `day ${L.day} · ` : ""}${hh(h)}:00</span></div>
+      <div class="small" style="margin:2px 0 8px">board, letters, parcels and offers</div>
+      ${rounds[h].map((m) => `<div class="said"><b>${esc(m.from)}${m.to ? " → " + esc(m.to) : ""}</b> <span class="small">${m.kind}</span> ${text(m.text)}</div>`).join("")}</div>`));
+    return cards;
+  });
+
+  return `
+  <section class="dayhead">
+    <div class="chips"><span class="small" style="margin-right:4px">Days</span>${chips}<button class="linkbtn" data-go="${daysHref(name, D.daylog.map((L) => L.day))}">All days</button></div>
+    <div><h1>${title}</h1><div class="sub">${sub}</div></div>
+  </section>
+  <main class="cols" style="padding-top:8px">
+    <div class="col" style="flex: 999 1 600px">
+      <div class="tiles">${tiles.map(([l, v, s]) => `<div class="tile"><div class="label">${l}</div><div class="v">${v}</div><div class="small" style="font-size:11px">${s}</div></div>`).join("")}</div>
+      ${mapHTML(lastDay, {sel: name, href: (n) => daysHref(n, picked)})}
+      <div class="small">Homes, as of the end of day ${lastDay.day}. Click a villager to read their ${multi ? "days" : "day"}.</div>
+      <div class="card"><div class="label" style="margin-bottom:12px">The commons ${multi ? "across the days picked" : "through the day"}</div>
+        <div class="lines4">${commonsChart("Rock hits left", "rocks", sel, multi)}${commonsChart("Wood on trees", "wood", sel, multi)}${commonsChart("Shells", "shells", sel, multi)}${commonsChart("Fruit", "fruit", sel, multi)}</div></div>
+    </div>
+    <aside class="col" style="flex: 1 1 460px">
+      <div class="vtabs" role="tablist" aria-label="Villagers">${D.run.villagers.map((n) => `<button role="tab" aria-selected="${n === name}" data-go="${daysHref(n, picked)}">${esc(n)}</button>`).join("")}</div>
+      <div class="card vcard">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px">
+            <div class="vname">${esc(name)}</div><div class="small" style="font-size:13px">${esc((lastDay.home_areas || {})[name] || "")}${lastL.houses[name] ? " · " + esc(lastL.houses[name]) : ""}</div></div>
+          <div class="stats">${[[nActs, "actions"], [nFail, "failed"], [nSeen, "discoveries"], [nTalk, "talks and mail"]].map(([n, l]) => `<div><div class="n">${fmt(n)}</div><div class="small">${l}</div></div>`).join("")}</div>
+        </div>
+        <div class="sec"><div class="label">Plans</div>${plans}</div>
+        <div class="sec"><div class="label">Actions and attempts</div>${acts}</div>
+        <div class="sec"><div class="label">Discoveries</div>${seen}</div>
+        <div class="sec"><div class="label">Conversations and mail</div>${talks}</div>
+        <div class="nightly"><div class="label private" style="margin-bottom:6px">${LOCK} Nightly page${multi ? "s" : ""}</div>${pages}</div>
+      </div>
+    </aside>
+  </main>
+  <section style="padding: 0 28px 32px">
+    <div class="label" style="margin-bottom:10px">All conversations ${multi ? "on these days" : "that day"}</div>
+    ${all.length ? `<div class="talkgrid">${all.join("")}</div>` : '<div class="empty">Nobody talked or wrote.</div>'}
+  </section>`;
+}
+
 function soon(name) {
   return `<section class="head"><h1>${name}</h1><div class="sub">Coming next.</div></section>`;
 }
 
 // --- routing -----------------------------------------------------------------------
+let shownTab = null;
 function show() {
   const tab = (location.hash.slice(1).split("/")[0] || "home");
   document.querySelectorAll(".tabs button").forEach((b) => { if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
-  $("#view").innerHTML = tab === "days" ? soon("Days") : tab === "social" ? soon("Who deals with whom") : home();
-  window.scrollTo(0, 0);
+  $("#view").innerHTML = tab === "days" ? days() : tab === "social" ? soon("Who deals with whom") : home();
+  if (tab !== shownTab) window.scrollTo(0, 0);
+  shownTab = tab;
 }
+// Buttons that change the view carry the link they lead to.
+$("#view").addEventListener("click", (e) => { const b = e.target.closest("[data-go]"); if (b) location.hash = b.dataset.go; });
 document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => { location.hash = b.dataset.tab; }));
 $("#runline").textContent = `${D.run.scenario} · seed ${D.run.seed} · ${D.run.model}`;
 window.addEventListener("hashchange", show);

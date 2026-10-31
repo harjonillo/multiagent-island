@@ -15,11 +15,11 @@ from collections import Counter
 from pathlib import Path
 
 from ..analysis import Run, load_run
-from .analysis import (RESOURCES, action_mix, extraction_shares, gini, hhi, llm_calls, net_worth, reply_errors,
-                       run_out, snapshots)
+from .analysis import (RESOURCES, _side, action_mix, extraction_shares, gini, hhi, llm_calls, net_worth,
+                       reply_errors, run_out, snapshots)
 from .world import CATEGORIES, clock
 
-VERSION = 1
+VERSION = 2  # 2: per-day detail for the Days tab
 
 # Why actions failed, matched on the result text; the first match wins.
 FAIL_BUCKETS = [
@@ -197,6 +197,91 @@ def home_data(run: Run) -> dict:
             "pages": pages, "commons": commons, "run_out": gone}
 
 
+def _pools(p: dict) -> dict:
+    """The commons as the Days tab shows them."""
+    trees = p.get("trees") or {}
+    return {"rocks": sum(p["rocks"]), "rocks_empty": sum(1 for r in p["rocks"] if r == 0), "n_rocks": len(p["rocks"]),
+            "wood": p["wood_left"], "fruit": p["fruit_on_trees"], "shells": p["shells_left"], "fossils": p["fossils_left"],
+            "museum": p["museum"], "bridge": p["bridge_fund"], "trees": trees.get("hardwood", 0) + trees.get("fruit", 0)}
+
+
+def _offer_text(e: dict) -> str:
+    return (f"offers {_side(e['give'])} for {_side(e['want'])}" + (" (a counter-offer)" if e.get("parent") else "")
+            + (f': "{e["note"]}"' if e.get("note") else ""))
+
+
+def day_detail(run: Run) -> list[dict]:
+    """Per day, for the Days tab: counts, the commons hour by hour, and per villager their plans,
+    actions, sightings and nightly page; plus every conversation and piece of mail.
+    Hours are the island's (5 to 28); the page shows hour % 24."""
+    days = [s["day"] for s in snapshots(run)]
+    by_day: dict[int, list[dict]] = {d: [] for d in days}
+    for e in run.events:
+        if e.get("day") in by_day:
+            by_day[e["day"]].append(e)
+    snaps = {s["day"]: s for s in snapshots(run)}
+    levels = run.manifest["world"]["house_levels"]
+    offers_final = {e["id"]: e for e in run.of("offer_update")}
+    out = []
+    for d in days:
+        ev = by_day[d]
+        of = lambda t: [e for e in ev if e["type"] == t]  # noqa: E731
+        start = next((e for e in ev if e["type"] == "day_start"), None)
+        states = of("hour_state")
+        hours = [h["hour"] for h in states]
+        series = [_pools(start["pools"])] if start else []
+        series += [_pools(h["pools"]) for h in states]
+
+        plans, acts, seen, pages = {}, {}, {}, {}
+        for e in of("plan"):
+            plans.setdefault(e["agent"], []).append({
+                "h": e["hour"], "thoughts": e.get("thoughts") or "", "n": len(e.get("scheduled") or []),
+                "dropped": len(e.get("dropped") or []), "note": e.get("note") or "", "error": bool(e.get("error"))})
+        for e in of("action"):
+            acts.setdefault(e["agent"], []).append([e["hour"], e.get("location") or "", e.get("result") or "", bool(e["ok"])])
+        for e in of("sighting"):
+            seen.setdefault(e["agent"], []).extend([e["hour"], s] for s in e["seen"])
+        for e in of("reflection"):
+            pages[e["agent"]] = {"skipped": e["skipped"]} if e.get("skipped") else {"text": (e.get("self_doc") or "").strip()}
+
+        talks = []
+        for e in of("encounter"):
+            lines = [[t["speaker"], t.get("text") or "", t.get("thoughts") or "", t.get("act") or ""] for t in e["turns"]]
+            talks.append({"h": e["hour"], "where": e.get("location") or "", "who": e["villagers"], "visit": bool(e.get("visit")),
+                          "lines": lines})
+
+        mail = []  # kind, hour, from, to ("" for the board), text
+        for e in of("message"):
+            mail.append({"kind": "letter", "h": e["hour"], "from": e["sender"], "to": e["recipient"], "text": e["content"]})
+        for e in of("parcel"):
+            mail.append({"kind": "parcel", "h": e["hour"], "from": e["sender"], "to": e["recipient"],
+                         "text": _side(e["items"]) + (f': "{e["note"]}"' if e.get("note") else "")})
+        for e in of("board"):
+            mail.append({"kind": "board post", "h": e["hour"], "from": e["author"], "to": "", "text": e["content"]})
+        for e in of("offer"):
+            fin = offers_final.get(e["id"])
+            status = (f" ({fin['status']}" + (f": {fin['reason']}" if fin.get("reason") else "") + ")") if fin else ""
+            mail.append({"kind": "offer", "h": e["hour"], "from": e["sender"], "to": e["recipient"], "text": _offer_text(e) + status})
+        for e in of("gift"):
+            mail.append({"kind": "gift", "h": e["hour"], "from": e["giver"], "to": e["receiver"], "in_person": e["how"] == "in person",
+                         "text": f"{_side(e['items'])}, {e['how']}" + ("" if e["ok"] else f"; failed: {e['result']}")})
+        mail.sort(key=lambda m: m["h"])
+
+        acts_all = of("action")
+        snap = snaps[d]
+        out.append({
+            "day": d,
+            "counts": {"actions": len(acts_all), "failed": sum(1 for a in acts_all if not a["ok"]),
+                       "talks": sum(1 for t in talks if any(x[1] for x in t["lines"])),
+                       "mail": len(of("message")) + len(of("parcel")), "board": len(of("board"))},
+            "hours": hours, "pools": series,
+            "houses": {n: levels[v["house"]]["name"] + (f", {v['loan']:,} loan" if v["loan"] else "")
+                       for n, v in snap["villagers"].items()},
+            "plans": plans, "acts": acts, "seen": seen, "pages": pages, "talks": talks, "mail": mail,
+        })
+    return out
+
+
 def build(run_dir: Path) -> dict:
     run = load_run(run_dir)
     m, snaps = run.manifest, snapshots(run)
@@ -212,6 +297,8 @@ def build(run_dir: Path) -> dict:
         "map": map_data(run),
         "days": days_data(run),
         "home": home_data(run),
+        "daylog": day_detail(run),
+        "bridge_cost": m["world"]["bridge"]["cost"],
     }
 
 

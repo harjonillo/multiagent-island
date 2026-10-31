@@ -919,6 +919,18 @@ def test_site_data_and_page_for_a_mock_run():
         M = data["map"]
         assert len(M["tiles"]) == M["H"] and all(len(r) == M["W"] for r in M["tiles"])
         assert sum(f["n"] for f in data["home"]["fails"]) == data["home"]["failed"]
+        # Days: per day, every action, plan, conversation and nightly page, and the commons hour by hour.
+        L = data["daylog"]
+        assert [x["day"] for x in L] == [0, 1]
+        for x in L:
+            acts = [a for a in run.of("action") if a["day"] == x["day"]]
+            assert x["counts"]["actions"] == len(acts) == sum(len(v) for v in x["acts"].values())
+            assert x["counts"]["failed"] == sum(1 for a in acts if not a["ok"])
+            assert sum(len(v) for v in x["plans"].values()) == sum(1 for p in run.of("plan") if p["day"] == x["day"])
+            assert len(x["talks"]) == sum(1 for e in run.of("encounter") if e["day"] == x["day"])
+            assert set(x["pages"]) == set(names) and len(x["pools"]) == len(x["hours"]) + 1
+            assert x["pools"][0]["rocks"] == sum(next(e for e in run.of("day_start") if e["day"] == x["day"])["pools"]["rocks"])
+        assert sum(x["counts"]["board"] for x in L) == len(run.of("board"))
         page = build_site(run_dir).read_text()
         assert "__DATA__" not in page and "__TITLE__" not in page
         blob = page.split('<script id="site-data" type="application/json">', 1)[1].split("</script>", 1)[0]
