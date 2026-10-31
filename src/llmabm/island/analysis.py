@@ -166,11 +166,14 @@ def summary(run: Run) -> str:
     L += ["", f"Trades: {ts['n_trades']} completed from {ts['n_offers']} offers ({ts['counters']} were counteroffers); "
           f"outcomes {dict(ts['status'])}",
           f"  median price paid vs Nook's Cranny price: {med:.2f}x" if med is not None else "  no item-for-bells trades"]
-    teach = run.of("teach")
     enc = run.of("encounter")
     pairs = Counter(tuple(sorted(e["villagers"])) for e in enc if any(t["text"] for t in e["turns"]))
-    L += [f"Recipes taught: {sum(1 for t in teach if t['new'])} new to the learner (of {len(teach)} teachings)",
-          f"Messages: {len(run.of('message'))}   board posts: {len(run.of('board'))}   "
+    cards = sum(1 for a in run.of("action") if a["ok"] and a["action"].get("do") == "buy" and "recipe card" in a["result"])
+    cards_given = sum(n for g in run.of("gift") for k, n in g["items"].items() if k.endswith(" recipe"))
+    broke = Counter(e["tool"] for e in run.of("tool_broke"))
+    L += [f"Recipe cards: {cards} bought, {cards_given} handed over or mailed   "
+          f"tools broken: {sum(broke.values())}" + (f" ({', '.join(f'{t} {n}' for t, n in broke.most_common())})" if broke else ""),
+          f"Letters: {len(run.of('message'))}   parcels: {len(run.of('parcel'))}   board posts: {len(run.of('board'))}   "
           f"encounters: {len(run.of('encounter_decision'))} times a villager noticed someone nearby, "
           f"{len(enc)} approaches ({sum(pairs.values())} became conversations)",
           "  most frequent chat pairs: " + (", ".join(f"{a}-{b} x{n}" for (a, b), n in pairs.most_common(5)) or "none")]
@@ -407,7 +410,12 @@ def _social_lines(hev: list[dict]) -> list[str]:
     for e in hev:
         t = e["type"]
         if t == "message":
-            out.append(f"{e['sender']} → {e['recipient']}: {e['content']}")
+            out.append(f"✉️ {e['sender']} → {e['recipient']} (arrives day {e.get('arrives_day', '?')}): {e['content']}")
+        elif t == "parcel":
+            out.append(f"📦 {e['sender']} sent {e['recipient']} {_side(e['items'])} (arrives day {e['arrives_day']})"
+                       + (f': "{e["note"]}"' if e.get("note") else ""))
+        elif t == "tool_broke":
+            out.append(f"🔧 {e['agent']}'s {e['tool']} broke")
         elif t == "board":
             out.append(f"{e['author']} posted on the board: {e['content']}")
         elif t == "offer":
@@ -415,8 +423,6 @@ def _social_lines(hev: list[dict]) -> list[str]:
                        + (f" (counter to {e['parent']})" if e.get("parent") else "") + (f': "{e["note"]}"' if e["note"] else ""))
         elif t == "offer_update" and e["status"] in ("accepted", "rejected", "failed", "expired"):
             out.append(f"[{e['id']}] {e['status']}" + (f" ({e['reason']})" if e.get("reason") else ""))
-        elif t == "teach":
-            out.append(f"{e['teacher']} taught {e['learner']} the {e['recipe']} recipe" + ("" if e["new"] else " (already knew it)"))
         elif t == "encounter":
             spoken = [x for x in e["turns"] if x["text"] or x.get("act")]
             who = " and ".join(e["villagers"])

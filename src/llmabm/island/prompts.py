@@ -30,7 +30,7 @@ ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour 
 - visit: who
 - craft: recipe
 - sell: items ({"<item>": <qty>})
-- buy: shop (cranny | able), item
+- buy: shop (cranny | able), item (or "<recipe> recipe" for a recipe card)
 - donate: item
 - ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters)
 - upgrade_house
@@ -109,7 +109,7 @@ def status_block(isl: Island, vil: Villager, when: str) -> str:
     f = isl.price_factor()
     shops = (f"Nook's Cranny today ({fmt_window(isl.shop_hours('cranny'))}): "
              + ", ".join(f"{k} {round(p * f)}" for k, p in isl.cranny_stock.items())
-             + (f"; recipe card: {isl.cranny_recipe} {round(w['shops']['cranny']['recipe_price'] * f)}" if isl.cranny_recipe else "")
+             + "; recipe cards: " + ", ".join(f"{r} {p}" for r, p in isl.recipe_cards_for_sale().items())
              + f"\nAble Sisters today ({fmt_window(isl.shop_hours('able'))}): "
              + ", ".join(f"{k} {round(p * f)}" for k, p in isl.able_stock.items()))
     bridge = "built" if isl.bridge_built else f"{isl.bridge_fund}/{w['bridge']['cost']} bells raised"
@@ -210,16 +210,17 @@ def evening_prompt(isl: Island, vil: Villager, round_: int, hour: int, offers: l
         + f"\n\nToday you:\n{done}\n\nLetters and messages to you:\n{inbox}\n\n"
         f"Bulletin board, newest last:\n{board_txt}\n\nTrade offers waiting for your answer:\n{offer_txt}\n\n"
         f"Other villagers: {others}\n\n"
-        "You can write to villagers, post on the board, offer trades, answer offers (accept, reject or "
-        "counter with your own terms), and teach recipes you know. Doing nothing is fine. Use \"bells\" as an "
-        "item name for money. Respond with one JSON object and nothing else:\n"
+        "You can post on the board, offer trades to villagers here, answer offers (accept, reject or counter "
+        "with your own terms), write letters, and send parcels of things from your pockets. Letters and parcels "
+        "arrive tomorrow morning. Doing nothing is fine. Use \"bells\" as an item name for money. "
+        "Respond with one JSON object and nothing else:\n"
         "{\n"
         '  "thoughts": "<your private reasoning; nobody else sees it>",\n'
-        '  "messages": [{"to": "<villager>", "content": "..."}],\n'
+        '  "letters": [{"to": "<villager>", "content": "..."}],\n'
         '  "board": "<post for everyone, or empty>",\n'
         '  "offers": [{"to": "<villager>", "give": {"<item>": <qty>}, "want": {"<item>": <qty>}, "note": "..."}],\n'
         '  "responses": [{"offer": "<id>", "decision": "accept" | "reject" | "counter", "give": {}, "want": {}, "note": "..."}],\n'
-        '  "teach": [{"to": "<villager>", "recipe": "<recipe>"}],\n'
+        '  "parcels": [{"to": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],\n'
         '  "note": "<optional private note to your future self>"\n'
         "}"
     )

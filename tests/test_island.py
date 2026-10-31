@@ -26,6 +26,7 @@ def _island(names=("A", "B")):
 
 def test_rocks_are_shared_and_run_out():
     isl = _island()
+    isl.v["A"].inventory.clear()  # room in A's pockets for everything the rocks give
     got = [isl.act("A", {"do": "mine_rock"}, 8)[0] for _ in range(isl.n_rocks)]
     assert all(got)
     ok, msg = isl.act("B", {"do": "mine_rock"}, 8)
@@ -205,6 +206,25 @@ def test_bodies_shorter_walk_gets_there_first():
     assert [n for n, _ in bodies.order(batch, rng)] == ["Far", "Near"]
 
 
+def test_fixtures_keep_a_free_tile_between_them():
+    from llmabm.island.grid import GridSpace
+
+    w = load_world(WORLD)
+    for seed in range(8):
+        g = GridSpace(w, seed=seed)
+        isl = Island(w, ["A"], random.Random(seed))
+        g.attach(isl)
+        groups = [set(b["cells"]) for b in g.buildings.values()] + [set(s["cells"]) for s in g.sites.values()]
+        groups += [{t.pos} for t in isl.trees if t.pos] + [{c} for c in g.rock_cells if c]
+        for i, a in enumerate(groups):
+            ring = {(x + dx, y + dy) for x, y in a for dx in (-1, 0, 1) for dy in (-1, 0, 1)}
+            for b in groups[i + 1:]:
+                assert not ring & b, f"seed {seed}: fixtures touch at {sorted(ring & b)[:3]}"
+        doors = {b["door"] for b in g.buildings.values()} | {s["door"] for s in g.sites.values()}
+        assert not doors & ({t.pos for t in isl.trees} | set(g.rock_cells))
+        assert not set(g.flowers) & g.fixtures  # nothing grows on the plaza or a homesite
+
+
 def test_grid_tools_gate_movement():
     from llmabm.island.grid import GridSpace
     from llmabm.island.body import Bodies
@@ -230,6 +250,7 @@ def test_grid_tools_gate_movement():
     action = {"do": "donate", "item": "x"} if far == "museum" else {"do": "sell", "items": {}} if far == "Nook's Cranny" \
         else {"do": "buy", "shop": "able", "item": "x"} if far == "Able Sisters" else {"do": "pay_loan", "bells": 1}
     isl.home["A"] = next(sid for sid, s in g.sites.items() if s["door"] in bare)
+    isl.v["A"].inventory["vaulting pole"] = isl.v["A"].inventory["ladder"] = 0  # start with no way across
     bodies = Bodies(isl, g)
     bodies.place_at_home("A")
     _, _, _, err = g.resolve(isl, "A", action, bodies.b["A"].pos, bodies.tools_of("A"), random.Random(0))
@@ -462,6 +483,84 @@ def test_decorating_has_limited_room():
     assert isl._do_undecorate(vil, {"item": "log stool"}, 10)[0]
     assert len(vil.interior) == room - 1 and vil.inventory["log stool"] == 3
     assert not isl._do_decorate(vil, {"item": "wood"}, 10)[0]  # only furniture goes inside
+
+
+def test_tools_wear_out_and_recipe_cards_replace_them():
+    isl = _island(("A", "B"))
+    a, b = isl.v["A"], isl.v["B"]
+    tools = isl.w["tools"]["start_with"]
+    assert all(a.inventory[t] == 1 for t in tools) and len(tools) == 6
+    assert not set(isl.tool_recipes()) & a.recipes  # nobody knows how to make tools at the start
+    isl.w["tools"]["uses"] = 3
+    assert isl.use_tool(a, "axe") is None and isl.use_tool(a, "axe") is None
+    assert isl.use_tool(a, "axe") == "your axe broke" and a.inventory["axe"] == 0
+    # Tool recipe cards are always at the Cranny; the daily card is never a tool.
+    for _ in range(20):
+        isl.new_day()
+        assert isl.cranny_recipe not in isl.tool_recipes()
+        assert set(isl.tool_recipes()) <= set(isl.recipe_cards_for_sale())
+    a.bells = 5000
+    ok, msg = isl.act("A", {"do": "buy", "shop": "cranny", "item": "axe recipe"}, 10)
+    assert ok and "learned the axe recipe" in msg and "axe" in a.recipes and a.bells == 4500
+    ok, msg = isl.act("A", {"do": "buy", "shop": "cranny", "item": "axe recipe"}, 10)
+    assert ok and "kept the card" in msg and a.inventory["axe recipe"] == 1
+    # A spare card handed over teaches the recipe to someone who doesn't know it.
+    assert isl.transfer("A", "B", {"axe recipe": 1})[0]
+    assert "axe" in b.recipes and b.inventory["axe recipe"] == 0
+    # A worn tool stays worn when it changes hands; spares go first.
+    a.inventory["shovel"] = 2
+    isl.use_tool(a, "shovel")
+    assert isl.transfer("A", "B", {"shovel": 1})[0]
+    assert a.wear["shovel"] == [1] and sorted(b.wear["shovel"]) == [0, 0]
+    assert isl.transfer("A", "B", {"shovel": 1})[0]
+    assert sorted(b.wear["shovel"]) == [0, 0, 1] and a.inventory["shovel"] == 0
+
+
+def test_bodies_need_tools_and_wear_ladders_on_climbs():
+    isl, g, bodies = _grid_island()
+    rng = random.Random(0)
+    a = isl.v["A"]
+    a.inventory["axe"] = 0
+    pos = bodies.b["A"].pos
+    ok, msg = bodies.perform("A", {"do": "chop_wood"}, 10, rng)
+    assert not ok and msg == "you have no axe" and bodies.b["A"].pos == pos  # didn't set out
+    # A rock up a cliff: the trip there climbs with the ladder, and mining wears the shovel.
+    rock = next(i + 1 for i, c in enumerate(g.rock_cells) if c
+                and "ladder" in g.route_tools(pos, g.approach_cells(c)[0], bodies.tools_of("A")))
+    ok, msg = bodies.perform("A", {"do": "mine_rock", "rock": rock}, 10, rng)
+    assert ok, msg
+    assert a.wear["ladder"] == [1] and a.wear["shovel"] == [1]
+    bodies.go_home("A")
+    assert a.wear["ladder"] == [2]  # and back down again
+    isl.w["tools"]["uses"] = 3
+    ok, msg = bodies.perform("A", {"do": "mine_rock", "rock": rock}, 11, rng)
+    assert "your ladder broke" in msg and a.inventory["ladder"] == 0 and bodies.broke
+
+
+def test_letters_and_parcels_arrive_the_next_morning():
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock", verbose=False)
+        sim.run(1)
+        sim._open_log("a")
+        sim.hour = 20  # the plaza
+        isl, day = sim.isl, sim.isl.day
+        isl.mail = []  # only what this test sends
+        ari, bo = isl.v["Ari"], isl.v["Bo"]
+        ari.inventory["axe"] = 1
+        axes = bo.inventory["axe"]
+        sim._apply_evening(day, 0, "Ari", {"letters": [{"to": "Bo", "content": "hello from Ari"}],
+                                           "parcels": [{"to": "Bo", "items": {"axe": 1}, "note": "a spare"}],
+                                           "teach": [{"to": "Bo", "recipe": "log stool"}]})
+        assert ari.inventory["axe"] == 0 and bo.inventory["axe"] == axes  # in the post
+        assert not any("hello" in x for x in bo.inbox)
+        sim._deliver_mail(day + 1)
+        assert bo.inventory["axe"] == axes + 1 and not isl.mail
+        assert any("letter from Ari: hello from Ari" in x for x in bo.inbox)
+        assert any("parcel from Ari: 1 axe" in x for x in bo.inbox)
+        sim._raw_log.close()
+        run = load_run(Path(d) / "run")
+        assert run.of("parcel") and any(g["how"] == "by mail" for g in run.of("gift")) and not run.of("teach")
 
 
 def test_favors_are_settled_by_gifts():

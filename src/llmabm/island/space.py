@@ -23,6 +23,10 @@ class Space:
         """Walking distance from a to b with the given tools, or None if b can't be reached."""
         raise NotImplementedError
 
+    def route_tools(self, a: Point, b: Point, tools: frozenset[str]) -> frozenset[str]:
+        """Which movement tools the walk from a to b uses (they wear out with use)."""
+        return frozenset()
+
     def resolve(self, island, name: str, action: dict, pos, tools, rng):
         """Where an action happens: (place label, where to stand, extra action fields, error)."""
         raise NotImplementedError

@@ -59,8 +59,10 @@ flowchart TD
     end
 
     d0{"Day 0?"}
-    settle["Everyone lands at 05:00<br/>Tom Nook's tent on a random free homesite"]
+    settle["Everyone lands at 05:00<br/>Tom Nook's tent on a random free homesite<br/>one of each tool, no tool recipes"]
     arr[("events.jsonl: arrival x10")]
+    mail["Mail: yesterday's letters and parcels arrive<br/>new recipe cards are learned<br/>a parcel that doesn't fit waits"]
+    mev[("events.jsonl: gift, by mail")]
 
     subgraph window["Each planning window: 05-12, 12-19, 19-05"]
         who["Villagers awake in the window with actions left"]
@@ -106,14 +108,15 @@ flowchart TD
     ckpt[("checkpoint.pkl")]
 
     ds --> d0
-    d0 -- yes --> settle --> arr --> who
-    d0 -- no --> who
+    d0 -- yes --> settle --> arr --> mail
+    d0 -- no --> mail
+    mail --> mev --> who
     hours -- "next window" --> who
     hours -- "after 04:00" --> mem
     ann --> ckpt
 
     class plan,refl,isa,ann llm
-    class ds,arr,pl,snap,rf,enl,isaf,ckpt file
+    class ds,arr,mev,pl,snap,rf,enl,isaf,ckpt file
     class d0,habitq,afford,wq,wa gate
 ```
 
@@ -130,9 +133,9 @@ flowchart TD
         pwho["20:00: everyone awake who chose 'plaza: true'<br/>21:00: only those with new trade offers waiting"]
         pafford{"Enough energy?"}
         eve(["LLM: plaza<br/>rules without the action menu<br/>letters, board, offers waiting"])
-        papply["Answer offers: accept = trade happens, counter, reject<br/>letters to inboxes, a board post, new offers, recipes taught"]
+        papply["Answer offers: accept = trade swaps on the spot, counter, reject<br/>a board post, new offers<br/>letters and parcels leave now, arrive tomorrow morning"]
         pskip["Skips the plaza"]
-        pev[("events.jsonl: evening_turn, message, board<br/>offer, offer_update, trade, teach")]
+        pev[("events.jsonl: evening_turn, message, parcel<br/>board, offer, offer_update, trade")]
         pwho --> pafford
         pafford -- yes --> eve --> papply --> pev
         pafford -- no --> pskip --> pev
@@ -140,9 +143,10 @@ flowchart TD
 
     tick["Grid: bugs and fish shadows appear and leave"]
     order["Scheduled actions this hour<br/>ordered by walking distance, ties are luck"]
-    act["Body: find the target, walk there with the tools carried<br/>World: apply the rule, or say why it failed<br/>the hour is used either way"]
-    aev[("events.jsonl: action<br/>result, delta, pools_delta, position")]
-    free["Everyone else: asleep at home, at home,<br/>or a short walk"]
+    act["Body: no tool for it? fail without setting out<br/>find the target, walk there with the ladder and pole carried<br/>World: apply the rule, or say why it failed<br/>the hour is used either way"]
+    wear["Wear: the tool used, and the ladder or pole if the route climbed or jumped<br/>50 uses and it breaks"]
+    aev[("events.jsonl: action, tool_broke<br/>result, delta, pools_delta, position")]
+    free["Everyone else: asleep at home, at home,<br/>or a short walk, and the trip home wears the ladder or pole too"]
     look["Each awake villager sees what's within 8 tiles<br/>bugs, fish shadows, shells, dig spots"]
     sev[("events.jsonl: sighting, seen")]
     near["Who is near whom, neighbors notice<br/>each other heading out"]
@@ -173,7 +177,7 @@ flowchart TD
     social -- yes --> pwho
     social -- no --> tick
     pev --> tick
-    tick --> order --> act --> aev --> free --> look --> sev --> near
+    tick --> order --> act --> wear --> aev --> free --> look --> sev --> near
     near --> vq
     vq -- yes --> vin --> cafford
     vq -- no --> vno --> vev
@@ -202,7 +206,7 @@ can't be afforded isn't made.
 | call | who | when | system prompt | reply | if it can't be afforded | logged as |
 |---|---|---|---|---|---|---|
 | plan | each awake villager with actions left | 05:00, 12:00, 19:00, unless they chose habit | full rules + action menu | JSON: thoughts, actions, note, plaza / write / next | repeats yesterday | `plan` |
-| plaza | villagers who chose to go | 20:00; 21:00 only with new offers waiting | rules, no menu | JSON: thoughts, messages, board, offers, responses, teach, note | skips the plaza | `evening_turn` and more |
+| plaza | villagers who chose to go | 20:00; 21:00 only with new offers waiting | rules, no menu | JSON: thoughts, letters, board, offers, responses, parcels, note | skips the plaza | `evening_turn` and more |
 | notice | a villager with someone nearby, out of the house | any hour, up to 4 a day | short: persona, nightly page | JSON: thoughts, approach, opening line | too tired to talk | `encounter_decision` |
 | chat turn | the one who was approached, then back and forth | right after a notice or a visit | rules, no menu | JSON: thoughts, say, give, ask, note | just nods | `encounter` |
 | nightly page | villagers who chose to write | end of day | short: persona, nightly page | free text, up to 150 words | doesn't write; old page stays | `reflection` |
@@ -218,7 +222,7 @@ All in the run directory, `runs/<timestamp>_<scenario>_s<seed>/` or `--run-dir`.
 | file | written | what it holds |
 |---|---|---|
 | `manifest.json` | at the start; `days_completed` after each day | scenario, perturbed world, villagers, system prompts |
-| `events.jsonl` | as things happen, one JSON line each | everything: day_start, arrival, plan, action, sighting, seen, visit, encounter_decision, encounter, gift, favor_asked, favor_done, evening_turn, message, board, offer, offer_update, trade, teach, hour_state, snapshot, reflection, energy, isabelle_summary, run_start, run_end, resume |
+| `events.jsonl` | as things happen, one JSON line each | everything: day_start, arrival, plan, action, sighting, seen, visit, encounter_decision, encounter, gift, favor_asked, favor_done, evening_turn, message, parcel, board, offer, offer_update, trade, tool_broke, hour_state, snapshot, reflection, energy, isabelle_summary, run_start, run_end, resume |
 | `checkpoint.pkl` | after each day | the whole simulation, for `llmabm resume` |
 | `days/day_NNN_isabelle.md` | end of each day | Isabelle's report |
 | `prompts/dNNN_*_<name>.txt` | each LLM call, with `--log-prompts` | the exact system and user prompt |

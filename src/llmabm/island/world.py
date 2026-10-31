@@ -79,6 +79,11 @@ def sell_prices(w: dict) -> dict[str, int]:
                 p.setdefault(k, v // 4)
     for k, v in (w.get("clothing") or {}).items():
         p.setdefault(k, int(v["price"]) // 4)
+    # Recipe cards sell back at a quarter of what the Cranny charges for them.
+    items, cr = w.get("items") or {}, w["shops"]["cranny"]
+    for r in w["recipes"]:
+        tool = items.get(r, {}).get("kind") == "tool"
+        p[r + " recipe"] = int(cr.get("tool_recipe_price", 500) if tool else cr.get("recipe_price", 2000)) // 4
     return p
 
 
@@ -120,6 +125,17 @@ ORDINANCE_TEXT = {
 }
 
 
+# Which tool each action wears out. The ladder and vaulting pole wear out on trips that need them.
+TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
+            "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
+MOVEMENT_TOOLS = ("ladder", "vaulting pole")
+CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
+
+
+def recipe_of_card(item: str) -> str | None:
+    return item[: -len(CARD)] if item.endswith(CARD) else None
+
+
 # Who you can ask, and where to find them.
 NPCS = {"tom nook": ("Resident Services", "resident_services"), "isabelle": ("Resident Services", "resident_services"),
         "blathers": ("museum", "museum"), "timmy": ("Nook's Cranny", "cranny"), "tommy": ("Nook's Cranny", "cranny"),
@@ -156,6 +172,7 @@ class Villager:
     sleeps: int = 24      # clock hour they go to bed; values past 24 or below `wakes` mean after midnight
     self_doc: str = ""    # private free-form page, rewritten nightly when reflection is on
     wearing: dict = field(default_factory=dict)  # slot -> clothing item; others can see it
+    wear: dict = field(default_factory=dict)  # tool -> uses so far of each one they carry, in-use first
     interior: list = field(default_factory=list)  # furniture inside their home; visitors see it
 
     def items(self) -> int:
@@ -197,11 +214,12 @@ class Island:
         self.able_stock: dict[str, int] = {}
         self.day = -1
         self.v: dict[str, Villager] = {n: Villager(n, bells=start_bells) for n in villager_names}
-        all_recipes = list(world["recipes"])
+        starters = set(world.get("starter_recipes", []))
+        pool = [r for r in world["recipes"] if r not in starters and r not in self.tool_recipes()]
         for vil in self.v.values():
-            starters = set(world.get("starter_recipes", []))
-            pool = [r for r in all_recipes if r not in starters]
             vil.recipes = set(rng.sample(pool, min(world["recipes_known_at_start"], len(pool)))) | starters
+            for t in (world.get("tools") or {}).get("start_with", []):
+                vil.inventory[t] += 1
         self.collected: dict[str, Counter] = {n: Counter() for n in villager_names}  # resource class -> count
         self.ordinance = "none"
         self.pending_ordinance: tuple[str, str] | None = None  # (ordinance, who set it), effective next morning
@@ -212,6 +230,7 @@ class Island:
         self.announcement: str | None = None  # LLM-written morning announcement, when enabled
         self.favors: list[dict] = []          # requests villagers made of each other
         self.favors_done_today: list[dict] = []
+        self.mail: list[dict] = []            # letters and parcels on their way; delivered the next morning
         self.where_notes: dict[str, str] = {}  # per villager: getting around (tools, what is reachable)
         self.sites: dict = {}  # homesite id -> {area, at}; filled in from the tile island
         self.home: dict[str, str | None] = {n: None for n in villager_names}       # homesite id
@@ -291,6 +310,94 @@ class Island:
     def space(self, vil: Villager) -> int:
         return self.capacity(vil) - vil.items()
 
+    # --- tools ------------------------------------------------------------
+    def is_tool(self, item: str) -> bool:
+        return (self.w.get("items") or {}).get(item, {}).get("kind") == "tool"
+
+    def tool_recipes(self) -> list[str]:
+        return [r for r in self.w["recipes"] if self.is_tool(r)]
+
+    def _wear(self, vil: Villager, tool: str) -> list[int]:
+        """Uses so far of each `tool` the villager carries, most worn (the one in use) first.
+        Kept in step with the inventory: new ones start at 0, and the least worn leave first."""
+        lst = sorted(vil.wear.get(tool, []), reverse=True)
+        lst = (lst + [0] * vil.inventory[tool])[: vil.inventory[tool]]
+        vil.wear[tool] = lst
+        return lst
+
+    def use_tool(self, vil: Villager, tool: str) -> str | None:
+        """One use of a tool. Returns a note if it broke."""
+        lst = self._wear(vil, tool)
+        if not lst:
+            return None
+        lst[0] += 1
+        if lst[0] < int((self.w.get("tools") or {}).get("uses", 50)):
+            return None
+        lst.pop(0)
+        vil.inventory[tool] -= 1
+        return f"your {tool} broke"
+
+    # --- moving things between villagers -------------------------------------
+    def take_items(self, vil: Villager, items: dict) -> dict | None:
+        """Take items (and bells) out of a villager's pockets, carrying tool wear along.
+        Spare tools go first. Returns a parcel, or None if they don't have it all."""
+        items = {str(k).lower(): int(n) for k, n in items.items() if int(n) > 0}
+        if not items or any((vil.bells if k == "bells" else vil.inventory[k]) < n for k, n in items.items()):
+            return None
+        wear = {}
+        for k, n in items.items():
+            if k == "bells":
+                vil.bells -= n
+                continue
+            if self.is_tool(k):
+                lst = self._wear(vil, k)
+                wear[k], vil.wear[k] = lst[len(lst) - n:], lst[: len(lst) - n]
+            vil.inventory[k] -= n
+        return {"items": items, "wear": wear}
+
+    def put_items(self, vil: Villager, parcel: dict) -> tuple[dict, dict]:
+        """Put a parcel in a villager's pockets, as much as fits. Returns (delivered, left over).
+        Recipe cards for recipes they don't know are learned on the spot."""
+        got, left = {}, {}
+        for k, n in parcel["items"].items():
+            if k == "bells":
+                vil.bells += n
+                got[k] = n
+                continue
+            fit = min(n, self.space(vil))
+            if fit:
+                if self.is_tool(k):
+                    worn = parcel.get("wear", {}).get(k, [])[:fit]
+                    vil.wear[k] = sorted(self._wear(vil, k) + worn + [0] * (fit - len(worn)), reverse=True)
+                vil.inventory[k] += fit
+                got[k] = fit
+            if n - fit:
+                left[k] = n - fit
+        self.read_cards(vil)
+        return got, ({"items": left, "wear": {k: parcel.get("wear", {}).get(k, [])[got.get(k, 0):] for k in left}}
+                     if left else {})
+
+    def read_cards(self, vil: Villager) -> list[str]:
+        """Learn the recipe on any card the villager doesn't know yet (using the card up)."""
+        learned = []
+        for k in list(vil.inventory):
+            r = recipe_of_card(k)
+            if r in self.w["recipes"] and r not in vil.recipes and vil.inventory[k] > 0:
+                vil.recipes.add(r)
+                vil.inventory[k] -= 1
+                learned.append(r)
+        return learned
+
+    def give_card(self, vil: Villager, recipe: str) -> str:
+        """A recipe card reaches a villager: learned if new, kept as a spare if not."""
+        if recipe not in vil.recipes:
+            vil.recipes.add(recipe)
+            return f"learned the {recipe} recipe"
+        if self.space(vil) < 1:
+            return f"already knew the {recipe} recipe, and had no room for the card"
+        vil.inventory[recipe + CARD] += 1
+        return f"already knew the {recipe} recipe, so you kept the card"
+
     def give_items(self, vil: Villager, items: Counter) -> Counter:
         """Add what fits; return what was actually added."""
         got = Counter()
@@ -345,7 +452,8 @@ class Island:
         self.cranny_stock = {**(cr.get("always") or {}),
                              **dict(self.rng.sample(seeds, min(len(seeds), cr.get("seeds_daily", 0)))),
                              **dict(self.rng.sample(sorted(cr["stock_pool"].items()), cr["sells_daily"]))}
-        self.cranny_recipe = self.rng.choice(sorted(self.w["recipes"])) if cr.get("sells_recipe_daily") else None
+        cards = sorted(set(self.w["recipes"]) - set(self.tool_recipes()))
+        self.cranny_recipe = self.rng.choice(cards) if cr.get("sells_recipe_daily") else None
         if self.w.get("clothing"):
             clothes = sorted((k, int(v["price"])) for k, v in self.w["clothing"].items())
         else:
@@ -594,7 +702,7 @@ class Island:
         return True, f"walked over to {host}'s home"
 
     def transfer(self, giver: str, taker: str, items: dict) -> tuple[bool, str]:
-        """Hand items (or bells) from one villager to another, in person or by mail."""
+        """Hand items (or bells) from one villager to another, in person."""
         g, t = self.v[giver], self.v[taker]
         items = {str(k).lower(): int(n) for k, n in items.items() if int(n) > 0}
         if not items:
@@ -605,13 +713,7 @@ class Island:
                 return False, f"{giver} doesn't have {n} {k}"
         if self.space(t) < sum(n for k, n in items.items() if k != "bells"):
             return False, f"{taker} has no room"
-        for k, n in items.items():
-            if k == "bells":
-                g.bells -= n
-                t.bells += n
-            else:
-                g.inventory[k] -= n
-                t.inventory[k] += n
+        self.put_items(t, self.take_items(g, items))
         self._settle_favors(giver, taker, items)
         return True, ", ".join(f"{n} {k}" for k, n in items.items())
 
@@ -649,11 +751,8 @@ class Island:
         if a.get("none_seen") and self.shells_left > 0:
             return True, "walked along the beach but saw no shells around there"
         if self.rng.random() < isl["bottle_chance"]:
-            unknown = sorted(set(self.w["recipes"]) - vil.recipes)
-            if unknown:
-                r = self.rng.choice(unknown)
-                vil.recipes.add(r)
-                msgs.append(f"found a message bottle with the {r} recipe")
+            r = self.rng.choice(sorted(set(self.w["recipes"]) - set(self.tool_recipes())))
+            msgs.append(f"found a message bottle with a recipe card: {self.give_card(vil, r)}")
         n = min(isl["shells_per_action"], self.shells_left)
         if n == 0:
             return True, "; ".join(msgs + ["the beach is picked clean today"])
@@ -844,16 +943,27 @@ class Island:
             msg += " (" + "; ".join(problems) + ")"
         return bool(sold), msg
 
+    def recipe_cards_for_sale(self) -> dict[str, int]:
+        """Recipe cards at Nook's Cranny today: every tool, plus the day's one other card."""
+        cr, f = self.w["shops"]["cranny"], self.price_factor()
+        out = {r: int(round(cr.get("tool_recipe_price", 500) * f)) for r in self.tool_recipes()}
+        if self.cranny_recipe:
+            out[self.cranny_recipe] = int(round(cr["recipe_price"] * f))
+        return out
+
     def _do_buy(self, vil, a, hour):
         shop = str(a.get("shop", "cranny")).lower()
         item = str(a.get("item", "")).lower()
-        if shop == "cranny" and self.cranny_recipe and item in (self.cranny_recipe, f"{self.cranny_recipe} recipe"):
-            price = int(round(self.w["shops"]["cranny"]["recipe_price"] * self.price_factor()))
+        cards = self.recipe_cards_for_sale() if shop == "cranny" else {}
+        r = recipe_of_card(item) or (item if item in cards else None)
+        if r in cards:
+            price = cards[r]
             if vil.bells < price:
-                return False, f"the {self.cranny_recipe} recipe costs {price} bells; you have {vil.bells}"
+                return False, f"the {r} recipe card costs {price} bells; you have {vil.bells}"
+            if r in vil.recipes and self.space(vil) < 1:
+                return False, "pockets full"
             vil.bells -= price
-            vil.recipes.add(self.cranny_recipe)
-            return True, f"bought the {self.cranny_recipe} recipe for {price} bells"
+            return True, f"bought the {r} recipe card for {price} bells; {self.give_card(vil, r)}"
         stock = self.cranny_stock if shop == "cranny" else self.able_stock if shop == "able" else None
         if stock is None:
             return False, "shop must be 'cranny' or 'able'"
@@ -989,8 +1099,10 @@ class Island:
             mine = {k: self.sell_price(k) for k in sorted(vil.inventory) if vil.inventory[k] > 0}
             vil.prices_seen.update(mine)
             offer = ", ".join(f"{k} {p}" for k, p in mine.items()) or "nothing, your pockets are empty"
+            tools = ", ".join(self.tool_recipes())
             text = (f"Timmy and Tommy: We buy almost anything at a fixed price, and sell a small stock that changes "
-                    f"every day. For what you're carrying we'd pay: {offer}.")
+                    f"every day, plus one recipe card. Recipe cards for tools ({tools}) are always in stock. "
+                    f"For what you're carrying we'd pay: {offer}.")
         else:
             text = "The Able Sisters: We sell clothes, a few different ones every day. Others see what you wear."
         return True, f"asked {text}"

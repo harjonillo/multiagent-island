@@ -36,8 +36,9 @@ water and cliff edges.
 **Getting around.** Beach and grass are walkable. Trees, rocks, buildings, homes, placed furniture
 and fences block their tiles; the plaza doesn't. Going up or down one cliff tier needs a **ladder**.
 Crossing the river needs a **vaulting pole**, which clears up to 3 tiles of water,
-until the bridge is built. The pond and the sea can never be crossed. Everyone knows both recipes
-from day 0 but has to gather the wood. The bridge goes across 2 tiles of river on lower ground, centre, near Resident Services; it costs
+until the bridge is built. The pond and the sea can never be crossed. Everyone starts with both,
+and they wear out (see Tools). Trees, rocks, buildings (the plaza too) and homes always keep at
+least one free tile between them. The bridge goes across 2 tiles of river on lower ground, centre, near Resident Services; it costs
 98,000 bells and, once funded, opens 3 more rocks and
 10 more hardwood trees.
 
@@ -45,9 +46,9 @@ What you can reach from Resident Services:
 
 | carrying | land | rocks | trees | buildings | homesites |
 |---|---|---|---|---|---|
-| no tools | 23% | 2 of 6 | 9 of 40 | 2 of 6 | 5 of 14 |
-| vaulting pole | 60% | 3 of 6 | 16 of 40 | 6 of 6 | 14 of 14 |
-| ladder | 82% | 6 of 6 | 39 of 40 | 3 of 6 | 12 of 14 |
+| no tools | 22% | 3 of 6 | 3 of 40 | 2 of 6 | 6 of 14 |
+| vaulting pole | 59% | 4 of 6 | 22 of 40 | 6 of 6 | 14 of 14 |
+| ladder | 82% | 6 of 6 | 35 of 40 | 3 of 6 | 13 of 14 |
 | both | 94% | 6 of 6 | 40 of 40 | 6 of 6 | 14 of 14 |
 
 **Buildings**
@@ -62,7 +63,7 @@ What you can reach from Resident Services:
 | airport | 6 x 4 | lower ground, south |  |
 
 **Homesites.** 14 sites of 5 x 4 tiles on the lower ground, at least
-9 tiles apart: centre 2; east 3; south 2; southeast 1; southwest 2; west 4.
+9 tiles apart: centre 2; east 3; south 1; southeast 2; southwest 2; west 4.
 Villagers whose homes are in the same area are neighbors and notice each other heading out. On day 0
 each villager gets one at random; moving costs 10,000 bells.
 
@@ -70,21 +71,21 @@ each villager gets one at random; moving costs 10,000 bells.
 
 | tier | hardwood | fruit |
 |---|---|---|
-| lower ground | 10 | 6 |
-| the middle cliff | 15 | 3 |
-| the top cliff | 5 | 1 |
+| lower ground | 17 | 5 |
+| the middle cliff | 11 | 4 |
+| the top cliff | 2 | 1 |
 
 **Rocks** (6; a broken rock turns up somewhere new after
 3 days)
 
 | rock | where |
 |---|---|
-| 1 | the middle cliff, east |
-| 2 | lower ground, centre |
-| 3 | the middle cliff, centre |
-| 4 | lower ground, southwest |
-| 5 | lower ground, east |
-| 6 | the middle cliff, centre |
+| 1 | lower ground, southeast |
+| 2 | the middle cliff, northwest |
+| 3 | the top cliff, northeast |
+| 4 | lower ground, centre |
+| 5 | lower ground, southeast |
+| 6 | lower ground, southeast |
 
 **Flowers.** 6 patches of wild flowers at the start, which bugs visit.
 
@@ -107,6 +108,23 @@ morning, and a villager only knows the ones they have seen. Fish and bugs come a
 | saplings and fruit | planted, they grow into trees in 5 days |  |
 | flower seeds | bloom in 3 days |  |
 
+## Tools
+
+Everyone starts with one of each, and nobody knows how to make them. Each breaks after 50
+uses. Without the tool an action fails before the villager sets out. Villagers aren't told how worn a
+tool is; they find out when it breaks. A replacement takes the tool's recipe card (always at Nook's
+Cranny, 500 bells) and materials. Spare tools can be
+handed over or mailed, and a worn tool stays worn.
+
+| tool | worn by | made from |
+|---|---|---|
+| shovel | mine_rock, dig_fossil, dig_stump, break_rock | 5 hardwood |
+| axe | chop_wood, chop_down_tree | 3 stone, 1 iron nugget |
+| fishing rod | fish | 4 wood |
+| net | catch_bug | 4 softwood |
+| ladder | each trip whose route climbs a cliff | 4 wood, 4 hardwood, 4 softwood |
+| vaulting pole | each trip whose route jumps the river | 5 wood |
+
 ## Items
 
 ### Materials (gathered)
@@ -123,17 +141,23 @@ morning, and a villager only knows the ones they have seen. Fish and bugs come a
 | apple | shake_tree; eat one to break_rock | 100 |
 | sapling | Nook's Cranny | 160 |
 
-### Recipes (22)
+### Recipes (26)
 
 Everyone knows the ones marked ★ from day 0, plus 3 drawn at random from the
-rest. More come from the Cranny's daily recipe card, message bottles on the beach, and other villagers
-teaching them at the plaza. Furniture can go inside a home (visitors see it) or outside, where it
-blocks its tiles. Fences come out in pieces of one tile.
+rest (never a tool). More come on recipe cards: the Cranny's tool cards and its one other card a
+day, message bottles on the beach, and other villagers. A card for a recipe you don't know is
+learned on the spot; a card for one you know stays in your pockets to give, mail, trade or sell.
+Furniture can go inside a home (visitors see it) or outside, where it blocks its tiles. Fences come
+out in pieces of one tile.
 
 | recipe | needs | sells for | notes |
 |---|---|---|---|
-| ★ ladder | 4 wood, 4 hardwood, 4 softwood | 600 | tool |
-| ★ vaulting pole | 5 wood | 300 | tool |
+| shovel | 5 hardwood | 200 | tool |
+| axe | 3 stone, 1 iron nugget | 250 | tool |
+| fishing rod | 4 wood | 150 | tool |
+| net | 4 softwood | 150 | tool |
+| ladder | 4 wood, 4 hardwood, 4 softwood | 600 | tool |
+| vaulting pole | 5 wood | 300 | tool |
 | log stool | 3 wood | 360 |  |
 | log bench | 4 wood, 2 hardwood | 480 | 2 x 1 tiles |
 | wooden chair | 4 wood, 2 softwood | 540 |  |
@@ -173,7 +197,8 @@ Shop goods sell back for a quarter of their price.
 | record player | Nook's Cranny | 3 a day | 9,800 | furniture |
 | simple wooden fence | Nook's Cranny | 3 a day | 100 | fence, makes a 1-tile piece |
 | iron fence | Nook's Cranny | 3 a day | 280 | fence, makes a 1-tile piece |
-| one DIY recipe card | Nook's Cranny | 1 a day | 2,000 | learn the recipe |
+| every tool's recipe card | Nook's Cranny | always in stock | 500 | learn to make that tool |
+| one other recipe card | Nook's Cranny | 1 a day, never a tool | 2,000 | learn the recipe |
 | straw hat | Able Sisters | 4 a day | 800 | hat: a wide-brimmed straw hat |
 | sundress | Able Sisters | 4 a day | 1,400 | dress: a light cotton sundress |
 | denim jacket | Able Sisters | 4 a day | 2,200 | top: a faded denim jacket |

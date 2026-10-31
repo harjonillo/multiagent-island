@@ -136,8 +136,9 @@ water and cliff edges.
 **Getting around.** Beach and grass are walkable. Trees, rocks, buildings, homes, placed furniture
 and fences block their tiles; the plaza doesn't. Going up or down one cliff tier needs a **ladder**.
 Crossing the river needs a **vaulting pole**, which clears up to {gc['pole_max_width']} tiles of water,
-until the bridge is built. The pond and the sea can never be crossed. Everyone knows both recipes
-from day 0 but has to gather the wood. The bridge goes {bridge}, near Resident Services; it costs
+until the bridge is built. The pond and the sea can never be crossed. Everyone starts with both,
+and they wear out (see Tools). Trees, rocks, buildings (the plaza too) and homes always keep at
+least one free tile between them. The bridge goes {bridge}, near Resident Services; it costs
 {n(br['cost'])} bells and, once funded, opens {br['unlocks'].get('rocks', 0)} more rocks and
 {br['unlocks'].get('hardwood_trees', 0)} more hardwood trees.
 
@@ -225,7 +226,10 @@ def items_section(w: dict) -> str:
             if info.get("outdoor") is False:
                 what += ", indoor only"
             shop_rows.append([k, "Nook's Cranny", note, n(v), what])
-    shop_rows.append([f"one DIY recipe card", "Nook's Cranny", "1 a day", n(cr["recipe_price"]), "learn the recipe"])
+    shop_rows.append([f"every tool's recipe card", "Nook's Cranny", "always in stock", n(cr.get("tool_recipe_price", 500)),
+                      "learn to make that tool"])
+    shop_rows.append([f"one other recipe card", "Nook's Cranny", "1 a day, never a tool", n(cr["recipe_price"]),
+                      "learn the recipe"])
     for k, v in (w.get("clothing") or {}).items():
         shop_rows.append([k, "Able Sisters", f"{ab['sells_daily']} a day", n(v["price"]), f"{v['slot']}: {v['description']}"])
 
@@ -256,9 +260,11 @@ def items_section(w: dict) -> str:
 ### Recipes ({len(w['recipes'])})
 
 Everyone knows the ones marked ★ from day 0, plus {w['recipes_known_at_start']} drawn at random from the
-rest. More come from the Cranny's daily recipe card, message bottles on the beach, and other villagers
-teaching them at the plaza. Furniture can go inside a home (visitors see it) or outside, where it
-blocks its tiles. Fences come out in pieces of one tile.
+rest (never a tool). More come on recipe cards: the Cranny's tool cards and its one other card a
+day, message bottles on the beach, and other villagers. A card for a recipe you don't know is
+learned on the spot; a card for one you know stays in your pockets to give, mail, trade or sell.
+Furniture can go inside a home (visitors see it) or outside, where it blocks its tiles. Fences come
+out in pieces of one tile.
 
 {table(["recipe", "needs", "sells for", "notes"], rec_rows)}
 
@@ -285,6 +291,24 @@ Blathers takes the first of each species. Names below are the unperturbed ones; 
 {shells}
 
 </details>
+"""
+
+
+def tools_section(w: dict) -> str:
+    t, rec = w["tools"], w["recipes"]
+    wears = {"shovel": "mine_rock, dig_fossil, dig_stump, break_rock", "axe": "chop_wood, chop_down_tree",
+             "fishing rod": "fish", "net": "catch_bug", "ladder": "each trip whose route climbs a cliff",
+             "vaulting pole": "each trip whose route jumps the river"}
+    rows = [[k, wears.get(k, ""), needs(rec[k]["needs"]) if k in rec else ""] for k in t["start_with"]]
+    return f"""## Tools
+
+Everyone starts with one of each, and nobody knows how to make them. Each breaks after {t['uses']}
+uses. Without the tool an action fails before the villager sets out. Villagers aren't told how worn a
+tool is; they find out when it breaks. A replacement takes the tool's recipe card (always at Nook's
+Cranny, {n(w['shops']['cranny'].get('tool_recipe_price', 500))} bells) and materials. Spare tools can be
+handed over or mailed, and a worn tool stays worn.
+
+{table(["tool", "worn by", "made from"], rows)}
 """
 
 
@@ -346,6 +370,7 @@ def main() -> None:
         "",
         map_section(w, g, isl, args.seed),
         daily_section(w),
+        tools_section(w),
         items_section(w),
         services_section(w),
         perturb_section(),

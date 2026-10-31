@@ -1,5 +1,5 @@
 """Offline villager policy for the mock backend. Random but valid-looking, so every
-code path (scarcity, crafting, selling, trades, counters, teaching) gets exercised."""
+code path (scarcity, crafting, selling, trades, counters, parcels, tools) gets exercised."""
 
 from __future__ import annotations
 
@@ -39,6 +39,7 @@ def _neighbors(prompt: str) -> list[str]:
     return [x.strip() for x in m.group(1).split(",")] if m else []
 
 
+_TOOLS = ("shovel", "axe", "fishing rod", "net", "ladder", "vaulting pole")
 _FURNITURE = ("log stool", "campfire", "stone stool", "wooden chair", "log bench", "wooden table", "small lamp")
 
 
@@ -50,7 +51,10 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
     hours.sort(key=window.index)
     inv, recipes, bells = _inventory(prompt), _recipes(prompt), _bells(prompt)
     acts = []
-    for _ in range(n):
+    missing = [t for t in _TOOLS if t not in inv]
+    for t in missing[:1]:  # replace a broken tool: craft it if you know how, else buy the recipe card
+        acts.append({"do": "craft", "recipe": t} if t in recipes else {"do": "buy", "shop": "cranny", "item": f"{t} recipe"})
+    for _ in range(n - len(acts)):
         r = rng.random()
         if r < 0.12 and inv:
             k = rng.choice(list(inv))
@@ -58,8 +62,7 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
         elif r < 0.20 and inv:
             acts.append({"do": "donate", "item": rng.choice(list(inv))})
         elif r < 0.27 and recipes:
-            tool = [t for t in ("vaulting pole", "ladder") if t in recipes and t not in inv]
-            acts.append({"do": "craft", "recipe": tool[0] if tool and rng.random() < 0.6 else rng.choice(recipes)})
+            acts.append({"do": "craft", "recipe": rng.choice(recipes)})
         elif r < 0.30 and bells > 2000:
             acts.append({"do": "contribute_bridge", "bells": rng.randint(500, bells // 2)})
         elif r < 0.32:
@@ -119,7 +122,7 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
     others = re.search(r"^Other villagers: (.*)$", prompt, re.M).group(1).split(", ")
     inv, recipes = _inventory(prompt), _recipes(prompt)
     offer_ids = re.findall(r"^\[(o\d+)\]", prompt, re.M)
-    out = {"messages": [], "board": "", "offers": [], "responses": [], "teach": [], "note": ""}
+    out = {"letters": [], "board": "", "offers": [], "responses": [], "parcels": [], "note": ""}
     for oid in offer_ids:
         dec = rng.choice(["accept", "accept", "reject", "counter"])
         resp = {"offer": oid, "decision": dec, "note": ""}
@@ -133,7 +136,7 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
         out["responses"].append(resp)
     if "round 0" in prompt:
         if rng.random() < 0.5:
-            out["messages"].append({"to": rng.choice(others), "content": rng.choice(
+            out["letters"].append({"to": rng.choice(others), "content": rng.choice(
                 ["the rocks were empty by the time I got there", "caught something nice in the river today",
                  "does anyone know which rock gives bells?", "want to trade?"])})
         if rng.random() < 0.15:
@@ -141,8 +144,10 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
         if inv and rng.random() < 0.4:
             k = rng.choice(list(inv))
             out["offers"].append({"to": rng.choice(others), "give": {k: 1}, "want": {"bells": rng.choice([100, 400, 900, 2000])}, "note": "fair price?"})
-        if recipes and rng.random() < 0.2:
-            out["teach"].append({"to": rng.choice(others), "recipe": rng.choice(recipes)})
+        spare = [k for k in inv if k.endswith(" recipe") or (inv[k] > 1 and k in _TOOLS)]
+        if (spare or inv) and rng.random() < 0.2:
+            k = rng.choice(spare or list(inv))
+            out["parcels"].append({"to": rng.choice(others), "items": {k: 1}, "note": "thought you could use this"})
     return json.dumps(out)
 
 

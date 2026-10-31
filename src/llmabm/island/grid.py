@@ -49,6 +49,7 @@ class GridSpace(Space):
         self.terrain = [[SEA] * self.W for _ in range(self.H)]
         self.tier = [[0] * self.W for _ in range(self.H)]
         self.blocked: set[Cell] = set()          # buildings, trees, rocks
+        self.fixtures: set[Cell] = set()         # every building (the plaza too) and homesite, for spacing
         self.buildings: dict[str, dict] = {}     # name -> {cells, door}
         self.sites: dict[str, dict] = {}         # homesite id -> {cells, door, area}
         self.rock_cells: list[Cell | None] = []   # index = rock number - 1; None while a broken rock is gone
@@ -175,7 +176,8 @@ class GridSpace(Space):
             for x in range(x0 - clearance, x0 + w + clearance):
                 if not (0 <= x < self.W and 0 <= y < self.H):
                     return False
-                if self.terrain[y][x] != GRASS or self.tier[y][x] not in tiers or (x, y) in self.blocked:
+                if (self.terrain[y][x] != GRASS or self.tier[y][x] not in tiers or (x, y) in self.blocked
+                        or (x, y) in self.fixtures):
                     return False
         return True
 
@@ -190,6 +192,7 @@ class GridSpace(Space):
         for x0, y0 in self._spiral(at[0] * self.W, at[1] * self.H):
             if self._footprint_ok(x0, y0, w, h, tiers):
                 cells = [(x, y) for y in range(y0, y0 + h) for x in range(x0, x0 + w)]
+                self.fixtures.update(cells)
                 if blocking:
                     self.blocked.update(cells)
                 door = (x0 + w // 2, y0 + h)  # the tile in front of the entrance
@@ -220,6 +223,7 @@ class GridSpace(Space):
                 continue
             cells = [(x, y) for y in range(y0, y0 + 4) for x in range(x0, x0 + 5)]
             self.blocked.update(cells)
+            self.fixtures.update(cells)
             sid = f"site-{len(self.sites) + 1}"
             door = (x0 + 2, y0 + 4)
             self.sites[sid] = {"cells": cells, "door": door, "centre": centre, "area": self.region(door)}
@@ -244,23 +248,24 @@ class GridSpace(Space):
 
     # --- objects ------------------------------------------------------------
     def spot_ok_for_object(self, cell: Cell, others: set[Cell]) -> bool:
-        """ASSUMPTION: trees and rocks need their 8 neighbours free of other trees, rocks and
-        buildings, and can't sit next to water or on a cliff edge."""
+        """ASSUMPTION: trees and rocks need their 8 neighbours free of other trees, rocks, buildings
+        (the plaza too) and homes, so every fixture has at least one free tile around it. They
+        can't sit on an entrance, next to water or on a cliff edge."""
         x, y = cell
         if not (0 < x < self.W - 1 and 0 < y < self.H - 1):
             return False
-        if self.terrain[y][x] != GRASS or cell in self.blocked or cell in others:
+        fixtures = getattr(self, "fixtures", set())
+        if self.terrain[y][x] != GRASS or cell in self.blocked or cell in others or cell in fixtures:
             return False
         t = self.tier[y][x]
         for dx, dy in N8:
             n = (x + dx, y + dy)
             if self.terrain[n[1]][n[0]] in WATER or self.tier[n[1]][n[0]] != t:
                 return False
-            if n in others or n in self.blocked:
+            if n in others or n in self.blocked or n in fixtures:
                 return False
-        if any(n == s["door"] for s in self.sites.values() for n in [cell]):
-            return False
-        return True
+        doors = {s["door"] for s in self.sites.values()} | {b["door"] for b in self.buildings.values()}
+        return cell not in doors
 
     def attach(self, island) -> None:
         """Give every tree and rock on the island a tile, and pin them in place."""
@@ -301,7 +306,8 @@ class GridSpace(Space):
             for _ in range(self.rng.randint(3, 6)):
                 c = (cx + self.rng.randint(-2, 2), cy + self.rng.randint(-2, 2))
                 if (0 <= c[0] < self.W and 0 <= c[1] < self.H and self.terrain[c[1]][c[0]] == GRASS
-                        and c not in self.blocked and c not in taken and c not in self.flowers):
+                        and c not in self.blocked and c not in taken and c not in self.flowers
+                        and c not in self.fixtures):
                     self.flowers[c] = {"kind": kind, "owner": None, "bloom_day": 0}
 
     def _occupied(self, island) -> set:
@@ -365,48 +371,74 @@ class GridSpace(Space):
         x, y = c
         return 1 if self.terrain[y][x] in (SAND, BRIDGE) else self.tier[y][x]
 
+    def _lookups(self):
+        """Walkability and level of every tile, rebuilt only when the island changes."""
+        cached = self.__dict__.get("_lk")
+        if cached and cached[0] == self._version:
+            return cached[1], cached[2]
+        walk = [[self.terrain[y][x] in (SAND, GRASS, BRIDGE) and (x, y) not in self.blocked for x in range(self.W)]
+                for y in range(self.H)]
+        lvl = [[1 if self.terrain[y][x] in (SAND, BRIDGE) else self.tier[y][x] for x in range(self.W)]
+               for y in range(self.H)]
+        self.__dict__["_lk"] = (self._version, walk, lvl)
+        return walk, lvl
+
     def distances(self, start: Cell, tools: frozenset) -> dict[Cell, float]:
         key = (start, tools, self._version)
         if key in self._cache:
             return self._cache[key]
+        used_cache = self.__dict__.setdefault("_used", {})
         if len(self._cache) > 400:
             self._cache.clear()
+            used_cache.clear()
         ladder, pole = "ladder" in tools, "vaulting pole" in tools
         pole_w = int(self.cfg["pole_max_width"])
+        W, H, terrain, paths, path_cost = self.W, self.H, self.terrain, self.paths, self.path_cost
+        walk, lvl = self._lookups()
         dist = {start: 0.0}
+        used: dict[Cell, frozenset] = {start: frozenset()}  # tools the best route to each cell climbs or jumps with
+        none, by_ladder, by_pole = frozenset(), frozenset({"ladder"}), frozenset({"vaulting pole"})
         pq = [(0.0, start)]
         while pq:
             d, c = heapq.heappop(pq)
             if d > dist.get(c, 1e18):
                 continue
             x, y = c
-            lc = self._level(c)
+            lc = lvl[y][x]
             for dx, dy in N4:
-                n = (x + dx, y + dy)
-                if not (0 <= n[0] < self.W and 0 <= n[1] < self.H):
+                nx, ny = x + dx, y + dy
+                if not (0 <= nx < W and 0 <= ny < H):
                     continue
-                cost = None
-                if self.walkable(n):
-                    ln = self._level(n)
+                n = (nx, ny)
+                cost, via = None, none
+                if walk[ny][nx]:
+                    ln = lvl[ny][nx]
                     if ln == lc:
-                        cost = self.path_cost if n in self.paths else 1.0
+                        cost = path_cost if n in paths else 1.0
                     elif ladder and abs(ln - lc) == 1:
-                        cost = 3.0
-                elif pole and self.terrain[n[1]][n[0]] == RIVER:
-                    k, jx, jy = 0, n[0], n[1]
-                    while 0 <= jx < self.W and 0 <= jy < self.H and self.terrain[jy][jx] == RIVER and k < pole_w:
+                        cost, via = 3.0, by_ladder
+                elif pole and terrain[ny][nx] == RIVER:
+                    k, jx, jy = 0, nx, ny
+                    while 0 <= jx < W and 0 <= jy < H and terrain[jy][jx] == RIVER and k < pole_w:
                         k, jx, jy = k + 1, jx + dx, jy + dy
-                    land = (jx, jy)
-                    if self.walkable(land) and self._level(land) == lc and self.terrain[jy][jx] != RIVER:
-                        n, cost = land, k + 2.0
+                    if 0 <= jx < W and 0 <= jy < H and walk[jy][jx] and lvl[jy][jx] == lc:
+                        n, cost, via = (jx, jy), k + 2.0, by_pole
                 if cost is None:
                     continue
                 nd = d + cost
                 if nd < dist.get(n, 1e18):
                     dist[n] = nd
+                    used[n] = used[c] if via is none else used[c] | via
                     heapq.heappush(pq, (nd, n))
         self._cache[key] = dist
+        used_cache[key] = used
         return dist
+
+    def route_tools(self, a: Cell, b: Cell, tools: frozenset) -> frozenset:
+        """The ladder and/or vaulting pole the shortest walk from a to b climbs or jumps with."""
+        a, b = tuple(a), tuple(b)
+        self.distances(a, tools)
+        return self.__dict__.get("_used", {}).get((a, tools, self._version), {}).get(b, frozenset())
 
     def approach_cells(self, target: Cell) -> list[Cell]:
         """Where you stand to use something: the tile itself if walkable, else its neighbours."""
@@ -480,7 +512,8 @@ class GridSpace(Space):
 
     def __getstate__(self):
         state = dict(self.__dict__)
-        state["_cache"] = {}
+        state["_cache"], state["_used"] = {}, {}
+        state.pop("_lk", None)
         return state
 
     def resolve(self, island, name: str, action: dict, pos, tools, rng):
@@ -709,7 +742,8 @@ class GridSpace(Space):
     def _free_tiles_near(self, ref: Cell, start: Cell, tools, w: int, h: int, n: int, island, max_d: float,
                          allow_path: bool = True) -> list[list[Cell]]:
         """Up to n free w x h footprints near ref, closest first, that the villager can walk up to.
-        Footprints never cover a door, and multi-tile pieces keep a one-tile gap between them."""
+        Footprints never cover a door, a building (the plaza too) or a homesite, and multi-tile pieces
+        keep a one-tile gap between them."""
         dist = self.distances(start, tools)
         taken = self._occupied(island) - (set(self.paths) if allow_path else set())
         doors = {s["door"] for s in self.sites.values()} | {b["door"] for b in self.buildings.values()}
@@ -722,7 +756,8 @@ class GridSpace(Space):
             if len(out) >= n:
                 break
             cells = [(x + i, y + j) for j in range(h) for i in range(w)]
-            if any(c in used or c in taken or c in doors or not self.walkable(c)
+            fixtures = getattr(self, "fixtures", set())
+            if any(c in used or c in taken or c in doors or c in fixtures or not self.walkable(c)
                    or self.terrain[c[1]][c[0]] not in (GRASS, SAND) for c in cells):
                 continue
             if not any(dist.get(a) is not None for a in self._around(cells)):

@@ -93,7 +93,7 @@ run, a day and an hour, with every LLM call and output file, are in
 | 05:00–04:00 | the engine steps hour by hour. Each scheduled action takes one hour. Villagers with nothing scheduled are at home or wandering |
 | 12:00 | second plan, for 12:00–18:00 |
 | 19:00 | third plan, for 19:00 until 05:00 |
-| 20:00, 21:00 | the plaza: letters, the bulletin board, trade offers and recipe teaching |
+| 20:00, 21:00 | the plaza: the bulletin board, trade offers, and letters and parcels (which arrive the next morning) |
 | end of day | snapshot, optional nightly reflection, Isabelle's report, checkpoint |
 
 - Each villager has **10 actions a day** (`calendar.actions_per_day`). A plan places each
@@ -106,9 +106,10 @@ run, a day and an hour, with every LLM call and output file, are in
   villager has to walk from where they are. Equal distances are shuffled. Whoever gets to a
   rock, tree, shell or dig spot first takes what is there.
 
-**Day 0: arrivals.** Every villager starts in a tent with 1,000 bells, empty pockets, no
-loan and three random DIY recipes, plus the starter recipes everyone knows (ladder, vaulting
-pole, simple wooden fence). Everyone lands together at 05:00, and Tom Nook has a tent ready
+**Day 0: arrivals.** Every villager starts in a tent with 1,000 bells, no loan, one of each
+tool (shovel, axe, fishing rod, net, ladder, vaulting pole) and three random DIY recipes, plus
+the simple wooden fence everyone knows. Nobody knows how to make tools yet. Everyone lands
+together at 05:00, and Tom Nook has a tent ready
 for each of them on a homesite drawn at random; nobody chooses. On landing day they are up
 from 05:00. Later, a villager can move home with `move_house` at Resident Services for 10,000
 bells (`move_house_cost` in the world file). The move happens overnight, and the furniture
@@ -154,10 +155,28 @@ snow. Nothing else changes in the rain, so whether villagers care is an open que
 
 Getting around is gated. Changing cliff tier needs a **ladder** (one tier at a time), and
 crossing the river needs a **vaulting pole** (up to 3 water tiles) until the bridge is
-built. The pond and the sea can't be crossed. Everyone knows both recipes from the start but
-has to gather the wood and craft them. Bodies pathfind with the tools the villager carries,
+built. The pond and the sea can't be crossed. Everyone starts with both. Bodies pathfind with
+the tools the villager carries,
 and each villager's prompt says which rocks and buildings are within reach and how many steps
-away. Placed furniture and fences block walking, so villagers can wall off space.
+away. Placed furniture and fences block walking, so villagers can wall off space. Trees,
+rocks, buildings (the plaza too) and homes always keep at least one free tile between them.
+
+**Tools wear out.** Every tool breaks after 50 uses (`tools.uses`). A use is one action that
+needs it (axe: `chop_wood`, `chop_down_tree`; shovel: `mine_rock`, `dig_fossil`, `dig_stump`,
+`break_rock`; fishing rod: `fish`; net: `catch_bug`; looking around without finding anything
+doesn't count), or one trip whose route climbs a cliff with the ladder or jumps the river with
+the pole (going home counts as a trip). Without the tool, the action fails before the villager
+sets out ("you have no axe"). Villagers aren't told how worn a tool is; they find out when it
+breaks. A replacement takes the tool's recipe card, always for sale at Nook's Cranny for 500
+bells, and materials: shovel 5 hardwood, axe 3 stone and 1 iron nugget, fishing rod 4 wood, net
+4 softwood, ladder 4 wood, 4 hardwood and 4 softwood, vaulting pole 5 wood. The axe takes rock
+materials and the others wood, so losing the axe or the shovel alone never leaves a villager
+stuck. Spare tools can be handed over or mailed, and a worn tool stays worn.
+
+**Recipe cards.** Recipes come on cards: the Cranny's tool cards and one other card a day,
+message bottles on the beach, and other villagers. A card for a recipe you don't know is
+learned on the spot and used up. A card for one you already know stays in your pockets, to
+hand over in person, mail, trade or sell. There is no free copying of recipes.
 
 The full design, with the rules I wasn't sure of marked, is in `docs/grid_spec.md`.
 [docs/world.md](docs/world.md) shows the island for seed 0 with a legend, what you can reach with
@@ -178,7 +197,7 @@ what the villager spotted today, so a rare bug can be shared or kept quiet.
 | money rock | one random rock per day | pays up to 6,750 bells instead of materials. Nobody knows which until someone hits it |
 | hardwood trees | 30 trees, 3 wood each per day | a mix of wood, softwood and hardwood |
 | fruit trees | 10 trees, 3 apples each | regrow 3 days after being shaken bare |
-| shells | 12 per day on the beach | 4 per `beachcomb`. 15% chance of a message bottle with a recipe you don't know |
+| shells | 12 per day on the beach | 4 per `beachcomb`. 15% chance of a message bottle with a recipe card (never a tool) |
 | fossils | 4 dig spots per day | |
 | fish | 19 species in the sea, river, pond and clifftop river | by hour, month and weather. 15% of tries get away |
 | bugs | 16 species on flowers, trees, stumps, rocks and the ground | by hour, month and weather. 15% of tries get away |
@@ -198,7 +217,7 @@ writing, below).
 |---|---|---|---|
 | Resident Services | Tom Nook | all day | house upgrades on an interest-free loan with no deadline; the loan must be paid off before the next upgrade. Takes bridge contributions |
 | Resident Services | Isabelle | all day | sets the island ordinance for 20,000 bells; makes the morning announcement |
-| Nook's Cranny | Timmy and Tommy | 08:00–22:00 | buys almost anything at a fixed price (shop goods and clothes at a quarter of their price). Sells saplings, 2 kinds of flower seeds, 3 rotating items and one DIY recipe card (2,000 bells) each day |
+| Nook's Cranny | Timmy and Tommy | 08:00–22:00 | buys almost anything at a fixed price (shop goods and clothes at a quarter of their price). Sells saplings, 2 kinds of flower seeds, 3 rotating items and one DIY recipe card (2,000 bells) each day, plus every tool's recipe card (500 bells) |
 | Able Sisters | the Able Sisters | 09:00–21:00 | 4 pieces of clothing a day, from `clothing` in the world file. The entries are placeholders for your own designs |
 | museum | Blathers | all day | takes the first donation of each fish, bug and fossil species. No bells for it |
 | plaza | | 20:00, 21:00 | the evening rounds |
@@ -291,7 +310,7 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 |---|---|---|---|
 | `craft` | `recipe` | home | use a known recipe; fences make 5 pieces |
 | `sell` | `items: {item: qty}` | Nook's Cranny | sell at the fixed price |
-| `buy` | `shop`: cranny or able; `item` | the shop | buy from today's stock, or the day's recipe card |
+| `buy` | `shop`: cranny or able; `item` (`"<recipe> recipe"` for a card) | the shop | buy from today's stock, a tool recipe card, or the day's recipe card |
 | `donate` | `item` | museum | first of each species only |
 | `wear` | `item` | home | others see what you wear |
 
@@ -367,7 +386,7 @@ it goes into both villagers' record of the day.
 
 **Gifts and requests.** In any conversation, either villager can hand the other something
 from their pockets (`"give"`) or ask for something (`"ask"`). A request stays open, shown to
-both, until the other gives at least that much, in person or by letter. Nothing enforces it.
+both, until the other gives at least that much, in person or by parcel. Nothing enforces it.
 
 **Visits.** `visit` is an action. If the host is awake, at home and not busy, they let the
 guest in: the guest sees the furniture inside and they talk, with gifts and requests as
@@ -376,13 +395,14 @@ above. Otherwise nobody answers, and the host later hears that the guest came by
 **The plaza** at 20:00 and 21:00 (no action hour). In the first round every awake villager
 gets a call. The second round only includes villagers with new offers waiting. A villager
 can:
-- write letters to anyone, which arrive in their inbox
 - post on the bulletin board, which everyone sees (the last 8 posts)
-- offer a trade (`give` and `want`, with `"bells"` as an item for money); an offer with an
-  empty `want` is a gift by mail
-- accept, reject or counter offers waiting for them. Unanswered offers expire after the
-  next evening. An accepted trade fails if either side no longer has the goods or room
-- teach a recipe they know, which the other villager learns immediately
+- offer a trade to another villager (`give` and `want`, with `"bells"` as an item for money)
+- accept, reject or counter offers waiting for them. Both villagers are at the plaza, so an
+  accepted trade swaps on the spot. Unanswered offers expire after the next evening, and an
+  accepted trade fails if either side no longer has the goods or room
+- write letters (`letters`) and send parcels of items, bells, spare tools or recipe cards
+  (`parcels`). The items leave right away, and both arrive the next morning, read in the first
+  plan. A parcel that doesn't fit in the recipient's pockets waits for them, and they are told.
 
 ### Isabelle
 
@@ -489,7 +509,7 @@ Each island run directory has:
 | file | what it is |
 |---|---|
 | `summary.txt` | see below |
-| `days/day_NNN.md` | one log per day, hour by hour: every action with its location, result and the state it changed, every message, offer, trade and teaching, the island's resources after each hour, and a table of everyone's state at the end |
+| `days/day_NNN.md` | one log per day, hour by hour: every action with its location, result and the state it changed, every letter, parcel, offer, trade and broken tool, the island's resources after each hour, and a table of everyone's state at the end |
 | `days/day_NNN_isabelle.md` | Isabelle's report |
 | `hourly_villagers.csv` | one row per villager per hour: activity, location, bells, loan, items, house |
 | `hourly_island.csv` | one row per hour: rock hits left, wood, fruit, shells, fossil spots, trees, museum, bridge fund |

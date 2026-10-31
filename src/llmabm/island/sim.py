@@ -4,11 +4,11 @@ The island runs on a 24-hour clock that rolls over at 05:00. Each action takes o
 in-game hour. Villagers plan at the start of each plan window (one LLM call each),
 giving every action an hour. The engine then steps hour by hour. Villagers acting
 in the same hour reach a place in order of distance from their home; equal
-distances are shuffled. At the social hours villagers meet at the plaza for
-messages, board posts, trades and recipe teaching.
+distances are shuffled. At the social hours villagers meet at the plaza to trade,
+post on the board, and send letters and parcels, which arrive the next morning.
 
-On day 0 villagers arrive (all at once or trickling in), and each picks a homesite
-for their tent. At the end of every day Isabelle (an LLM call) writes a summary of
+On day 0 everyone arrives at once, each in a tent on a homesite drawn at random, with
+one of each tool. At the end of every day Isabelle (an LLM call) writes a summary of
 the day from the log, and the whole simulation is checkpointed so it can be resumed
 later, one day at a time if you like.
 """
@@ -220,9 +220,14 @@ class IslandSimulation:
             sim.isl.energy = sim.energy
         if not hasattr(sim, "choices"):
             sim.choices = {n: {"plaza": True, "write": True, "next": "plan"} for n in sim.isl.v}
-        for attr, default in (("pending_moves", {}), ("moved_today", [])):
+        for attr, default in (("pending_moves", {}), ("moved_today", []), ("mail", [])):
             if not hasattr(sim.isl, attr):
                 setattr(sim.isl, attr, default)
+        for vil in sim.isl.v.values():
+            if not hasattr(vil, "wear"):
+                vil.wear = {}
+        if not hasattr(sim.bodies, "broke"):
+            sim.bodies.broke = []
         sim.verbose = verbose
         if backend_override:
             sim.override = backend_override
@@ -393,6 +398,7 @@ class IslandSimulation:
             awake={n: list(isl.awake_window(n)) for n in isl.v})
         if d == 0:
             self._settle_all(d)
+        self._deliver_mail(d)
         for i, (a, b) in enumerate(cal["plans"]):
             self.hour = a
             self.window_end = b
@@ -414,6 +420,36 @@ class IslandSimulation:
             trades = sum(1 for o in self.offers.values() if o.day == d and o.status == "accepted")
             print(f"day {d:>3}: museum {sum(len(m) for m in isl.museum.values())}, "
                   f"bridge {isl.bridge_fund}, trades {trades}, calls so far {self.calls}", flush=True)
+
+    # --- mail ----------------------------------------------------------------
+    def _deliver_mail(self, d: int) -> None:
+        """Morning: letters and parcels sent before today arrive. A parcel that doesn't fit in
+        the recipient's pockets waits for them, and they are told."""
+        isl, waiting = self.isl, []
+        for m in isl.mail:
+            if m["sent_day"] >= d:
+                waiting.append(m)
+                continue
+            vil = isl.v[m["to"]]
+            if m["kind"] == "letter":
+                vil.inbox.append(f"(sent day {m['sent_day']}) letter from {m['from']}: {m['text']}")
+                continue
+            got, left = isl.put_items(vil, m["parcel"])
+            if got:
+                what = ", ".join(f"{n} {k}" for k, n in got.items())
+                vil.inbox.append(f"(sent day {m['sent_day']}) parcel from {m['from']}: {what}"
+                                 + (f' ("{m["note"]}")' if m.get("note") else ""))
+                isl._settle_favors(m["from"], m["to"], got)
+                self.log("gift", day=d, giver=m["from"], receiver=m["to"], items=got, ok=True, how="by mail",
+                         result=what, sent_day=m["sent_day"])
+                for f in isl.favors_done_today:
+                    self.log("favor_done", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
+                isl.favors_done_today = []
+            if left:
+                vil.inbox.append(f"a parcel from {m['from']} with {', '.join(f'{n} {k}' for k, n in left['items'].items())} "
+                                 "is waiting for you: no room in your pockets")
+                waiting.append({**m, "parcel": left})
+        isl.mail = waiting
 
     # --- arrivals ----------------------------------------------------------
     def _settle_all(self, d: int) -> None:
@@ -775,6 +811,9 @@ class IslandSimulation:
         if pairs:
             log("seen", day=d, pairs=[list(p) for p in pairs],
                 places={n: self.bodies.b[n].place for p in pairs for n in p})
+        for n, tool, during in self.bodies.broke:
+            log("tool_broke", day=d, agent=n, tool=tool, during=during)
+        self.bodies.broke = []
         busy: set[str] = set()
         self._visits(d, h, doing, ok_by, busy)
         self._encounters(d, h, [n for n in out if n not in busy], near)
@@ -890,15 +929,31 @@ class IslandSimulation:
                 log("offer_update", **asdict(o))
                 isl.v[o.sender].inbox.append(f"(day {d}) {name} turned down your offer [{o.id}]" + (f': "{note}"' if note else ""))
 
-        for m in obj.get("messages") or []:
+        for m in obj.get("letters") or obj.get("messages") or []:  # letters arrive tomorrow morning
             if not isinstance(m, dict):
                 continue
             to, content = who(m.get("to")), str(m.get("content") or "").strip()
             if not to or to == name or not content:
                 log("invalid", day=d, agent=name, what="message", detail=m)
                 continue
-            isl.v[to].inbox.append(f"(day {d}, {clock(self.hour)}) from {name}: {content}")
-            log("message", day=d, round=r, sender=name, recipient=to, content=content)
+            isl.mail.append({"kind": "letter", "from": name, "to": to, "sent_day": d, "text": content})
+            log("message", day=d, round=r, sender=name, recipient=to, content=content, arrives_day=d + 1)
+
+        for m in obj.get("parcels") or []:  # items leave now and arrive tomorrow morning
+            if not isinstance(m, dict):
+                continue
+            to = who(m.get("to"))
+            items = _clean_side(m.get("items"))
+            parcel = isl.take_items(vil, items) if to and to != name and items else None
+            if parcel is None:
+                log("invalid", day=d, agent=name, what="parcel", detail=m)
+                vil.today.append(f"{clock(self.hour)} couldn't send a parcel: "
+                                 + ("you don't have all of that" if to and items else "no one to send it to"))
+                continue
+            note = str(m.get("note") or "")[:300]
+            isl.mail.append({"kind": "parcel", "from": name, "to": to, "sent_day": d, "parcel": parcel, "note": note})
+            vil.today.append(f"{clock(self.hour)} sent {to} a parcel: {', '.join(f'{n} {k}' for k, n in items.items())}")
+            log("parcel", day=d, round=r, sender=name, recipient=to, items=items, note=note, arrives_day=d + 1)
 
         post = str(obj.get("board") or "").strip()
         if post:
@@ -914,18 +969,6 @@ class IslandSimulation:
                 log("invalid", day=d, agent=name, what="offer", detail=o)
                 continue
             self._new_offer(d, name, to, give, want, str(o.get("note") or "")[:300])
-
-        for t in obj.get("teach") or []:
-            if not isinstance(t, dict):
-                continue
-            to, rec = who(t.get("to")), str(t.get("recipe") or "").strip().lower()
-            if not to or to == name or rec not in vil.recipes:
-                log("invalid", day=d, agent=name, what="teach", detail=t)
-                continue
-            new = rec not in isl.v[to].recipes
-            isl.v[to].recipes.add(rec)
-            isl.v[to].inbox.append(f"(day {d}) {name} taught you the {rec} recipe")
-            log("teach", day=d, round=r, teacher=name, learner=to, recipe=rec, new=new)
 
         note = str(obj.get("note") or "").strip()
         if note:
@@ -962,14 +1005,12 @@ class IslandSimulation:
             for v in (a, b):
                 v.inbox.append(f"(day {d}) trade [{o.id}] fell through: {problem}")
             return
-        for src, dst, side in ((a, b, o.give), (b, a, o.want)):
-            for k, n in side.items():
-                if k == "bells":
-                    src.bells -= n
-                    dst.bells += n
-                else:
-                    src.inventory[k] -= n
-                    dst.inventory[k] += n
+        pa = isl.take_items(a, o.give) if o.give else None
+        pb = isl.take_items(b, o.want) if o.want else None
+        if pa:
+            isl.put_items(b, pa)
+        if pb:
+            isl.put_items(a, pb)
         o.status = "accepted"
         if not o.want:  # a gift by mail can fulfil an open request
             isl._settle_favors(o.sender, o.recipient, o.give)
