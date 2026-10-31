@@ -16,18 +16,18 @@ from .site_experiments import TOKENS, build_experiments, experiment_order, is_ru
 
 TEMPLATE = Path(__file__).with_name("site_template.html")
 
-def _crumb(run_dir: Path) -> str:
+def _crumb(run_dir: Path, home: str) -> str:
     """`multiagent-island / experiments / exp NN`, numbered from 00 as on the Experiments page (a mock
     run has no number: it isn't on that page). The logo links back to the Experiments page."""
     runs = [p.resolve() for p in experiment_order(run_dir.parent)]
     n = runs.index(run_dir.resolve()) if run_dir.resolve() in runs else None
-    home = "../../site/index.html"
     return (f'<a href="{home}">multiagent-island</a><span class="sep">/ experiments'
             + (f' / exp {n:02d}' if n is not None else "") + "</span>")
 
 
-def build_site(run_dir: Path, out_dir: Path | None = None) -> Path:
-    """Write <out_dir>/index.html (default <run_dir>/site/) from <run_dir>/site_data.json."""
+def build_site(run_dir: Path, out_dir: Path | None = None, home: str = "../../site/index.html") -> Path:
+    """Write <out_dir>/index.html (default <run_dir>/site/) from <run_dir>/site_data.json. `home` is
+    the link to the Experiments page, relative to the page."""
     run_dir = Path(run_dir)
     src = run_dir / "site_data.json"
     if not src.exists():
@@ -38,23 +38,31 @@ def build_site(run_dir: Path, out_dir: Path | None = None) -> Path:
     # Inside <script>, "</" could end the element early; JSON allows escaping it.
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     title = html.escape(f"{data['run']['scenario']}, seed {data['run']['seed']}")
-    page = (TEMPLATE.read_text().replace("__TOKENS__", TOKENS.read_text()).replace("__CRUMB__", _crumb(run_dir))
+    page = (TEMPLATE.read_text().replace("__TOKENS__", TOKENS.read_text()).replace("__CRUMB__", _crumb(run_dir, home))
             .replace("__TITLE__", title).replace("__DATA__", payload))
     out = out_dir / "index.html"
     out.write_text(page)
     return out
 
 
-def build_all(runs_dir: Path) -> list[Path]:
+def build_all(runs_dir: Path, out_dir: Path | None = None) -> list[Path]:
     """Every experiment's page in a runs folder (mock runs aside), then the Experiments page. A run without
-    site_data.json gets it first (no LLM calls; the same data `llmabm analyze` writes)."""
+    site_data.json gets it first (no LLM calls; the same data `llmabm analyze` writes), so a run needs
+    only manifest.json and events.jsonl.
+
+    By default the pages go inside the runs folder (<run>/site/, and site/ for the Experiments page).
+    With out_dir, the whole site goes there instead, ready to publish: index.html is the Experiments
+    page and <run>/index.html each run's."""
     runs_dir = Path(runs_dir)
     out = []
     for run_dir in experiment_order(runs_dir):
         if not (run_dir / "site_data.json").exists():
             write_site_data(run_dir)
-        out.append(build_site(run_dir))
-    out.append(build_experiments(runs_dir))
+        if out_dir:
+            out.append(build_site(run_dir, Path(out_dir) / run_dir.name, home="../index.html"))
+        else:
+            out.append(build_site(run_dir))
+    out.append(build_experiments(runs_dir, out_dir))
     return out
 
 

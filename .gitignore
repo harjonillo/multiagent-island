@@ -3,4 +3,11 @@ __pycache__/
 .pytest_cache/
 .env
 .cache/
-runs/
+# Runs stay local, except the two files the explorer site is built from: commit a run's
+# manifest.json and events.jsonl to publish it (README, "Publishing the explorer").
+runs/*
+!runs/*/
+runs/*/*
+!runs/*/manifest.json
+!runs/*/events.jsonl
+_site/

@@ -126,7 +126,6 @@ def experiment(run_dir: Path, number: int) -> dict:
         "number": number, "dir": run_dir.name, "scenario": m["scenario"], "seed": m["seed"],
         "agents": agents_label(m), "days_done": m.get("days_completed", 0), "days_total": total,
         "started": f"{time.strftime('%b', lt)} {lt.tm_mday}, {lt.tm_year}",
-        "has_site": (run_dir / "site" / "index.html").exists(),
         "villagers": len(m["villagers"]),
         "conditions": conditions(m, day0),
     }
@@ -152,7 +151,7 @@ def door_html(e: dict) -> str:
     c = e["conditions"]
     return f"""
     <div class="slot">
-      <a class="door" href="../{html.escape(e['dir'])}/site/index.html" aria-label="{html.escape(label)}">
+      <a class="door" href="{html.escape(e['href'])}" aria-label="{html.escape(label)}">
         {frame_svg()}
         <div class="panel-box" style="{_pos(PANEL)}">
           <div class="panel">
@@ -199,11 +198,21 @@ def empty_html(number: int, runs_dir: Path) -> str:
     </div>"""
 
 
-def build_experiments(runs_dir: Path) -> Path:
-    """Write <runs_dir>/site/index.html, the Experiments page, over every run in the folder."""
+def build_experiments(runs_dir: Path, out_dir: Path | None = None) -> Path:
+    """Write the Experiments page over every run in the folder.
+
+    By default it goes to <runs_dir>/site/index.html, linking to each run's <run>/site/index.html.
+    With out_dir (a folder to publish, as for GitHub Pages) it is <out_dir>/index.html, linking to
+    <out_dir>/<run>/index.html; build_all writes the run pages there."""
     runs_dir = Path(runs_dir)
     exps = [experiment(p, i) for i, p in enumerate(experiment_order(runs_dir))]
-    out_dir = runs_dir / "site"  # the doors link to ../<run>/site/index.html
+    for e in exps:
+        if out_dir:
+            e["href"], page = f"{e['dir']}/index.html", Path(out_dir) / e["dir"] / "index.html"
+        else:
+            e["href"], page = f"../{e['dir']}/site/index.html", runs_dir / e["dir"] / "site" / "index.html"
+        e["has_site"] = page.exists()
+    out_dir = Path(out_dir) if out_dir else runs_dir / "site"
     out_dir.mkdir(parents=True, exist_ok=True)
     frames = [door_svg(w) for w in OPEN_WIDTHS[1:]]
     doors = "".join(door_html(e) for e in exps) + empty_html(len(exps), runs_dir)

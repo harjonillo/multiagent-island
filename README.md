@@ -69,9 +69,34 @@ LLM calls. More under [Outputs](#outputs).
 | `llmabm resume <run_dir>` | continue an island run from its last checkpoint. `--days`, `--backend` |
 | `llmabm analyze <run_dir>` | rebuild the summary, plots and logs, for example after you edit the analysis code |
 | `llmabm site <run_dir>` | build the run's explorer page, `<run_dir>/site/index.html` (from `site_data.json`, which `analyze` writes) |
-| `llmabm site runs/` | build every run's page and the Experiments page, `runs/site/index.html`: one door per run (numbered from 00; mock runs left out), each card opening to the run's initial conditions |
+| `llmabm site runs/` | build every run's page and the Experiments page, `runs/site/index.html`: one door per run (numbered from 00; mock runs left out), each card opening to the run's initial conditions. `--out _site` builds the whole site in one folder to publish instead |
 
 Runs are written to `runs/<timestamp>_<scenario>_s<seed>/`.
+
+### Publishing the explorer
+
+The explorer is published on GitHub Pages by `.github/workflows/pages.yml`. On each push to `main`
+that touches `runs/`, `src/` or `data/` (or when run by hand from the Actions tab), it installs the
+package, runs `llmabm site runs --out _site` and deploys `_site/`: the Experiments page at the site's
+root and each run at `<run>/`. The build makes no LLM calls.
+
+A run is published when its `manifest.json` and `events.jsonl` are committed; everything else in a
+run directory stays ignored, and the site is built from those two files alone. To publish a run:
+
+```bash
+git add runs/<run>/manifest.json runs/<run>/events.jsonl
+git commit -m "Publish <run>" && git push
+```
+
+To take one down, `git rm --cached` the two files and push. Once (in the repository's settings):
+Pages > Build and deployment > Source: GitHub Actions.
+
+The site shows the villagers' private thoughts, notes and nightly pages, and anyone with the link
+can read it. The villagers themselves can't: they are model calls with no web access, and their
+prompts only ever hold their own thoughts, notes and pages (conversations pass on only what was said
+and done). Every page also asks search engines and AI crawlers not to index or train on it
+(`noindex, noai`), so a model that plays a villager later is less likely to have read it. That is a
+request crawlers can ignore, not a lock.
 
 ## The island
 

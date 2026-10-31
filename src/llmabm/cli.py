@@ -60,7 +60,8 @@ def main(argv: list[str] | None = None) -> int:
 
     st = sub.add_parser("site", help="build the static explorer: a run's page, or every run's plus the Experiments page")
     st.add_argument("run_dir", type=Path, help="a run directory, or a runs folder (e.g. runs/) for all of them")
-    st.add_argument("--out", type=Path, help="folder for a single run's index.html (default <run_dir>/site)")
+    st.add_argument("--out", type=Path, help="for a run: folder for its index.html (default <run_dir>/site); for a runs "
+                                            "folder: build the whole site there, ready to publish (e.g. _site)")
 
     args = ap.parse_args(argv)
     load_dotenv()
@@ -127,11 +128,11 @@ def main(argv: list[str] | None = None) -> int:
         try:
             if is_run(args.run_dir):
                 print(f"wrote {build_site(args.run_dir, args.out)}")
-            elif args.out:
-                print("error: --out only applies to a single run directory", file=sys.stderr)
+            elif not args.run_dir.is_dir():
+                print(f"error: {args.run_dir} is not a run directory or a runs folder", file=sys.stderr)
                 return 2
             else:
-                for out in build_all(args.run_dir):
+                for out in build_all(args.run_dir, args.out):
                     print(f"wrote {out}")
         except FileNotFoundError as e:
             print(f"error: {e}", file=sys.stderr)

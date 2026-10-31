@@ -972,6 +972,15 @@ def test_site_data_and_page_for_a_mock_run():
         day0 = next(x for x in run.of("day_start") if x["day"] == 0)["pools"]
         assert island["rocks"].startswith(f"{len(day0['rocks'])},") and island["shells"].startswith(f"{day0['shells_left']} ")
         assert "initial conditions</summary>" in doors and html.escape(kit["tools"]) in doors
+        # Built to publish (GitHub Pages): the doors at the root, each run in its own folder, linked both
+        # ways; a run needs only manifest.json and events.jsonl; every page asks crawlers to stay away.
+        (real / "site_data.json").unlink()
+        pub = Path(d) / "_site"
+        build_all(Path(d), pub)
+        assert sorted(p.relative_to(pub).as_posix() for p in pub.rglob("*.html")) == ["index.html", "real/index.html"]
+        root, page = (pub / "index.html").read_text(), (pub / "real" / "index.html").read_text()
+        assert 'href="real/index.html"' in root and 'href="../index.html"' in page and "No page yet" not in root
+        assert all('name="robots" content="noindex' in p for p in (root, page))
     assert fail_bucket("you have no axe") == "Has no tool for it" and fail_bucket("whatever") == "Other"
 
 
