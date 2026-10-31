@@ -54,3 +54,7 @@ class Space:
 
     def where_note(self, island, name: str, pos, tools) -> str:
         return ""
+
+    def map_text(self, island) -> str:
+        """The island map a villager can get from Tom Nook or Isabelle; empty where there is no layout."""
+        return ""

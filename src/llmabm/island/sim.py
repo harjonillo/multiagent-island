@@ -777,6 +777,8 @@ class IslandSimulation:
 
         for n in who:
             isl.where_notes[n] = self.bodies.where_note(n)
+        if getattr(isl, "prompt_version", 1) >= 3:
+            isl.map_text = self.space.map_text(isl)
 
         # An even share of the actions left, rounded up; fixed windows had no shares.
         shares = {n: None if fixed else -(-(budget - self.used[n]) // (slot[n][3] - slot[n][0])) for n in who}

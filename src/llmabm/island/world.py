@@ -137,7 +137,10 @@ ORDINANCE_TEXT = {
 TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
+LATEST_PROMPT_VERSION = 4  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
+MAP = "island map"  # from Tom Nook or Isabelle; carried, it shows the island's layout in plans (prompt version 3 on)
 
 
 def recipe_of_card(item: str) -> str | None:
@@ -233,6 +236,8 @@ class Island:
         self.ordinance = "none"
         self.pending_ordinance: tuple[str, str] | None = None  # (ordinance, who set it), effective next morning
         self.pending_moves: dict[str, str] = {}  # villager -> homesite Tom Nook moves them to overnight
+        # A new island follows the latest rules; resumed runs set the version they started with.
+        self.prompt_version = LATEST_PROMPT_VERSION
         self.moved_today: list[str] = []
         self.news: list[str] = []            # today's public happenings, for Isabelle's announcement
         self.yesterday_news: list[str] = []
@@ -320,6 +325,21 @@ class Island:
         return self.capacity(vil) - vil.items()
 
     # --- tools ------------------------------------------------------------
+    def tool_for(self, vil: Villager, action: dict) -> tuple[str | None, str | None]:
+        """(the tool this action uses, or None; why it can't be done, or None). From prompt version 4,
+        chop_wood takes either axe: the one named in `axe`, else the stone axe if they carry one."""
+        do = str(action.get("do", "")).lower()
+        if do == "chop_wood" and getattr(self, "prompt_version", 1) >= 4:
+            want = str(action.get("axe", "")).strip().lower()
+            if want in AXES:
+                return (want, None) if vil.inventory[want] > 0 else (None, f"you have no {want}")
+            have = [t for t in AXES if vil.inventory[t] > 0]
+            return (have[0], None) if have else (None, "you have no axe")
+        need = TOOL_FOR.get(do)
+        if need and vil.inventory[need] < 1:
+            return None, f"you have no {need}"
+        return need, None
+
     def is_tool(self, item: str) -> bool:
         return (self.w.get("items") or {}).get(item, {}).get("kind") == "tool"
 
@@ -447,10 +467,13 @@ class Island:
         for t in self.trees:
             if t.kind == "hardwood":
                 t.wood_left = isl["wood_per_tree"]
-            elif t.kind == "fruit" and t.fruit == 0:
-                t.regrow_in -= 1
-                if t.regrow_in <= 0:
-                    t.fruit = isl["fruit_per_tree"]
+            elif t.kind == "fruit":
+                if getattr(self, "prompt_version", 1) >= 4:  # fruit trees can be chopped for wood too
+                    t.wood_left = isl["wood_per_tree"]
+                if t.fruit == 0:
+                    t.regrow_in -= 1
+                    if t.regrow_in <= 0:
+                        t.fruit = isl["fruit_per_tree"]
             elif t.kind == "sapling":
                 t.mature_in -= 1
                 if t.mature_in <= 0:
@@ -528,6 +551,9 @@ class Island:
         place = self._NEEDS_OPEN.get(do)
         if do == "buy":
             place = "able" if str(action.get("shop", "")).lower() == "able" else "cranny"
+        if do == "chop_down_tree" and getattr(self, "prompt_version", 1) >= 4:
+            return False, ("there's no felling on its own: chopping wood with an axe (not a stone axe) brings the tree "
+                           "down when it takes the tree's last wood")
         if do == "ask":
             if npc_of(action) not in NPCS:
                 if getattr(self, "prompt_version", 1) >= 2:
@@ -603,14 +629,28 @@ class Island:
         return self.rng.choice(trees) if trees else None
 
     def _do_chop_wood(self, vil, a, hour):
-        t = self._pick_tree(a, lambda t: t.kind == "hardwood" and t.wood_left > 0)
+        v4 = getattr(self, "prompt_version", 1) >= 4
+        kind = str(a.get("kind", "hardwood")).lower() if v4 else "hardwood"
+        if kind not in ("hardwood", "fruit"):
+            return False, f"there are no {kind} trees to chop; try hardwood or fruit"
+        t = self._pick_tree(a, lambda t: t.kind == kind and t.wood_left > 0)
         if t is None:
-            return False, "no tree has wood left today"
+            return False, f"no {kind} tree has wood left today" if v4 else "no tree has wood left today"
         draws = Counter(self.rng.choices(["wood", "softwood", "hardwood"], k=t.wood_left))
         got = self.give_items(vil, draws)
         t.wood_left -= sum(got.values())
         self.collected[vil.name]["wood"] += sum(got.values())
-        return (True, f"chopped a tree: {_fmt(got)}") if got else (False, "pockets full")
+        if not got:
+            return False, "pockets full"
+        if a.get("_tool") == "axe" and t.wood_left == 0 and v4:
+            # An iron axe brings the tree down with its last wood; a fruit tree drops what fruit it had.
+            fruit = self.give_items(vil, Counter({self.w["island"]["native_fruit"]: t.fruit})) if t.fruit else Counter()
+            self.collected[vil.name]["fruit"] += sum(fruit.values())
+            t.kind, t.fruit = "stump", 0
+            self.collected[vil.name]["trees_removed"] += 1
+            return True, (f"chopped a {kind} tree: {_fmt(got + fruit)}; with the last wood the axe brought the tree "
+                          "down, leaving a stump")
+        return True, f"chopped a {kind} tree: {_fmt(got)}" if v4 else f"chopped a tree: {_fmt(got)}"
 
     def _do_shake_tree(self, vil, a, hour):
         t = self._pick_tree(a, lambda t: t.kind == "fruit" and t.fruit > 0)
@@ -1147,7 +1187,7 @@ class Island:
                     "up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay "
                     f"{self.sell_price(FOSSIL)} bells for an unassessed one. So far: {self.museum_line()}.")
         elif who in ("timmy", "tommy", "timmy and tommy"):
-            mine = {k: self.sell_price(k) for k in sorted(vil.inventory) if vil.inventory[k] > 0}
+            mine = {k: self.sell_price(k) for k in sorted(vil.inventory) if vil.inventory[k] > 0 and k in self.prices}
             vil.prices_seen.update(mine)
             offer = ", ".join(f"{k} {p}" for k, p in mine.items()) or "nothing, your pockets are empty"
             tools = ", ".join(self.tool_recipes())
@@ -1156,6 +1196,13 @@ class Island:
                     f"For what you're carrying we'd pay: {offer}.")
         else:
             text = "The Able Sisters: We sell clothes, a few different ones every day. Others see what you wear."
+        if who in ("tom nook", "isabelle") and getattr(self, "prompt_version", 1) >= 3 and vil.inventory[MAP] < 1:
+            if self.space(vil) < 1:
+                text += " I'd give you a map of the island, but your pockets are full."
+            else:
+                vil.inventory[MAP] += 1
+                text += (" And here's a map of the island; keep it with you and you'll always know where things are. "
+                         "(You got an island map.)")
         return True, f"asked {text}"
 
     def _build_bridge(self):

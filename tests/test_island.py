@@ -403,8 +403,16 @@ def test_stumps_and_breaking_rocks():
     isl.v["A"].inventory["ladder"] = 1
     isl.v["A"].inventory["vaulting pole"] = 1
     n_trees = len(isl.trees)
-    ok, msg = bodies.perform("A", {"do": "chop_down_tree", "kind": "hardwood"}, 10, rng)
-    assert ok and any(t.kind == "stump" for t in isl.trees) and len(isl.trees) == n_trees, msg
+    # A stone axe gathers wood and leaves the tree; the axe brings it down with the last wood.
+    ok, msg = bodies.perform("A", {"do": "chop_wood"}, 9, rng)
+    assert ok and "brought the tree down" not in msg and not any(t.kind == "stump" for t in isl.trees), msg
+    ok, msg = bodies.perform("A", {"do": "chop_wood", "axe": "axe"}, 10, rng)
+    assert not ok and msg == "you have no axe"
+    isl.v["A"].inventory["axe"] = 1
+    ok, msg = bodies.perform("A", {"do": "chop_wood", "axe": "axe"}, 10, rng)
+    assert ok and "brought the tree down" in msg and isl.collected["A"]["trees_removed"] == 1, msg
+    assert any(t.kind == "stump" for t in isl.trees) and len(isl.trees) == n_trees
+    assert "no felling on its own" in isl.act("A", {"do": "chop_down_tree", "kind": "hardwood"}, 10)[1]
     stump = next(t.pos for t in isl.trees if t.kind == "stump")
     assert not g.walkable(stump)
     ok, msg = bodies.perform("A", {"do": "dig_stump"}, 11, rng)
@@ -420,6 +428,27 @@ def test_stumps_and_breaking_rocks():
     isl.v["A"].inventory["apple"] = 1
     ok, msg = bodies.perform("A", {"do": "break_rock", "rock": rock}, 12, rng)
     assert ok and g.rock_cells[rock - 1] is None and g.walkable(old), msg
+    # Runs from before version 4 keep one axe that never fells, and chop_down_tree to fell on purpose.
+    isl.prompt_version = 3
+    ok, msg = bodies.perform("A", {"do": "chop_wood", "axe": "axe"}, 13, rng)
+    assert ok and "brought the tree down" not in msg, msg
+    ok, msg = bodies.perform("A", {"do": "chop_down_tree", "kind": "hardwood"}, 14, rng)
+    assert ok and isl.collected["A"]["trees_removed"] == 2, msg
+    isl.prompt_version = 4
+    # Fruit trees have wood too: a stone axe leaves the tree and its fruit; the axe fells it and the fruit drops.
+    fruit_trees = [t for t in isl.trees if t.kind == "fruit"]
+    isl.new_day()
+    assert all(t.wood_left == isl.w["island"]["wood_per_tree"] for t in isl.trees if t.kind == "fruit")
+    ok, msg = bodies.perform("A", {"do": "chop_wood", "kind": "fruit", "axe": "stone axe"}, 15, rng)
+    assert ok and "fruit tree" in msg and "brought the tree down" not in msg, msg
+    assert len([t for t in isl.trees if t.kind == "fruit"]) == len(fruit_trees)
+    apples = isl.v["A"].inventory["apple"]
+    stumps = sum(1 for t in isl.trees if t.kind == "stump")
+    ok, msg = bodies.perform("A", {"do": "chop_wood", "kind": "fruit", "axe": "axe"}, 16, rng)
+    assert ok and "brought the tree down" in msg and "apple x3" in msg, msg
+    assert sum(1 for t in isl.trees if t.kind == "stump") == stumps + 1
+    assert len([t for t in isl.trees if t.kind == "fruit"]) == len(fruit_trees) - 1
+    assert isl.v["A"].inventory["apple"] == apples + 3
     for _ in range(isl.w["building"]["rock_respawn_days"]):
         isl.new_day()
         g.new_day(isl, random.Random(isl.day))
@@ -516,8 +545,9 @@ def test_tools_wear_out_and_recipe_cards_replace_them():
     assert all(a.inventory[t] == 1 for t in tools) and len(tools) == 6
     assert not set(isl.tool_recipes()) & a.recipes  # nobody knows how to make tools at the start
     isl.w["tools"]["uses"] = 3
-    assert isl.use_tool(a, "axe") is None and isl.use_tool(a, "axe") is None
-    assert isl.use_tool(a, "axe") == "your axe broke" and a.inventory["axe"] == 0
+    assert "stone axe" in tools and a.inventory["axe"] == 0  # the axe that fells trees is an upgrade
+    assert isl.use_tool(a, "stone axe") is None and isl.use_tool(a, "stone axe") is None
+    assert isl.use_tool(a, "stone axe") == "your stone axe broke" and a.inventory["stone axe"] == 0
     # Tool recipe cards are always at the Cranny; the daily card is never a tool.
     for _ in range(20):
         isl.new_day()
@@ -544,7 +574,7 @@ def test_bodies_need_tools_and_wear_ladders_on_climbs():
     isl, g, bodies = _grid_island()
     rng = random.Random(0)
     a = isl.v["A"]
-    a.inventory["axe"] = 0
+    a.inventory["axe"] = a.inventory["stone axe"] = 0
     pos = bodies.b["A"].pos
     ok, msg = bodies.perform("A", {"do": "chop_wood"}, 10, rng)
     assert not ok and msg == "you have no axe" and bodies.b["A"].pos == pos  # didn't set out
@@ -916,7 +946,7 @@ def test_runs_keep_their_prompt_wording_unless_switched_on_purpose():
         run_dir = Path(d) / "run"
         sim = IslandSimulation(sc, load_backends(None), run_dir, seed=10, backend_override="mock", verbose=False)
         sim.run(1)
-        assert sim.prompt_version == PROMPT_VERSION and json.loads((run_dir / "manifest.json").read_text())["prompt_version"] == 2
+        assert sim.prompt_version == PROMPT_VERSION and json.loads((run_dir / "manifest.json").read_text())["prompt_version"] == PROMPT_VERSION
         # Pretend this run started on version 1, as runs before versions did.
         ck = run_dir / "checkpoint.pkl"
         old = pickle.loads(ck.read_bytes())
@@ -930,15 +960,41 @@ def test_runs_keep_their_prompt_wording_unless_switched_on_purpose():
                                 prompt_version="latest")
         run = load_run(run_dir)
         (iv,) = run.of("intervention")
-        assert iv["from_day"] == 2 and iv["what"] == "prompt version 1 -> 2"
+        assert iv["from_day"] == 2 and iv["what"] == f"prompt version 1 -> {PROMPT_VERSION}"
+        assert len(iv["details"]) == PROMPT_VERSION - 1  # every change between the two
         assert run.manifest["interventions"][0]["from_day"] == 2
-        assert "intervention from day 2: prompt version 1 -> 2" in summary(run)
+        assert f"intervention from day 2: prompt version 1 -> {PROMPT_VERSION}" in summary(run)
         try:
             IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False,
                                     prompt_version=99)
             raise AssertionError("expected an unknown version to be refused")
         except ValueError:
             pass
+
+
+def test_tom_nook_or_isabelle_hand_out_a_map_from_version_3():
+    from llmabm.island.prompts import status_block
+    from llmabm.island.world import MAP
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=11)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=11, backend_override="mock", verbose=False)
+        sim.run(1)
+        isl, ari = sim.isl, sim.isl.v["Ari"]
+        ari.inventory[MAP] = 0
+        isl.map_text = sim.space.map_text(isl)
+        assert "- centre:" in isl.map_text and "homes:" in isl.map_text
+        isl.prompt_version = 2  # before version 3: no map
+        assert "map" not in isl.act("Ari", {"do": "ask", "who": "Tom Nook"}, 10)[1]
+        assert ari.inventory[MAP] == 0 and "Your island map" not in status_block(isl, ari, "10:00")
+        isl.prompt_version = 3
+        ok, msg = isl.act("Ari", {"do": "ask", "who": "Isabelle"}, 10)
+        assert ok and "You got an island map" in msg and ari.inventory[MAP] == 1
+        assert "map" not in isl.act("Ari", {"do": "ask", "who": "Tom Nook"}, 10)[1].split("(You got")[0][-60:]
+        assert ari.inventory[MAP] == 1  # one each
+        assert "Your island map:\n- northwest:" in status_block(isl, ari, "10:00")
+        ari.inventory[MAP] = 0  # given away, mailed or sold: the map goes with it
+        assert "Your island map" not in status_block(isl, ari, "10:00")
 
 
 def test_spending_choices_are_read_from_plans():

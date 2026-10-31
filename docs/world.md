@@ -110,7 +110,8 @@ morning, and a villager only knows the ones they have seen. Fish and bugs come a
 
 ## Tools
 
-Everyone starts with one of each, and nobody knows how to make them. Each breaks after 50
+Everyone starts with one of each, except the axe, which is an upgrade (its recipe card is at
+Nook's Cranny); nobody knows how to make them. Each breaks after 50
 uses. Without the tool an action fails before the villager sets out. Villagers aren't told how worn a
 tool is; they find out when it breaks. A replacement takes the tool's recipe card (always at Nook's
 Cranny, 500 bells) and materials. Spare tools can be
@@ -119,11 +120,12 @@ handed over or mailed, and a worn tool stays worn.
 | tool | worn by | made from |
 |---|---|---|
 | shovel | mine_rock, dig_fossil, dig_stump, break_rock | 5 hardwood |
-| axe | chop_wood, chop_down_tree | 3 stone, 1 iron nugget |
+| stone axe | chop_wood (the tree stays) | 5 stone |
 | fishing rod | fish | 4 wood |
 | net | catch_bug | 4 softwood |
 | ladder | each trip whose route climbs a cliff | 4 wood, 4 hardwood, 4 softwood |
 | vaulting pole | each trip whose route jumps the river | 5 wood |
+| axe | chop_wood; brings the tree down with its last wood (a fruit tree drops its fruit) | 3 wood, 1 iron nugget |
 
 ## Items
 
@@ -131,7 +133,7 @@ handed over or mailed, and a worn tool stays worn.
 
 | item | where it comes from | sells for |
 |---|---|---|
-| wood | chop_wood; chop_down_tree gives 2 | 60 |
+| wood | chop_wood | 60 |
 | softwood | chop_wood | 60 |
 | hardwood | chop_wood | 60 |
 | stone | mine_rock | 75 |
@@ -141,7 +143,7 @@ handed over or mailed, and a worn tool stays worn.
 | apple | shake_tree; eat one to break_rock | 100 |
 | sapling | Nook's Cranny | 160 |
 
-### Recipes (26)
+### Recipes (27)
 
 Everyone knows the ones marked ★ from day 0, plus 3 drawn at random from the
 rest (never a tool). More come on recipe cards: the Cranny's tool cards and its one other card a
@@ -153,7 +155,8 @@ out in pieces of one tile.
 | recipe | needs | sells for | notes |
 |---|---|---|---|
 | shovel | 5 hardwood | 200 | tool |
-| axe | 3 stone, 1 iron nugget | 250 | tool |
+| stone axe | 5 stone | 150 | tool |
+| axe | 3 wood, 1 iron nugget | 300 | tool |
 | fishing rod | 4 wood | 150 | tool |
 | net | 4 softwood | 150 | tool |
 | ladder | 4 wood, 4 hardwood, 4 softwood | 600 | tool |

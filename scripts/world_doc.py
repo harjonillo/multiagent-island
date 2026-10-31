@@ -195,7 +195,7 @@ def daily_section(w: dict) -> str:
 
 def items_section(w: dict) -> str:
     mats = w["materials"]
-    src = {"wood": "chop_wood; chop_down_tree gives 2", "softwood": "chop_wood", "hardwood": "chop_wood",
+    src = {"wood": "chop_wood", "softwood": "chop_wood", "hardwood": "chop_wood",
            "stone": "mine_rock", "clay": "mine_rock", "iron nugget": "mine_rock", "gold nugget": "mine_rock, rarely",
            w["island"]["native_fruit"]: "shake_tree; eat one to break_rock", "sapling": "Nook's Cranny"}
     mat_rows = [[k, src.get(k, ""), n(v)] for k, v in mats.items()]
@@ -303,13 +303,17 @@ between {n(fa['min_price'])} and {n(fa['max_price'])}.
 
 def tools_section(w: dict) -> str:
     t, rec = w["tools"], w["recipes"]
-    wears = {"shovel": "mine_rock, dig_fossil, dig_stump, break_rock", "axe": "chop_wood, chop_down_tree",
+    wears = {"shovel": "mine_rock, dig_fossil, dig_stump, break_rock", "stone axe": "chop_wood (the tree stays)",
+             "axe": "chop_wood; brings the tree down with its last wood (a fruit tree drops its fruit)",
              "fishing rod": "fish", "net": "catch_bug", "ladder": "each trip whose route climbs a cliff",
              "vaulting pole": "each trip whose route jumps the river"}
-    rows = [[k, wears.get(k, ""), needs(rec[k]["needs"]) if k in rec else ""] for k in t["start_with"]]
+    rows = [[k, wears.get(k, ""), needs(rec[k]["needs"]) if k in rec else ""]
+            for k in t["start_with"] + [r for r in rec if (w.get("items") or {}).get(r, {}).get("kind") == "tool"
+                                        and r not in t["start_with"]]]
     return f"""## Tools
 
-Everyone starts with one of each, and nobody knows how to make them. Each breaks after {t['uses']}
+Everyone starts with one of each, except the axe, which is an upgrade (its recipe card is at
+Nook's Cranny); nobody knows how to make them. Each breaks after {t['uses']}
 uses. Without the tool an action fails before the villager sets out. Villagers aren't told how worn a
 tool is; they find out when it breaks. A replacement takes the tool's recipe card (always at Nook's
 Cranny, {n(w['shops']['cranny'].get('tool_recipe_price', 500))} bells) and materials. Spare tools can be

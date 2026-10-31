@@ -202,10 +202,13 @@ fossils:                           # name: sell price once assessed
 recipes:                           # name: {needs, price (sell value), makes (default 1)}
   # ASSUMPTION throughout: material costs and prices as remembered from ACNH, approximate.
   # Tools (see `tools` below). A ladder climbs one cliff tier and a vaulting pole jumps the river.
-  # The axe is made from rock materials and the other tools from wood, so a broken axe or a
-  # broken shovel alone never leaves a villager unable to make a new one. ASSUMPTION: costs.
+  # Two axes, as in ACNH: the stone axe only gathers wood; the axe (iron) also brings a tree down
+  # when it takes the tree's last wood. Villagers start with the stone axe. The stone axe is made
+  # from stone and the shovel from wood, so a broken axe or a broken shovel alone never leaves a
+  # villager unable to make a new one. ASSUMPTION: costs.
   shovel: {needs: {hardwood: 5}, price: 200}
-  axe: {needs: {stone: 3, iron nugget: 1}, price: 250}
+  stone axe: {needs: {stone: 5}, price: 150}
+  axe: {needs: {wood: 3, iron nugget: 1}, price: 300}
   fishing rod: {needs: {wood: 4}, price: 150}
   net: {needs: {softwood: 4}, price: 150}
   ladder: {needs: {wood: 4, hardwood: 4, softwood: 4}, price: 600}
@@ -236,13 +239,14 @@ recipes:                           # name: {needs, price (sell value), makes (de
 recipes_known_at_start: 3          # each villager starts knowing this many random recipes (never tools)
 starter_recipes: [simple wooden fence]   # everyone knows these from day 0
 
-# Tools wear out. Everyone starts with one of each; when one breaks, its recipe card is always
-# for sale at Nook's Cranny. A use is one action that needs the tool (axe: chop_wood,
-# chop_down_tree; shovel: mine_rock, dig_fossil, dig_stump, break_rock; fishing rod: fish;
-# net: catch_bug), or one trip whose route climbs a cliff (ladder) or jumps the river (pole).
+# Tools wear out. Everyone starts with one of each basic tool (a stone axe, not the axe); when
+# one breaks, its recipe card is always for sale at Nook's Cranny, as is the axe's. A use is one
+# action that needs the tool (either axe: chop_wood; shovel: mine_rock, dig_fossil, dig_stump,
+# break_rock; fishing rod: fish; net: catch_bug), or one trip whose route climbs a cliff (ladder)
+# or jumps the river (pole).
 tools:
   uses: 50
-  start_with: [shovel, axe, fishing rod, net, ladder, vaulting pole]
+  start_with: [shovel, stone axe, fishing rod, net, ladder, vaulting pole]
 
 # What each item is, for the things that matter in space. Anything not listed is a plain
 # item you can carry, sell, give or trade. kind: furniture | fence | seeds | sapling | tool.
@@ -278,11 +282,13 @@ items:
   hyacinth seeds: {kind: seeds, grows: hyacinths}
   sapling: {kind: sapling}
   shovel: {kind: tool}
+  stone axe: {kind: tool}
   axe: {kind: tool}
   fishing rod: {kind: tool}
   net: {kind: tool}
   ladder: {kind: tool}
   vaulting pole: {kind: tool}
+  island map: {kind: map}          # Tom Nook or Isabelle hand one out when asked; carried, it shows the layout
   fishing bait: {kind: bait}       # fish with "bait": true and a fish is sure to appear (it can still get away)
 
 # Mental energy: one daily budget of tokens per villager for everything they read, think and

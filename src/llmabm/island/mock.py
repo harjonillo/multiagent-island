@@ -39,7 +39,7 @@ def _neighbors(prompt: str) -> list[str]:
     return [x.strip() for x in m.group(1).split(",")] if m else []
 
 
-_TOOLS = ("shovel", "axe", "fishing rod", "net", "ladder", "vaulting pole")
+_TOOLS = ("shovel", "stone axe", "fishing rod", "net", "ladder", "vaulting pole")
 _FURNITURE = ("log stool", "campfire", "stone stool", "wooden chair", "log bench", "wooden table", "small lamp")
 
 
@@ -74,7 +74,8 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
         elif r < 0.45 and r >= 0.39:
             acts.append(rng.choice([
                 {"do": "lay_path", "style": rng.choice(["dirt", "stone", "brick"]), "from": "home", "to": "Resident Services"},
-                {"do": "chop_down_tree", "kind": "hardwood", "near": "home"},
+                {"do": "chop_wood", "axe": "axe"},
+                {"do": "chop_wood", "kind": "fruit", "axe": "axe"},
                 {"do": "dig_stump", "near": "home"},
                 {"do": "buy", "shop": "cranny", "item": rng.choice(["tulip seeds", "cosmos seeds", "pansy seeds", "hyacinth seeds",
                                                                     "fishing bait"])},

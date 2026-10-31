@@ -119,7 +119,7 @@ run, a day and an hour, with every LLM call and output file, are in
   rock, tree, shell or dig spot first takes what is there.
 
 **Day 0: arrivals.** Every villager starts in a tent with 1,000 bells, no loan, one of each
-tool (shovel, axe, fishing rod, net, ladder, vaulting pole) and three random DIY recipes, plus
+basic tool (shovel, stone axe, fishing rod, net, ladder, vaulting pole) and three random DIY recipes, plus
 the simple wooden fence everyone knows. Nobody knows how to make tools yet. Everyone lands
 together at 05:00, and Tom Nook has a tent ready
 for each of them on a homesite drawn at random; nobody chooses. On landing day they are up
@@ -173,17 +173,26 @@ and each villager's prompt says which rocks and buildings are within reach and h
 away. Placed furniture and fences block walking, so villagers can wall off space. Trees,
 rocks, buildings (the plaza too) and homes always keep at least one free tile between them.
 
+**Two axes.** The stone axe, which everyone starts with, only gathers wood: the tree stays. The
+axe (iron) gathers wood too, and brings the tree down, leaving a stump, when it takes the tree's
+last wood of the day, as in ACNH. It is an upgrade: its recipe card is always at Nook's Cranny.
+With both, `chop_wood` uses the stone axe unless it says `"axe": "axe"`. Fruit trees have wood
+too (`"kind": "fruit"`): the stone axe leaves the tree and its fruit, and the axe brings it down
+for up to 3 wood plus whatever fruit it had. There is no separate felling action, so whether
+trees survive depends on which axe villagers choose. (Runs from
+before prompt version 4 keep one axe that never fells, and `chop_down_tree` to fell on purpose.)
+
 **Tools wear out.** Every tool breaks after 50 uses (`tools.uses`). A use is one action that
-needs it (axe: `chop_wood`, `chop_down_tree`; shovel: `mine_rock`, `dig_fossil`, `dig_stump`,
+needs it (either axe: `chop_wood`; shovel: `mine_rock`, `dig_fossil`, `dig_stump`,
 `break_rock`; fishing rod: `fish`; net: `catch_bug`; looking around without finding anything
 doesn't count), or one trip whose route climbs a cliff with the ladder or jumps the river with
 the pole (going home counts as a trip). Without the tool, the action fails before the villager
 sets out ("you have no axe"). Villagers aren't told how worn a tool is; they find out when it
 breaks. A replacement takes the tool's recipe card, always for sale at Nook's Cranny for 500
-bells, and materials: shovel 5 hardwood, axe 3 stone and 1 iron nugget, fishing rod 4 wood, net
-4 softwood, ladder 4 wood, 4 hardwood and 4 softwood, vaulting pole 5 wood. The axe takes rock
-materials and the others wood, so losing the axe or the shovel alone never leaves a villager
-stuck. Spare tools can be handed over or mailed, and a worn tool stays worn.
+bells, and materials: shovel 5 hardwood, stone axe 5 stone, axe 3 wood and 1 iron nugget,
+fishing rod 4 wood, net 4 softwood, ladder 4 wood, 4 hardwood and 4 softwood, vaulting pole 5
+wood. The stone axe takes stone and the shovel wood, so losing one of them never leaves a
+villager stuck. Spare tools can be handed over or mailed, and a worn tool stays worn.
 
 **Recipe cards.** Recipes come on cards: the Cranny's tool cards and one other card a day,
 message bottles on the beach, and other villagers. A card for a recipe you don't know is
@@ -273,6 +282,10 @@ building, their mental energy, and what is private. Everything else they learn o
 - **by asking.** `ask` an NPC at their building: Tom Nook (house upgrades and loans, moving
   home and the free homesites, the bridge), Isabelle (ordinances and their cost), Blathers (the
   museum and fossils), Timmy and Tommy (what they'd pay for what you're carrying) or the Able Sisters.
+  From prompt version 3, Tom Nook or Isabelle also hand over an `island map` the first time
+  someone asks. While a villager carries it, their plans show the island area by area (a 3 x 3
+  grid: ground and cliffs, beach and water, buildings, whose homes, rock numbers, trees), about
+  230 tokens, charged as reading. It is an item, so it can be given, mailed or traded.
 - **from each other**, at the plaza, in letters and in conversation.
 
 What they learn lasts as long as their memory does: today's and yesterday's events, their notes
@@ -348,7 +361,7 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 | action | parameters | what it does |
 |---|---|---|
 | `plant` | `item`: apple, sapling or flower seeds; `near` | a new tree, or flowers that bloom in 3 days |
-| `chop_down_tree` | `kind`: hardwood or fruit; `near` | leaves a stump and 2 wood |
+| `chop_wood` with `"axe": "axe"` | `kind`: hardwood or fruit | takes the tree's wood and, with its last wood, brings it down, leaving a stump; a fruit tree also drops its fruit (prompt version 4; earlier runs have `chop_down_tree`) |
 | `dig_stump` | `near` | clears the stump |
 | `break_rock` | `rock` | eat an apple first; the rock is gone and turns up elsewhere in 3 days |
 | `lay_path` | `style`: dirt, stone, brick, sand, terracotta; `from`, `to` | up to 30 tiles an hour; repeat to continue. Paths don't change walking speed by default |

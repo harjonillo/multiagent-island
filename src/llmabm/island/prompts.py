@@ -6,15 +6,20 @@ from collections import Counter
 
 from ..agent import AgentSpec
 from .memory import memory_lines
-from .world import ORDINANCE_TEXT, Island, Villager, _fmt, clock, fmt_window
+from .world import LATEST_PROMPT_VERSION, MAP, ORDINANCE_TEXT, Island, Villager, _fmt, clock, fmt_window
 
 # Prompt wording has versions so that a resumed run keeps the wording it started with, unless
 # it is switched on purpose (`llmabm resume --prompt-version`), which is logged as an intervention.
-PROMPT_VERSION = 2
+PROMPT_VERSION = LATEST_PROMPT_VERSION
 PROMPT_CHANGES = {
     1: "the original wording",
     2: "visit and ask: the action menu says who each is for, and visiting an NPC or a place, or asking a "
        "villager, says how to reach them instead",
+    3: "a map: asking Tom Nook or Isabelle gets you an island map, and while you carry it, your plans show the "
+       "island's layout area by area",
+    4: "axes: everyone starts with a stone axe, which only gathers wood; the axe (iron; its recipe card is at "
+       "Nook's Cranny) gathers wood and brings the tree down when it takes the tree's last wood. Fruit trees have "
+       "wood too, and drop their fruit when felled. There is no separate chop_down_tree",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -58,6 +63,10 @@ _MENU_CHANGES = {
         ("- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters)\n",
          "- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters: go to them and hear what "
          "they do and what it costs)\n")],
+    4: [("- chop_wood\n", "- chop_wood: kind? (hardwood | fruit), axe? (stone axe | axe; if you carry both, the stone axe. "
+                        "An axe brings the tree down when it takes its last wood, and a fruit tree drops its fruit; a "
+                        "stone axe never fells)\n"),
+        ("- chop_down_tree: kind (hardwood | fruit), near?\n", "")],
 }
 
 
@@ -168,6 +177,8 @@ def status_block(isl: Island, vil: Villager, when: str) -> str:
         f"{shops}\n"
         + memory_block(isl, vil)
         + (f"\nGetting around: {isl.where_notes[vil.name]}" if isl.where_notes.get(vil.name) else "")
+        + (f"\nYour island map:\n{isl.map_text}" if getattr(isl, "prompt_version", 1) >= 3 and vil.inventory[MAP] > 0
+           and getattr(isl, "map_text", "") else "")
         + spotted_lines(isl, vil)
         + energy_lines(isl, vil)
     )

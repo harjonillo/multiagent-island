@@ -572,6 +572,8 @@ class GridSpace(Space):
             return self._resolve_building(island, name, action, start, tools)
         if do in ("chop_wood", "shake_tree", "chop_down_tree"):
             kind = {"chop_wood": "hardwood", "shake_tree": "fruit"}.get(do, str(action.get("kind", "hardwood")).lower())
+            if do == "chop_wood" and getattr(island, "prompt_version", 1) >= 4:  # fruit trees have wood too
+                kind = str(action.get("kind", "hardwood")).lower()
             def ok(t):
                 if t.kind != kind or not t.pos:
                     return False
@@ -940,6 +942,64 @@ class GridSpace(Space):
         return (f"You are at {self.region(start)}. You carry: {', '.join(carry)}. Cliffs need a ladder and the river "
                 f"needs a vaulting pole (or a bridge).\nRocks: {rocks}\nBuildings: {places}"
                 + (f"\nYour mark on the island: {'; '.join(built)}" if built else ""))
+
+    _AREAS = ["northwest", "north", "northeast", "west", "centre", "east", "southwest", "south", "southeast"]
+
+    def _area(self, c: Cell) -> str:
+        return self.region(c).split(", ")[-1]
+
+    def map_text(self, island) -> str:
+        """The island map, one line per area of a 3 x 3 grid, in the same words as "Getting around":
+        what ground and water is there, buildings, whose homes, rock numbers and trees."""
+        land, water = {a: Counter() for a in self._AREAS}, {a: set() for a in self._AREAS}
+        for y in range(self.H):
+            for x in range(self.W):
+                t, a = self.terrain[y][x], self._area((x, y))
+                if t == GRASS:
+                    land[a][TIER_NAME.get(self.tier[y][x], "lower ground")] += 1
+                elif t == SAND:
+                    water[a].add("beach")
+                elif t == ROCKY:
+                    water[a].add("rocky shore")
+                elif t == RIVER:
+                    water[a].add("river")
+                elif t == POND:
+                    water[a].add("pond")
+                elif t == BRIDGE:
+                    water[a].add("the bridge")
+        things = {a: [] for a in self._AREAS}
+        for b, v in self.buildings.items():
+            things[self._area(v["door"])].append(b)
+        homes = {a: [] for a in self._AREAS}
+        for n, site in island.home.items():
+            if site in self.sites:
+                homes[self._area(self.sites[site]["door"])].append(n)
+        rocks = {a: [] for a in self._AREAS}
+        for i, c in enumerate(self.rock_cells):
+            if c:
+                rocks[self._area(c)].append(str(i + 1))
+        trees = {a: Counter() for a in self._AREAS}
+        for t in island.trees:
+            if t.pos and t.kind in ("hardwood", "fruit"):
+                trees[self._area(tuple(t.pos))][t.kind] += 1
+        lines = []
+        for a in self._AREAS:
+            ground = [k for k, n in land[a].most_common() if n >= 20]
+            if not ground and not water[a]:
+                lines.append(f"- {a}: sea")
+                continue
+            bits = [" and ".join(ground) if ground else "no dry land"]
+            bits += sorted(water[a])
+            if things[a]:
+                bits.append("buildings: " + ", ".join(things[a]))
+            if homes[a]:
+                bits.append("homes: " + ", ".join(sorted(homes[a])))
+            if rocks[a]:
+                bits.append("rocks " + ", ".join(rocks[a]))
+            if trees[a]:
+                bits.append(", ".join(f"{n} {k} tree{'s' if n > 1 else ''}" for k, n in sorted(trees[a].items())))
+            lines.append(f"- {a}: " + "; ".join(bits))
+        return "\n".join(lines)
 
     # --- helpers -----------------------------------------------------------------
     def _distance_from(self, sources: set[Cell], nbrs) -> list[list[int]]:

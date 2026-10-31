@@ -16,7 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .space import Point, Space
-from .world import MOVEMENT_TOOLS, TOOL_FOR, Island
+from .world import MOVEMENT_TOOLS, Island
 
 
 @dataclass
@@ -96,9 +96,9 @@ class Bodies:
     def perform(self, name: str, action: dict, hour: int, rng=None) -> tuple[bool, str]:
         body = self.b[name]
         vil = self.isl.v[name]
-        need = TOOL_FOR.get(str(action.get("do", "")).lower())
-        if need and vil.inventory[need] < 1:
-            return False, f"you have no {need}"
+        need, why = self.isl.tool_for(vil, action)
+        if why:
+            return False, why
         tools = self.tools_of(name)
         place, target, extra, err = self.space.resolve(self.isl, name, action, body.pos, tools, rng or _NoRng())
         body.place = place
@@ -112,7 +112,7 @@ class Bodies:
             notes = self._trip_wear(name, body.pos, target)
             body.walked_today += d
             body.pos = tuple(target)
-        act = {**action, **extra}
+        act = {**action, **extra, **({"_tool": need} if need else {})}
         ok, res = self.isl.act(name, act, hour)
         self.space.after_act(self.isl, name, act, ok)
         if ok and need and not act.get("none_seen"):  # looking around without finding anything doesn't wear it
