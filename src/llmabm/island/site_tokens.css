@@ -8,4 +8,12 @@
   --private-ink: #6A4FB8; --private-fill: #F1E9FA; --private-accent: #9B7FE0;
   --act-shops: #F08C5A; --fail: #B8452A; --chart-line: #E07A4F;
   --card-shadow: 4px 4px 0 var(--shadow); --tile-shadow: 3px 3px 0 var(--shadow);
+  /* Type scale: body text at --text-base, each step --ratio larger or smaller. Change these two to rescale. */
+  --text-base: 12px; --ratio: 1.25;
+  --step--1: calc(var(--text-base) / var(--ratio));
+  --step-0: var(--text-base);
+  --step-1: calc(var(--step-0) * var(--ratio));
+  --step-2: calc(var(--step-1) * var(--ratio));
+  --step-3: calc(var(--step-2) * var(--ratio));
+  --step-4: calc(var(--step-3) * var(--ratio));
 }

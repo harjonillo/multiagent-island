@@ -12,27 +12,27 @@
 <style>
 __TOKENS__
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--font-body); font-size: 14px; }
+body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); }
 a { color: var(--ink); } a:hover { color: var(--ink-muted); }
 button { font: inherit; color: inherit; cursor: pointer; }
 .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin: 20px 28px 0;
   padding: 10px 2px; border-top: 2px solid var(--tabbar-rule); border-bottom: 2px solid var(--tabbar-rule); }
-.logo, .crumb { font-family: var(--font-display); font-size: 18px; }
+.logo, .crumb { font-family: var(--font-display); font-size: var(--step-1); }
 .crumb { display: flex; align-items: center; gap: 8px; line-height: 1; } .crumb > a:first-child { text-decoration: none; }
 .crumb .sep { color: var(--ink-muted); }
-.runline { font-size: 13px; color: var(--ink-muted); }
+.runline { font-size: var(--step-0); color: var(--ink-muted); }
 .tabs { display: flex; gap: 4px; }
-.tabs button { min-height: 44px; padding: 8px 16px; border: 2px solid transparent; background: none; font-size: 14px; }
+.tabs button { min-height: 44px; padding: 8px 16px; border: 2px solid transparent; background: none; font-size: var(--step-0); }
 .tabs button[aria-current="page"] { border-color: var(--tabbar-rule); background: var(--tab-active-fill); font-weight: 600; }
 .head { padding: 20px 28px 8px; }
-h1 { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 400; line-height: 1.15; }
-.sub { font-size: 14px; color: var(--ink-muted); margin-top: 4px; }
+h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font-weight: 400; line-height: 1.15; }
+.sub { font-size: var(--step-0); color: var(--ink-muted); margin-top: 4px; }
 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; padding: 8px 28px 0; }
 .kpi { background: var(--panel); border: 2px solid var(--border); box-shadow: var(--tile-shadow); padding: 12px 14px; }
-.kpi .v { font-size: 22px; font-weight: 600; margin-top: 4px; }
-.label { font-family: var(--font-display); font-size: 12px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-muted); }
-.kpi .label { font-size: 11px; }
-.small { font-size: 12px; color: var(--ink-muted); }
+.kpi .v { font-size: var(--step-2); font-weight: 600; margin-top: 4px; }
+.label { font-family: var(--font-display); font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-muted); }
+.kpi .label { font-size: var(--step--1); }
+.small { font-size: var(--step--1); color: var(--ink-muted); }
 .cols { display: flex; flex-wrap: wrap; gap: 20px; padding: 16px 28px 28px; align-items: flex-start; }
 .col { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .col.left { flex: 1 1 480px; } .col.right { flex: 999 1 640px; }
@@ -41,36 +41,36 @@ h1 { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 
 .scroll { overflow-x: auto; }
 .map { position: relative; width: 100%; border: 1px solid var(--border); background: #A9D3E3; overflow: hidden; }
 .map canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0.92; }
-.map .bld { position: absolute; transform: translate(-50%, -100%); font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.78);
+.map .bld { position: absolute; transform: translate(-50%, -100%); font-size: var(--step--1); font-weight: 600; background: rgba(255,255,255,0.78);
   padding: 1px 6px; border-radius: 4px; white-space: nowrap; pointer-events: none; }
-.map .who { position: absolute; transform: translate(-50%, -50%); padding: 3px 9px; font-size: 12px; font-weight: 600; text-decoration: none;
+.map .who { position: absolute; transform: translate(-50%, -50%); padding: 3px 9px; font-size: var(--step--1); font-weight: 600; text-decoration: none;
   background: var(--panel); border: 1px solid rgba(59,47,42,0.3); }
 .trends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.trend-head { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.trend-head { display: flex; justify-content: space-between; gap: 8px; font-size: var(--step-0); }
 .trend svg { width: 100%; height: 60px; margin-top: 6px; display: block; overflow: visible; }
-.axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-muted); }
-.barrow { display: grid; grid-template-columns: minmax(0, 1fr) 110px 36px; gap: 10px; align-items: center; font-size: 13px; padding: 4px 0; }
+.axis { display: flex; justify-content: space-between; font-size: var(--step--1); color: var(--ink-muted); }
+.barrow { display: grid; grid-template-columns: minmax(0, 1fr) 110px 36px; gap: 10px; align-items: center; font-size: var(--step-0); padding: 4px 0; }
 .track { height: 10px; background: var(--fill-soft); } .track > div { height: 10px; background: var(--act-shops); }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .vtable { min-width: 680px; }
 .vrow { display: grid; grid-template-columns: 56px minmax(120px, 1.2fr) 150px 70px 80px minmax(0, 1fr); gap: 12px; align-items: center;
-  font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--fill-soft); }
-.vrow.th { font-family: var(--font-display); font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-muted);
+  font-size: var(--step-0); padding: 8px 0; border-bottom: 1px solid var(--fill-soft); }
+.vrow.th { font-family: var(--font-display); font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-muted);
   padding: 6px 0; border-bottom: 1px solid var(--border); }
 .vrow a { font-weight: 600; text-decoration: none; }
 .private { color: var(--private-ink); }
 .private .label, .label.private { color: var(--private-ink); display: flex; gap: 6px; align-items: center; }
 .pages { display: grid; gap: 6px 8px; align-items: stretch; }
-.pages .nm { font-size: 13px; font-weight: 600; align-self: center; }
-.cell { font-size: 13px; padding: 7px 10px; line-height: 1.35; background: var(--panel); border: 1px solid var(--border); min-width: 0; }
+.pages .nm { font-size: var(--step-0); font-weight: 600; align-self: center; }
+.cell { font-size: var(--step-0); padding: 7px 10px; line-height: 1.35; background: var(--panel); border: 1px solid var(--border); min-width: 0; }
 .cell.same { background: var(--private-fill); border-color: transparent; }
 .cell.skip { color: var(--ink-muted); font-style: italic; background: var(--ground); border-color: transparent; }
 .cell details summary { cursor: pointer; list-style: none; } .cell details summary::-webkit-details-marker { display: none; }
 .cell details[open] summary { margin-bottom: 6px; }
-.commons { display: grid; grid-template-columns: 70px 44px minmax(0, 1fr); gap: 10px; font-size: 13px; padding: 5px 0; border-top: 1px solid var(--fill-soft); }
-.legend { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-muted); }
+.commons { display: grid; grid-template-columns: 70px 44px minmax(0, 1fr); gap: 10px; font-size: var(--step-0); padding: 5px 0; border-top: 1px solid var(--fill-soft); }
+.legend { display: flex; flex-direction: column; gap: 4px; font-size: var(--step--1); color: var(--ink-muted); }
 .legend .grp { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; align-items: baseline; }
-.legend .grp > b { font-family: var(--font-display); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
+.legend .grp > b { font-family: var(--font-display); font-weight: 400; font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.02em; }
 .legend .items { display: flex; flex-wrap: wrap; gap: 4px 14px; }
 .legend .sw { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .legend .sw i { width: 12px; height: 12px; flex: none; border: 1px solid rgba(59,47,42,0.25); }
@@ -78,68 +78,68 @@ h1 { margin: 0; font-family: var(--font-display); font-size: 30px; font-weight: 
 /* Days */
 .dayhead { padding: 18px 28px 8px; display: flex; flex-direction: column; gap: 12px; }
 .chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.chip { min-height: 44px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 8px; background: var(--panel); border: 2px solid var(--border); font-size: 14px; }
+.chip { min-height: 44px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 8px; background: var(--panel); border: 2px solid var(--border); font-size: var(--step-0); }
 .chip[aria-pressed="true"] { border-color: var(--selected-border); }
 .chip .box { width: 16px; height: 16px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background: var(--panel); border: 1px solid var(--outline); }
 .chip[aria-pressed="true"] .box { background: var(--ink); border-color: var(--ink); }
-.linkbtn { min-height: 44px; padding: 8px 12px; border: none; background: none; font-size: 13px; text-decoration: underline; }
+.linkbtn { min-height: 44px; padding: 8px 12px; border: none; background: none; font-size: var(--step-0); text-decoration: underline; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
 .tile { background: var(--panel); border: 2px solid var(--border); box-shadow: var(--tile-shadow); padding: 10px 14px; }
-.tile .label { font-size: 11px; } .tile .v { font-size: 18px; font-weight: 600; margin-top: 4px; }
+.tile .label { font-size: var(--step--1); } .tile .v { font-size: var(--step-1); font-weight: 600; margin-top: 4px; }
 .lines4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
 .lines4 svg { width: 100%; height: 70px; margin-top: 6px; display: block; overflow: visible; }
 .vtabs { display: flex; flex-wrap: wrap; gap: 6px; }
-.vtabs button { min-height: 44px; min-width: 52px; padding: 8px 12px; background: var(--panel); border: 2px solid var(--border); font-size: 14px; }
+.vtabs button { min-height: 44px; min-width: 52px; padding: 8px 12px; background: var(--panel); border: 2px solid var(--border); font-size: var(--step-0); }
 .vtabs button[aria-selected="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--selected-border); font-weight: 600; }
 .vcard { padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; }
-.vname { font-family: var(--font-display); font-size: 22px; }
+.vname { font-family: var(--font-display); font-size: var(--step-2); }
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
-.stats .n { font-size: 20px; font-weight: 600; }
+.stats .n { font-size: var(--step-2); font-weight: 600; }
 .sec > .label { margin-bottom: 6px; }
-.dlabel { font-size: 12px; font-weight: 600; color: var(--ink-muted); margin: 8px 0 2px; }
-.hrow { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: 13px; padding: 5px 0; line-height: 1.4; }
+.dlabel { font-size: var(--step--1); font-weight: 600; color: var(--ink-muted); margin: 8px 0 2px; }
+.hrow { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: var(--step-0); padding: 5px 0; line-height: 1.4; }
 .hrow .h, .arow .h { color: var(--ink-muted); }
-.arow { display: grid; grid-template-columns: 44px minmax(0, 1fr) 72px; gap: 8px; padding: 7px 0; border-top: 1px solid var(--fill-soft); font-size: 13px; line-height: 1.4; }
-.arow .ok { text-align: right; font-size: 12px; font-weight: 600; color: var(--ink-muted); }
+.arow { display: grid; grid-template-columns: 44px minmax(0, 1fr) 72px; gap: 8px; padding: 7px 0; border-top: 1px solid var(--fill-soft); font-size: var(--step-0); line-height: 1.4; }
+.arow .ok { text-align: right; font-size: var(--step--1); font-weight: 600; color: var(--ink-muted); }
 .arow .ok.bad { color: var(--fail); }
 .thought { display: flex; gap: 6px; align-items: flex-start; color: var(--private-ink); }
 .thought svg { flex: none; margin-top: 3px; }
-.meta { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+.meta { font-size: var(--step--1); color: var(--ink-muted); margin-top: 2px; }
 .talk { padding: 8px 0; border-top: 1px solid var(--fill-soft); }
-.talk .thead { font-size: 12px; color: var(--ink-muted); margin-bottom: 6px; }
-.tline { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: 14px; margin-bottom: 6px; line-height: 1.4; }
+.talk .thead { font-size: var(--step--1); color: var(--ink-muted); margin-bottom: 6px; }
+.tline { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: var(--step-0); margin-bottom: 6px; line-height: 1.4; }
 .tline .who { font-weight: 600; }
-.act { font-size: 12px; color: var(--ink-muted); font-style: italic; }
+.act { font-size: var(--step--1); color: var(--ink-muted); font-style: italic; }
 .nightly { background: var(--private-fill); padding: 14px 16px; }
-.nightly .text { font-size: 15px; line-height: 1.5; }
-.more summary { cursor: pointer; font-size: 13px; text-decoration: underline; padding: 6px 0; }
-.empty { font-size: 14px; color: var(--ink-muted); }
+.nightly .text { font-size: var(--step-0); line-height: 1.5; }
+.more summary { cursor: pointer; font-size: var(--step-0); text-decoration: underline; padding: 6px 0; }
+.empty { font-size: var(--step-0); color: var(--ink-muted); }
 .talkgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
 .talkgrid .card { padding: 14px 16px; }
 /* Social */
 .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding: 10px 28px 14px; }
-.chip .n { color: var(--ink-muted); font-size: 12px; }
-.filters select { font: inherit; font-size: 14px; min-height: 44px; padding: 0 10px; border: 1px solid var(--border); background: var(--panel); color: var(--ink); }
+.chip .n { color: var(--ink-muted); font-size: var(--step--1); }
+.filters select { font: inherit; font-size: var(--step-0); min-height: 44px; padding: 0 10px; border: 1px solid var(--border); background: var(--panel); color: var(--ink); }
 .net { position: relative; width: 100%; max-width: 600px; aspect-ratio: 1; margin: 0 auto; }
 .net svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .net svg .hit { stroke: transparent; stroke-width: 18; cursor: pointer; }
 .net .node { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; display: flex; flex-direction: column; align-items: center;
   justify-content: center; background: var(--panel); color: var(--ink); border: 2px solid var(--outline); z-index: 2; padding: 0; }
 .net .node.on { background: var(--ink); color: var(--on-ink); border-color: var(--selected-border); }
-.net .node b { font-size: 14px; } .net .node span { font-size: 11px; opacity: 0.8; }
-.net .badge { position: absolute; transform: translate(-50%, -50%); background: var(--ink); color: var(--on-ink); font-size: 12px; padding: 2px 7px; z-index: 1; pointer-events: none; }
-.ptitle { font-family: var(--font-display); font-size: 20px; }
-.plain { font-size: 13px; min-height: 44px; padding: 0 12px; border: 1px solid var(--border); background: var(--panel); }
+.net .node b { font-size: var(--step-0); } .net .node span { font-size: var(--step--1); opacity: 0.8; }
+.net .badge { position: absolute; transform: translate(-50%, -50%); background: var(--ink); color: var(--on-ink); font-size: var(--step--1); padding: 2px 7px; z-index: 1; pointer-events: none; }
+.ptitle { font-family: var(--font-display); font-size: var(--step-2); }
+.plain { font-size: var(--step-0); min-height: 44px; padding: 0 12px; border: 1px solid var(--border); background: var(--panel); }
 .item { padding: 10px 0; border-top: 1px solid var(--fill-soft); }
-.item .top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--ink-muted); }
+.item .top { display: flex; justify-content: space-between; gap: 8px; font-size: var(--step--1); color: var(--ink-muted); }
 .item .dot { width: 8px; height: 8px; border-radius: 4px; display: inline-block; margin-right: 6px; }
-.item .ln { font-size: 14px; margin-top: 4px; line-height: 1.45; }
+.item .ln { font-size: var(--step-0); margin-top: 4px; line-height: 1.45; }
 .pair { width: 100%; min-height: 36px; display: grid; grid-template-columns: 96px minmax(0, 1fr) 28px; gap: 10px; align-items: center;
-  padding: 4px 8px; border: none; background: none; text-align: left; font-size: 13px; }
+  padding: 4px 8px; border: none; background: none; text-align: left; font-size: var(--step-0); }
 .pair.on { background: var(--fill-soft); }
 .pair .pbar { height: 8px; background: var(--fill-soft); } .pair.on .pbar { background: var(--panel); }
 .pair .pbar span { display: block; height: 8px; background: var(--ink-muted); }
-.talkgrid .said { font-size: 14px; margin-bottom: 4px; line-height: 1.4; }
+.talkgrid .said { font-size: var(--step-0); margin-bottom: 4px; line-height: 1.4; }
 @media (max-width: 1000px) { .trends { grid-template-columns: minmax(0, 1fr); } }
 </style>
 </head>
@@ -274,7 +274,7 @@ function home() {
         <div class="label private" style="margin-bottom:4px">${LOCK} Nightly pages, night by night</div>
         <div class="small" style="margin-bottom:10px">First line of what each villager wrote to themselves (private; click a line for the rest). Tinted: the same as the night before.</div>
         <div class="scroll"><div class="pages" style="grid-template-columns: 56px repeat(${nights.length}, minmax(180px, 1fr)); min-width:${56 + nights.length * 188}px">
-          <div></div>${nights.map((n) => `<div class="label" style="font-size:11px">Night ${n}</div>`).join("")}
+          <div></div>${nights.map((n) => `<div class="label" style="font-size: var(--step--1)">Night ${n}</div>`).join("")}
           ${R.villagers.map((n) => `<div class="nm">${esc(n)}</div>${nights.map((_, i) => pageCell(H.pages[n], i)).join("")}`).join("")}
         </div></div>
       </div>
@@ -282,7 +282,7 @@ function home() {
         <div class="label" style="margin-bottom:4px">Who took the commons</div>
         <div class="small" style="margin-bottom:8px">Concentration (HHI; ${(1 / R.villagers.length).toFixed(2)} is perfectly even) and the top three takers</div>
         ${H.commons.map((c) => `<div class="commons"><div style="font-weight:600">${esc(c.what)}</div><div>${c.hhi.toFixed(2)}</div><div class="small">${c.top.map(([n, s]) => `${esc(n)} ${pct(s)}`).join(", ")}</div></div>`).join("")}
-        <div style="font-size:13px; margin-top:10px; line-height:1.45">${roText("rocks", "Rocks")}; ${roText("shells", "shells")}; ${roText("fossils", "fossil spots")}.</div>
+        <div style="font-size: var(--step-0); margin-top:10px; line-height:1.45">${roText("rocks", "Rocks")}; ${roText("shells", "shells")}; ${roText("fossils", "fossil spots")}.</div>
       </div>
     </div>
   </main>`;
@@ -392,9 +392,9 @@ function days() {
     const items = talksOf(L).map((t) => ({h: t.h, html: `<div class="talk"><div class="thead">${hh(t.h)}:00 · ${t.visit ? `${esc(t.who[0])} visited ${esc(t.who[1])} at home` : `at the ${esc(t.where)}`}</div>
       ${t.lines.filter((l) => l[1] || l[3]).map(([who, said, thought, act]) => `<div class="tline"><div class="who">${esc(who)}</div><div>
         ${said ? `<div>“${text(said)}”</div>` : ""}${act ? `<div class="act">${esc(act)}</div>` : ""}
-        ${who === name && thought ? `<div class="thought" style="font-size:13px; margin-top:2px">${LOCK}<span>${text(thought)}</span></div>` : ""}</div></div>`).join("") || '<div class="empty">They just waved.</div>'}</div>`}));
+        ${who === name && thought ? `<div class="thought" style="font-size: var(--step-0); margin-top:2px">${LOCK}<span>${text(thought)}</span></div>` : ""}</div></div>`).join("") || '<div class="empty">They just waved.</div>'}</div>`}));
     mailOf(L).forEach((m) => items.push({h: m.h, html: `<div class="talk"><div class="thead">${hh(m.h)}:00 · ${m.kind}${m.to ? (m.from === name ? ` to ${esc(m.to)}` : ` from ${esc(m.from)}`) : ""}</div>
-      <div style="font-size:14px; line-height:1.4">${text(m.text)}</div></div>`}));
+      <div style="font-size: var(--step-0); line-height:1.4">${text(m.text)}</div></div>`}));
     return items.sort((x, y) => x.h - y.h).map((x) => x.html);
   }, "Talked to nobody.");
   const pages = sel.map((L) => {
@@ -423,7 +423,7 @@ function days() {
   </section>
   <main class="cols" style="padding-top:8px">
     <div class="col" style="flex: 999 1 600px">
-      <div class="tiles">${tiles.map(([l, v, s]) => `<div class="tile"><div class="label">${l}</div><div class="v">${v}</div><div class="small" style="font-size:11px">${s}</div></div>`).join("")}</div>
+      <div class="tiles">${tiles.map(([l, v, s]) => `<div class="tile"><div class="label">${l}</div><div class="v">${v}</div><div class="small" style="font-size: var(--step--1)">${s}</div></div>`).join("")}</div>
       ${mapHTML(lastDay, {sel: name, href: (n) => daysHref(n, picked)})}
       <div class="small">Homes, as of the end of day ${lastDay.day}. Click a villager to read their ${multi ? "days" : "day"}.</div>
       <div class="card"><div class="label" style="margin-bottom:12px">The commons ${multi ? "across the days picked" : "through the day"}</div>
@@ -434,7 +434,7 @@ function days() {
       <div class="card vcard">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px">
-            <div class="vname">${esc(name)}</div><div class="small" style="font-size:13px">${esc((lastDay.home_areas || {})[name] || "")}${lastL.houses[name] ? " · " + esc(lastL.houses[name]) : ""}</div></div>
+            <div class="vname">${esc(name)}</div><div class="small" style="font-size: var(--step-0)">${esc((lastDay.home_areas || {})[name] || "")}${lastL.houses[name] ? " · " + esc(lastL.houses[name]) : ""}</div></div>
           <div class="stats">${[[nActs, "actions"], [nFail, "failed"], [nSeen, "discoveries"], [nTalk, "talks and mail"]].map(([n, l]) => `<div><div class="n">${fmt(n)}</div><div class="small">${l}</div></div>`).join("")}</div>
         </div>
         <div class="sec"><div class="label">Plans</div>${plans}</div>
@@ -540,7 +540,7 @@ function social() {
     <div class="sub">Line thickness is the number of interactions between two villagers. Click a line, or a pair in the list, to read everything between them.</div></section>
   <section class="filters">
     <div class="chips"><span class="small" style="margin-right:4px">Kind of contact</span>${chips}</div>
-    <div style="display:flex; align-items:center; gap:8px; font-size:13px">
+    <div style="display:flex; align-items:center; gap:8px; font-size: var(--step-0)">
       <label for="from-day" class="small">From</label><select id="from-day">${opts(st.from)}</select>
       <label for="to-day" class="small">to</label><select id="to-day">${opts(st.to)}</select></div>
   </section>
@@ -555,7 +555,7 @@ function social() {
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap">
           <div class="ptitle">${title}</div>${node ? `<button class="plain" data-go="${go({node: null})}">Clear</button>` : ""}</div>
-        <div class="small" style="font-size:13px; margin-top:4px">${plural(items.length, "interaction")}, ${range}</div>
+        <div class="small" style="font-size: var(--step-0); margin-top:4px">${plural(items.length, "interaction")}, ${range}</div>
         ${items.length ? `<div style="margin-top:10px">${capped(items.map(itemHTML))}</div>` : `<div class="empty" style="margin-top:14px">${rows.length ? "Nothing between them with the current filters." : "No interactions with the current filters."}</div>`}
       </div>
       <div class="card"><div class="label" style="margin-bottom:8px">Pairs, most contact first</div>

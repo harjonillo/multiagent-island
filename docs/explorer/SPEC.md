@@ -25,6 +25,15 @@ to the experiments page in the top bar.
 - Add a test that builds the explorer for a short mock run and checks the embedded JSON has every
   villager, every day and no private field leaking where it shouldn't (see Privacy).
 
+## Type scale
+
+In the repo, every font size is a step on one modular scale: body text 12px, ratio 1.25 (`--text-base` and
+`--ratio` in `src/llmabm/island/site_tokens.css`; change those two to rescale everything). Steps:
+`--step--1` 9.6px (labels, meta, axis ticks), `--step-0` 12px (body), `--step-1` 15px, `--step-2`
+18.75px, `--step-3` 23.44px, `--step-4` 29.3px. The pixel sizes below are the handoff's, designed around
+14px body text; each maps to the step nearest its ratio to 14px: 11-12 to -1, 13-15 to 0, 18 to 1, 20-24
+to 2, 30 to 3, 34 to 4.
+
 ## Shared chrome
 
 - **Top bar:** inset to the page margins (28px), 20px above it, 2px `--tabbar-rule` lines above and below,
