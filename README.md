@@ -35,13 +35,17 @@ reasoning kept low), which has a free tier.
 4. Keep going later with `llmabm resume runs/test1 --days 1`.
 
 Always pass `--days` for a test: the scenarios default to 30. An island day for 10 villagers is
-about 65 to 70 calls and 100k tokens, and later days cost more. Groq's free tier allows 8,000
-tokens a minute and 200,000 a day per model, so two island days is about the most one run can do
-in a real day (the second may need finishing tomorrow), and each island day takes 10 to 15
-minutes because the backend paces itself to stay under the per-minute cap (`rpm` and `tpm` in
-`config/models.yaml`). The progress lines show the calls and tokens so far. If a run stops on a
-rate or daily limit, rerun the same command with the same seed (or `llmabm resume` it the next
-day): cached replies replay the finished part for free. Small models sometimes return broken
+about 150 to 170 calls and over 250k tokens (test1, November 2026), and later days cost more.
+Groq's free tier allows 8,000 tokens a minute and 200,000 a day per model, so one island day
+doesn't fit in one real day: a run stops at the daily cap partway through a day, and resuming it
+once the cap resets replays the unfinished part from the cache for free, then carries on. The cap
+error says how long to wait; trying earlier costs nothing (the replay is free) but gets no
+further. Each island day takes 10 to 15 minutes of calls, because the backend paces itself to stay
+under the per-minute cap (`rpm` and `tpm` in `config/models.yaml`). The progress lines show the
+calls and tokens so far. If a run stops on a rate or daily limit, rerun the same command with the
+same seed (or `llmabm resume` it the next day): cached replies replay the finished part for free.
+A resume that switched the prompt version (`--prompt-version`) needs the flag again until its
+first day finishes, because the checkpoint it replays from still has the old version. Small models sometimes return broken
 JSON; check the error count in `summary.txt` before reading much into a run. `--log-prompts` saves exactly what
 each villager saw, which is worth having on a first run.
 
@@ -66,9 +70,9 @@ LLM calls. More under [Outputs](#outputs).
 | command | what it does |
 |---|---|
 | `llmabm run <scenario>` | run a scenario. `--seed`, `--days` (or `--steps`), `--backend`, `--concurrency N`, `--no-cache`, `--log-prompts`, `--run-dir`, `--no-analyze` |
-| `llmabm resume <run_dir>` | continue an island run from its last checkpoint. `--days`, `--backend` |
+| `llmabm resume <run_dir>` | continue an island run from its last checkpoint. `--days`, `--backend`, `--prompt-version`, `--no-analyze` |
 | `llmabm analyze <run_dir>` | rebuild the summary, plots and logs, for example after you edit the analysis code |
-| `llmabm site <run_dir>` | build the run's explorer page, `<run_dir>/site/index.html` (from `site_data.json`, which `analyze` writes) |
+| `llmabm site <run_dir>` | build the run's explorer page, `<run_dir>/site/index.html`, from `site_data.json`. That file is written again first if it's missing or older than `events.jsonl`, so you don't need `analyze` before it |
 | `llmabm site runs/` | build every run's page and the Experiments page, `runs/site/index.html`: one door per run (numbered from 00; mock runs left out), each card opening to the run's initial conditions. `--out _site` builds the whole site in one folder to publish instead |
 
 Runs are written to `runs/<timestamp>_<scenario>_s<seed>/`.
@@ -89,7 +93,26 @@ git commit -m "Publish <run>" && git push
 ```
 
 To take one down, `git rm --cached` the two files and push. Once (in the repository's settings):
-Pages > Build and deployment > Source: GitHub Actions.
+Pages > Build and deployment > Source: GitHub Actions. On a free GitHub plan the repository has to
+be public for Pages, and then its whole history is public too.
+
+**You don't run `llmabm analyze` before pushing.** `site_data.json` (what the pages are built from)
+isn't committed: the workflow writes it from `manifest.json` and `events.jsonl` on every build. To
+preview locally, `llmabm site runs` does the same, and writes a run's `site_data.json` again
+whenever it's older than its `events.jsonl` (for example after a resume that stopped at a daily cap,
+which skips analyze).
+
+**Publish after a day finishes.** The Days, Social and map views show finished days only, but the
+Home counts include whatever is in `events.jsonl`, so committing it partway through a day publishes a
+half day that the next resume will set aside and replay. A resume that finished prints no
+`stopped:` line and has `days_completed` one higher in `manifest.json`. After each day:
+
+```bash
+llmabm resume runs/<run> --days 1        # until it finishes the day
+llmabm site runs                         # optional: preview at runs/site/index.html
+git add runs/<run>/manifest.json runs/<run>/events.jsonl
+git commit -m "Publish <run> through day N" && git push
+```
 
 The site shows the villagers' private thoughts, notes and nightly pages, and anyone with the link
 can read it. The villagers themselves can't: they are model calls with no web access, and their

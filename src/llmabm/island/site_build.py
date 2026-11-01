@@ -11,6 +11,7 @@ import html
 import json
 from pathlib import Path
 
+from .site_data import VERSION as SITE_DATA_VERSION
 from .site_data import write as write_site_data
 from .site_experiments import TOKENS, build_experiments, experiment_order, is_run
 
@@ -25,14 +26,28 @@ def _crumb(run_dir: Path, home: str) -> str:
             + (f' / exp {n:02d}' if n is not None else "") + "</span>")
 
 
-def build_site(run_dir: Path, out_dir: Path | None = None, home: str = "../../site/index.html") -> Path:
-    """Write <out_dir>/index.html (default <run_dir>/site/) from <run_dir>/site_data.json. `home` is
-    the link to the Experiments page, relative to the page."""
+def fresh_site_data(run_dir: Path) -> Path:
+    """<run_dir>/site_data.json, written again (no LLM calls) if it is missing, older than the run's
+    events.jsonl or manifest.json (say after a resume that stopped at a daily cap, which skips
+    `llmabm analyze`), or from an older version of the site code."""
     run_dir = Path(run_dir)
-    src = run_dir / "site_data.json"
-    if not src.exists():
-        raise FileNotFoundError(f"{src} not found; run `llmabm analyze {run_dir}` first")
-    data = json.loads(src.read_text())
+    out = run_dir / "site_data.json"
+    if out.exists():
+        newest = max((run_dir / f).stat().st_mtime for f in ("events.jsonl", "manifest.json") if (run_dir / f).exists())
+        try:
+            current = json.loads(out.read_text()).get("version") == SITE_DATA_VERSION
+        except ValueError:
+            current = False
+        if current and out.stat().st_mtime >= newest:
+            return out
+    return write_site_data(run_dir)
+
+
+def build_site(run_dir: Path, out_dir: Path | None = None, home: str = "../../site/index.html") -> Path:
+    """Write <out_dir>/index.html (default <run_dir>/site/) from <run_dir>/site_data.json, brought up to
+    date first (fresh_site_data). `home` is the link to the Experiments page, relative to the page."""
+    run_dir = Path(run_dir)
+    data = json.loads(fresh_site_data(run_dir).read_text())
     out_dir = Path(out_dir) if out_dir else run_dir / "site"
     out_dir.mkdir(parents=True, exist_ok=True)
     # Inside <script>, "</" could end the element early; JSON allows escaping it.
@@ -46,9 +61,9 @@ def build_site(run_dir: Path, out_dir: Path | None = None, home: str = "../../si
 
 
 def build_all(runs_dir: Path, out_dir: Path | None = None) -> list[Path]:
-    """Every experiment's page in a runs folder (mock runs aside), then the Experiments page. A run without
-    site_data.json gets it first (no LLM calls; the same data `llmabm analyze` writes), so a run needs
-    only manifest.json and events.jsonl.
+    """Every experiment's page in a runs folder (mock runs aside), then the Experiments page. Each run's
+    site_data.json is written first if it is missing or out of date (fresh_site_data; no LLM calls),
+    so a run needs only manifest.json and events.jsonl.
 
     By default the pages go inside the runs folder (<run>/site/, and site/ for the Experiments page).
     With out_dir, the whole site goes there instead, ready to publish: index.html is the Experiments
@@ -56,8 +71,6 @@ def build_all(runs_dir: Path, out_dir: Path | None = None) -> list[Path]:
     runs_dir = Path(runs_dir)
     out = []
     for run_dir in experiment_order(runs_dir):
-        if not (run_dir / "site_data.json").exists():
-            write_site_data(run_dir)
         if out_dir:
             out.append(build_site(run_dir, Path(out_dir) / run_dir.name, home="../index.html"))
         else:
@@ -66,4 +79,4 @@ def build_all(runs_dir: Path, out_dir: Path | None = None) -> list[Path]:
     return out
 
 
-__all__ = ["build_all", "build_site", "build_experiments", "is_run"]
+__all__ = ["build_all", "build_site", "build_experiments", "fresh_site_data", "is_run"]

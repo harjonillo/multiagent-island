@@ -982,6 +982,23 @@ def test_site_data_and_page_for_a_mock_run():
         root, page = (pub / "index.html").read_text(), (pub / "real" / "index.html").read_text()
         assert 'href="real/index.html"' in root and 'href="../index.html"' in page and "No page yet" not in root
         assert all('name="robots" content="noindex' in p for p in (root, page))
+        # A site_data.json older than the run's events (a resume that stopped at a daily cap skips
+        # analyze), or from older site code, is written again before a page is built; a current one is kept.
+        import os
+
+        from llmabm.island.site_build import fresh_site_data
+
+        sd = real / "site_data.json"
+        for stale in ({"version": 3, "stale": True}, {"version": 0}):
+            sd.write_text(json.dumps(stale))
+            if "stale" in stale:
+                t = (real / "events.jsonl").stat().st_mtime - 60
+                os.utime(sd, (t, t))
+            assert "stale" not in json.loads(fresh_site_data(real).read_text())
+            assert json.loads(sd.read_text())["version"] != 0
+        kept = sd.stat().st_mtime_ns
+        fresh_site_data(real)
+        assert sd.stat().st_mtime_ns == kept
     assert fail_bucket("you have no axe") == "Has no tool for it" and fail_bucket("whatever") == "Other"
 
 
