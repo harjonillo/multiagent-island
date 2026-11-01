@@ -273,17 +273,19 @@ class IslandSimulation:
         # Rebuild system prompts from the saved specs with the current prompt code.
         sim._build_systems()
         _set_aside_unfinished(run_dir, getattr(sim, "_log_offset", None), sim.isl.day)
+        _drop_unfinished_interventions(run_dir, sim.isl.day)
         sim._open_log("a")
         sim.log("resume", from_day=sim.isl.day + 1, days=days, time=time.time(), prompt_version=sim.prompt_version)
         if change:
             sim._intervene(sim.isl.day + 1, f"prompt version {change[0]} -> {change[1]}",
-                           [PROMPT_CHANGES[v] for v in range(change[0] + 1, change[1] + 1) if v in PROMPT_CHANGES]
+                           [_change_note(v, sim.sc.world) for v in range(change[0] + 1, change[1] + 1) if v in PROMPT_CHANGES]
                            if change[1] > change[0] else [f"back to: {PROMPT_CHANGES[change[1]]}"])
         try:
             sim._run_days(days)
         finally:
             sim.hour = None
-            sim.log("run_end", time=time.time(), calls=sim.calls)
+            sim.log("run_end", time=time.time(), calls=sim.calls, provider_tokens=sim.provider_tokens,
+                    reasoning_tokens=sim.reasoning_tokens)
             sim._raw_log.close()
         return run_dir
 
@@ -1177,6 +1179,34 @@ class IslandSimulation:
             "system_prompts": self.systems,
         }
         (self.run_dir / "manifest.json").write_text(json.dumps(m, indent=2, ensure_ascii=False))
+
+
+def _change_note(version: int, world: dict) -> str:
+    """What prompt version `version` changed, for the intervention record. The axe note says what this run's
+    villagers carry: a run's world (and so its starting tools) is the one it started with."""
+    if version == 4 and "stone axe" not in ((world.get("tools") or {}).get("start_with") or []):
+        stone = ("a stone axe only gathers wood" if "stone axe" in json.dumps(world)
+                 else "this run's island has no stone axe")
+        return ("axes: chopping wood with the axe (iron) brings the tree down when it takes the tree's last wood; "
+                f"{stone}. Fruit trees have wood too, and drop their fruit when felled. There is no separate "
+                "chop_down_tree. This run's villagers started with the axe, so they keep it")
+    return PROMPT_CHANGES[version]
+
+
+def _drop_unfinished_interventions(run_dir: Path, day: int) -> None:
+    """A resume replays from the end of `day`: interventions recorded for later days belong to the
+    attempt that didn't finish (its events were set aside), and the resume records its own again."""
+    path = run_dir / "manifest.json"
+    if not path.exists():
+        return
+    m = json.loads(path.read_text())
+    kept = [i for i in m.get("interventions", []) if i.get("from_day", 0) <= day]
+    if len(kept) != len(m.get("interventions", [])):
+        if kept:
+            m["interventions"] = kept
+        else:
+            m.pop("interventions")
+        path.write_text(json.dumps(m, indent=2, ensure_ascii=False))
 
 
 def _set_aside_unfinished(run_dir: Path, offset: int | None, day: int) -> Path | None:

@@ -10,7 +10,9 @@ default: groq
 
 backends:
   # Groq's free tier (October 2026): 30 requests/min, 1,000 requests/day, 8,000 tokens/min and
-  # 200,000 tokens/day per model. A 2-day island_blank run is roughly 150-200k tokens. Groq no
+  # 200,000 tokens/day per model. An island_blank day with 10 villagers is roughly 150-170 calls and
+  # 250k+ tokens, more than one day's cap: a run stops at the cap and `llmabm resume` continues it
+  # once the cap resets (cached replies replay the unfinished day for free). Groq no
   # longer serves Llama chat models; these are reasoning models, so keep reasoning short or it
   # eats the reply budget (gpt-oss-20b at its default effort returned empty replies).
   # `params` are sent with every request.

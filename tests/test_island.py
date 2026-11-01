@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 
 from llmabm.island import IslandSimulation, load_island_scenario
+from llmabm.island.sim import _change_note
 from llmabm.island.analysis import day_log, extraction_shares, forgone_donations, summary
 from llmabm.island.world import Island, load_world
 from llmabm.analysis import load_run
@@ -1015,14 +1016,23 @@ def test_runs_keep_their_prompt_wording_unless_switched_on_purpose():
         run = load_run(kept)
         assert not run.of("intervention") and run.of("resume")[-1]["prompt_version"] == 1
         # Switching on purpose is logged, in the events and the manifest, from the next day.
-        IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False,
-                                prompt_version="latest")
-        run = load_run(run_dir)
-        (iv,) = run.of("intervention")
-        assert iv["from_day"] == 2 and iv["what"] == f"prompt version 1 -> {PROMPT_VERSION}"
-        assert len(iv["details"]) == PROMPT_VERSION - 1  # every change between the two
-        assert run.manifest["interventions"][0]["from_day"] == 2
-        assert f"intervention from day 2: prompt version 1 -> {PROMPT_VERSION}" in summary(run)
+        before_switch = ck.read_bytes()
+        for attempt in range(2):
+            IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False,
+                                    prompt_version="latest")
+            run = load_run(run_dir)
+            (iv,) = run.of("intervention")
+            assert iv["from_day"] == 2 and iv["what"] == f"prompt version 1 -> {PROMPT_VERSION}"
+            assert len(iv["details"]) == PROMPT_VERSION - 1  # every change between the two
+            assert [i["from_day"] for i in run.manifest["interventions"]] == [2]
+            assert f"intervention from day 2: prompt version 1 -> {PROMPT_VERSION}" in summary(run)
+            assert "provider_tokens" in run.of("run_end")[-1]
+            if attempt == 0:  # as if day 2 had stopped at a daily limit: the next resume replays it
+                ck.write_bytes(before_switch)
+        # The axe note says what the run's villagers carry: its world is the one it started with.
+        assert "everyone starts with a stone axe" in _change_note(4, sc.world)
+        old_world = {**sc.world, "tools": {**sc.world["tools"], "start_with": ["shovel", "axe"]}}
+        assert "started with the axe" in _change_note(4, old_world)
         try:
             IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False,
                                     prompt_version=99)
