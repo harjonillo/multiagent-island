@@ -131,6 +131,49 @@ def experiment(run_dir: Path, number: int) -> dict:
     }
 
 
+def _day(n: int, dates: dict) -> str:
+    return f"day {n}" + (f" · {dates[n]}" if dates.get(n) else "")
+
+
+def _real_date(t: float) -> str:
+    lt = time.localtime(t)
+    return f"{time.strftime('%b', lt)} {lt.tm_mday}, {lt.tm_year}"
+
+
+def changes(run_dir: Path, e: dict) -> list[dict]:
+    """The changelog entries for one experiment: when it started, then every deliberate change mid-run
+    (`intervention` events, such as a switch of prompt version on resume), each from the island day it
+    applies. `time` is when it happened in the real world, for ordering the whole changelog."""
+    run_dir = Path(run_dir)
+    m = json.loads((run_dir / "manifest.json").read_text())
+    dates, start_time, out = {}, None, []
+    p = run_dir / "events.jsonl"
+    events = [json.loads(line) for line in p.open()] if p.exists() else []
+    for ev in events:
+        if ev.get("type") == "day_start":
+            dates[ev["day"]] = (ev.get("date") or "").split(",")[0]  # "April 1, spring, rain" -> "April 1"
+        elif ev.get("type") == "run_start" and start_time is None:
+            start_time = ev.get("time")
+    v = m.get("prompt_version", 1)  # runs from before prompt versions used the original wording
+    t0 = start_time or run_dir.stat().st_mtime
+    out.append({"time": t0, "date": _real_date(t0), "number": e["number"], "href": e.get("href"),
+                "what": "Started", "when": _day(0, dates),
+                "details": [{"title": "", "text": f"{m['scenario']}, seed {m['seed']}, {len(m['villagers'])} villagers, "
+                             f"{e['agents']}, prompt version {v}" + (" (the original wording)" if v == 1 else "")}]})
+    for ev in events:
+        if ev.get("type") != "intervention":
+            continue
+        details = []
+        for d in ev.get("details") or []:
+            title, sep, rest = d.partition(": ")
+            details.append({"title": title, "text": rest} if sep else {"title": "", "text": d})
+        t = ev.get("time") or t0
+        out.append({"time": t, "date": _real_date(t), "number": e["number"], "href": e.get("href"),
+                    "what": ev["what"].replace(" -> ", " → "), "when": "from " + _day(ev["from_day"], dates),
+                    "details": details})
+    return out
+
+
 # --- the page ------------------------------------------------------------------------------
 def _pos(d: dict) -> str:
     return "; ".join(f"{k}: {v}" for k, v in d.items())
@@ -198,6 +241,39 @@ def empty_html(number: int, runs_dir: Path) -> str:
     </div>"""
 
 
+def _sentence(t: str) -> str:
+    t = t[:1].upper() + t[1:]
+    return t if t[-1:] in ".!?" else t + "."
+
+
+def changelog_html(entries: list[dict]) -> str:
+    """The sidebar: every experiment's start and changes, newest first. It folds to a tab (the script
+    remembers which); without the script it stays open."""
+    items = []
+    for c in sorted(entries, key=lambda c: -c["time"]):
+        exp = f"EXP {c['number']:02d}"
+        exp = f'<a href="{html.escape(c["href"])}">{exp}</a>' if c.get("href") else exp
+        details = ""
+        for d in c["details"]:
+            title = f"<b>{html.escape(_sentence(d['title']))}</b> " if d["title"] else ""
+            details += f"<li>{title}{html.escape(_sentence(d['text']))}</li>"
+        items.append(f'<li><div class="when">{html.escape(c["date"])}</div>'
+                     f'<div class="what"><span class="exp">{exp}</span> {html.escape(c["what"][:1].upper() + c["what"][1:])}</div>'
+                     f'<div class="when">{html.escape(c["when"][:1].upper() + c["when"][1:])}</div>'
+                     f'<ul>{details}</ul></li>')
+    n = len(entries)
+    return f"""<aside class="clog" id="clog">
+  <button class="tab" type="button" data-log="open" aria-expanded="false" aria-controls="clog-panel" title="Show the changelog">
+    <span class="chev left" aria-hidden="true"></span>Changelog<span class="n">{n}</span></button>
+  <div class="panel" id="clog-panel">
+    <div class="top"><div class="label">Changelog</div>
+      <button class="fold" type="button" data-log="closed" aria-expanded="true" aria-controls="clog-panel" title="Hide the changelog" aria-label="Hide the changelog"><span class="chev right" aria-hidden="true"></span></button></div>
+    <div class="note" style="margin:0 0 14px">When each experiment started, and what was changed on purpose since, newest first.</div>
+    <ol class="log">{"".join(items) or '<li><div class="what">No experiments yet.</div></li>'}</ol>
+  </div>
+</aside>"""
+
+
 def build_experiments(runs_dir: Path, out_dir: Path | None = None) -> Path:
     """Write the Experiments page over every run in the folder.
 
@@ -219,6 +295,7 @@ def build_experiments(runs_dir: Path, out_dir: Path | None = None) -> Path:
     page = (TEMPLATE.read_text().replace("__TOKENS__", TOKENS.read_text())
             .replace("__COUNT__", f"{len(exps)} experiment" + ("" if len(exps) == 1 else "s"))
             .replace("__DOORS__", doors)
+            .replace("__CHANGELOG__", changelog_html([c for e in exps for c in changes(runs_dir / e["dir"], e)]))
             .replace("__FRAMES__", json.dumps(frames).replace("</", "<\\/")))
     out = out_dir / "index.html"
     out.write_text(page)

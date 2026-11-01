@@ -18,10 +18,10 @@ a { color: var(--ink); } a:hover { color: var(--ink-muted); }
   padding: 10px 2px; border-top: 2px solid var(--tabbar-rule); border-bottom: 2px solid var(--tabbar-rule); }
 .logo { font-family: var(--font-display); font-size: var(--step-1); }
 .count { font-size: var(--step-0); color: var(--ink-muted); }
-.intro { padding: 28px 28px 8px; text-align: center; }
+.intro { padding: 28px 0 8px; text-align: center; }
 h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-4); font-weight: 400; line-height: 1.15; }
 .intro .sub { font-size: var(--step-0); color: var(--ink-muted); margin-top: 8px; }
-main { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 48px; padding: 28px 28px 0; }
+main { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 48px; padding: 28px 0 0; }
 .slot { width: 300px; display: flex; flex-direction: column; }
 
 /* The door: frame, then the panel over the doorway, then sign and handle. Sprites only, no transforms. */
@@ -63,6 +63,39 @@ main { display: flex; flex-wrap: wrap; justify-content: center; align-items: fle
 .card.next { background: none; box-shadow: none; border: 2px dashed #D2C0AC; color: var(--ink-muted); line-height: 1.5; }
 .card.next .title { color: var(--ink); margin-bottom: 6px; }
 .cmd { font-size: var(--step--1); background: var(--fill-soft); color: var(--ink); padding: 8px 10px; margin-top: 8px; overflow-x: auto; white-space: nowrap; }
+
+/* The changelog sits in the page's right margin, out of the doors' way: both margins are kept wide enough for
+   it (--side), so the doors never move when it opens or folds. Where that doesn't fit, the margins only make
+   room for the folded tab, and the open panel covers part of the doors. */
+:root { --clog-w: 280px; --clog-top: 92px; --side: calc(28px + 44px + 16px); }
+@media (min-width: 1320px) { :root { --side: calc(28px + var(--clog-w) + 28px); } }
+@media (max-width: 599px) { :root { --side: 16px; } .clog { right: 16px; } .clog .panel { width: calc(100vw - 32px); } }  /* phones: the tab sits over the doors' edge */
+.page { padding: 0 var(--side); }
+.clog { position: fixed; z-index: 10; top: var(--clog-top); right: 28px; max-height: calc(100vh - var(--clog-top) - 16px); display: flex; }
+.clog .tab { display: none; min-height: 44px; min-width: 44px; padding: 14px 10px; background: var(--panel); border: 2px solid var(--border);
+  box-shadow: var(--tile-shadow); writing-mode: vertical-rl; font-family: var(--font-display); font-size: var(--step--1);
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-muted); align-items: center; gap: 8px; cursor: pointer; }
+.clog .tab .n { background: var(--ink); color: var(--on-ink); padding: 3px 2px; writing-mode: horizontal-tb; font-family: var(--font-body); letter-spacing: 0; }
+.clog.folded .tab { display: flex; } .clog.folded .panel { display: none; }
+.clog .tab:hover, .clog .fold:hover { border-color: var(--selected-border); color: var(--ink); }
+.clog .tab:focus-visible, .clog .fold:focus-visible { outline: 2px solid var(--tabbar-rule); outline-offset: 2px; }
+.clog .panel { width: min(var(--clog-w), calc(100vw - 56px)); overflow-y: auto; background: var(--panel); border: 2px solid var(--border); box-shadow: var(--card-shadow); padding: 14px 16px; }
+.clog .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.clog .label { font-family: var(--font-display); font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-muted); }
+.clog .fold { min-height: 32px; min-width: 32px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 2px solid var(--border); color: var(--ink-muted); cursor: pointer; }
+/* Pixel chevrons, as sprites. */
+.chev { width: 10px; height: 10px; flex: none; background: no-repeat center / 10px 10px; }
+.chev.right { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath fill='%236E5D52' d='M1 0h1v1H1zM2 1h1v1H2zM3 2h1v1H3zM2 3h1v1H2zM1 4h1v1H1z'/%3E%3C/svg%3E"); }
+.chev.left { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath fill='%236E5D52' d='M3 0h1v1H3zM2 1h1v1H2zM1 2h1v1H1zM2 3h1v1H2zM3 4h1v1H3z'/%3E%3C/svg%3E"); }
+.log { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--rule); }
+.log > li { position: relative; padding-bottom: 16px; } .log > li:last-child { padding-bottom: 0; }
+.log > li::before { content: ""; position: absolute; left: -20px; top: 3px; width: 10px; height: 10px; background: var(--chart-line); }
+.log .when { font-size: var(--step--1); color: var(--ink-muted); }
+.log .what { font-weight: 600; margin: 2px 0; }
+.log .exp { font-family: var(--font-display); font-weight: 400; font-size: var(--step--1); margin-right: 4px; }
+.log ul { margin: 6px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.log ul li { font-size: var(--step--1); line-height: 1.45; color: var(--ink-muted); } .log ul li b { color: var(--ink); }
+@media (max-width: 1319px) { .clog .panel { box-shadow: var(--card-shadow), 0 6px 24px rgba(59, 47, 42, 0.18); } }
 </style>
 </head>
 <body>
@@ -70,12 +103,15 @@ main { display: flex; flex-wrap: wrap; justify-content: center; align-items: fle
   <div class="logo">multiagent-island</div>
   <div class="count">__COUNT__</div>
 </header>
+<div class="page">
 <section class="intro">
   <h1>pick a door</h1>
   <div class="sub">Each door is one experiment. Open it to see everything that happened on that island.</div>
 </section>
 <main>__DOORS__
 </main>
+</div>
+__CHANGELOG__
 <script>
 "use strict";
 // Opening a door: four sprite frames about 110 ms apart, then go to the run's page 300 ms later.
@@ -94,6 +130,26 @@ document.querySelectorAll("a.door").forEach((door) => {
     FRAMES.forEach((svg, i) => setTimeout(() => { box.innerHTML = svg; }, (i + 1) * 110));
     setTimeout(() => { location.href = door.href; }, FRAMES.length * 110 + 300);
   });
+});
+// The changelog folds to a tab and back. Where it has room beside the doors, the choice is remembered
+// between visits; where open it would cover the doors, it starts folded, and Escape folds it.
+const clog = document.getElementById("clog");
+const covers = window.matchMedia("(max-width: 1319px)");
+const fold = (folded, focus) => {
+  clog.classList.toggle("folded", folded);
+  if (focus) clog.querySelector(folded ? ".tab" : ".fold").focus();
+};
+let stored = null;
+try { stored = localStorage.getItem("changelog"); } catch (e) { /* storage off */ }
+fold(covers.matches || stored === "closed", false);
+clog.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-log]");
+  if (!b) return;
+  fold(b.dataset.log === "closed", true);
+  if (!covers.matches) try { localStorage.setItem("changelog", b.dataset.log); } catch (err) { /* just this visit */ }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && covers.matches && !clog.classList.contains("folded")) fold(true, true);
 });
 // Coming back with the browser's back button shows the doors closed again.
 window.addEventListener("pageshow", (e) => {

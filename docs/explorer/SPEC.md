@@ -104,6 +104,17 @@ each in a 300px column with its card below.
 - **An empty slot** after the last door: the same door faded (grayscale 60%, opacity 0.55, `EMPTY_DOOR`
   colours), sign with the next number / `empty lot`, and a dashed card "Next experiment" with an example command
   for starting another run. Not a link.
+- **Changelog** (added Nov 1, in the repo): a sidebar fixed in the page's right margin, 280px, panel
+  style, headed `Changelog` (Silkscreen label) with a fold button (a pixel chevron). Entries newest first
+  on a timeline (2px rule, a 10px square per entry): the real date, then `EXP NN` (linking to the run) and
+  what happened, then the island day it applies from, then the details as short sentences with a bold
+  lead. One entry per experiment's start (scenario, seed, villagers, model, prompt version) and one per
+  `intervention` event (such as a prompt version switch on resume). Folded, it is a vertical tab reading
+  `Changelog` with the entry count. The doors never move when it opens or folds: both side margins are
+  fixed, wide enough for the open panel from 1320px up; narrower, they only fit the folded tab, and the
+  open panel covers part of the doors (it starts folded there, and Escape folds it). Phones (below 600px)
+  get 16px margins and the tab sits over the doors' edge. Where it has room, open or folded is kept in
+  `localStorage`.
 
 Data: `manifest.json` per run (scenario name, seed, backend and model, scenario days, days completed;
 check the exact keys) and the `run_start` event or the directory's timestamp for the start date.

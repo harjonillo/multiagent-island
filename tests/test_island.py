@@ -960,6 +960,9 @@ def test_site_data_and_page_for_a_mock_run():
         m = json.loads((real / "manifest.json").read_text())
         m["backend_override"] = "groq"
         (real / "manifest.json").write_text(json.dumps(m))
+        with (real / "events.jsonl").open("a") as f:  # a prompt switch from day 1, as a resume logs it
+            f.write(json.dumps({"type": "intervention", "hour": None, "from_day": 1, "what": "prompt version 1 -> 4",
+                                "details": ["a map: asking Tom Nook gets you a map"], "time": 2e9}) + "\n")
         assert experiment_order(Path(d)) == [real]
         assert build_all(Path(d))[-1] == Path(d) / "site" / "index.html"
         assert "/ exp 00" in (real / "site" / "index.html").read_text()
@@ -973,6 +976,10 @@ def test_site_data_and_page_for_a_mock_run():
         day0 = next(x for x in run.of("day_start") if x["day"] == 0)["pools"]
         assert island["rocks"].startswith(f"{len(day0['rocks'])},") and island["shells"].startswith(f"{day0['shells_left']} ")
         assert "initial conditions</summary>" in doors and html.escape(kit["tools"]) in doors
+        # The changelog sidebar: each experiment's start and its changes, newest first, linked to the run.
+        log = doors.split('<aside class="clog"', 1)[1]
+        assert log.index("Prompt version 1 → 4") < log.index("Started") and "From day 1" in log
+        assert "<b>A map.</b> Asking Tom Nook gets you a map." in log and 'href="../real/site/index.html">EXP 00' in log
         # Built to publish (GitHub Pages): the doors at the root, each run in its own folder, linked both
         # ways; a run needs only manifest.json and events.jsonl; every page asks crawlers to stay away.
         (real / "site_data.json").unlink()
