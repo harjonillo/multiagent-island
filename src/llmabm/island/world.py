@@ -137,7 +137,7 @@ ORDINANCE_TEXT = {
 TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 5  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+LATEST_PROMPT_VERSION = 7  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
 AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
 MAP = "island map"  # from Tom Nook or Isabelle; carried, it shows the island's layout in plans (prompt version 3 on)

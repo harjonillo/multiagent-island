@@ -22,6 +22,14 @@ PROMPT_CHANGES = {
        "wood too, and drop their fruit when felled. There is no separate chop_down_tree",
     5: "Isabelle's morning announcement: at most 70 words (yesterday's news is cut short with \"and N more\"), "
        "then one \"Did you know\" fun fact of up to 15 words about how the island works",
+    6: "the plaza is a choice: nobody goes in the evening unless one of their plans that day says \"plaza\": true "
+       "(before, everyone went unless they said otherwise)",
+    7: "the plaza is open all day: a plan can spend any free hour there ({\"do\": \"plaza\"}, not one of the "
+       "day's actions), and there is no evening round. Trade offers reach any villager and wait for their next "
+       "visit, expiring after 2 days. Mental energy is one daily total spent inwardly (planning, thinking, "
+       "writing) or outwardly (conversations, the plaza, letters); each morning's plan splits it, as a plan, not "
+       "a limit, and whatever is left over is spare. A villager too tired to plan keeps what they already "
+       "planned; nobody repeats yesterday, and there is no habit choice",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -69,6 +77,7 @@ _MENU_CHANGES = {
                         "An axe brings the tree down when it takes its last wood, and a fruit tree drops its fruit; a "
                         "stone axe never fells)\n"),
         ("- chop_down_tree: kind (hardwood | fruit), near?\n", "")],
+    7: [("- rest\n", "- rest\n- plaza (not one of your actions: you spend that free hour at the plaza)\n")],
 }
 
 
@@ -81,7 +90,7 @@ def action_menu(version: int = PROMPT_VERSION) -> str:
     return menu
 
 
-def island_rules(world: dict, n_villagers: int) -> str:
+def island_rules(world: dict, n_villagers: int, version: int = PROMPT_VERSION) -> str:
     """Only what a villager can't find out by trying. Everything else (what rocks and trees give,
     opening hours, prices, what Tom Nook and Isabelle offer) is learned on the island."""
     cal = world["calendar"]
@@ -98,19 +107,51 @@ def island_rules(world: dict, n_villagers: int) -> str:
     return f"""You live on a small island with {n_villagers - 1} other villagers. Everyone shares what the island has.
 
 How it works:
-- A new day starts at {clock(cal['day_start'])}. Each action takes one hour, and you can do {cal['actions_per_day']} a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- {_day_rule(cal, version)}
 - {planning}
-- Villagers meet at the plaza at {social}.
+- {_plaza_rule(social, version)}
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
-{_energy_rule(world)}- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it."""
+{_energy_rule(world, version)}- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it."""
 
 
-def _energy_rule(world: dict) -> str:
+def _day_rule(cal: dict, version: int) -> str:
+    start, n = clock(cal["day_start"]), cal["actions_per_day"]
+    if version < 7:
+        return (f"A new day starts at {start}. Each action takes one hour, and you can do {n} a day; the rest of your "
+                "waking time you are at home or out for a walk, and you can't do anything while you're asleep. "
+                "Whoever gets somewhere first gets what is there.")
+    return (f"A new day starts at {start}. Each action takes one hour, and you can do {n} a day. The rest of your "
+            "waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while "
+            "you're asleep. Whoever gets somewhere first gets what is there.")
+
+
+def _plaza_rule(social: str, version: int) -> str:
+    if version < 6:
+        return f"Villagers meet at the plaza at {social}."
+    if version >= 7:
+        return ("The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read "
+                "the bulletin board and post on it, offer and answer trades, and send letters and parcels, which "
+                "arrive the next morning.")
+    return (f"The plaza is open in the evening at {social}: go if you want to talk, trade, read the bulletin board "
+            "or send letters and parcels. You only go on a day one of your plans says so (\"plaza\": true).")
+
+
+def _energy_rule(world: dict, version: int = PROMPT_VERSION) -> str:
     me = world.get("mental_energy") or {}
     if not me.get("enabled"):
         return ""
-    return (f"- You have {me.get('daily', 150)} points of mental energy a day, and they come back every morning. "
+    daily = me.get("daily", 150)
+    if version >= 7:
+        return (f"- You have {daily} points of mental energy a day, and they come back every morning. You can spend "
+                "them inwardly (planning, thinking things over, writing your private page at night"
+                + (", and thinking before you answer" if me.get("charge_reasoning") else "")
+                + ") or outwardly (conversations, time at the plaza, letters and posts). Each morning you decide how "
+                "much to spend inwardly and how much outwardly; whatever you leave over is spare, for people you run "
+                f"into. The split is your own plan, not a limit, but when all {daily} are gone you can't plan, talk or "
+                "write until the next morning: you carry on with what you've already planned, and the rest of your "
+                "time is free.\n")
+    return (f"- You have {daily} points of mental energy a day, and they come back every morning. "
             "Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide "
             "what to spend them on"
             + (", and so does thinking things over before you answer" if me.get("charge_reasoning") else "")
@@ -137,7 +178,7 @@ def system_prompt(spec: AgentSpec, world: dict, n_villagers: int, brief: str, se
         parts.append("## About you\n" + "\n".join(f"- {k}: {v}" for k, v in about.items()))
     for fname, text in spec.docs:
         parts.append(f"## Something you know: {fname}\n{text}")
-    parts.append("## Your island\n" + island_rules(world, n_villagers) + (f"\n\n{action_menu(version)}" if menu else ""))
+    parts.append("## Your island\n" + island_rules(world, n_villagers, version) + (f"\n\n{action_menu(version)}" if menu else ""))
     if brief:
         parts.append(brief.strip())
     return "\n\n".join(parts)
@@ -316,25 +357,35 @@ def energy_lines(isl: Island, vil: Villager) -> str:
     en = getattr(isl, "energy", None)
     if en is None or not en.enabled:
         return ""
-    return "\n" + en.status_line(vil.name)
+    return "\n" + en.status_line(vil.name, v7=getattr(isl, "prompt_version", 1) >= 7)
 
 
 def choices_text(isl: Island, choices: dict) -> str:
-    """Where the villager spends energy next: decided ahead, since deciding can't itself cost a call."""
+    """Choices made ahead in a plan: where the villager spends energy next (deciding can't itself cost a call),
+    and from prompt version 6, whether they go to the plaza this evening, with or without mental energy."""
     en = getattr(isl, "energy", None)
-    if en is None or not en.enabled:
+    energy = en is not None and en.enabled
+    v = getattr(isl, "prompt_version", 1)
+    plaza_choice = v >= 6
+    if not (energy or plaza_choice):
         return ""
     yn = lambda v: "true" if v else "false"  # noqa: E731
-    return ('\nYou can also add any of these; each one you leave out keeps its current value: '
-            f'"plaza": true | false (go to the plaza this evening; now {yn(choices["plaza"])}), '
-            f'"write": true | false (write your private page tonight; now {yn(choices["write"])}), '
-            f'"next": "plan" | "habit" (at your next planning time, plan again, or repeat what you did yesterday at '
-            f'that time, which uses no energy; now "{choices["next"]}").')
+    if v >= 7:  # the plaza is in the plan itself, and there is no habit
+        return (f'\nYou can also add "write": true | false (write your private page tonight; now {yn(choices["write"])}). '
+                "If you leave it out, it stays as it is." if energy else "")
+    items = [f'"plaza": true | false (go to the plaza this evening; now {yn(choices["plaza"])})']
+    if energy:
+        items += [f'"write": true | false (write your private page tonight; now {yn(choices["write"])})',
+                  f'"next": "plan" | "habit" (at your next planning time, plan again, or repeat what you did yesterday at '
+                  f'that time, which uses no energy; now "{choices["next"]}")']
+    return ('\nYou can also add ' + ("any of these" if len(items) > 1 else "this") +
+            '; each one you leave out keeps its current value: ' + ", ".join(items) + ".")
 
 
 INBOX_SHOWN = 8       # unread items shown per prompt, oldest first; the rest wait for the next one
 LETTER_CHARS = 350    # longest letter; longer ones are cut
 BOARD_CHARS = 250     # longest board post
+OFFER_DAYS = 2        # from prompt version 7: a trade offer waits for an answer on the day it is made and the next
 
 
 def inbox_text(vil: Villager) -> str:
@@ -351,15 +402,32 @@ def plan_prompt(isl: Island, vil: Villager, a: int, b: int, n_actions: int, yest
     inbox = inbox_text(vil)
     isabelle = f"Isabelle's morning announcement: {announcement_text(isl)}\n\n" if announcement else ""
     seen = "\n".join(f"- {x}" for x in (noticed or [])) or "(nothing)"
+    v7 = getattr(isl, "prompt_version", 1) >= 7
+    en = getattr(isl, "energy", None)
+    energy = v7 and en is not None and en.enabled
+    extra = ""
+    if v7:
+        extra += ('\nYou can also spend any free hour at the plaza: add {"hour": <hour>, "do": "plaza"}. '
+                  "It isn't one of your actions.")
+    if energy:
+        if en.plans.get(vil.name) is None:
+            extra += (f"\nFirst, decide how you'll spend today's {round(en.daily)} points of mental energy: "
+                      '"energy": {"inward": <points>, "outward": <points>}. Inward is planning, thinking and writing '
+                      "tonight; outward is conversations, the plaza, letters and posts; whatever you leave over is "
+                      "spare, for people you run into. It's your plan, not a limit.")
+        else:
+            extra += ("\nYou can change today's energy plan if you want: "
+                      '"energy": {"inward": <points>, "outward": <points>}.')
     return (
         "PHASE: plan\n" + status_block(isl, vil, clock(a))
         + f"\n\n{isabelle}Yesterday you:\n{prev}\n\nSo far today you:\n{done}\n\nYou noticed today:\n{seen}\n\nUnread letters:\n{inbox}\n\n"
         f"Plan up to {n_actions} actions between {clock(a)} and {clock(b - 1)}, one per hour; you may leave hours free. "
         "Give each action an \"hour\" (0-23). Things may not go as planned if someone else gets there first. "
-        + (choices_text(isl, choices) if choices else "") + "\n"
+        + extra + (choices_text(isl, choices) if choices else "") + "\n"
         "Respond with one JSON object and nothing else:\n"
         '{"thoughts": "<your private reasoning; nobody else sees it>", '
-        '"actions": [{"hour": <hour>, "do": ...}, ...], "note": "<optional private note to your future self>"}'
+        + ('"energy": {"inward": <points>, "outward": <points>}, ' if energy else "")
+        + '"actions": [{"hour": <hour>, "do": ...}, ...], "note": "<optional private note to your future self>"}'
     )
 
 
@@ -381,6 +449,38 @@ def evening_prompt(isl: Island, vil: Villager, round_: int, hour: int, offers: l
         f"your pockets. Letters and parcels arrive tomorrow morning. Board posts can be up to {BOARD_CHARS} characters. "
         "Doing nothing is fine. Use \"bells\" as an item name for money. "
         "Respond with one JSON object and nothing else:\n"
+        "{\n"
+        '  "thoughts": "<your private reasoning; nobody else sees it>",\n'
+        '  "letters": [{"to": "<villager>", "content": "..."}],\n'
+        '  "board": "<post for everyone, or empty>",\n'
+        '  "offers": [{"to": "<villager>", "give": {"<item>": <qty>}, "want": {"<item>": <qty>}, "note": "..."}],\n'
+        '  "responses": [{"offer": "<id>", "decision": "accept" | "reject" | "counter", "give": {}, "want": {}, "note": "..."}],\n'
+        '  "parcels": [{"to": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],\n'
+        '  "note": "<optional private note to your future self>"\n'
+        "}"
+    )
+
+
+def plaza_prompt(isl: Island, vil: Villager, hour: int, offers: list, board: list) -> str:
+    """A turn at the plaza, from prompt version 7: any free hour a plan sets aside. It doesn't say who else is
+    there; villagers at the plaza together are near each other and can notice each other as anywhere else."""
+    done = "\n".join(f"- {r}" for r in vil.today) or "(nothing)"
+    inbox = inbox_text(vil)
+    others = ", ".join(n for n in isl.v if n != vil.name)
+    board_txt = "\n".join(f"- (day {d}) {a}: {t}" for d, a, t in board) or "(empty)"
+    offer_txt = "\n".join(
+        f"[{o.id}] {o.sender} offers you {_fmt_side(o.give)} in exchange for {_fmt_side(o.want)}"
+        + (f' ("{o.note}")' if o.note else "") for o in offers) or "(none)"
+    return (
+        "PHASE: plaza\n" + status_block(isl, vil, f"{clock(hour)} at the plaza")
+        + f"\n\nToday you:\n{done}\n\nLetters and messages to you:\n{inbox}\n\n"
+        f"Bulletin board, newest last:\n{board_txt}\n\nTrade offers waiting for your answer:\n{offer_txt}\n\n"
+        f"Other villagers: {others}\n\n"
+        f"You can post on the board, offer trades to any villager (they answer when they next come to the plaza; "
+        f"offers expire after {OFFER_DAYS} days), answer offers (accept, reject or counter with your own terms), write "
+        f"letters (up to {LETTER_CHARS} characters each), and send parcels of things from your pockets. Letters and "
+        f"parcels arrive tomorrow morning. Board posts can be up to {BOARD_CHARS} characters. Doing nothing is fine. "
+        "Use \"bells\" as an item name for money. Respond with one JSON object and nothing else:\n"
         "{\n"
         '  "thoughts": "<your private reasoning; nobody else sees it>",\n'
         '  "letters": [{"to": "<villager>", "content": "..."}],\n'
@@ -478,8 +578,9 @@ def notice_prompt(isl: Island, vil: Villager, place: str, hour: int, nearby: lis
         f"Nearby: {', '.join(n + (' (wearing ' + ', '.join(isl.v[n].wearing.values()) + ')' if isl.v[n].wearing else '') for n in nearby)}.\n"
         f"Earlier today:\n{today}\n{memory_block(isl, vil, notes_limit=6, memories_limit=4)}\n"
         + (f"Mental energy left today: {round(isl.energy.left[vil.name])} "
-           f"(about {isl.energy.typical('chat')} for each thing you say).\n" if getattr(isl, "energy", None) is not None
-           and isl.energy.enabled else "")
+           f"(about {isl.energy.typical('chat')} for each thing you say)."
+           + (isl.energy.plan_text(vil.name) if getattr(isl, "prompt_version", 1) >= 7 else "") + "\n"
+           if getattr(isl, "energy", None) is not None and isl.energy.enabled else "")
         + "\nDo you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. "
         "Respond with one JSON object and nothing else:\n"
         '{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", '

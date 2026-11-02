@@ -22,8 +22,10 @@ reflection:
   max_words: 150
 
 # Mental energy: one daily token budget per villager for everything they read, think and say
-# (see mental_energy in the world file). Each plan lets them skip the plaza, skip writing,
-# or follow habit next time for free; what they spend it on is part of what emerges.
+# (see mental_energy in the world file). From prompt version 7 they're told it is one daily total
+# spent inwardly (planning, thinking, writing) or outwardly (talking, the plaza, letters), and each
+# morning's plan splits it, as a plan, not a limit. Before that, a plan could skip the plaza,
+# skip writing, or follow habit next time for free. What they spend it on is part of what emerges.
 mental_energy:
   enabled: true
   daily: 150

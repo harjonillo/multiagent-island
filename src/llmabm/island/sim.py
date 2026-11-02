@@ -5,7 +5,9 @@ in-game hour. Villagers plan at the start of each plan window (one LLM call each
 giving every action an hour. The engine then steps hour by hour. Villagers acting
 in the same hour reach a place in order of distance from their home; equal
 distances are shuffled. At the social hours villagers meet at the plaza to trade,
-post on the board, and send letters and parcels, which arrive the next morning.
+post on the board, and send letters and parcels, which arrive the next morning. From prompt
+version 7 there are no social hours: the plaza is open all day, and a plan can set any free hour
+aside for it.
 
 On day 0 everyone arrives at once, each in a tent on a homesite drawn at random, with
 one of each tool. At the end of every day Isabelle (an LLM call) writes a summary of
@@ -31,7 +33,8 @@ import yaml
 
 from ..agent import AgentSpec, load_agent_file
 from ..llm import DailyLimit, LLMError
-from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, encounter_prompt, evening_prompt,
+from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, OFFER_DAYS,
+                      encounter_prompt, evening_prompt, plaza_prompt,
                       announcement_text, inbox_text, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
                       isabelle_summary_prompt, plan_prompt, system_prompt)
@@ -446,6 +449,8 @@ class IslandSimulation:
 
     def _run_days(self, days: int) -> None:
         self._t0 = time.monotonic()
+        self._tokens0 = self.provider_tokens  # this session's tokens are counted from here
+        self._progress_header()
         for _ in range(days):
             self._day()
             self._checkpoint()
@@ -457,8 +462,16 @@ class IslandSimulation:
             return
         self._last_calls = self.calls
         secs = int(time.monotonic() - getattr(self, "_t0", time.monotonic()))
-        print(f"  day {self.isl.day} {clock(self.hour)}  {what:<18} calls {self.calls:>4}  "
-              f"tokens {self.provider_tokens:>9,}  {secs // 60:>3}m{secs % 60:02d}s", flush=True)
+        session = self.provider_tokens - getattr(self, "_tokens0", 0)
+        print(f"  {self.isl.day:>3}  {clock(self.hour):>5}  {what:<18}  {self.calls:>9,}  {session:>14,}  "
+              f"{self.provider_tokens:>10,}  {secs // 60:>4}m{secs % 60:02d}s", flush=True)
+
+    def _progress_header(self) -> None:
+        """Column labels for the progress lines. Tokens are as the provider counts them; cached replies cost
+        none. "this session" starts at zero for each run or resume; "run total" carries on across resumes."""
+        if self.verbose:
+            print(f"  {'day':>3}  {'time':>5}  {'step':<18}  {'calls run':>9}  {'tokens session':>14}  "
+                  f"{'tokens run':>10}  {'elapsed':>8}", flush=True)
 
     def _day(self) -> None:
         isl, log = self.isl, self.log
@@ -479,6 +492,9 @@ class IslandSimulation:
         self.noticed = {n: [] for n in isl.v}
         self.chats_today = {n: 0 for n in isl.v}
         self.decisions_today = {n: 0 for n in isl.v}
+        if getattr(self, "prompt_version", 1) >= 6:  # the plaza is opt-in: nobody is going until a plan says so
+            for n in isl.v:
+                self.choices[n]["plaza"] = False
         log("day_start", day=d, money_rock=isl.money_rock + 1, cranny=isl.cranny_stock,
             cranny_recipe=isl.cranny_recipe, able=isl.able_stock, pools=isl.pools(),
             ordinance=isl.ordinance, news=isl.yesterday_news, announcement=isl.announcement,
@@ -487,6 +503,11 @@ class IslandSimulation:
             awake={n: list(isl.awake_window(n)) for n in isl.v})
         if self.verbose:
             print(f"day {d} ({isl.date_text()})", flush=True)
+        if getattr(self, "prompt_version", 1) >= 7:  # offers wait OFFER_DAYS days for an answer
+            for o in self.offers.values():
+                if o.status == "pending" and o.day <= d - OFFER_DAYS:
+                    o.status = "expired"
+                    log("offer_update", **asdict(o))
         if d == 0:
             self._settle_all(d)
         self._deliver_mail(d)
@@ -771,13 +792,17 @@ class IslandSimulation:
         """One LLM call per villager whose planning time is `at`, to schedule actions in the hours
         that plan covers. With personal schedules a plan may use at most an even share of the
         actions left (half of them, with two plans a day); whatever it doesn't use carries over.
-        Those who chose habit for this planning time, or have no energy left, repeat what they
-        did yesterday at this time."""
+        Before prompt version 7, those who chose habit for this planning time, or have no energy left,
+        repeat what they did yesterday at this time. From version 7 there is no habit: a villager with
+        no energy left keeps what they already planned and plans nothing new. Plans also set free hours
+        aside for the plaza, and the first plan of the day splits the day's energy."""
         isl, log = self.isl, self.log
         budget = self.sc.world["calendar"]["actions_per_day"]
         fixed = "plans" in self.sc.world["calendar"]
+        v7 = getattr(self, "prompt_version", 1) >= 7
         slot = {n: (phase, hours, window, k) for n, phase, hours, window, k in slots}
-        who = [n for n in slot if self.used[n] < budget]
+        # From version 7 everyone plans, even with no actions left: they can still go to the plaza.
+        who = [n for n in slot if v7 or self.used[n] < budget]
 
         for n in who:
             isl.where_notes[n] = self.bodies.where_note(n)
@@ -791,7 +816,7 @@ class IslandSimulation:
             vil = isl.v[name]
             phase, awake, _, k = slot[name]
             left = budget - self.used[name]
-            if self.choices[name]["next"] == "habit":
+            if not v7 and self.choices[name]["next"] == "habit":
                 return HABIT
             user = plan_prompt(isl, vil, awake[0], awake[-1] + 1, min(shares[name] or left, len(awake)), self.yesterday[name],
                                announcement=self.first_plan[name], noticed=self.noticed[name][-8:],
@@ -806,6 +831,13 @@ class IslandSimulation:
         results = self._parallel(plan, who)
         for name in who:
             phase, awake, (a, b), _ = slot[name]
+            if v7 and results[name] is TIRED:  # hold: what is already planned stands, nothing new
+                self.energy.skip(name, "planning")
+                isl.v[name].today.append(f"{clock(a)} too tired to plan, so you planned nothing new")
+                log("plan", day=d, phase=phase, agent=name, window=[a, b], thoughts="", held=True,
+                    held_reason="no energy left", scheduled=[], dropped=[], note="", error=None, raw=None,
+                    cached=False)
+                continue
             if results[name] in (TIRED, HABIT):  # do what they did yesterday at this time of day
                 chose = results[name] is HABIT
                 if chose:
@@ -831,43 +863,54 @@ class IslandSimulation:
                 self.schedule.setdefault(h, []).append((name, act))
             self.habits[(name, phase)] = [{"hour": h % 24, **act} for h, act in scheduled]
             chosen = self._apply_choices(name, obj or {})
+            split = self.energy.set_plan(name, (obj or {}).get("energy")) if v7 and self.energy.enabled else None
             note = str((obj or {}).get("note") or "").strip()
             if note:
                 isl.v[name].notes.append((d, note))
             log("plan", day=d, phase=phase, agent=name, window=[a, b], thoughts=_thoughts(obj),
                 scheduled=[{"at": h, **act} for h, act in scheduled], dropped=dropped, note=note, error=err,
-                choices=chosen, raw=reply.text if reply else None, cached=reply.cached if reply else False)
+                choices=chosen, **({"energy_plan": split} if split else {}),
+                raw=reply.text if reply else None, cached=reply.cached if reply else False)
 
     def _apply_choices(self, name: str, obj: dict) -> dict:
-        """Read the spending choices from a plan reply. Anything missing or unreadable keeps its value."""
-        if not self.energy.enabled:
+        """Read the choices from a plan reply. Anything missing or unreadable keeps its value. Without mental
+        energy, only the plaza is a choice, and only in prompt version 6. From version 7 the plaza is in the
+        plan itself and there is no habit, so writing tonight is the only choice left."""
+        v = getattr(self, "prompt_version", 1)
+        keys = (("plaza",) if v == 6 or (v < 7 and self.energy.enabled) else ()) + (("write",) if self.energy.enabled else ())
+        if not keys:
             return {}
         ch, changed = self.choices[name], {}
-        for key in ("plaza", "write"):
-            v = obj.get(key)
-            if isinstance(v, str) and v.strip().lower() in ("true", "false", "yes", "no"):
-                v = v.strip().lower() in ("true", "yes")
-            if isinstance(v, bool):
-                ch[key] = changed[key] = v
+        for key in keys:
+            val = obj.get(key)
+            if isinstance(val, str) and val.strip().lower() in ("true", "false", "yes", "no"):
+                val = val.strip().lower() in ("true", "yes")
+            if isinstance(val, bool):
+                ch[key] = changed[key] = val
         nxt = str(obj.get("next") or "").strip().lower()
-        if nxt in ("plan", "habit"):
+        if self.energy.enabled and v < 7 and nxt in ("plan", "habit"):
             ch["next"] = changed["next"] = nxt
         return changed
 
     def _assign_hours(self, name: str, acts: list[dict], a: int, b: int, cap: int | None = None):
         """Place each action at its requested hour, or the next free hour in the window.
         One action per hour; stops when the day's action budget, or this plan's share of it
-        (`cap`), runs out."""
+        (`cap`), runs out. From prompt version 7 an hour at the plaza takes an hour but isn't an action:
+        it doesn't count against either."""
         budget = self.sc.world["calendar"]["actions_per_day"]
+        v7 = getattr(self, "prompt_version", 1) >= 7
         taken = {h for h, lst in self.schedule.items() for n, _ in lst if n == name}
-        out, dropped, cursor = [], [], a
+        out, dropped, cursor, n_acts = [], [], a, 0
         for act in acts:
             # Keys the body fills in (targets, what was seen) can't come from the mind.
             act = {k: v for k, v in act.items() if not str(k).startswith("_") and k not in ("none_seen", "none_out", "habitat")}
-            if self.used[name] >= budget:
+            plaza = v7 and str(act.get("do") or "").strip().lower() == "plaza"
+            if plaza:
+                act = {"hour": act.get("hour"), "do": "plaza"} if "hour" in act else {"do": "plaza"}
+            elif self.used[name] >= budget:
                 dropped.append({**act, "why": "no actions left today"})
                 continue
-            if cap is not None and len(out) >= cap:
+            elif cap is not None and n_acts >= cap:
                 dropped.append({**act, "why": f"this plan could use only {cap} of your actions; the rest are for later"})
                 continue
             want = act.pop("hour", None)
@@ -886,7 +929,9 @@ class IslandSimulation:
                 dropped.append({**act, "why": f"no free hour left before {clock(b)}"})
                 continue
             taken.add(h)
-            self.used[name] += 1
+            if not plaza:
+                self.used[name] += 1
+                n_acts += 1
             cursor = h + 1
             out.append((h, act))
         return sorted(out, key=lambda x: x[0]), dropped
@@ -895,14 +940,17 @@ class IslandSimulation:
         isl, log = self.isl, self.log
         cal = self.sc.world["calendar"]
         social = cal.get("social_hours", [])
+        v7 = getattr(self, "prompt_version", 1) >= 7
         spoke = set()
-        if h in social:
+        if h in social and not v7:  # from version 7 the plaza is open all day instead
             spoke = self._social_round(d, social.index(h))
         self.space.hour_tick(isl, h, self.rng)  # bugs and fish shadows come and go
         doing: dict[str, dict] = {}
         ok_by: dict[str, bool] = {}
+        todo = list(self.schedule.get(h, []))
+        to_plaza = [n for n, act in todo if v7 and act.get("do") == "plaza"]
         # Same hour: whoever has the shorter walk from where they are gets there first; ties are luck.
-        batch = self.bodies.order(list(self.schedule.get(h, [])), self.rng)
+        batch = self.bodies.order([(n, act) for n, act in todo if n not in to_plaza], self.rng)
         for name, act in batch:
             vil = isl.v[name]
             before_v = (vil.bells, vil.loan, Counter(vil.inventory), len(vil.recipes), vil.house)
@@ -914,10 +962,14 @@ class IslandSimulation:
             log("action", day=d, agent=name, action=act, location=self.bodies.b[name].place, ok=ok, result=res,
                 delta=self._delta(vil, before_v), pools_delta=_pools_delta(before_p, isl.pools()),
                 at=list(self.bodies.b[name].pos) if self.bodies.b[name].pos else None)
+        # A free hour set aside for the plaza (version 7): walk there and take a turn.
+        plaza_line: dict[str, int] = {}
+        if to_plaza:
+            spoke, plaza_line = self._plaza_hour(d, h, to_plaza)
         # Free time: wander (random walk) or stay home; asleep villagers are home.
         wandering = set()
         for n in isl.v:
-            if n in doing or isl.arrived[n] is None:
+            if n in doing or n in plaza_line or isl.arrived[n] is None:
                 continue
             stay_in = self.rng.random() < float(self.sc.world.get("grid", {}).get("wander_home_chance", 0.5))
             if isl.is_awake(n, h) and self.sc.free_time == "wander" and n not in spoke and not stay_in:
@@ -932,12 +984,14 @@ class IslandSimulation:
                 if seen:
                     self.log("sighting", day=d, agent=n, seen=seen)
         # Who saw whom. Bodies detect who is near whom; neighbors notice each other heading out.
-        out = [n for n in doing if self.bodies.b[n].place != "home"] + sorted(wandering)
+        out = [n for n in doing if self.bodies.b[n].place != "home"] + sorted(plaza_line) + sorted(wandering)
         near = self.bodies.nearby(out, self._radius())
         for n in out:
             if n in doing and near[n]:
                 isl.v[n].today[-1] += f" (also nearby: {', '.join(near[n])})"
-        for n in doing:
+            elif n in plaza_line and near[n]:  # seen after their turn there, like after an action
+                isl.v[n].today[plaza_line[n]] += f" (also nearby: {', '.join(near[n])})"
+        for n in list(doing) + sorted(plaza_line):
             place = self.bodies.b[n].place
             if place != "home":
                 for m in isl.neighbors(n):
@@ -989,6 +1043,52 @@ class IslandSimulation:
         if vil.house != house:
             out["house"] = vil.house - house
         return out
+
+    def _plaza_hour(self, d: int, h: int, names: list[str]) -> tuple[set, dict]:
+        """From prompt version 7: villagers who set this free hour aside walk to the plaza and take one turn
+        there (board, offers to anyone, letters, parcels). They aren't told who else is there; being there
+        together, they can notice each other afterwards like anywhere else. Returns who got there, and the
+        line in each one's day that says so."""
+        isl, log = self.isl, self.log
+        line: dict[str, int] = {}
+        for n in sorted(names):
+            ok, res = self.bodies.go_to(n, "plaza", "plaza")
+            if not ok:
+                isl.v[n].today.append(f"{clock(h)} tried to go to the plaza: {res}")
+                log("evening_turn", day=d, round=0, place="plaza", agent=n, error=None, thoughts="", raw=None,
+                    cached=False, skipped=f"didn't get there: {res}")
+                continue
+            isl.v[n].today.append(f"{clock(h)} went to the plaza{res}")
+            line[n] = len(isl.v[n].today) - 1
+        there = sorted(line)
+
+        def turn(name):
+            vil = isl.v[name]
+            waiting = [o for o in self.offers.values() if o.recipient == name and o.status == "pending"]
+            user = plaza_prompt(isl, vil, h, waiting, isl.board[-8:])
+            if not self.energy.can(name, self._need(name, user)):
+                return TIRED
+            mail = inbox_text(vil) if vil.inbox else ""
+            vil.inbox = vil.inbox[INBOX_SHOWN:]
+            return self._call(name, user, f"d{d:03d}_h{h % 24:02d}_plaza", system=self.talk_systems[name],
+                              kind="talking", what="evening", social=mail)
+
+        results = self._parallel(turn, there)
+        order = list(there)
+        self.rng.shuffle(order)
+        for name in order:
+            if results[name] is TIRED:
+                self.energy.skip(name, "talking")
+                isl.v[name].today[line[name]] += ", but were too tired to do anything there"
+                log("evening_turn", day=d, round=0, place="plaza", agent=name, error=None, thoughts="", raw=None,
+                    cached=False, skipped="too tired to do anything at the plaza")
+                continue
+            reply, obj, err = results[name]
+            log("evening_turn", day=d, round=0, place="plaza", agent=name, error=err, thoughts=_thoughts(obj),
+                raw=reply.text if reply else None, cached=reply.cached if reply else False)
+            if obj:
+                self._apply_evening(d, 0, name, obj)
+        return set(there), line
 
     def _social_round(self, d: int, r: int) -> set:
         """Evening at the plaza. Round 0 includes everyone; later rounds only villagers

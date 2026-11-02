@@ -1,0 +1,18 @@
+# Changes to the simulation itself that aren't part of any one experiment, such as a new prompt
+# version for new runs. The doors page changelog shows them with each experiment's start and its
+# mid-run changes, all newest first. A run keeps the wording it started with unless switched on
+# purpose, and that switch shows up under the run.
+- time: 2026-11-02 17:50
+  what: Prompt version 7, for new runs
+  when: new runs from now on; running ones keep theirs
+  details:
+    - "the plaza: open all day. A plan can set any free hour aside for it; that takes the hour but isn't one of the day's actions. There are no evening rounds"
+    - "at the plaza: villagers aren't told who else is there. Those there together can notice each other and talk, as anywhere else"
+    - "trade offers: can go to any villager, who answers on their next visit. Offers expire after 2 days"
+    - "mental energy: one daily total in points, spent inwardly (planning, thinking, writing) or outwardly (conversations, the plaza, letters). Each morning's plan splits it, as a plan, not a limit; whatever is left over is spare"
+    - "too tired to plan: a villager keeps what they already planned and plans nothing new. Nobody repeats yesterday, and there is no habit choice"
+- time: 2026-11-02 17:49
+  what: Prompt version 6
+  when: never used by a run; version 7 replaced it
+  details:
+    - "the plaza: opt-in. Nobody went in the evening unless a plan that day said so"

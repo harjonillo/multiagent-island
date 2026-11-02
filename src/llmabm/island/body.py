@@ -122,6 +122,23 @@ class Bodies:
                 self.broke.append((name, need, act.get("do")))
         return ok, res + "".join(f"; {n}" for n in notes)
 
+    def go_to(self, name: str, landmark: str, label: str) -> tuple[bool, str]:
+        """Walk to a building (the plaza, from prompt version 7) in free time. Not an action: nothing
+        happens there but being there. Returns whether they got there, and why not."""
+        body = self.b[name]
+        if body.pos is None:
+            return False, "you haven't arrived yet"
+        tools = self.tools_of(name)
+        door = self.space.landmark(self.isl, name, landmark, body.pos)
+        best = self.space.nearest(tuple(body.pos), tools, [door]) if door is not None else None
+        if best is None:
+            return False, f"couldn't find a way to the {label} with the tools you carry"
+        _, stand, d = best
+        notes = self._trip_wear(name, body.pos, stand)
+        body.walked_today += d
+        body.pos, body.place = tuple(stand), label
+        return True, "".join(f"; {n}" for n in notes)
+
     def wander(self, name: str, steps: int, rng) -> bool:
         """Free time on the grid: a short random walk. Returns False where wandering isn't modelled."""
         body = self.b[name]

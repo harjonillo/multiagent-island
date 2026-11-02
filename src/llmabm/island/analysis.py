@@ -219,8 +219,8 @@ def trade_stats(run: Run) -> dict:
 
 
 def llm_calls(run: Run) -> int:
-    """LLM calls the run made, counted from the events (habit plans and nods made none)."""
-    return (sum(1 for p in run.of("plan") if not p.get("habit"))
+    """LLM calls the run made, counted from the events (habit or held plans, and nods, made none)."""
+    return (sum(1 for p in run.of("plan") if not (p.get("habit") or p.get("held")))
             + sum(1 for e in run.of("evening_turn") if not e.get("skipped"))
             + sum(1 for e in run.of("reflection") if not e.get("skipped"))
             + len(run.of("isabelle_summary")) + len(run.of("isabelle_announcement"))
@@ -502,7 +502,13 @@ def energy_lines(run: Run, names: list[str]) -> list[str]:
                  f"{chose[n]['habit']:>14}/{chose[n]['plaza']}/{chose[n]['write']:<14}"
                  f"{skipped[n]['planning']}/{skipped[n]['thinking']}/{skipped[n]['talking']}")
     habit = sum(1 for p in run.of("plan") if p.get("habit"))
-    L.append(f"  plans replaced by habit: {habit} of {len(run.of('plan'))}")
+    held = sum(1 for p in run.of("plan") if p.get("held"))
+    L.append(f"  plans replaced by habit: {habit} of {len(run.of('plan'))}"
+             + (f"; plans not made, too tired (from prompt version 7): {held}" if held else ""))
+    split = [p["energy_plan"] for p in run.of("plan") if p.get("energy_plan")]
+    if split:
+        L.append(f"  energy plans made or changed: {len(split)}; average inward {sum(x['inward'] for x in split) / len(split):.0f}, "
+                 f"outward {sum(x['outward'] for x in split) / len(split):.0f}")
     return L
 
 

@@ -780,8 +780,8 @@ def test_plans_follow_each_villagers_own_waking_hours():
         # A plan can use an even share of the actions left: half of the 10 in the morning.
         run = load_run(Path(d) / "run")
         for e in run.of("plan"):
-            if e["day"] == 1 and e["phase"] == 0 and not e.get("habit"):
-                assert len(e["scheduled"]) <= 5
+            if e["day"] == 1 and e["phase"] == 0 and not e.get("held"):
+                assert len([x for x in e["scheduled"] if x["do"] != "plaza"]) <= 5  # the plaza isn't an action
                 assert all("only 5" in x["why"] for x in e["dropped"] if "this plan" in x.get("why", ""))
         prompt = sim.systems["Ari"]
         assert "You plan twice a day: when you get up" in prompt
@@ -991,6 +991,9 @@ def test_site_data_and_page_for_a_mock_run():
         log = doors.split('<aside class="clog"', 1)[1]
         assert log.index("Prompt version 1 → 4") < log.index("Started") and "From day 1" in log
         assert "<b>A map.</b> Asking Tom Nook gets you a map." in log and 'href="../real/site/index.html">EXP 00' in log
+        # Changes to the simulation for new runs (changelog.yaml) are listed too, marked SIM.
+        assert '<span class="exp">SIM</span> Prompt version 7, for new runs' in log
+        assert "<b>The plaza.</b> Open all day." in log
         # Built to publish (GitHub Pages): the doors at the root, each run in its own folder, linked both
         # ways; a run needs only manifest.json and events.jsonl; every page asks crawlers to stay away.
         (real / "site_data.json").unlink()
@@ -1101,10 +1104,18 @@ def test_tom_nook_or_isabelle_hand_out_a_map_from_version_3():
         assert "Your island map" not in status_block(isl, ari, "10:00")
 
 
+def _at_version(sim, v):
+    """Run a new simulation with an older prompt wording."""
+    sim.prompt_version = sim.isl.prompt_version = v
+    sim._build_systems()
+    return sim
+
+
 def test_spending_choices_are_read_from_plans():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=5, backend_override="mock", verbose=False)
+        _at_version(sim, 6)
         ch = sim._apply_choices("Ari", {"plaza": False, "write": "no", "next": "habit"})
         assert ch == {"plaza": False, "write": False, "next": "habit"} == sim.choices["Ari"]
         assert sim._apply_choices("Ari", {"plaza": "maybe", "next": "later"}) == {}  # unreadable: kept
@@ -1165,15 +1176,17 @@ def test_mental_energy_in_a_run():
         run = load_run(Path(d) / "run")
         days = run.of("energy")
         assert len(days) == 3 and all(e["enabled"] for e in days)
-        # Running out shows up as habit plans, and the budget caps what is charged:
-        # nobody goes over by more than the one call that was affordable when it started.
-        assert any(p.get("habit_reason") == "no energy left" for p in run.of("plan"))
+        # Running out shows up as plans held (nothing new planned, nothing repeated from yesterday), and the
+        # budget caps what is charged: nobody goes over by more than the one call affordable when it started.
+        held = [p for p in run.of("plan") if p.get("held")]
+        assert held and all(p["held_reason"] == "no energy left" and not p["scheduled"] for p in held)
+        assert not any(p.get("habit") for p in run.of("plan"))
         for e in days[1:]:
             for v in e["villagers"].values():
                 assert sum(v["spent"].values()) <= 25 + 40
         # Villagers see their energy and choose where it goes.
         prompt = next((Path(d) / "run" / "prompts").glob("d001_p0_*.txt")).read_text()
-        assert "Mental energy left today" in prompt and '"plaza": true | false' in prompt
+        assert "Mental energy today: 25" in prompt and '"energy": {"inward": <points>, "outward": <points>}' in prompt
         assert "25 points of mental energy a day" in prompt
         text = summary(run)
         assert "Estimated villager tokens" in text and "ran out" in text and "hidden reasoning: 0 tokens" in text
@@ -1339,3 +1352,69 @@ def test_announcement_from_version_5_is_short_and_ends_with_a_fun_fact():
     assert "; and " in announcement_text(isl) and " more." in announcement_text(isl)  # the news was cut short
     isl.announcement = "word " * 100 + "end."  # one Isabelle wrote herself is held to the limit too
     assert len(announcement_text(isl)[: -len(fun_fact(isl))].split()) <= ANNOUNCE_WORDS
+
+
+def test_from_version_6_the_plaza_is_opt_in():
+    from llmabm.island.prompts import island_rules
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
+    assert "Villagers meet at the plaza" in island_rules(sc.world, 10, version=5)
+    assert '"plaza": true' in island_rules(sc.world, 10, version=6)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock", verbose=False)
+        _at_version(sim, 6).run(1)
+        run = load_run(Path(d) / "run")
+        going = {n: False for n in sc.villagers}  # nobody is going until a plan that day says so
+        for e in run.of("plan"):
+            if "plaza" in (e.get("choices") or {}):
+                going[e["agent"]] = e["choices"]["plaza"]
+        r0 = {e["agent"]: e for e in run.of("evening_turn") if e["round"] == 0}
+        assert any(going.values()) and not all(going.values())  # the mock says yes about half the time
+        for n, g in going.items():
+            if not g:
+                assert r0[n]["skipped"] == "chose not to go to the plaza"
+            else:
+                assert r0[n].get("skipped") != "chose not to go to the plaza"
+
+
+def test_from_version_7_the_plaza_is_open_all_day_and_energy_is_planned():
+    from llmabm.island.prompts import action_menu, island_rules
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=7)
+    rules = island_rules(sc.world, 10, version=7)
+    assert "The plaza is open all day" in rules and "inwardly" in rules and "outwardly" in rules
+    assert "yesterday" not in rules and "habit" not in rules
+    assert "- plaza (not one of your actions" in action_menu(7) and "- plaza" not in action_menu(6)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=7, backend_override="mock", verbose=False,
+                               log_prompts=True)
+        sim.run(3)
+        run = load_run(Path(d) / "run")
+        prompts = Path(d) / "run" / "prompts"
+        social = sc.world["calendar"]["social_hours"]
+        # Visits happen whenever a plan sets a free hour aside, not in evening rounds.
+        visits = [e for e in run.of("evening_turn") if e.get("place") == "plaza" and not e.get("skipped")]
+        assert visits and {e["hour"] for e in visits} - set(social)
+        for p in run.of("plan"):
+            plaza = [x for x in p["scheduled"] if x["do"] == "plaza"]
+            assert all(set(x) == {"at", "do"} for x in plaza)
+        for day in range(3):  # an hour at the plaza isn't one of the day's actions
+            acts = Counter(e["agent"] for e in run.of("action") if e["day"] == day)
+            assert max(acts.values()) <= sc.world["calendar"]["actions_per_day"]
+        planned = {(p["day"], p["agent"], x["at"]) for p in run.of("plan") for x in p["scheduled"] if x["do"] == "plaza"}
+        assert {(e["day"], e["agent"], e["hour"]) for e in visits} <= planned
+        # The plaza turn doesn't say who else is there.
+        turn = next(prompts.glob("d*_plaza_*.txt")).read_text()
+        assert "PHASE: plaza" in turn and "Here now" not in turn and "offers expire after 2 days" in turn
+        # The first plan splits the day's energy; later prompts show the plan against what was spent.
+        first = next(prompts.glob("d001_p0_*.txt")).read_text()
+        assert "Mental energy today: 150" in first and "First, decide how you'll spend" in first
+        assert '"next"' not in first and "habit" not in first
+        split = [p for p in run.of("plan") if p.get("energy_plan")]
+        assert split
+        later = [f.read_text() for f in prompts.glob("d00[12]_p1_*.txt")]
+        assert any("Your plan for today: inward" in t and "You can change today's energy plan" in t for t in later)
+        assert any(v.get("plan") for e in run.of("energy") for v in e["villagers"].values())
+        # Offers wait for an answer on the day they're made and the next, then expire.
+        assert all(o.status != "pending" for o in sim.offers.values() if o.day <= 0)
+        assert not any(p.get("habit") for p in run.of("plan"))

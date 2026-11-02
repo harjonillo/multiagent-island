@@ -118,6 +118,14 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
             out["write"] = rng.random() < 0.6
         if rng.random() < 0.15:
             out["next"] = rng.choice(["plan", "habit"])
+    if '"do": "plaza"}' in prompt:  # prompt version 7: the plaza is open all day
+        free = [h for h in window if h not in hours]
+        if free and rng.random() < 0.5:
+            out["actions"].append({"hour": rng.choice(free), "do": "plaza"})
+        if '"write": true | false' in prompt and rng.random() < 0.2:
+            out["write"] = rng.random() < 0.6
+        if '"energy": {"inward"' in prompt and rng.random() < 0.8:
+            out["energy"] = {"inward": rng.randint(20, 80), "outward": rng.randint(20, 80)}
     return json.dumps(out)
 
 
@@ -137,7 +145,7 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
                 resp["give"] = {k: 1}
                 resp["want"] = {"bells": rng.choice([300, 800, 1500])}
         out["responses"].append(resp)
-    if "round 0" in prompt:
+    if "round 0" in prompt or prompt.startswith("PHASE: plaza"):
         if rng.random() < 0.5:
             out["letters"].append({"to": rng.choice(others), "content": rng.choice(
                 ["the rocks were empty by the time I got there", "caught something nice in the river today",

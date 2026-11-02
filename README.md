@@ -291,7 +291,7 @@ writing, below).
 | Nook's Cranny | Timmy and Tommy | 08:00–22:00 | buys almost anything at a fixed price (shop goods and clothes at a quarter of their price). Sells saplings, 2 kinds of flower seeds, 3 rotating items and one DIY recipe card (2,000 bells) each day, plus every tool's recipe card (500 bells) |
 | Able Sisters | the Able Sisters | 09:00–21:00 | 4 pieces of clothing a day, from `clothing` in the world file. The entries are placeholders for your own designs |
 | museum | Blathers | all day | takes the first donation of each fish, bug and fossil species and shows who gave what, with a tally per villager. No bells for it. Assesses fossils for free |
-| plaza | | 20:00, 21:00 | the evening rounds |
+| plaza | | all day (from prompt version 7; before, 20:00 and 21:00) | the board, trade offers, letters and parcels |
 
 **Houses.**
 
@@ -470,9 +470,24 @@ both, until the other gives at least that much, in person or by parcel. Nothing 
 guest in: the guest sees the furniture inside and they talk, with gifts and requests as
 above. Otherwise nobody answers, and the host later hears that the guest came by.
 
-**The plaza** at 20:00 and 21:00 (no action hour). In the first round every awake villager
-gets a call. The second round only includes villagers with new offers waiting. A villager
-can:
+**The plaza, from prompt version 7.** The plaza is open all day. A plan can set any free hour
+aside for it with `{"hour": <hour>, "do": "plaza"}`: that takes the hour but isn't one of the
+day's actions, and nothing else limits how often a villager goes except their energy. That hour
+they walk there (a villager who can't reach it with the tools they carry doesn't get there) and
+get one turn: the board, offers, answers to offers, letters and parcels, as below. The turn
+doesn't say who else is at the plaza. Villagers there in the same hour are near each other, so
+they can notice each other afterwards and choose whether to talk, one to one, as anywhere else.
+Offers can go to any villager, not only those at the plaza; the recipient sees them on their
+next visit, and an offer not answered by the end of the day after it was made expires. There
+are no evening rounds. Turns are logged as `evening_turn` events with `"place": "plaza"`.
+
+**The plaza before prompt version 7** at 20:00 and 21:00 (no action hour). In the first round every awake villager
+who is going gets a call. The second round only includes those with new offers waiting. Who goes:
+before prompt version 6, everyone unless a plan reply said `"plaza": false` (only possible with
+mental energy on); from version 6 it is opt-in: each morning nobody is going, and a villager goes
+that evening only if a plan reply that day says `"plaza": true`, with or without mental energy. A
+villager who doesn't go can't post, offer, answer offers or send mail that evening; offers to
+them wait, and expire after the next evening. At the plaza, a villager can:
 - post on the bulletin board, which everyone sees (the last 8 posts; up to 250 characters)
 - offer a trade to another villager (`give` and `want`, with `"bells"` as an item for money)
 - accept, reject or counter offers waiting for them. Both villagers are at the plaza, so an
@@ -498,8 +513,8 @@ her model; `null` means the villagers' model.
 information only. That puts an LLM between events and what villagers hear, so treat it as an
 experimental condition of its own. Otherwise the announcement is a fixed template.
 
-Villagers read the announcement once a day, at the top of their first plan (a villager who skips
-that call, out of energy or repeating yesterday's plan, misses it). From prompt version 5 it is at
+Villagers read the announcement once a day, at the top of their first plan (before prompt version 7,
+a villager who skipped that call by repeating yesterday's plan missed it). From prompt version 5 it is at
 most 70 words, with yesterday's news cut short as "and N more", then one "Did you know..." fun fact
 of up to 15 words about how the island works (`fun_facts` in `prompts.py`: saplings at Nook's Cranny,
 eating fruit before breaking a rock, the money rock, and so on). The facts take their numbers and
@@ -519,7 +534,20 @@ prompt aren't charged: they are the same every time, and charging them would mos
 how often a villager re-reads the rulebook. Villagers see what they have left and the typical
 cost of each kind of call. Isabelle isn't charged.
 
-**Choosing where it goes.** Deciding whether to spend energy can't itself cost a call, so
+**From prompt version 7: inward and outward.** Villagers are told energy is one daily total in
+points, spent inwardly (planning, thinking things over, writing their page at night) or outwardly
+(conversations, the plaza, letters and posts). The first plan of the day asks them to split it,
+`"energy": {"inward": <points>, "outward": <points>}`; whatever is left over is spare, for people
+they run into. Any later plan can change the split. It's a plan, not a limit: every later prompt
+shows it against what they've spent so far (inward is the planning and thinking kinds below,
+outward is talking), e.g. `inward 50 (spent 24), outward 70 (spent 29), spare 30 (used 0)`, and
+nothing stops them going over. The split is logged as `energy_plan` on the plan event and as
+`plan` in the day's `energy` event. The only choice left is `"write"`: the plaza is in the plan
+itself, and there is no habit. A villager with no energy left at a planning time keeps what they
+already planned and plans nothing new (logged as a plan with `"held": true`); nobody repeats
+yesterday.
+
+**Choosing where it goes, before prompt version 7.** Deciding whether to spend energy can't itself cost a call, so
 villagers decide ahead, in each plan reply:
 - `"plaza": true | false`: go to the plaza this evening
 - `"write": true | false`: write the private page tonight
@@ -527,11 +555,13 @@ villagers decide ahead, in each plan reply:
   yesterday at that time, which is free. Habit covers one planning time; they plan again after.
 
 Each choice keeps its value until they change it, and the prompt shows the current value. The
-plaza and writing default to on, and the next plan to "plan". In the moment they also choose
+plaza and writing default to on, and the next plan to "plan". From prompt version 6 the plaza
+choice is offered even without mental energy, and resets to off every morning. In the moment they also choose
 whether to approach someone, how long to talk and how much to write.
 
-**When it runs out** they can't make any call until the next morning: they follow habit instead
-of planning, only nod when spoken to, skip the plaza, and don't write. Their old page stays.
+**When it runs out** they can't make any call until the next morning: they plan nothing new (before
+version 7, they followed habit instead), only nod when spoken to, do nothing at the plaza, and don't
+write. Their old page stays.
 
 **Hidden reasoning.** Reasoning models (gpt-oss on Groq, for example) think before they answer,
 in text the villager never writes down. That reasoning is always recorded: the provider's

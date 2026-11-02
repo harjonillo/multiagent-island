@@ -931,7 +931,8 @@ class GridSpace(Space):
         n_flowers = sum(1 for f in self.flowers.values() if f["owner"] == name)
         yours = ", ".join(f"{k} x{v}" for k, v in mine.items())
         places = "; ".join(f"{b} ({reach([v['door']])})" for b, v in self.buildings.items()
-                           if b in ("Resident Services", "Nook's Cranny", "Able Sisters", "museum"))
+                           if b in ("Resident Services", "Nook's Cranny", "Able Sisters", "museum")
+                           or (b == "plaza" and getattr(island, "prompt_version", 1) >= 7))  # open all day from v7
         built = []
         if yours:
             built.append(f"things you put outside: {yours}")

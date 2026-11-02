@@ -22,6 +22,12 @@ That hidden reasoning is always recorded (tokens per villager and call type, as 
 reports them). With `charge_reasoning: true` it is also charged to the pool, like any other
 thinking; by default it is free, so only what a villager reads and writes costs energy.
 
+From prompt version 7 villagers are told about two directions instead: inward (planning and
+thinking, the first two kinds) and outward (talking). Each morning's plan splits the day's total
+between them, and whatever is left over is spare. The split is only a plan: it is shown back to them
+with what they have spent so far, and nothing stops them going over it. There is no habit: a
+villager too tired to plan keeps what they already planned.
+
 Isabelle is an NPC and is not charged.
 """
 
@@ -52,6 +58,7 @@ class MentalEnergy:
         self.estimates = {"plan": 12, "notice": 3, "chat": 8, "evening": 12, "reflect": 5, **(cfg.get("estimates") or {})}
         self._pending: list[tuple] = []
         self._lock = threading.Lock()
+        self.plans: dict[str, dict | None] = {n: None for n in names}  # today's split, from version 7
 
     def __getstate__(self):
         state = dict(self.__dict__)
@@ -61,6 +68,7 @@ class MentalEnergy:
     def __setstate__(self, state):
         state.setdefault("charge_reasoning", False)  # checkpoints from before reasoning was tracked
         state.setdefault("reasoning", {n: defaultdict(float) for n in state["left"]})
+        state.setdefault("plans", {n: None for n in state["left"]})  # checkpoints from before energy plans
         self.__dict__.update(state)
         self._lock = threading.Lock()
 
@@ -71,12 +79,50 @@ class MentalEnergy:
             self.spent[n] = defaultdict(float)
             self.skipped[n] = defaultdict(int)
             self.reasoning[n] = defaultdict(float)
+            self.plans[n] = None
         self.tokens = defaultdict(float)
 
     def day_record(self) -> dict:
         return {n: {"spent": {k: round(self.spent[n][k], 1) for k in KINDS}, "left": round(self.left[n], 1),
                     "skipped": dict(self.skipped[n]), "tokens": round(self.tokens[n]),
-                    "reasoning": {k: round(v) for k, v in self.reasoning[n].items()}} for n in self.left}
+                    "reasoning": {k: round(v) for k, v in self.reasoning[n].items()},
+                    **({"plan": self.plans[n]} if self.plans.get(n) else {})} for n in self.left}
+
+    # --- the day's plan (prompt version 7) -------------------------------------------
+    def set_plan(self, name: str, plan) -> dict | None:
+        """Read {"inward": n, "outward": n} from a plan reply. Unreadable parts keep today's plan;
+        each side is at most the daily total. Returns the plan if it changed."""
+        if not isinstance(plan, dict) or name not in self.left:
+            return None
+        new = dict(self.plans.get(name) or {})
+        for k in ("inward", "outward"):
+            try:
+                new[k] = max(0, min(round(self.daily), int(round(float(plan[k])))))
+            except (KeyError, TypeError, ValueError):
+                continue
+        if set(new) != {"inward", "outward"} or new == self.plans.get(name):
+            return None
+        self.plans[name] = new
+        return new
+
+    def inward_outward(self, name: str) -> tuple[float, float]:
+        """What was spent today, inwardly (planning and thinking) and outwardly (talking)."""
+        sp = self.spent[name]
+        return sp["planning"] + sp["thinking"], sp["talking"]
+
+    def plan_text(self, name: str) -> str:
+        """The day's plan against what was spent, e.g. " Your plan for today: inward 50 (spent 24), ..."."""
+        plan = self.plans.get(name)
+        if not plan:
+            return ""
+        spare = max(0, round(self.daily) - plan["inward"] - plan["outward"])
+        sides = []
+        for k, spent in zip(("inward", "outward"), self.inward_outward(name)):
+            over = round(spent) - plan[k]
+            sides.append(f"{k} {plan[k]} (spent {round(spent)}"
+                         + (f": {over} more than planned, from your spare" if over > 0 else "") + ")")
+        used = sum(max(0, round(s) - plan[k]) for k, s in zip(("inward", "outward"), self.inward_outward(name)))
+        return f" Your plan for today: {', '.join(sides)}, spare {spare} (used {used})."
 
     # --- costs -----------------------------------------------------------------------
     def points(self, *texts: str) -> float:
@@ -139,9 +185,17 @@ class MentalEnergy:
         if self.enabled:
             self.left[name] = max(0.0, self.left[name] - total)
 
-    def status_line(self, name: str) -> str:
+    def status_line(self, name: str, v7: bool = False) -> str:
         if not self.enabled or name not in self.left:
             return ""
+        if v7:
+            fresh = not self.plans.get(name) and self.left[name] >= self.daily - 0.5
+            return ((f"Mental energy today: {round(self.daily)}." if fresh else
+                     f"Mental energy left today: {round(self.left[name])} of {round(self.daily)}.")
+                    + self.plan_text(name)
+                    + f" Typical costs: a plan {self.typical('plan')}, noticing someone {self.typical('notice')}, "
+                    f"one thing you say in a conversation {self.typical('chat')}, a turn at the plaza "
+                    f"{self.typical('evening')}, writing at night {self.typical('reflect')}; longer replies cost more.")
         return (f"Mental energy left today: {round(self.left[name])} of {round(self.daily)}. "
                 f"Typical costs: a plan {self.typical('plan')}, noticing someone {self.typical('notice')}, "
                 f"one thing you say in a conversation {self.typical('chat')}, an evening at the plaza "

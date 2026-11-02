@@ -175,6 +175,30 @@ def changes(run_dir: Path, e: dict) -> list[dict]:
     return out
 
 
+SIM_CHANGES = Path(__file__).with_name("changelog.yaml")
+
+
+def sim_changes(path: Path = SIM_CHANGES) -> list[dict]:
+    """Changelog entries for the simulation itself (changelog.yaml), not tied to one experiment."""
+    import datetime
+
+    import yaml
+
+    if not Path(path).exists():
+        return []
+    out = []
+    for c in yaml.safe_load(Path(path).read_text()) or []:
+        t = c["time"] if isinstance(c["time"], datetime.datetime) else datetime.datetime.fromisoformat(str(c["time"]))
+        ts = t.timestamp()
+        details = []
+        for d in c.get("details") or []:
+            title, sep, rest = str(d).partition(": ")
+            details.append({"title": title, "text": rest} if sep else {"title": "", "text": str(d)})
+        out.append({"time": ts, "date": _real_date(ts), "number": None, "label": "SIM", "href": None,
+                    "what": c["what"], "when": c.get("when", ""), "details": details})
+    return out
+
+
 # --- the page ------------------------------------------------------------------------------
 def _pos(d: dict) -> str:
     return "; ".join(f"{k}: {v}" for k, v in d.items())
@@ -253,7 +277,7 @@ def changelog_html(entries: list[dict]) -> str:
     remembers which); without the script it stays open."""
     items = []
     for c in sorted(entries, key=lambda c: -c["time"]):
-        exp = f"EXP {c['number']:02d}"
+        exp = c.get("label") or f"EXP {c['number']:02d}"
         exp = f'<a href="{html.escape(c["href"])}">{exp}</a>' if c.get("href") else exp
         details = ""
         for d in c["details"]:
@@ -261,8 +285,8 @@ def changelog_html(entries: list[dict]) -> str:
             details += f"<li>{title}{html.escape(_sentence(d['text']))}</li>"
         items.append(f'<li><div class="when">{html.escape(c["date"])}</div>'
                      f'<div class="what"><span class="exp">{exp}</span> {html.escape(c["what"][:1].upper() + c["what"][1:])}</div>'
-                     f'<div class="when">{html.escape(c["when"][:1].upper() + c["when"][1:])}</div>'
-                     f'<ul>{details}</ul></li>')
+                     + (f'<div class="when">{html.escape(c["when"][:1].upper() + c["when"][1:])}</div>' if c["when"] else "")
+                     + f'<ul>{details}</ul></li>')
     n = len(entries)
     return f"""<aside class="clog" id="clog">
   <button class="tab" type="button" data-log="open" aria-expanded="false" aria-controls="clog-panel" title="Show the changelog">
@@ -270,7 +294,7 @@ def changelog_html(entries: list[dict]) -> str:
   <div class="panel" id="clog-panel">
     <div class="top"><div class="label">Changelog</div>
       <button class="fold" type="button" data-log="closed" aria-expanded="true" aria-controls="clog-panel" title="Hide the changelog" aria-label="Hide the changelog"><span class="chev right" aria-hidden="true"></span></button></div>
-    <div class="note" style="margin:0 0 14px">When each experiment started, and what was changed on purpose since, newest first.</div>
+    <div class="note" style="margin:0 0 14px">When each experiment started, what was changed on purpose since, and changes to the simulation for new runs (SIM), newest first.</div>
     <ol class="log">{"".join(items) or '<li><div class="what">No experiments yet.</div></li>'}</ol>
   </div>
 </aside>"""
@@ -297,7 +321,8 @@ def build_experiments(runs_dir: Path, out_dir: Path | None = None) -> Path:
     page = (TEMPLATE.read_text().replace("__TOKENS__", TOKENS.read_text())
             .replace("__COUNT__", f"{len(exps)} experiment" + ("" if len(exps) == 1 else "s"))
             .replace("__DOORS__", doors)
-            .replace("__CHANGELOG__", changelog_html([c for e in exps for c in changes(runs_dir / e["dir"], e)]))
+            .replace("__CHANGELOG__", changelog_html([c for e in exps for c in changes(runs_dir / e["dir"], e)]
+                                                     + sim_changes()))
             .replace("__FRAMES__", json.dumps(frames).replace("</", "<\\/")))
     out = out_dir / "index.html"
     out.write_text(page)
