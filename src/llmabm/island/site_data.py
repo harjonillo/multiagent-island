@@ -19,7 +19,7 @@ from .analysis import (RESOURCES, _side, action_mix, extraction_shares, gini, hh
                        reply_errors, run_out, snapshots)
 from .world import CATEGORIES, clock
 
-VERSION = 3  # 2: per-day detail for the Days tab; 3: interactions for the Social tab
+VERSION = 6  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
 
 # Why actions failed, matched on the result text; the first match wins.
 FAIL_BUCKETS = [
@@ -210,6 +210,38 @@ def _offer_text(e: dict) -> str:
             + (f': "{e["note"]}"' if e.get("note") else ""))
 
 
+def _assets(v: dict, world: dict) -> dict:
+    """A villager's assets at the end of a day, from its snapshot. There is one inventory: the house only adds
+    room to it (pockets plus the house's storage). Snapshots list the items from Nov 2026 on; older ones
+    only count them (`items` is then None)."""
+    house = world["house_levels"][v["house"]]
+    return {"bells": v["bells"], "loan": v["loan"], "n": v["items"], "value": v.get("inventory_value", 0),
+            "pockets": world["pockets"], "storage": house["storage"], "house": house["name"],
+            "items": v.get("inventory"), "recipes": v.get("recipes") or [],
+            "interior": v.get("interior") or [], "wearing": v.get("wearing") or {}}
+
+
+def _isabelle(start: dict | None, events: list[dict], llm_announce: bool) -> dict:
+    """What Isabelle said that day. The morning announcement is the day_start event's `heard`, exactly as the
+    villagers' first plan of the day showed it; older runs didn't record it, and are rebuilt from the same event
+    with the same function (they all used the original template). The report is her end-of-day summary,
+    written for the researcher and never shown to villagers."""
+    from types import SimpleNamespace
+
+    from .prompts import announcement_text
+
+    heard = start.get("heard") if start else None  # recorded as heard from Nov 2026 on
+    if start and heard is None:  # before that: always the original template, rebuilt the same way
+        isl = SimpleNamespace(announcement=start.get("announcement"), day=start["day"], ordinance=start.get("ordinance", "none"),
+                              weather=start.get("weather", ""), yesterday_news=start.get("news") or [],
+                              date_text=lambda: start.get("date", ""))
+        if not start.get("date"):
+            del isl.weather  # runs without a calendar leave the weather line out
+        heard = announcement_text(isl)
+    report = next((e.get("text") for e in events if e["type"] == "isabelle_summary"), None)
+    return {"announcement": heard, "written": bool(start and start.get("announcement")) and llm_announce, "report": report}
+
+
 def day_detail(run: Run) -> list[dict]:
     """Per day, for the Days tab: counts, the commons hour by hour, and per villager their plans,
     actions, sightings and nightly page; plus every conversation and piece of mail.
@@ -278,6 +310,8 @@ def day_detail(run: Run) -> list[dict]:
             "houses": {n: levels[v["house"]]["name"] + (f", {v['loan']:,} loan" if v["loan"] else "")
                        for n, v in snap["villagers"].items()},
             "plans": plans, "acts": acts, "seen": seen, "pages": pages, "talks": talks, "mail": mail,
+            "assets": {n: _assets(v, run.manifest["world"]) for n, v in snap["villagers"].items()},
+            "isabelle": _isabelle(start, ev, bool(((run.manifest.get("scenario_config") or {}).get("isabelle") or {}).get("announce"))),
         })
     return out
 

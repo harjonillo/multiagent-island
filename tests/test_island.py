@@ -941,6 +941,16 @@ def test_site_data_and_page_for_a_mock_run():
         assert kinds["offer"] == len(run.of("offer")) and kinds["trade"] == len(run.of("trade"))
         assert all(x["a"] != x["b"] and x["a"] in names and x["b"] in names for x in S)
         assert "thoughts" not in json.dumps(S)
+        # Assets per villager at the end of each day: bells, the items held (one inventory; the house adds room).
+        last_snap = [e for e in run.of("snapshot")][-1]
+        for n, a in data["daylog"][-1]["assets"].items():
+            v = last_snap["villagers"][n]
+            assert a["bells"] == v["bells"] and a["n"] == v["items"] == sum(a["items"].values())
+            assert a["pockets"] + a["storage"] >= a["n"] and a["recipes"] == v["recipes"]
+        # Isabelle per day: the morning announcement as the villagers' first plan showed it, and her report.
+        I = {L["day"]: L["isabelle"] for L in data["daylog"]}
+        assert I[0]["announcement"].startswith("Welcome to the island") and I[1]["announcement"].startswith("Good morning")
+        assert all(I[e["day"]]["report"] == e["text"] for e in run.of("isabelle_summary") if e["day"] in I)
         page = build_site(run_dir).read_text()
         assert "__DATA__" not in page and "__TITLE__" not in page
         blob = page.split('<script id="site-data" type="application/json">', 1)[1].split("</script>", 1)[0]
@@ -976,6 +986,7 @@ def test_site_data_and_page_for_a_mock_run():
         day0 = next(x for x in run.of("day_start") if x["day"] == 0)["pools"]
         assert island["rocks"].startswith(f"{len(day0['rocks'])},") and island["shells"].startswith(f"{day0['shells_left']} ")
         assert "initial conditions</summary>" in doors and html.escape(kit["tools"]) in doors
+        assert '<div class="k">temperature</div><div>0.8</div>' in doors
         # The changelog sidebar: each experiment's start and its changes, newest first, linked to the run.
         log = doors.split('<aside class="clog"', 1)[1]
         assert log.index("Prompt version 1 → 4") < log.index("Started") and "From day 1" in log
@@ -1304,3 +1315,27 @@ if __name__ == "__main__":
         if name.startswith("test_"):
             fn()
             print("ok", name)
+
+
+def test_announcement_from_version_5_is_short_and_ends_with_a_fun_fact():
+    from llmabm.island.prompts import ANNOUNCE_WORDS, FACT_WORDS, _announcement_v1, announcement_text, fun_fact, fun_facts
+
+    isl = _island(("Ari", "Bo"))
+    isl.yesterday_news = [f"villager {i} moved to the island and lives lower ground, centre" for i in range(12)]
+    isl.day = 3
+    isl.prompt_version = 4  # earlier versions keep the original announcement: no limit, no fact
+    assert announcement_text(isl) == _announcement_v1(isl) and "Did you know" not in announcement_text(isl)
+    for v in (3, 4, 5):
+        isl.prompt_version = v
+        facts = fun_facts(isl)
+        assert facts and all(f.startswith("Did you know") and len(f.split()) <= FACT_WORDS for f in facts)
+        assert ("island map" in " ".join(facts)) == (v >= 3) and ("axe" in " ".join(facts)) == (v >= 4)
+    isl.prompt_version = 5
+    for day in range(len(fun_facts(isl)) + 1):  # a different fact each morning, in turn
+        isl.day = day
+        text, fact = announcement_text(isl), fun_fact(isl)
+        assert text.endswith(" " + fact) and len(text[: -len(fact)].split()) <= ANNOUNCE_WORDS
+    isl.day = 3
+    assert "; and " in announcement_text(isl) and " more." in announcement_text(isl)  # the news was cut short
+    isl.announcement = "word " * 100 + "end."  # one Isabelle wrote herself is held to the limit too
+    assert len(announcement_text(isl)[: -len(fun_fact(isl))].split()) <= ANNOUNCE_WORDS

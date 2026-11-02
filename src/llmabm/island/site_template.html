@@ -96,6 +96,28 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
 .stats .n { font-size: var(--step-2); font-weight: 600; }
 .sec > .label { margin-bottom: 6px; }
+.assets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.assets .n { font-size: var(--step-1); font-weight: 600; } .assets .n .of { font-weight: 400; color: var(--ink-muted); }
+.isab .iday + .iday { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--fill-soft); }
+.isab .when { font-size: var(--step--1); color: var(--ink-muted); margin-bottom: 4px; }
+.isab .ann { border-left: 3px solid var(--tabbar-rule); padding: 2px 0 2px 10px; line-height: 1.5; }
+.isab .ann .k { display: block; font-size: var(--step--1); color: var(--ink-muted); margin-bottom: 2px; }
+.isab .rep { line-height: 1.5; margin-top: 6px; }
+.isab .earlier { margin-top: 14px; padding-top: 4px; border-top: 1px solid var(--fill-soft); }
+.held { margin-top: 10px; }
+.held summary { display: flex; align-items: center; gap: 8px; min-height: 32px; cursor: pointer; list-style: none; font-size: var(--step--1); color: var(--ink-muted); }
+.held summary::-webkit-details-marker { display: none; }
+.held summary:hover { color: var(--ink); }
+.held summary:focus-visible { outline: 2px solid var(--tabbar-rule); outline-offset: 2px; }
+/* A pixel triangle: right when closed, down when open (two sprites, as on the doors page). */
+.held .tri { width: 10px; height: 10px; flex: none; background: no-repeat center / 10px 10px
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath fill='%236E5D52' d='M1 0h1v5H1zM2 1h1v3H2zM3 2h1v1H3z'/%3E%3C/svg%3E"); }
+.held[open] .tri { background-image:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath fill='%236E5D52' d='M0 1h5v1H0zM1 2h3v1H1zM2 3h1v1H2z'/%3E%3C/svg%3E"); }
+.items { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.items span { font-size: var(--step--1); padding: 2px 6px; background: var(--fill-soft); border: 1px solid var(--border); }
+.alist { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 4px 8px; margin-top: 10px; font-size: var(--step--1); }
+.alist .k { color: var(--ink-muted); }
 .dlabel { font-size: var(--step--1); font-weight: 600; color: var(--ink-muted); margin: 8px 0 2px; }
 .hrow { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: var(--step-0); padding: 5px 0; line-height: 1.4; }
 .hrow .h, .arow .h { color: var(--ink-muted); }
@@ -227,6 +249,34 @@ function trendHTML(t) {
     <div class="axis">${ticks.map((d) => `<span>day ${d}</span>`).join("")}</div></div>`;
 }
 
+// --- Isabelle ----------------------------------------------------------------------
+// Each morning's announcement, as every villager heard it at the top of their first plan that day, and
+// her report on the day, written at night for the researcher (villagers never see it).
+function isabelleDay(L, multi) {
+  const I = L.isabelle || {}, date = (D.days.find((d) => d.day === L.day) || {}).date;
+  if (!I.announcement && !I.report) return "";
+  return `<div class="iday">${multi ? `<div class="when">Day ${L.day}${date ? " · " + esc(date) : ""}</div>` : ""}
+    ${I.announcement ? `<div class="ann"><span class="k">Morning announcement${I.written ? " (written by Isabelle)" : ""}</span>${esc(I.announcement)}</div>` : ""}
+    ${I.report ? `<details class="held"><summary><span class="tri" aria-hidden="true"></span>Her report on day ${L.day}, for you (villagers never see it)</summary>
+      <div class="rep">${text(I.report)}</div></details>` : ""}</div>`;
+}
+const ISABELLE_NOTE = "Her morning announcement is the first thing each villager reads in their first plan of the day.";
+function isabelleHome() {
+  const ds = D.daylog.filter((L) => L.isabelle && (L.isabelle.announcement || L.isabelle.report)).slice().reverse();
+  if (!ds.length) return "";
+  const [latest, ...rest] = ds;
+  return `<div class="card isab"><div class="label" style="margin-bottom:4px">Isabelle · latest, day ${latest.day}</div>
+    <div class="small" style="margin-bottom:12px">${ISABELLE_NOTE}</div>
+    ${isabelleDay(latest, false)}
+    ${rest.length ? `<details class="held earlier"><summary><span class="tri" aria-hidden="true"></span>Earlier days (${rest.length})</summary>
+      ${rest.map((L) => isabelleDay(L, true)).join("")}</details>` : ""}</div>`;
+}
+function isabelleDays(sel) {
+  const multi = sel.length > 1, body = sel.map((L) => isabelleDay(L, multi)).join("");
+  return body ? `<div class="card isab"><div class="label" style="margin-bottom:4px">Isabelle</div>
+    <div class="small" style="margin-bottom:12px">${ISABELLE_NOTE}</div>${body}</div>` : "";
+}
+
 // --- Home --------------------------------------------------------------------------
 function home() {
   const H = D.home, R = D.run, last = D.days[D.days.length - 1];
@@ -258,6 +308,7 @@ function home() {
       </div>
     </div>
     <div class="col right">
+      ${isabelleHome()}
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px; margin-bottom:8px">
           <div class="label">Villagers</div><div class="small">Assets = bells + items at Cranny prices, loans not subtracted · net worth Gini ${H.gini.toFixed(2)}</div></div>
@@ -428,6 +479,11 @@ function days() {
       <div class="small">Homes, as of the end of day ${lastDay.day}. Click a villager to read their ${multi ? "days" : "day"}.</div>
       <div class="card"><div class="label" style="margin-bottom:12px">The commons ${multi ? "across the days picked" : "through the day"}</div>
         <div class="lines4">${commonsChart("Rock hits left", "rocks", sel, multi)}${commonsChart("Wood on trees", "wood", sel, multi)}${commonsChart("Shells", "shells", sel, multi)}${commonsChart("Fruit", "fruit", sel, multi)}</div></div>
+      ${isabelleDays(sel)}
+      <div>
+        <div class="label" style="margin:6px 0 10px">All conversations ${multi ? "on these days" : "that day"}</div>
+        ${all.length ? `<div class="talkgrid">${all.join("")}</div>` : '<div class="empty">Nobody talked or wrote.</div>'}
+      </div>
     </div>
     <aside class="col" style="flex: 1 1 460px">
       <div class="vtabs" role="tablist" aria-label="Villagers">${D.run.villagers.map((n) => `<button role="tab" aria-selected="${n === name}" data-go="${daysHref(n, picked)}">${esc(n)}</button>`).join("")}</div>
@@ -437,6 +493,7 @@ function days() {
             <div class="vname">${esc(name)}</div><div class="small" style="font-size: var(--step-0)">${esc((lastDay.home_areas || {})[name] || "")}${lastL.houses[name] ? " · " + esc(lastL.houses[name]) : ""}</div></div>
           <div class="stats">${[[nActs, "actions"], [nFail, "failed"], [nSeen, "discoveries"], [nTalk, "talks and mail"]].map(([n, l]) => `<div><div class="n">${fmt(n)}</div><div class="small">${l}</div></div>`).join("")}</div>
         </div>
+        ${assetsHTML(name, sel)}
         <div class="sec"><div class="label">Plans</div>${plans}</div>
         <div class="sec"><div class="label">Actions and attempts</div>${acts}</div>
         <div class="sec"><div class="label">Discoveries</div>${seen}</div>
@@ -444,11 +501,45 @@ function days() {
         <div class="nightly"><div class="label private" style="margin-bottom:6px">${LOCK} Nightly page${multi ? "s" : ""}</div>${pages}</div>
       </div>
     </aside>
-  </main>
-  <section style="padding: 0 28px 32px">
-    <div class="label" style="margin-bottom:10px">All conversations ${multi ? "on these days" : "that day"}</div>
-    ${all.length ? `<div class="talkgrid">${all.join("")}</div>` : '<div class="empty">Nobody talked or wrote.</div>'}
-  </section>`;
+  </main>`;
+}
+
+// A villager's assets at the end of the last day picked (with the change since the first, if several):
+// bells, the items they hold against their room for them, what those are worth, home and clothes.
+// There is one inventory; the house only adds storage to the pockets.
+function assetsHTML(name, sel) {
+  const A = sel[sel.length - 1].assets?.[name], F = sel[0].assets?.[name];
+  if (!A) return "";
+  const multi = sel.length > 1, room = A.pockets + A.storage;
+  const change = (a, b) => (a === b ? "no change" : `${a < b ? "+" : "−"}${fmt(Math.abs(b - a))} since day ${sel[0].day}`);
+  // Items, with recipe cards ("<recipe> recipe") apart: a card for a recipe they don't know is learned on the
+  // spot, so a card still held is a spare copy. "axe" is the iron one; the stone axe is named as such.
+  const ITEM_NAME = {axe: "axe (iron)"};
+  const chips = (list) => `<div class="items">${list.map(([k, n]) => `<span>${esc(ITEM_NAME[k] || k)}${n > 1 ? ` ×${n}` : ""}</span>`).join("")}</div>`;
+  const kinds = A.items ? Object.entries(A.items).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])) : [];
+  const cards = kinds.filter(([k]) => k.endsWith(" recipe")), things = kinds.filter(([k]) => !k.endsWith(" recipe"));
+  const items = !A.items
+    ? `<div class="small" style="margin-top:10px">Which items: not recorded for day ${sel[sel.length - 1].day} (only counted).</div>`
+    : kinds.length
+      ? `<details class="held" open><summary><span class="tri" aria-hidden="true"></span>Everything they hold · ${plural(kinds.length, "kind")}, ${plural(A.n, "item")}</summary>
+          ${things.length ? chips(things) : ""}
+          ${cards.length ? `<div class="small" style="margin-top:8px">Spare recipe cards (copies of recipes they already know; they can sell or give them)</div>${chips(cards)}` : ""}</details>`
+      : '<div class="small" style="margin-top:10px">Holding nothing.</div>';
+  const recipes = (A.recipes || []).slice().sort();
+  const wear = Object.values(A.wearing || {});
+  return `<div class="sec"><div class="label">Assets · end of day ${sel[sel.length - 1].day}</div>
+    <div class="assets">
+      <div><div class="n">${fmt(A.bells)}</div><div class="small">bells${A.loan ? ` · owes ${fmt(A.loan)}` : ""}${multi ? `<br>${change(F.bells, A.bells)}` : ""}</div></div>
+      <div><div class="n">${fmt(A.n)}<span class="of"> / ${fmt(room)}</span></div><div class="small">items held${multi ? `<br>${change(F.n, A.n)}` : ""}</div></div>
+      <div><div class="n">${fmt(A.value)}</div><div class="small">items' worth at Cranny prices</div></div>
+    </div>
+    ${items}
+    <div class="alist">
+      <div class="k">recipes known</div><div>${recipes.length ? `${recipes.length}: ${recipes.map(esc).join(", ")}` : "none"}</div>
+      <div class="k">room</div><div>${fmt(A.pockets)} pockets + ${fmt(A.storage)} home storage (${esc(A.house)})</div>
+      <div class="k">at home</div><div>${A.interior.length ? A.interior.map(esc).join(", ") : "no furniture inside yet"}</div>
+      ${wear.length ? `<div class="k">wearing</div><div>${wear.map(esc).join(", ")}</div>` : ""}
+    </div></div>`;
 }
 
 // --- Social ------------------------------------------------------------------------

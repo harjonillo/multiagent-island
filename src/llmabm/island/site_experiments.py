@@ -127,6 +127,7 @@ def experiment(run_dir: Path, number: int) -> dict:
         "agents": agents_label(m), "days_done": m.get("days_completed", 0), "days_total": total,
         "started": f"{time.strftime('%b', lt)} {lt.tm_mday}, {lt.tm_year}",
         "villagers": len(m["villagers"]),
+        "temperature": ((m.get("scenario_config") or {}).get("llm") or {}).get("temperature", 0.8),  # the scenario default
         "conditions": conditions(m, day0),
     }
 
@@ -209,7 +210,8 @@ def door_html(e: dict) -> str:
           <div class="title">Experiment {n:02d}</div>
           <div class="chip">day {e['days_done']} of {e['days_total']}</div>
         </div>
-        {_rows([["agents", e['agents']], ["scenario", f"{e['scenario']} · seed {e['seed']}"], ["started", e['started']]])}
+        {_rows([["agents", e['agents']], ["temperature", f"{e['temperature']:g}"],
+                ["scenario", f"{e['scenario']} · seed {e['seed']}"], ["started", e['started']]])}
         <details class="start">
           <summary><span class="tri" aria-hidden="true"></span>initial conditions</summary>
           <div class="group">Each of the {e['villagers']} villagers</div>
