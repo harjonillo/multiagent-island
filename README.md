@@ -505,9 +505,11 @@ read. Oldest first means nothing is starved by newer mail.
 ### Isabelle
 
 At the end of each day an LLM call as Isabelle reads a compact record of the day (actions,
-conversations and trades, not private thoughts) and writes a 150 to 300 word report to
+conversations and trades, not private thoughts) and writes a report of at most 120 words to
 `days/day_NNN_isabelle.md`. The report is for you, not the villagers. `isabelle.backend` sets
-her model; `null` means the villagers' model.
+her model; `null` means the villagers' model. Reports written before November 2, 2026 asked for
+150 to 300 words. The report never reaches villagers, so its wording has no prompt version: a
+change applies to running experiments from their next day.
 
 `isabelle.announce: true` also has her write the next morning's announcement from public
 information only. That puts an LLM between events and what villagers hear, so treat it as an

@@ -211,7 +211,7 @@ can't be afforded isn't made.
 | notice | a villager with someone nearby, out of the house | any hour, up to 4 a day | short: persona, nightly page | JSON: thoughts, approach, opening line | too tired to talk | `encounter_decision` |
 | chat turn | the one who was approached, then back and forth | right after a notice or a visit | rules, no menu | JSON: thoughts, say, give, ask, note | just nods | `encounter` |
 | nightly page | villagers who chose to write | end of day | short: persona, nightly page | free text, up to 150 words, then optionally `Remember:` and up to 3 things to hold on to | doesn't write; old page stays, nothing new is remembered | `reflection` |
-| Isabelle's report | Isabelle (not charged) | end of day, if `isabelle.summary` (on) | Isabelle | free text, 150 to 300 words | always made | `isabelle_summary` |
+| Isabelle's report | Isabelle (not charged) | end of day, if `isabelle.summary` (on) | Isabelle | free text, at most 120 words | always made | `isabelle_summary` |
 | Isabelle's announcement | Isabelle (not charged) | end of day, if `isabelle.announce` | Isabelle | free text, read in the next morning's plan | always made | `isabelle_announcement` |
 
 Day 0 has no extra call: homesites are drawn, not chosen.

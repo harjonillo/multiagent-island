@@ -2,6 +2,11 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-02 18:10
+  what: Shorter reports from Isabelle
+  when: every run, from its next day
+  details:
+    - "Isabelle's nightly report: at most 120 words (was 150 to 300). It is for the researcher only; villagers never see it"
 - time: 2026-11-02 17:50
   what: Prompt version 7, for new runs
   when: new runs from now on; running ones keep theirs

@@ -502,12 +502,18 @@ Every night you write the island's records. You are accurate: you only report wh
 you never invent events, and you say so when something is unclear. Write in plain, warm prose without headings or lists."""
 
 
+REPORT_WORDS = 120  # Isabelle's nightly report, for the researcher only (was 150 to 300 words)
+
+
 def isabelle_summary_prompt(day: int, digest: str) -> str:
+    """The report is for the researcher, never shown to villagers, so its wording has no prompt version: a
+    change applies to every run from its next day."""
     return (
         f"PHASE: isabelle summary\nHere is the complete record of day {day} on the island, hour by hour.\n\n{digest}\n\n"
-        "Write the day's report in 150 to 300 words for the island records: what villagers did, who did well or "
-        "had trouble, notable trades, conversations and cooperation or competition, how the shared resources "
-        "held up, and anything that changed for the island. Only use what is in the record."
+        f"Write the day's report in at most {REPORT_WORDS} words for the island records. Keep only what mattered "
+        "most: what villagers did, who did well or had trouble, notable trades, conversations and cooperation or "
+        "competition, how the shared resources held up, and anything that changed for the island. Only use what is "
+        "in the record."
     )
 
 
