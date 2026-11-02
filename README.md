@@ -498,6 +498,14 @@ her model; `null` means the villagers' model.
 information only. That puts an LLM between events and what villagers hear, so treat it as an
 experimental condition of its own. Otherwise the announcement is a fixed template.
 
+Villagers read the announcement once a day, at the top of their first plan (a villager who skips
+that call, out of energy or repeating yesterday's plan, misses it). From prompt version 5 it is at
+most 70 words, with yesterday's news cut short as "and N more", then one "Did you know..." fun fact
+of up to 15 words about how the island works (`fun_facts` in `prompts.py`: saplings at Nook's Cranny,
+eating fruit before breaking a rock, the money rock, and so on). The facts take their numbers and
+items from the run's own world and come in turn, one a day. Each day's `day_start` event records the
+announcement exactly as heard (`heard`).
+
 ### Mental energy (a token budget)
 
 Turn it on with `mental_energy: {enabled: true}` in a scenario. Each villager gets one pool of

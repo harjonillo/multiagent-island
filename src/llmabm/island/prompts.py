@@ -20,6 +20,8 @@ PROMPT_CHANGES = {
     4: "axes: everyone starts with a stone axe, which only gathers wood; the axe (iron; its recipe card is at "
        "Nook's Cranny) gathers wood and brings the tree down when it takes the tree's last wood. Fruit trees have "
        "wood too, and drop their fruit when felled. There is no separate chop_down_tree",
+    5: "Isabelle's morning announcement: at most 70 words (yesterday's news is cut short with \"and N more\"), "
+       "then one \"Did you know\" fun fact of up to 15 words about how the island works",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -184,7 +186,111 @@ def status_block(isl: Island, vil: Villager, when: str) -> str:
     )
 
 
+ANNOUNCE_WORDS = 70  # from prompt version 5: the announcement itself...
+FACT_WORDS = 15      # ...then one fun fact
+
+
+def _a_word(thing: str) -> str:
+    return ("an " if thing[:1].lower() in "aeiou" else "a ") + thing
+
+
+def fun_facts(isl: Island) -> list[str]:
+    """True things about how this island works, one per morning announcement from prompt version 5, each at
+    most FACT_WORDS words. Built from the run's own world (its fruit, prices, days and tools), so a fact is never
+    wrong for the island it is told on; facts about later prompt versions' rules appear only under them."""
+    w, v = isl.w, getattr(isl, "prompt_version", 1)
+    fruit, isl_cfg = w["island"]["native_fruit"], w["island"]
+    tools, houses = w.get("tools") or {}, w["house_levels"]
+    facts = [
+        f"Did you know Nook's Cranny always sells saplings? Planted, they're hardwood trees in {isl_cfg['sapling_mature_days']} days.",
+        f"Did you know eating {_a_word(fruit)} first lets your shovel break a rock?",
+        "Did you know one rock a day pays bells instead of stone?",
+        f"Did you know you can plant {_a_word(fruit)}, and it grows into a fruit tree?",
+        "Did you know fishing bait makes a fish shadow appear right away?",
+        "Did you know beachcombing sometimes turns up a message bottle with a recipe card?",
+        "Did you know Blathers has to assess a fossil before the museum takes it?",
+        f"Did you know a shaken fruit tree grows its fruit back in {isl_cfg['fruit_regrow_days']} days?",
+        "Did you know Timmy and Tommy buy almost anything at a fixed price?",
+        "Did you know letters and parcels sent at the plaza arrive the next morning?",
+        "Did you know digging up a stump with your shovel clears the spot again?",
+        "Did you know funding the bridge north opens more rocks and trees to everyone?",
+        f"Did you know anyone can pay Isabelle {w['ordinances']['cost']:,} bells to set an island ordinance?",
+    ]
+    if tools.get("uses"):
+        facts.append(f"Did you know tools break after {tools['uses']} uses, and Nook's Cranny always has their recipes?")
+    if len(houses) > 1:
+        facts.append(f"Did you know a house from Tom Nook adds {houses[1]['storage']} storage to your {w['pockets']} pockets?")
+    if getattr(isl, "map_text", None):
+        facts.append("Did you know a ladder climbs one cliff and a vaulting pole crosses the river?")
+    if v >= 3:
+        facts.append("Did you know asking Tom Nook or Isabelle gets you an island map?")
+    if v >= 4:
+        facts.append("Did you know a stone axe only gathers wood, but an iron axe fells trees?"
+                     if "stone axe" in (w.get("items") or {}) else
+                     "Did you know taking a tree's last wood with an axe brings it down?")
+    if getattr(getattr(isl, "energy", None), "enabled", False):
+        facts.append("Did you know your mental energy comes back in full every morning?")
+    return facts
+
+
+def fun_fact(isl: Island) -> str:
+    """Today's fun fact: the facts in turn, the same one on the same day in every run with the same rules."""
+    facts = fun_facts(isl)
+    return facts[isl.day % len(facts)]
+
+
+def _cap_words(text: str, limit: int) -> str:
+    """Whole sentences up to `limit` words; a first sentence longer than that is cut with an ellipsis."""
+    import re
+
+    out, n = [], 0
+    for sentence in re.split(r"(?<=[.!?])\s+", text.strip()):
+        k = len(sentence.split())
+        if n + k > limit:
+            if not out:
+                out.append(" ".join(sentence.split()[:limit]) + "…")
+            break
+        out.append(sentence)
+        n += k
+    return " ".join(out)
+
+
+def _news_within(head: str, news: list[str], limit: int) -> str:
+    """`head` and as much of yesterday's news as fits in `limit` words, ending with "and N more" if cut."""
+    if not news:
+        return f"{head} Nothing much to report from yesterday."
+    for k in range(len(news), -1, -1):
+        rest = len(news) - k
+        if k == 0:
+            tail = f"Yesterday, {rest} things happened on the island."
+        else:
+            tail = "Yesterday on the island: " + "; ".join(news[:k]) + (f"; and {rest} more." if rest else ".")
+        text = f"{head} {tail}"
+        if len(text.split()) <= limit:
+            return text
+    return _cap_words(head, limit)
+
+
 def announcement_text(isl: Island) -> str:
+    """Isabelle's morning announcement, as the first plan of each villager's day shows it. From prompt version 5
+    it is at most ANNOUNCE_WORDS words, then one fun fact (FACT_WORDS words at most)."""
+    if getattr(isl, "prompt_version", 1) < 5:
+        return _announcement_v1(isl)
+    if isl.announcement:
+        body = _cap_words(isl.announcement, ANNOUNCE_WORDS)
+    elif isl.day == 0:
+        body = _announcement_v1(isl)
+    else:
+        head = [f"Good morning, everyone! It's day {isl.day}.",
+                f"The island ordinance is {ORDINANCE_TEXT.get(isl.ordinance, isl.ordinance).split(':')[0].lower()}."]
+        if hasattr(isl, "weather"):
+            head.append(f"It's {isl.date_text().split(',')[0]} and the weather today is {isl.weather}.")
+        body = _news_within(" ".join(head), list(isl.yesterday_news), ANNOUNCE_WORDS)
+    return f"{body} {fun_fact(isl)}"
+
+
+def _announcement_v1(isl: Island) -> str:
+    """The announcement before prompt version 5: no word limit, no fun fact."""
     if isl.announcement:
         return isl.announcement
     if isl.day == 0:
@@ -305,10 +411,11 @@ def isabelle_summary_prompt(day: int, digest: str) -> str:
     )
 
 
-def isabelle_announce_prompt(day: int, public: str) -> str:
+def isabelle_announce_prompt(day: int, public: str, version: int = PROMPT_VERSION) -> str:
+    length = f"in at most {ANNOUNCE_WORDS} words" if version >= 5 else "in 50 to 120 words"
     return (
         f"PHASE: isabelle announce\nTomorrow is day {day}. This is what is publicly known about today:\n\n{public}\n\n"
-        "Write tomorrow morning's announcement to all villagers in 50 to 120 words. Use only the public "
+        f"Write tomorrow morning's announcement to all villagers {length}. Use only the public "
         "information above. Do not mention anything private, such as letters, trades or what anyone was thinking."
     )
 

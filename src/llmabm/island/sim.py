@@ -32,7 +32,7 @@ import yaml
 from ..agent import AgentSpec, load_agent_file
 from ..llm import DailyLimit, LLMError
 from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, encounter_prompt, evening_prompt,
-                      inbox_text, isabelle_announce_prompt,
+                      announcement_text, inbox_text, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
                       isabelle_summary_prompt, plan_prompt, system_prompt)
 from .energy import MentalEnergy
@@ -482,6 +482,7 @@ class IslandSimulation:
         log("day_start", day=d, money_rock=isl.money_rock + 1, cranny=isl.cranny_stock,
             cranny_recipe=isl.cranny_recipe, able=isl.able_stock, pools=isl.pools(),
             ordinance=isl.ordinance, news=isl.yesterday_news, announcement=isl.announcement,
+            heard=announcement_text(isl),  # Isabelle's announcement exactly as the first plan of the day shows it
             month=isl.month, season=isl.season, weather=isl.weather, date=isl.date_text(),
             awake={n: list(isl.awake_window(n)) for n in isl.v})
         if self.verbose:
@@ -735,7 +736,8 @@ class IslandSimulation:
             self.log("isabelle_summary", day=d, text=text, error=err, digest_chars=len(digest))
         if cfg.get("announce"):
             pub = public_digest(self.isl, events)
-            reply, _, err = self._call("isabelle", isabelle_announce_prompt(d + 1, pub), f"d{d:03d}_announce",
+            reply, _, err = self._call("isabelle", isabelle_announce_prompt(d + 1, pub, getattr(self, "prompt_version", 1)),
+                                       f"d{d:03d}_announce",
                                        system=ISABELLE_SYSTEM, backend_name=backend_name, max_tokens=600, free_text=True)
             self.isl.announcement = reply.text.strip() if reply else None
             self.log("isabelle_announcement", day=d, for_day=d + 1, text=self.isl.announcement, error=err)
