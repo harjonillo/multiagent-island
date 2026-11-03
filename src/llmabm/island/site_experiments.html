@@ -79,8 +79,12 @@ main { display: flex; flex-wrap: wrap; justify-content: center; align-items: fle
 .clog.folded .tab { display: flex; } .clog.folded .panel { display: none; }
 .clog .tab:hover, .clog .fold:hover { border-color: var(--selected-border); color: var(--ink); }
 .clog .tab:focus-visible, .clog .fold:focus-visible { outline: 2px solid var(--tabbar-rule); outline-offset: 2px; }
-.clog .panel { width: min(var(--clog-w), calc(100vw - 56px)); overflow-y: auto; background: var(--panel); border: 2px solid var(--border); box-shadow: var(--card-shadow); padding: 14px 16px; }
-.clog .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+/* The panel scrolls on its own, inside the window; its heading (with the fold button) stays put while the list moves. */
+.clog .panel { width: min(var(--clog-w), calc(100vw - 56px)); max-height: calc(100vh - var(--clog-top) - 16px); overflow-y: auto;
+  overscroll-behavior: contain; scrollbar-gutter: stable; background: var(--panel); border: 2px solid var(--border); box-shadow: var(--card-shadow);
+  padding: 0 16px 14px; }
+.clog .top { position: sticky; top: 0; z-index: 1; background: var(--panel); padding: 14px 0 8px; display: flex; justify-content: space-between;
+  align-items: center; gap: 8px; }
 .clog .label { font-family: var(--font-display); font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-muted); }
 .clog .fold { min-height: 32px; min-width: 32px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 2px solid var(--border); color: var(--ink-muted); cursor: pointer; }
 /* Pixel chevrons, as sprites. */
