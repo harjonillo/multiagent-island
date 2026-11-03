@@ -19,7 +19,8 @@ from .analysis import (RESOURCES, _side, action_mix, extraction_shares, gini, hh
                        reply_errors, run_out, snapshots)
 from .world import CATEGORIES, clock
 
-VERSION = 6  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
+VERSION = 7  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
+# 7: what each thing on the map is, for hovering (objects.info), buildings' tiles, and each day's house names
 
 # Why actions failed, matched on the result text; the first match wins.
 FAIL_BUCKETS = [
@@ -28,7 +29,7 @@ FAIL_BUCKETS = [
     ("Museum only takes fish, bugs, fossils", ("Blathers only",)),
     ("Has no tool for it", ("you have no shovel", "you have no axe", "you have no fishing rod", "you have no net")),
     ("Shop closed", ("closed",)),
-    ("Rock or spot already empty", ("nothing more", "mined out", "picked clean", "no dig spots")),
+    ("Rock or spot already empty", ("nothing more", "mined out", "picked clean", "no dig spots", "no clam spots")),
     ("Has a loan to pay off first", ("paid off first",)),
     ("Can't afford it", ("bells; you have",)),
     ("Not in stock today", ("not for sale",)),
@@ -81,8 +82,8 @@ def map_data(run: Run) -> dict:
     centre = lambda cells: [round(sum(c[0] for c in cells) / len(cells), 2), round(sum(c[1] for c in cells) / len(cells), 2)]  # noqa: E731
     return {
         "W": g.W, "H": g.H, "tiles": rows,
-        "buildings": [{"name": n, "x": centre(b["cells"])[0], "top": min(c[1] for c in b["cells"])}
-                      for n, b in g.buildings.items()],
+        "buildings": [{"name": n, "x": centre(b["cells"])[0], "top": min(c[1] for c in b["cells"]),
+                       "cells": [list(c) for c in b["cells"]]} for n, b in g.buildings.items()],
         "sites": {sid: {"centre": centre(s["cells"]), "cells": [list(c) for c in s["cells"]]} for sid, s in g.sites.items()},
         "bridge": [list(c) for c in g.bridge_cells],
     }
@@ -95,15 +96,118 @@ def _objects(snap: dict) -> dict:
             "bridge_open": bool(o.get("bridge_open"))}
 
 
+FELLED = ("brought the tree down", "chopped down")  # chop results that left a stump
+
+
+def _near(at, objs, ok, taken) -> tuple | None:
+    """The object at most one tile (diagonals too) from `at` that `ok` accepts and isn't `taken` yet, nearest first."""
+    best = None
+    for o in objs:
+        pos = (o[0], o[1])
+        dist = max(abs(pos[0] - at[0]), abs(pos[1] - at[1]))
+        if dist <= 1 and ok(o) and pos not in taken and (best is None or dist < best[0]):
+            best = (dist, pos)
+    return best[1] if best else None
+
+
+def tree_history(run: Run) -> dict[tuple, list[tuple]]:
+    """Who planted and who felled each tree, by tile: {(x, y): [(day, "planted" | "felled", who), ...]}.
+    Rebuilt from the log alone: a villager stands next to the tree they plant or chop, so each planting and
+    each felling is matched to the nearest sapling or stump one tile away in that day's snapshot."""
+    snaps = {s["day"]: (s.get("objects") or {}).get("trees", []) for s in snapshots(run)}
+    hist: dict[tuple, list[tuple]] = {}
+    taken: dict[int, set] = {}
+    for e in run.of("action"):
+        if not e.get("ok") or not e.get("at") or e["day"] not in snaps:
+            continue
+        res, do = e.get("result") or "", (e.get("action") or {}).get("do")
+        if do == "plant" and "grown tree" in res:
+            what, ok = "planted", (lambda o: o[2] in ("sapling", "hardwood", "fruit"))
+        elif any(f in res for f in FELLED):
+            what, ok = "felled", (lambda o: o[2] == "stump")
+        else:
+            continue
+        pos = _near(e["at"], snaps[e["day"]], ok, taken.setdefault(e["day"], set()))
+        if pos:
+            taken[e["day"]].add(pos)
+            hist.setdefault(pos, []).append((e["day"], what, e["agent"]))
+    return hist
+
+
+def _rock_notes(run: Run) -> dict[int, dict[int, str]]:
+    """Per day, per rock number: whether it was the money rock, what was left at the end of the day, and who
+    mined it."""
+    import re
+
+    hits = int(run.manifest["world"]["island"].get("rock_hits", 0))
+    starts = {e["day"]: e for e in run.of("day_start")}
+    last = {}
+    for h in run.of("hour_state"):
+        last[h["day"]] = h["pools"].get("rocks") or []
+    miners: dict[tuple, Counter] = {}
+    for e in run.of("action"):
+        m = re.search(r"\brock (\d+)", e.get("result") or "") if e.get("ok") else None
+        if m and (e.get("action") or {}).get("do") in ("mine_rock", "break_rock"):
+            miners.setdefault((e["day"], int(m.group(1))), Counter())[e["agent"]] += 1
+    out: dict[int, dict[int, str]] = {}
+    for d, left in last.items():
+        money = (starts.get(d) or {}).get("money_rock")
+        for i, n_left in enumerate(left):
+            num = i + 1
+            bits = [f"rock {num}"]
+            if num == money:
+                bits.append("the money rock that day (bells instead of materials)")
+            bits.append(f"{n_left} of {hits} hits left at the end of the day" if n_left else "mined out that day")
+            who = miners.get((d, num))
+            if who:
+                bits.append("mined by " + ", ".join(f"{n}" + (f" x{k}" if k > 1 else "") for n, k in who.most_common()))
+            out.setdefault(d, {})[num] = "; ".join(bits)
+    return out
+
+
+def _object_info(snap: dict, hist: dict, rocks: dict) -> list[list]:
+    """What each thing on the map is, for hovering: [[x, y, text], ...], at the end of `snap`'s day."""
+    d, o = snap["day"], snap.get("objects") or {}
+    info = []
+    names = {"hardwood": "hardwood tree", "fruit": "fruit tree", "sapling": "sapling", "stump": "stump"}
+    for t in o.get("trees", []):
+        x, y, kind = t[0], t[1], t[2]
+        past = [h for h in hist.get((x, y), []) if h[0] <= d]
+        planted = next((h for h in reversed(past) if h[1] == "planted"), None)
+        felled = next((h for h in reversed(past) if h[1] == "felled"), None) if kind == "stump" else None
+        bits = [names.get(kind, kind)]
+        if planted:
+            bits.append(f"planted by {planted[2]} on day {planted[0]}")
+        if felled:
+            bits.append(f"felled by {felled[2]} on day {felled[0]}")
+        info.append([x, y, ", ".join(bits)])
+    for i, r in enumerate(o.get("rocks", [])):
+        if r:
+            info.append([r[0], r[1], rocks.get(d, {}).get(i + 1, f"rock {i + 1}")])
+    for x, y, item, kind, owner in o.get("placed", []):
+        info.append([x, y, f"{item}" + (f" ({kind})" if kind not in ("furniture",) else "") + f", put here by {owner}"])
+    for x, y, kind, owner, bloomed in o.get("flowers", []):
+        info.append([x, y, f"{kind}, " + (f"planted by {owner}" if owner else "growing wild")
+                     + (", in bloom" if bloomed else ", not blooming yet")])
+    for x, y, style, owner in o.get("paths", []):
+        info.append([x, y, f"{style} path" + (f", laid by {owner}" if owner else "")])
+    return info
+
+
 def days_data(run: Run) -> list[dict]:
     starts = {e["day"]: e for e in run.of("day_start")}
+    levels = run.manifest["world"]["house_levels"]
+    hist, rocks = tree_history(run), _rock_notes(run)
     out = []
     for snap in snapshots(run):
         d = snap["day"]
         st = starts.get(d, {})
+        objects = _objects(snap)
+        objects["info"] = _object_info(snap, hist, rocks)
         out.append({"day": d, "date": _short_date(st.get("date", "")), "season": st.get("season", ""),
                     "weather": st.get("weather", ""), "homes": snap.get("homes", {}),
-                    "home_areas": snap.get("home_areas", {}), "objects": _objects(snap)})
+                    "home_areas": snap.get("home_areas", {}), "objects": objects,
+                    "houses": {n: levels[v["house"]]["name"] for n, v in snap["villagers"].items()}})
     return out
 
 

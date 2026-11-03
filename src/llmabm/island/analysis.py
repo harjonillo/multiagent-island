@@ -540,7 +540,7 @@ def _reason(text: str) -> str:
 
 
 ACTIVITY_GROUPS = {
-    "gathering": {"mine_rock", "chop_wood", "shake_tree", "beachcomb", "dig_fossil", "plant"},
+    "gathering": {"mine_rock", "chop_wood", "shake_tree", "beachcomb", "dig_fossil", "dig_clam", "plant"},
     "fishing": {"fish"},
     "bugs": {"catch_bug"},
     "crafting": {"craft"},

@@ -135,17 +135,23 @@ ORDINANCE_TEXT = {
 
 
 # Which tool each action wears out. The ladder and vaulting pole wear out on trips that need them.
-TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
+TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_clam": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 8  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+LATEST_PROMPT_VERSION = 11  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
 AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
+CLAM, BAIT = "manila clam", "fishing bait"  # dug on the beach (dig_clam); one clam crafts one bait
 MAP = "island map"  # from Tom Nook or Isabelle; carried, it shows the island's layout in plans (prompt version 3 on)
 
 
 def recipe_of_card(item: str) -> str | None:
     return item[: -len(CARD)] if item.endswith(CARD) else None
+
+
+def tool_uses(isl) -> int:
+    """How many uses a tool lasts on this island."""
+    return int((isl.w.get("tools") or {}).get("uses", 50))
 
 
 def _item_words(name: str) -> tuple[str, ...]:
@@ -246,6 +252,7 @@ class Island:
         self.rocks_respawned: list[int] = []
         self.money_hits: dict[int, int] = {}
         self.shells_left = self.fossils_left = 0
+        self.clams_left = 0
         self.museum: dict[str, dict[str, str]] = {c: {} for c in CATEGORIES}  # species -> donor
         self.bridge_fund = 0
         self.bridge_built = False
@@ -391,6 +398,11 @@ class Island:
             out[r] = out.get(r, 0) + n
         return out
 
+    def unknown_items(self, items: dict) -> list[str]:
+        """Names in `items` (already resolved) that aren't anything on the island, such as "selit bait"."""
+        names = self.item_names()
+        return [k for k in items if k != "bells" and k not in names]
+
     def is_tool(self, item: str) -> bool:
         return (self.w.get("items") or {}).get(item, {}).get("kind") == "tool"
 
@@ -411,10 +423,12 @@ class Island:
         if not lst:
             return None
         lst[0] += 1
-        if lst[0] < int((self.w.get("tools") or {}).get("uses", 50)):
+        if lst[0] < tool_uses(self):
             return None
         lst.pop(0)
         vil.inventory[tool] -= 1
+        if getattr(self, "prompt_version", 1) >= 10:
+            return f"your {tool} broke after {tool_uses(self)} uses and is gone from your pockets"
         return f"your {tool} broke"
 
     # --- moving things between villagers -------------------------------------
@@ -515,6 +529,7 @@ class Island:
         self.money_hits = {}
         self.shells_left = isl["shells_per_day"]
         self.fossils_left = isl["fossils_per_day"]
+        self.clams_left = int(isl.get("clams_per_day", 0))
         for t in self.trees:
             if t.kind == "hardwood":
                 t.wood_left = isl["wood_per_tree"]
@@ -851,6 +866,8 @@ class Island:
         if not items or asked not in self.v or asked == asker:
             return None
         items = self.resolve_side(asked, items)
+        if self.unknown_items(items):  # a request for something that doesn't exist isn't kept
+            return None
         for f in self.favors:  # asking again for the same thing doesn't open a second request
             if f["status"] == "open" and f["asker"] == asker and f["asked"] == asked and f["items"] == items:
                 return f
@@ -908,6 +925,23 @@ class Island:
         vil.inventory[FOSSIL] += 1
         self.collected[vil.name]["fossils"] += 1
         return True, "dug up a fossil; nobody knows what it is until Blathers assesses it at the museum"
+
+    def _do_dig_clam(self, vil, a, hour):
+        """A manila clam from a spot on the beach. The first one teaches the fishing bait recipe (1 clam, 1 bait)."""
+        if getattr(self, "clams_left", 0) == 0:
+            return False, "no clam spots left on the beach today"
+        if a.get("none_seen"):
+            return True, "looked along the beach but saw no clam spots there"
+        if self.space(vil) < 1:
+            return False, "pockets full"
+        self.clams_left -= 1
+        vil.inventory[CLAM] += 1
+        self.collected[vil.name]["clams"] += 1
+        msg = f"dug up {_a(CLAM)}"
+        if BAIT in self.w["recipes"] and BAIT not in vil.recipes:
+            vil.recipes.add(BAIT)
+            msg += f"; you see you could make {BAIT} from it, and now know the {BAIT} recipe"
+        return True, msg
 
     def _do_assess(self, vil, a, hour):
         n = vil.inventory[FOSSIL]
@@ -1288,6 +1322,7 @@ class Island:
             "trees": dict(Counter(t.kind for t in self.trees)),
             "shells_left": self.shells_left,
             "fossils_left": self.fossils_left,
+            "clams_left": getattr(self, "clams_left", 0),
             "museum": sum(len(m) for m in self.museum.values()),
             "bridge_fund": self.bridge_fund,
         }

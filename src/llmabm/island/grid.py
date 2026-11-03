@@ -357,6 +357,8 @@ class GridSpace(Space):
                  if self.terrain[y][x] == GRASS and (x, y) not in self.blocked]
         self.shells = rng.sample(sand, min(len(sand), island.shells_left))
         self.dig_spots = rng.sample(grass, min(len(grass), island.fossils_left))
+        clams = getattr(island, "clams_left", 0)
+        self.clam_spots = rng.sample(sand, min(len(sand), clams)) if clams else []
         # What each villager has seen is today's knowledge: shells and dig spots are new every morning.
         self.critters, self.known, self.looked, self.seen_ids = [], {}, {}, {}
         island.spotted = {}
@@ -624,7 +626,7 @@ class GridSpace(Space):
                     return "visiting", None, {}, island.not_a_villager(host, "visit")
                 return "visiting", None, {}, f"there is no home of {host} to visit"
             return self._to_building_door(f"{host}'s home", self.sites[site]["door"], start, tools)
-        if do in ("beachcomb", "dig_fossil"):
+        if do in ("beachcomb", "dig_fossil", "dig_clam"):
             return self._resolve_spots(island, name, do, action, start, tools)
         if do == "buy":
             b = "Able Sisters" if str(action.get("shop", "")).lower() == "able" else "Nook's Cranny"
@@ -665,6 +667,9 @@ class GridSpace(Space):
             self.shells = [c for c in self.shells if c not in taken][: max(0, island.shells_left)]
         if do == "dig_fossil" and ok and "_target" in action and action["_target"] < len(self.dig_spots):
             self.dig_spots.pop(action["_target"])
+        clams = getattr(self, "clam_spots", [])
+        if do == "dig_clam" and ok and "_target" in action and action["_target"] < len(clams):
+            clams.pop(action["_target"])
         if "_critter" in action:  # caught, or it got away: either way it's gone from that spot
             self.critters = [c for c in self._crit() if c["id"] != action["_critter"]]
         self.sync(island)
@@ -942,7 +947,17 @@ class GridSpace(Space):
             built.append(f"{n_flowers} flowers you planted")
         return (f"You are at {self.region(start)}. You carry: {', '.join(carry)}. Cliffs need a ladder and the river "
                 f"needs a vaulting pole (or a bridge).\nRocks: {rocks}\nBuildings: {places}"
+                + (self.trees_here(island, start) if getattr(island, "prompt_version", 1) >= 10 else "")
                 + (f"\nYour mark on the island: {'; '.join(built)}" if built else ""))
+
+    def trees_here(self, island, at) -> str:
+        """Prompt version 10: the trees a villager can see in the part of the island they're in (one of nine
+        areas), as plainly as the rocks: standing trees, stumps and saplings."""
+        here = self._area(tuple(at))
+        c = Counter(t.kind for t in island.trees if t.pos and self._area(tuple(t.pos)) == here)
+        names = (("hardwood", "hardwood tree"), ("fruit", "fruit tree"), ("stump", "stump"), ("sapling", "sapling"))
+        seen = [f"{c[k]} {name}{'s' if c[k] > 1 else ''}" for k, name in names if c[k]]
+        return f"\nTrees around here ({here}): " + (", ".join(seen) or "none")
 
     _AREAS = ["northwest", "north", "northeast", "west", "centre", "east", "southwest", "south", "southeast"]
 
@@ -1169,6 +1184,7 @@ class GridSpace(Space):
         yet today (or where you were told to look) and take one you can see from there."""
         self._crit()
         spots, terrain, label, what = ((self.shells, SAND, "beach", "beach") if do == "beachcomb"
+                                       else (getattr(self, "clam_spots", []), SAND, "beach", "beach") if do == "dig_clam"
                                        else (self.dig_spots, GRASS, "fields", "open ground"))
         if not spots:
             return label, None, {}, None  # the world says the beach is picked clean / no dig spots
@@ -1218,7 +1234,8 @@ class GridSpace(Space):
         known = self.known.setdefault(name, set())
         seen = self.seen_ids.setdefault(name, set())
         notes = []
-        for spots, word in ((self.shells, "shells on the beach"), (self.dig_spots, "fossil dig spots")):
+        for spots, word in ((self.shells, "shells on the beach"), (self.dig_spots, "fossil dig spots"),
+                            (getattr(self, "clam_spots", []), "clam spots on the beach")):
             new = [c for c in spots if c not in known and math.dist(c, pos) <= r]
             if new:
                 known |= set(new)

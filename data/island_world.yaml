@@ -41,7 +41,8 @@ encounters:
   # (one more call per turn). Conversations are one on one, at most one per villager per
   # hour, and cost no action hour.
   grid_radius: 6                   # how close counts as "near" (tiles)
-  turns: 2                         # utterances per chat: opener (in the decision) + reply; up to 4
+  turns: null                      # lines per chat (opener included); null: no set number. From prompt version 9
+                                   # each villager decides when to leave, and sees what each line costs in energy
   max_chats_per_villager_per_day: 2
   max_decisions_per_villager_per_day: 4   # caps the small "approach or not" calls
   skip_places: [home]
@@ -97,6 +98,8 @@ island:
   shells_per_action: 4
   bottle_chance: 0.15              # beachcombing can turn up a message bottle with a DIY recipe
   fossils_per_day: 4
+  clams_per_day: 6                 # manila clam spots on the beach each morning (dig_clam, with a shovel). The first
+                                   # clam a villager digs teaches them the fishing bait recipe: 1 clam makes 1 bait
   catch_fail_rate: 0.15            # a fish or bug action can come up empty
 
 pockets: 40                        # item slots everyone carries; house storage adds to this
@@ -126,6 +129,7 @@ materials:                         # sell price at Nook's Cranny
   gold nugget: 10000
   apple: 100
   sapling: 160
+  manila clam: 100
 
 shells:                            # name: [sell price, weight]
   sea snail: [180, 3]
@@ -234,6 +238,8 @@ recipes:                           # name: {needs, price (sell value), makes (de
   ironwood dresser: {needs: {iron nugget: 4, hardwood: 8, wood: 4}, price: 3400}
   # Fences: one craft makes several pieces; each piece fills one tile.
   simple wooden fence: {needs: {wood: 3}, price: 60, makes: 5}
+  # Bait, as in ACNH: anyone who has dug up a manila clam knows it (see island.clams_per_day).
+  fishing bait: {needs: {manila clam: 1}, price: 75}
   stone fence: {needs: {stone: 3}, price: 75, makes: 5}
   iron fence: {needs: {iron nugget: 2}, price: 150, makes: 5}
 
@@ -246,7 +252,7 @@ starter_recipes: [simple wooden fence]   # everyone knows these from day 0
 # break_rock; fishing rod: fish; net: catch_bug), or one trip whose route climbs a cliff (ladder)
 # or jumps the river (pole).
 tools:
-  uses: 50
+  uses: 30
   start_with: [shovel, stone axe, fishing rod, net, ladder, vaulting pole]
 
 # What each item is, for the things that matter in space. Anything not listed is a plain

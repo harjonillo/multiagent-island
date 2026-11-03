@@ -548,7 +548,8 @@ def test_tools_wear_out_and_recipe_cards_replace_them():
     isl.w["tools"]["uses"] = 3
     assert "stone axe" in tools and a.inventory["axe"] == 0  # the axe that fells trees is an upgrade
     assert isl.use_tool(a, "stone axe") is None and isl.use_tool(a, "stone axe") is None
-    assert isl.use_tool(a, "stone axe") == "your stone axe broke" and a.inventory["stone axe"] == 0
+    assert isl.use_tool(a, "stone axe") == "your stone axe broke after 3 uses and is gone from your pockets"
+    assert a.inventory["stone axe"] == 0
     # Tool recipe cards are always at the Cranny; the daily card is never a tool.
     for _ in range(20):
         isl.new_day()
@@ -919,6 +920,14 @@ def test_site_data_and_page_for_a_mock_run():
         assert set(data["home"]["pages"]) == set(names) and all(len(p) == 2 for p in data["home"]["pages"].values())
         M = data["map"]
         assert len(M["tiles"]) == M["H"] and all(len(r) == M["W"] for r in M["tiles"])
+        assert all(b["cells"] for b in M["buildings"])
+        # Hovering the map: every tree and rock has a description, and so does whatever villagers put down.
+        for day in data["days"]:
+            o, info = day["objects"], {(x, y): text for x, y, text in day["objects"]["info"]}
+            assert all((t[0], t[1]) in info for t in o["trees"]) and all((r[0], r[1]) in info for r in o["rocks"] if r)
+            assert all(info[(r[0], r[1])].startswith(f"rock {i + 1}") for i, r in enumerate(o["rocks"]) if r)
+            assert set(day["houses"]) == set(names)
+
         assert sum(f["n"] for f in data["home"]["fails"]) == data["home"]["failed"]
         # Days: per day, every action, plan, conversation and nightly page, and the commons hour by hour.
         L = data["daylog"]
@@ -1435,6 +1444,11 @@ def test_item_names_resolve_for_gifts_requests_and_offers():
     assert f["items"] == {MAP: 1} and isl.ask_favor("A", "B", {"island map": 1}) is f and len(isl.favors) == 1
     ok, _ = isl.transfer("B", "A", {"map": 1})  # the giver calls it "map"; they carry an island map
     assert ok and isl.v["A"].inventory[MAP] == 1 and f["status"] == "done"
+    # Something that isn't anything on the island ("selit bait") isn't kept as a request.
+    assert isl.unknown_items(isl.resolve_side("B", {"selit bait": 1})) == ["selit bait"]
+    assert isl.ask_favor("A", "B", {"selit bait": 1}) is None and not isl.unknown_items({"bells": 5, "wood": 1})
+    from llmabm.island.sim import _offer_id
+    assert _offer_id("18") == _offer_id("[o18]") == _offer_id(18) == "o18"
     # A request stored under an old loose name (runs from before this fix) still settles.
     old = {"id": "f9", "day": 1, "asker": "B", "asked": "A", "items": {"map": 1}, "status": "open", "done_day": None}
     isl.favors.append(old)
@@ -1449,7 +1463,7 @@ def test_prompt_version_8_shows_what_you_have_and_what_changed_hands():
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=2, backend_override="mock", verbose=False)
         sim.run(3)
         isl = sim.isl
-        assert isl.prompt_version == 8 and hasattr(isl, "morning_state")
+        assert isl.prompt_version >= 8 and hasattr(isl, "morning_state")
         a, b = sorted(isl.v)[:2]
         va = isl.v[a]
         va.inventory["shovel"] = max(va.inventory["shovel"], 1)
@@ -1477,3 +1491,106 @@ def test_prompt_version_8_shows_what_you_have_and_what_changed_hands():
         assert "What you have tonight" not in reflect_prompt(isl, va, 150)
         # The real run recorded exchanges too, in the same shape.
         assert all({"day", "how", "from", "to", "items", "got", "asked"} <= set(e) for e in getattr(sim.isl, "exchanges", []))
+
+
+def test_prompt_version_9_conversations_end_when_someone_leaves():
+    from llmabm.island.prompts import encounter_prompt
+    from llmabm.island.sim import _turn_cap
+
+    assert _turn_cap({"turns": None}) is None and _turn_cap({"turns": 2}) == 2 and _turn_cap({}) == 2
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
+        sim.run(2)
+        isl = sim.isl
+        a, b = sorted(isl.v)[:2]
+        turns = [{"speaker": b, "text": "Hi!"}]
+        reply = encounter_prompt(isl, isl.v[a], b, "plaza", 10, turns, opener=False)
+        assert '"leave": true' in reply and "You decide when to stop" in reply
+        assert ("Each thing you say costs about" in reply) == isl.energy.enabled
+        assert "last thing you can say" in encounter_prompt(isl, isl.v[a], b, "plaza", 10, turns, opener=False, last="turns")
+        isl.prompt_version = 8
+        assert '"leave"' not in encounter_prompt(isl, isl.v[a], b, "plaza", 10, turns, opener=False)
+        # With no set length, a conversation runs until someone leaves, says nothing or is too tired.
+        isl.prompt_version = 9
+        sim.sc.world["encounters"]["turns"] = None
+        calls = []
+
+        def scripted(name, user, tag, **kw):
+            calls.append(name)
+            obj = {"say": f"line {len(calls)}", "leave": len(calls) == 5}
+            return None, obj, None
+
+        sim._call = scripted
+        sim.log = lambda *a, **k: None  # the run's log is closed once it ends
+        sim.energy.new_day()  # a fresh morning's energy, so nobody is too tired to talk
+        n = len(isl.v[a].today)
+        sim._chat(isl.day, 10, "plaza", a, b, None)
+        assert len(calls) == 5 and "then went their way" in isl.v[a].today[n]
+
+
+def test_prompt_version_10_trees_around_here_and_tools_breaking():
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=4)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=4, backend_override="mock", verbose=False)
+        sim.run(1)
+        isl, grid = sim.isl, sim.space
+        name = sorted(isl.v)[0]
+        assert isl.prompt_version >= 10 and isl.w["tools"]["uses"] == 30
+        tree = next(t for t in isl.trees if t.pos)
+        line = grid.trees_here(isl, tree.pos)
+        assert line.startswith(f"\nTrees around here ({grid._area(tuple(tree.pos))}): ") and "none" not in line
+        tree.kind = "stump"
+        assert "stump" in grid.trees_here(isl, tree.pos)
+        assert "Trees around here" in grid.where_note(isl, name, tree.pos, ["ladder"])
+        isl.prompt_version = 9
+        assert "Trees around here" not in grid.where_note(isl, name, tree.pos, ["ladder"])
+        isl.prompt_version = 10
+        vil = isl.v[name]
+        vil.inventory["net"], vil.wear["net"] = 1, [29]
+        assert isl.use_tool(vil, "net") == "your net broke after 30 uses and is gone from your pockets"
+        assert vil.inventory["net"] == 0
+
+
+
+def test_who_felled_and_planted_each_tree_comes_from_the_log():
+    from llmabm.analysis import Run
+    from llmabm.island.site_data import _object_info, tree_history
+
+    act = lambda d, who, at, do, res: {"type": "action", "day": d, "agent": who, "at": at, "ok": True,  # noqa: E731
+                                       "action": {"do": do}, "result": res}
+    snap = lambda d, trees: {"type": "snapshot", "day": d, "objects": {"trees": trees, "rocks": []}}  # noqa: E731
+    run = Run(Path("."), {}, [
+        act(1, "Ari", [10, 10], "chop_wood", "chopped a hardwood tree: wood x3; with the last wood the axe brought the tree down, leaving a stump"),
+        act(1, "Bo", [20, 20], "chop_wood", "chopped a hardwood tree: wood x3"),  # took wood; the tree stands
+        act(1, "Cal", [30, 31], "plant", "planted a sapling; it will be a grown tree in 5 days"),
+        snap(1, [[11, 10, "stump"], [21, 20, "hardwood"], [30, 30, "sapling"], [50, 50, "stump"]]),
+    ])
+    hist = tree_history(run)
+    assert hist == {(11, 10): [(1, "felled", "Ari")], (30, 30): [(1, "planted", "Cal")]}
+    info = {(x, y): text for x, y, text in _object_info(run.of("snapshot")[0], hist, {})}
+    assert info[(11, 10)] == "stump, felled by Ari on day 1" and info[(30, 30)] == "sapling, planted by Cal on day 1"
+    assert info[(21, 20)] == "hardwood tree" and info[(50, 50)] == "stump"  # a stump from before anyone chopped
+
+
+def test_clams_on_the_beach_make_fishing_bait():
+    from llmabm.island.prompts import action_menu, fun_facts
+    from llmabm.island.world import BAIT, CLAM
+
+    isl = _island(("A", "B"))
+    a = isl.v["A"]
+    assert isl.clams_left == isl.w["island"]["clams_per_day"] > 0 and isl.pools()["clams_left"] == isl.clams_left
+    assert BAIT not in a.recipes and isl.tool_for(a, {"do": "dig_clam"}) == ("shovel", None)
+    ok, msg = isl.act("A", {"do": "dig_clam"}, 9)
+    assert ok and a.inventory[CLAM] == 1 and BAIT in a.recipes and "fishing bait recipe" in msg
+    ok, msg = isl.act("A", {"do": "dig_clam"}, 10)
+    assert ok and "recipe" not in msg  # only the first clam teaches it
+    ok, _ = isl.act("A", {"do": "craft", "recipe": BAIT}, 11)
+    assert ok and a.inventory[BAIT] == 1 and a.inventory[CLAM] == 1
+    isl.clams_left = 0
+    assert isl.act("B", {"do": "dig_clam"}, 9) == (False, "no clam spots left on the beach today")
+    assert "dig_clam" in action_menu(11) and "dig_clam" not in action_menu(10)
+    isl.prompt_version = 11
+    assert any("manila clam" in f for f in fun_facts(isl))
+    isl.prompt_version = 10
+    assert not any("manila clam" in f for f in fun_facts(isl))

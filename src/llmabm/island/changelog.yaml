@@ -2,6 +2,56 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-03 23:30
+  what: Prompt version 11, and fishing bait from clams
+  when: new runs from now on; running ones keep theirs (test1 switched from day 4)
+  details:
+    - "clams: 6 manila clam spots on the beach each morning (island.clams_per_day). Villagers see them like shells and fossil dig spots, and dig one with the shovel (dig_clam, in the action menu)"
+    - "the first clam a villager digs teaches them the fishing bait recipe: 1 manila clam makes 1 fishing bait. Nook's Cranny still sells bait on some days"
+    - "a fun fact: digging up a manila clam teaches you to make fishing bait"
+- time: 2026-11-03 23:30
+  what: "test1: clams on the beach"
+  when: test1 only, from day 4 (the original checkpoint is checkpoint.pkl.before-clams)
+  details:
+    - "the run's world gets 6 clam spots a day, the manila clam (sells for 100) and the fishing bait recipe (1 clam). Nobody knows the recipe yet; they learn it from their first clam"
+- time: 2026-11-03 18:00
+  what: Prompt version 10, and tools last 30 uses
+  when: new runs from now on; running ones keep theirs (test1 switched from day 4)
+  details:
+    - "trees: getting around lists the trees in the part of the island you're in (standing hardwood and fruit trees, stumps, saplings), next to the rocks and buildings"
+    - "a tool that breaks says how many uses it lasted and that it is gone from your pockets"
+    - "tools: every tool breaks after 30 uses (tools.uses; was 50). New runs only: a run keeps the world it started with"
+- time: 2026-11-03 18:00
+  what: "test1: tools last 30 uses, and the stone axe recipe is at Nook's Cranny"
+  when: test1 only, from day 4 (the original checkpoint is checkpoint.pkl.before-tools)
+  details:
+    - "the run's world had tools lasting 50 uses; now 30. No tool had reached 25 uses yet"
+    - "the run started before the stone axe existed. Its recipe (5 stone, as in new runs) is now among the tool recipe cards always for sale at Nook's Cranny, 500 bells. Nobody was given one: villagers keep the axe that fells trees until it breaks"
+- time: 2026-11-03 17:00
+  what: Prompt version 9, and conversations with no set length
+  when: new runs from now on; running ones keep theirs (test1 switched from day 4)
+  details:
+    - "conversations: no set number of lines (encounters.turns: null; was 2, up to 4). They go on until someone leaves, says nothing or runs out of energy, and stop at 40 lines regardless"
+    - "each villager decides when to stop: \"leave\": true says their line and then they go their ways"
+    - "each turn says what a line costs in mental energy and how much is left today, and when it is probably the last thing they have the energy to say"
+- time: 2026-11-03 17:00
+  what: "test1: conversations with no set length"
+  when: test1 only, from day 4 (the original checkpoint is checkpoint.pkl.before-long-chats)
+  details:
+    - "the run's world had encounters.turns: 2; it is now null, so prompt version 9's \"leave\" decides when a conversation ends"
+- time: 2026-11-03 16:00
+  what: Requests and offers for things that don't exist
+  when: every run, from its next day
+  details:
+    - "a request for something that isn't anything on the island (villagers made up \"selit bait\" and asked for \"rock\") isn't kept as an open request. Both villagers see that there's nothing called that on the island"
+    - "a trade offer of or for such a thing isn't made, and the sender is told why"
+    - "answering an offer by its number alone (\"18\" for o18) works"
+- time: 2026-11-03 16:00
+  what: "test1: made-up items cleared at the end of day 3"
+  when: test1 only, from day 4 (the original checkpoint is checkpoint.pkl.before-unknown-items)
+  details:
+    - "4 open requests (2 for selit bait, 2 for rock) set to void, and 4 pending offers involving them set to failed"
+    - "2 older requests for \"bait\" now name fishing bait, and a duplicate request (Ike asking Eli for fishing bait twice) is void"
 - time: 2026-11-03 12:20
   what: "test1: who gave what to whom, filled in for days 0-2"
   when: test1 only, from day 3 (the end-of-day-2 checkpoint; the original is checkpoint.pkl.before-exchanges)

@@ -220,7 +220,9 @@ crossing the river needs a **vaulting pole** (up to 3 water tiles) until the bri
 built. The pond and the sea can't be crossed. Everyone starts with both. Bodies pathfind with
 the tools the villager carries,
 and each villager's prompt says which rocks and buildings are within reach and how many steps
-away. Placed furniture and fences block walking, so villagers can wall off space. Trees,
+away. From prompt version 10 it also lists the trees in the part of the island they're in (one
+of nine areas): standing hardwood and fruit trees, stumps and saplings, so a thinning wood can
+be seen rather than only pieced together from chop results. Placed furniture and fences block walking, so villagers can wall off space. Trees,
 rocks, buildings (the plaza too) and homes always keep at least one free tile between them.
 
 **Two axes.** The stone axe, which everyone starts with, only gathers wood: the tree stays. The
@@ -232,13 +234,14 @@ for up to 3 wood plus whatever fruit it had. There is no separate felling action
 trees survive depends on which axe villagers choose. (Runs from
 before prompt version 4 keep one axe that never fells, and `chop_down_tree` to fell on purpose.)
 
-**Tools wear out.** Every tool breaks after 50 uses (`tools.uses`). A use is one action that
-needs it (either axe: `chop_wood`; shovel: `mine_rock`, `dig_fossil`, `dig_stump`,
+**Tools wear out.** Every tool breaks after 30 uses (`tools.uses`; 50 before 2026-11-03). A use is one action that
+needs it (either axe: `chop_wood`; shovel: `mine_rock`, `dig_fossil`, `dig_clam`, `dig_stump`,
 `break_rock`; fishing rod: `fish`; net: `catch_bug`; looking around without finding anything
 doesn't count), or one trip whose route climbs a cliff with the ladder or jumps the river with
 the pole (going home counts as a trip). Without the tool, the action fails before the villager
 sets out ("you have no axe"). Villagers aren't told how worn a tool is; they find out when it
-breaks. A replacement takes the tool's recipe card, always for sale at Nook's Cranny for 500
+breaks. From prompt version 10 that result says how many uses it lasted and that it is gone from
+their pockets. A replacement takes the tool's recipe card, always for sale at Nook's Cranny for 500
 bells, and materials: shovel 5 hardwood, stone axe 5 stone, axe 3 wood and 1 iron nugget,
 fishing rod 4 wood, net 4 softwood, ladder 4 wood, 4 hardwood and 4 softwood, vaulting pole 5
 wood. The stone axe takes stone and the shovel wood, so losing one of them never leaves a
@@ -379,10 +382,11 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 | `mine_rock` | `rock` (optional) | take what a rock has left today |
 | `chop_wood` | | take today's wood from the nearest tree that has some |
 | `shake_tree` | | take the fruit from a fruit tree |
-| `fish` | `where`: sea, river, pond (clifftop also works); `size` (optional); `bait: true` (optional) | go after a fish shadow; with fishing bait (Nook's Cranny, 300 bells), a fish is sure to appear, though it can still get away |
+| `fish` | `where`: sea, river, pond (clifftop also works); `size` (optional); `bait: true` (optional) | go after a fish shadow; with fishing bait (Nook's Cranny, 300 bells, some days; or crafted from a manila clam), a fish is sure to appear, though it can still get away |
 | `catch_bug` | `where`: flowers, trees, stumps, rocks, ground; `species` (optional) | go after a bug |
 | `beachcomb` | `near` (optional) | collect shells; sometimes a message bottle |
 | `dig_fossil` | `near` (optional) | dig up a fossil spot |
+| `dig_clam` | `near` (optional) | dig a manila clam from a clam spot on the beach (shovel; 6 spots a day, `island.clams_per_day`). The first clam teaches the fishing bait recipe: 1 clam makes 1 bait. From prompt version 11 |
 
 **Making and trading**
 
@@ -459,8 +463,12 @@ of villager pairs within sight of each other:
    chooses whether to approach one of them, and if so, their opening line.
 3. **Talk.** Approaches are taken in random order. Conversations are one on one, each
    villager is in at most one an hour, and the other villager replies with full context.
-   There are 2 utterances by default (`turns`, up to 4). Either side can stop by saying
-   nothing.
+   There is no set number of lines (`turns: null`; a number sets one, and a conversation stops
+   at 40 lines regardless). Either side can stop by saying nothing, and from prompt version 9
+   by adding `"leave": true` to their line: they say it and go their ways. Each turn also says
+   what a line costs in mental energy and how much is left, and when it is probably the last
+   thing they have the energy to say, so stopping is their choice rather than running out.
+   Before 2026-11-03 conversations had 2 lines by default (up to 4): an opener and one reply.
 
 Caps per villager per day: 4 decisions and 2 chats. Only the two villagers hear a chat, and
 it goes into both villagers' record of the day.

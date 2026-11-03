@@ -13,7 +13,7 @@ _ACTIONS = [
     ({"do": "fish", "where": "river"}, 1), ({"do": "beachcomb", "near": "south beach"}, 1), ({"do": "fish", "where": "pond"}, 1),
     ({"do": "fish", "where": "clifftop"}, 1),
     ({"do": "catch_bug"}, 1), ({"do": "catch_bug", "where": "flowers"}, 1), ({"do": "catch_bug", "where": "trees"}, 1),
-    ({"do": "catch_bug", "where": "rocks"}, 1), ({"do": "beachcomb"}, 2), ({"do": "dig_fossil"}, 2),
+    ({"do": "catch_bug", "where": "rocks"}, 1), ({"do": "beachcomb"}, 2), ({"do": "dig_fossil"}, 2), ({"do": "dig_clam"}, 1),
 ]
 
 

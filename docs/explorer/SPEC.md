@@ -66,6 +66,13 @@ percent of the grid: `left = (x + 0.5) / W`, `top = (y + 0.5) / H`.
 - Building labels sit just above each building (centre x, min y of its cells).
 - Villager names sit on their homesite centre (`snapshot.homes` → `grid.sites[site]["cells"]`).
 - Clicking a name selects that villager (Days) or opens Days for them (Home).
+- Pointing at the map (or tapping it, which pins the box until the next tap) shows what is there at the end of
+  that day: a tree ("stump, felled by Ari on day 2"; "sapling, planted by Cal on day 4"), a rock (its number,
+  whether it was that day's money rock, hits left, who mined it), furniture and fences (who put them there),
+  flowers (who planted them, or growing wild, and whether they bloom), paths (style, who laid them), homes
+  (whose, which house) and buildings, else the ground. The text is built in `site_data.py` (`objects.info` per
+  day). Who planted or felled a tree is read from the log: the villager stands next to the tree, so each
+  planting or felling is matched to the sapling or stump one tile away in that day's snapshot.
 
 ## Page 0: Experiments, "pick a door"
 

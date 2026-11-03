@@ -43,6 +43,8 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font
 .map canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0.92; }
 .map .bld { position: absolute; transform: translate(-50%, -100%); font-size: var(--step--1); font-weight: 600; background: rgba(255,255,255,0.78);
   padding: 1px 6px; border-radius: 4px; white-space: nowrap; pointer-events: none; }
+.map .tip { position: absolute; max-width: 260px; width: max-content; padding: 4px 8px; font-size: var(--step--1);
+  line-height: 1.35; background: var(--panel); border: 2px solid var(--border); box-shadow: var(--card-shadow); pointer-events: none; z-index: 3; }
 .map .who { position: absolute; transform: translate(-50%, -50%); padding: 3px 9px; font-size: var(--step--1); font-weight: 600; text-decoration: none;
   background: var(--panel); border: 1px solid rgba(59,47,42,0.3); }
 .trends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
@@ -213,8 +215,52 @@ function mapHTML(day, opts = {}) {
     const [x, y] = M.sites[s].centre;
     return `<a class="who${n === opts.sel ? " on" : ""}" href="${href(n)}" aria-label="${esc(n)} lives ${esc((day.home_areas || {})[n] || "")}" style="left:${((x + 0.5) / M.W * 100).toFixed(2)}%;top:${((y + 0.5) / M.H * 100).toFixed(2)}%">${esc(n)}</a>`;
   }).join("");
-  setTimeout(() => paint(document.getElementById(id), day), 0);
-  return `<div class="map" style="aspect-ratio:${M.W} / ${M.H}"><canvas id="${id}" width="${M.W}" height="${M.H}" role="img" aria-label="Tile map of the island at the end of day ${day.day}, with homes, paths and trees"></canvas>${labels}${names}</div>${legendHTML()}`;
+  setTimeout(() => { const c = document.getElementById(id); paint(c, day); hover(c, day); }, 0);
+  return `<div class="map" style="aspect-ratio:${M.W} / ${M.H}"><canvas id="${id}" width="${M.W}" height="${M.H}" role="img" aria-label="Tile map of the island at the end of day ${day.day}, with homes, paths and trees. Point at anything on it to see what it is and who put it there."></canvas>${labels}${names}<div class="tip" role="status" aria-live="polite" hidden></div></div>${legendHTML()}`;
+}
+
+// What is at a tile, for the hover box: an object (tree, rock, furniture, flowers, path), else a home or a
+// building, else the ground. Objects are one tile, so the nearest one within a tile of the pointer counts.
+const GROUND = {s: "sea", a: "beach", r: "river or pond", k: "rocky shore", b: "bridge", "1": "lower ground", "2": "middle cliff",
+  "3": "upper cliff", P: "plaza"};
+function whatIsAt(day, x, y) {
+  const M = D.map, info = (day.objects && day.objects.info) || [];
+  let best = null, bd = 9;
+  info.forEach(([ox, oy, text]) => {
+    const d = Math.max(Math.abs(ox - x), Math.abs(oy - y));
+    if (d <= 1 && d < bd) { best = text; bd = d; }
+  });
+  if (best) return best;
+  const home = Object.entries(M.sites).find(([, s]) => s.cells.some(([cx, cy]) => cx === x && cy === y));
+  if (home) {
+    const who = Object.entries(day.homes || {}).find(([, s]) => s === home[0]);
+    if (who) return `${who[0]}'s home` + ((day.houses || {})[who[0]] ? ` (${day.houses[who[0]]})` : "");
+    return "a free homesite";
+  }
+  const b = M.buildings.find((b) => (b.cells || []).some(([cx, cy]) => cx === x && cy === y));
+  if (b) return b.name;
+  const t = (M.tiles[y] || "")[x];
+  return GROUND[t] || "";
+}
+function hover(canvas, day) {
+  if (!canvas) return;
+  const box = canvas.parentElement, tip = box.querySelector(".tip"), M = D.map;
+  let pinned = false;
+  const show = (ev) => {
+    const r = canvas.getBoundingClientRect();
+    const x = Math.floor((ev.clientX - r.left) / r.width * M.W), y = Math.floor((ev.clientY - r.top) / r.height * M.H);
+    const text = whatIsAt(day, x, y);
+    if (!text) { tip.hidden = true; return; }
+    tip.textContent = text;
+    tip.hidden = false;
+    tip.style.left = `${(x + 0.5) / M.W * 100}%`;
+    tip.style.top = `${(y + 0.5) / M.H * 100}%`;
+    const fx = x / M.W;  // keep the box inside the map near its edges
+    tip.style.transform = `translate(${fx < 0.25 ? "-8%" : fx > 0.75 ? "-92%" : "-50%"}, ${y < M.H * 0.18 ? "10px" : "calc(-100% - 10px)"})`;
+  };
+  canvas.addEventListener("mousemove", (ev) => { if (!pinned) show(ev); });
+  canvas.addEventListener("mouseleave", () => { if (!pinned) tip.hidden = true; });
+  canvas.addEventListener("click", (ev) => { pinned = !(pinned && !tip.hidden); show(ev); if (!pinned) tip.hidden = true; });
 }
 
 function paint(canvas, day) {

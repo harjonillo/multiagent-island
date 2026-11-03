@@ -35,6 +35,14 @@ PROMPT_CHANGES = {
        "in the shop. When you meet someone, what has changed hands between the two of you so far. At night: what "
        "changed hands today, what you have and what changed since the morning, and your open requests and offers. "
        "A gift that doesn't go through says what was missing",
+    9: "conversations: no set number of lines. Each villager decides when to stop: \"leave\": true says their line "
+       "and then they go their ways (saying nothing ends it too). Each turn says what a line costs in mental "
+       "energy and how much is left, and says so when it is probably the last thing they have the energy to say",
+    10: "trees: getting around lists the trees in the part of the island you're in (standing trees, stumps, "
+        "saplings), next to the rocks and buildings. A tool that breaks says how many uses it lasted and that it "
+        "is gone from your pockets",
+    11: "clams: manila clam spots on the beach each morning, seen like shells and fossil dig spots, and dug with a "
+        "shovel (dig_clam). The first clam teaches the fishing bait recipe: 1 clam makes 1 bait. A fun fact says so",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -83,6 +91,7 @@ _MENU_CHANGES = {
                         "stone axe never fells)\n"),
         ("- chop_down_tree: kind (hardwood | fruit), near?\n", "")],
     7: [("- rest\n", "- rest\n- plaza (not one of your actions: you spend that free hour at the plaza)\n")],
+    11: [("- dig_fossil: near?\n", "- dig_fossil: near?\n- dig_clam: near? (a clam spot on the beach)\n")],
 }
 
 
@@ -303,6 +312,8 @@ def fun_facts(isl: Island) -> list[str]:
         facts.append("Did you know a stone axe only gathers wood, but an iron axe fells trees?"
                      if "stone axe" in (w.get("items") or {}) else
                      "Did you know taking a tree's last wood with an axe brings it down?")
+    if v >= 11 and int(isl_cfg.get("clams_per_day", 0)) > 0:
+        facts.append("Did you know digging up a manila clam teaches you to make fishing bait?")
     if getattr(getattr(isl, "energy", None), "enabled", False):
         facts.append("Did you know your mental energy comes back in full every morning?")
     return facts
@@ -560,8 +571,23 @@ def isabelle_announce_prompt(day: int, public: str, version: int = PROMPT_VERSIO
     )
 
 
+def talk_cost_text(isl: Island, vil: Villager, last: str | None) -> str:
+    """Prompt version 9: what talking more costs, so stopping is a choice and not running out. `last` is
+    "turns" when this is their last line in the conversation, "energy" when they probably can't afford another."""
+    en = getattr(isl, "energy", None)
+    out = ""
+    if en is not None and en.enabled:
+        out = (f"Each thing you say costs about {en.typical('chat')} points of mental energy; you have "
+               f"{round(en.left[vil.name])} left today.")
+        if last == "energy":
+            out += " This is probably the last thing you'll have the energy to say today."
+    if last == "turns":
+        out += (" " if out else "") + "This is the last thing you can say before you go your ways."
+    return out + "\n" if out else ""
+
+
 def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: int, turns: list[dict],
-                     opener: bool, visit: str | None = None) -> str:
+                     opener: bool, visit: str | None = None, last: str | None = None) -> str:
     said = "\n".join(f'{"You" if t["speaker"] == vil.name else t["speaker"]}: {t["text"]}'
                      + (f" [{t['act']}]" if t.get("act") else "") for t in turns if t["text"] or t.get("act"))
     if visit == "guest":
@@ -572,19 +598,25 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
         meet = f"{other} has come to visit you at your home."
     else:
         meet = f"You ran into {other} at the {place}."
+    v9 = _v(isl) >= 9
     situation = (f"{meet} You can start a short conversation, or say nothing."
                  if opener else f"{meet} So far:\n{said}\n\nYou can reply, or say nothing.")
+    if v9 and not opener:
+        situation += (" You decide when to stop: add \"leave\": true to say this and then go your ways. "
+                      "Saying nothing ends it too.")
     return (
         "PHASE: encounter\n" + status_block(isl, vil, clock(hour))
         + f"\n\nSo far today you:\n" + ("\n".join(f"- {r}" for r in vil.today) or "(nothing yet)")
         + "\n\n" + (exchanges_with(isl, vil.name, other) if _v(isl) >= 8 else "")
         + f"{situation}\nKeep it to one or two sentences, the way you would actually talk. Only {other} hears it.\n"
-        f"You can also hand {other} something from your pockets right now (\"give\"), or ask them for something "
+        + (talk_cost_text(isl, vil, last) if v9 else "")
+        + f"You can also hand {other} something from your pockets right now (\"give\"), or ask them for something "
         "(\"ask\"); a request stays open until they give it to you.\n"
         "Respond with one JSON object and nothing else:\n"
         '{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", '
         '"give": {"<item or bells>": <qty>}, "ask": {"<item or bells>": <qty>}, '
-        '"note": "<optional private note to your future self>"}'
+        + ('"leave": true | false, ' if v9 else "")
+        + '"note": "<optional private note to your future self>"}'
     )
 
 

@@ -149,6 +149,22 @@ def _failed_give(isl, giver: str, taker: str, items: dict) -> str:
     return f"tried to give {', '.join(f'{n} {k}' for k, n in items.items())} but {taker} had no room"
 
 
+MAX_CHAT_LINES = 40  # a conversation with no set length still stops here (it matters only without mental energy)
+
+
+def _turn_cap(cfg: dict) -> int | None:
+    """Lines a conversation can have: `turns` from the world's encounter settings; none (null) means no set
+    number, so it goes on until someone leaves, says nothing or runs out of energy."""
+    n = cfg.get("turns", 2)
+    return None if n is None else int(n)
+
+
+def _offer_id(x) -> str:
+    """An offer id as villagers write it: "o18", "[o18]", "18" or 18 are all offer o18."""
+    x = str(x or "").strip().strip("[]").strip().lower()
+    return f"o{x}" if x.isdigit() else x
+
+
 def _clean_side(d) -> dict:
     if not isinstance(d, dict):
         return {}
@@ -675,11 +691,11 @@ class IslandSimulation:
                      raw=reply.text if reply else None)
             if outcome.startswith("approached"):
                 busy |= {name, target}
-                self._chat(d, h, self.bodies.b[name].place, name, target, int(cfg.get("turns", 2)),
+                self._chat(d, h, self.bodies.b[name].place, name, target, _turn_cap(cfg),
                            opener={"speaker": name, "text": opener, "thoughts": _thoughts(obj), "error": err,
                                    "_obj": obj or {}})
 
-    def _chat(self, d: int, h: int, place: str, a: str, b: str, n_turns: int, opener: dict | None = None,
+    def _chat(self, d: int, h: int, place: str, a: str, b: str, n_turns: int | None, opener: dict | None = None,
               visit: bool = False) -> None:
         """A one-on-one conversation. `a` speaks first. On a visit, `a` is the guest and `b` the host.
         Each turn can also hand something over ("give") or ask for something ("ask")."""
@@ -689,10 +705,22 @@ class IslandSimulation:
             obj0 = opener.pop("_obj", None) or {}
             self._chat_acts(d, a, b, obj0, opener)
             turns.append(opener)
-        for i in range(len(turns), max(1, min(4, n_turns))):
+        v9 = getattr(self, "prompt_version", 1) >= 9
+        if n_turns is None:  # no set length needs a way to leave (prompt version 9); before it, the old 2 lines
+            n_turns = None if v9 else 2
+        cap = MAX_CHAT_LINES if n_turns is None else max(1, n_turns)
+        for i in range(len(turns), cap):
             speaker, other = (a, b) if i % 2 == 0 else (b, a)
             role = None if not visit else ("guest" if speaker == a else "host")
-            user = encounter_prompt(isl, isl.v[speaker], other, place, h, turns, opener=(i == 0), visit=role)
+            last = None
+            if v9:  # is this their last line: no more turns, or probably no energy for another
+                probe = encounter_prompt(isl, isl.v[speaker], other, place, h, turns, opener=(i == 0), visit=role)
+                cost = max(self._need(speaker, probe), self.energy.typical("chat"))
+                if i + 2 >= cap and n_turns is not None:
+                    last = "turns"
+                elif self.energy.enabled and self.energy.left.get(speaker, 0) < 2 * cost + 1:
+                    last = "energy"
+            user = encounter_prompt(isl, isl.v[speaker], other, place, h, turns, opener=(i == 0), visit=role, last=last)
             if not self.energy.can(speaker, self._need(speaker, user)):
                 self.energy.skip(speaker, "talking")
                 turns.append({"speaker": speaker, "text": "", "thoughts": "", "error": None,
@@ -708,6 +736,10 @@ class IslandSimulation:
             if note:
                 isl.v[speaker].notes.append((d, note))
             if not say and not turn.get("act"):
+                break
+            if v9 and (obj or {}).get("leave") is True:  # they chose to end it here
+                turn["leave"] = True
+                turn["act"] = "; ".join(x for x in (turn.get("act"), "then went their way") if x)
                 break
         self.chats_today[a] = self.chats_today.get(a, 0) + 1
         self.chats_today[b] = self.chats_today.get(b, 0) + 1
@@ -741,7 +773,11 @@ class IslandSimulation:
             else:
                 acts.append(f"tried to give something but {what}")
         ask = obj.get("ask")
-        if isinstance(ask, dict) and _clean_side(ask):
+        unknown = isl.unknown_items(isl.resolve_side(other, _clean_side(ask))) if isinstance(ask, dict) else []
+        if unknown:  # not kept as a request, so nobody sees it listed as a real thing
+            acts.append(f"asked for {', '.join(f'{n} {k}' for k, n in _clean_side(ask).items())}, "
+                        f"but there's nothing called {' or '.join(unknown)} on this island")
+        elif isinstance(ask, dict) and _clean_side(ask):
             before = len(isl.favors)
             f = isl.ask_favor(speaker, other, _clean_side(ask))
             if f:
@@ -769,7 +805,7 @@ class IslandSimulation:
                 isl.v[g].today.append(f"{clock(h)} inside {host}'s home: "
                                       f"{', '.join(isl.v[host].interior) or 'not much furniture yet'}")
                 self.log("visit", day=d, guest=g, host=host, answered=True, interior=list(isl.v[host].interior))
-                self._chat(d, h, f"{host}'s home", g, host, int(self.sc.world["encounters"].get("turns", 2)), visit=True)
+                self._chat(d, h, f"{host}'s home", g, host, _turn_cap(self.sc.world["encounters"]), visit=True)
             else:
                 isl.v[g].today.append(f"{clock(h)} knocked at {host}'s home, but nobody answered")
                 self.noticed[host].append(f"{clock(h)} {g} came by your home, but you weren't in")
@@ -1187,7 +1223,7 @@ class IslandSimulation:
         for resp in obj.get("responses") or []:
             if not isinstance(resp, dict):
                 continue
-            o = self.offers.get(str(resp.get("offer", "")).strip())
+            o = self.offers.get(_offer_id(resp.get("offer")))
             if not o or o.recipient != name or o.status != "pending":
                 log("invalid", day=d, agent=name, what="response", detail=resp)
                 continue
@@ -1251,6 +1287,13 @@ class IslandSimulation:
 
     def _new_offer(self, d, sender, recipient, give, want, note, parent=None):
         give, want = self.isl.resolve_side(sender, give), self.isl.resolve_side(recipient, want)
+        unknown = self.isl.unknown_items({**give, **want})
+        if unknown:  # an offer of or for something that doesn't exist isn't made; the sender is told
+            self.log("invalid", day=d, agent=sender, what="offer", detail={"to": recipient, "give": give, "want": want,
+                                                                         "unknown": unknown})
+            self.isl.v[sender].today.append(f"{clock(self.hour)} couldn't offer {recipient} that trade: there's "
+                                            f"nothing called {' or '.join(unknown)} on this island")
+            return
         self._oid += 1
         o = Offer(f"o{self._oid}", d, sender, recipient, give, want, note, parent=parent)
         self.offers[o.id] = o
