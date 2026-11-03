@@ -30,6 +30,11 @@ PROMPT_CHANGES = {
        "writing) or outwardly (conversations, the plaza, letters); each morning's plan splits it, as a plan, not "
        "a limit, and whatever is left over is spare. A villager too tired to plan keeps what they already "
        "planned; nobody repeats yesterday, and there is no habit choice",
+    8: "what you have, said plainly: your pockets as tools and other things, each recipe you know with how much "
+       "of what it needs you have (and how many of the thing you carry), and recipe cards you already know marked "
+       "in the shop. When you meet someone, what has changed hands between the two of you so far. At night: what "
+       "changed hands today, what you have and what changed since the morning, and your open requests and offers. "
+       "A gift that doesn't go through says what was missing",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -184,6 +189,32 @@ def system_prompt(spec: AgentSpec, world: dict, n_villagers: int, brief: str, se
     return "\n\n".join(parts)
 
 
+def _v(isl: Island) -> int:
+    return getattr(isl, "prompt_version", 1)
+
+
+def _count(d: dict) -> str:
+    """{"wood": 3, "bells": 200} -> "3 wood, 200 bells"."""
+    return ", ".join(f"{n} {k}" for k, n in d.items()) or "nothing"
+
+
+def pockets_text(isl: Island, vil: Villager) -> str:
+    """Prompt version 8: tools apart from everything else, so what you already carry is easy to see."""
+    carried = {k: n for k, n in vil.inventory.items() if n > 0}
+    tools = [k for k in carried if isl.is_tool(k)]
+    other = [k for k in carried if k not in tools]
+    return (f"Tools you carry: {', '.join(k + (f' x{carried[k]}' if carried[k] > 1 else '') for k in tools) or 'none'}\n"
+            f"Other things you carry: {', '.join(f'{k} x{carried[k]}' for k in other) or 'nothing'}")
+
+
+def recipe_text(isl: Island, vil: Villager, r: str) -> str:
+    """Prompt version 8: a recipe with how much of what it needs you have, and how many of the thing you carry."""
+    needs = Counter(isl.w["recipes"][r]["needs"])
+    have = ", ".join(f"{k} {vil.inventory[k]}" for k in needs if vil.inventory[k] > 0)
+    out = f"{r} ({_fmt(needs)}; " + (f"you have {have}" if have else "you have none of these")
+    return out + (f"; you carry {vil.inventory[r]} {r}" if vil.inventory[r] > 0 else "") + ")"
+
+
 def status_block(isl: Island, vil: Villager, when: str) -> str:
     w = isl.w
     wake, sleep = isl.awake_window(vil.name)
@@ -192,13 +223,16 @@ def status_block(isl: Island, vil: Villager, when: str) -> str:
     home_txt = (f"{isl.sites[site]['area']} ({site})" + (f", neighbors: {', '.join(nb)}" if nb else ", no neighbors yet")
                 if site else "(no homesite yet)")
     house = w["house_levels"][vil.house]
-    inv = _fmt(vil.inventory) or "nothing"
-    recipes = "; ".join(f"{r} ({_fmt(Counter(w['recipes'][r]['needs']))})" for r in sorted(vil.recipes)) or "none"
+    v8 = _v(isl) >= 8
+    inv = pockets_text(isl, vil) if v8 else "Inventory: " + (_fmt(vil.inventory) or "nothing")
+    recipes = "; ".join(recipe_text(isl, vil, r) if v8 else f"{r} ({_fmt(Counter(w['recipes'][r]['needs']))})"
+                        for r in sorted(vil.recipes)) or "none"
+    known = lambda r: " (you know it)" if v8 and r in vil.recipes else ""  # noqa: E731
     prices = ", ".join(f"{k} {p}" for k, p in sorted(vil.prices_seen.items())) or "none yet"
     f = isl.price_factor()
     shops = (f"Nook's Cranny today ({fmt_window(isl.shop_hours('cranny'))}): "
              + ", ".join(f"{k} {round(p * f)}" for k, p in isl.cranny_stock.items())
-             + "; recipe cards: " + ", ".join(f"{r} {p}" for r, p in isl.recipe_cards_for_sale().items())
+             + "; recipe cards: " + ", ".join(f"{r} {p}{known(r)}" for r, p in isl.recipe_cards_for_sale().items())
              + f"\nAble Sisters today ({fmt_window(isl.shop_hours('able'))}): "
              + ", ".join(f"{k} {round(p * f)}" for k, p in isl.able_stock.items()))
     bridge = "built" if isl.bridge_built else f"{isl.bridge_fund}/{w['bridge']['cost']} bells raised"
@@ -209,7 +243,7 @@ def status_block(isl: Island, vil: Villager, when: str) -> str:
         + (f" (changing to {isl.pending_ordinance[0].replace('_', ' ')} tomorrow)" if isl.pending_ordinance else "") + "\n"
         f"Bells: {vil.bells}. Loan owed to Tom Nook: {vil.loan}. Home: {house['name']} {home_txt}. "
         f"Carrying {vil.items()}/{isl.capacity(vil)} items.\n"
-        f"Inventory: {inv}\n"
+        f"{inv}\n"
         + (f"Wearing: {', '.join(vil.wearing.values())}\n" if vil.wearing else "")
         + f"Inside your home ({len(vil.interior)}/{isl.interior_slots(vil)}): {', '.join(vil.interior) or 'nothing yet'}\n"
         + (f"Open requests: {'; '.join(isl.favor_lines(vil.name))}\n" if isl.favor_lines(vil.name) else "")
@@ -543,7 +577,8 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
     return (
         "PHASE: encounter\n" + status_block(isl, vil, clock(hour))
         + f"\n\nSo far today you:\n" + ("\n".join(f"- {r}" for r in vil.today) or "(nothing yet)")
-        + f"\n\n{situation}\nKeep it to one or two sentences, the way you would actually talk. Only {other} hears it.\n"
+        + "\n\n" + (exchanges_with(isl, vil.name, other) if _v(isl) >= 8 else "")
+        + f"{situation}\nKeep it to one or two sentences, the way you would actually talk. Only {other} hears it.\n"
         f"You can also hand {other} something from your pockets right now (\"give\"), or ask them for something "
         "(\"ask\"); a request stays open until they give it to you.\n"
         "Respond with one JSON object and nothing else:\n"
@@ -551,6 +586,78 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
         '"give": {"<item or bells>": <qty>}, "ask": {"<item or bells>": <qty>}, '
         '"note": "<optional private note to your future self>"}'
     )
+
+
+def exchange_line(e: dict, me: str) -> str:
+    """One thing that changed hands, as `me` saw it (prompt version 8)."""
+    mine = e["from"] == me
+    other = e["to"] if mine else e["from"]
+    if e["how"] == "trade":
+        return (f"you traded {other} {_count(e['items'])} for {_count(e['got'])}" if mine
+                else f"{other} traded you {_count(e['items'])} for your {_count(e['got'])}")
+    how = " by parcel" if e["how"] == "by mail" else ""
+    if mine:
+        return f"you gave {other} {_count(e['items'])}{how}" + (", which they had asked for" if e.get("asked") else "")
+    return f"{other} gave you {_count(e['items'])}{how}" + (", which you had asked for" if e.get("asked") else "")
+
+
+EXCHANGES_SHOWN = 6  # the latest things that changed hands with someone, shown when you meet them
+
+
+def exchanges_with(isl: Island, me: str, other: str) -> str:
+    """Prompt version 8: what has changed hands between two villagers so far, latest few, oldest first."""
+    ex = [e for e in getattr(isl, "exchanges", []) if {e["from"], e["to"]} == {me, other}]
+    if not ex:
+        return ""
+    shown = ex[-EXCHANGES_SHOWN:]
+    lines = [f"- day {e['day']}: {exchange_line(e, me)}" for e in shown]
+    more = len(ex) - len(shown)
+    return (f"Between you and {other} so far" + (f" (the latest {len(shown)}; {more} earlier)" if more else "")
+            + ":\n" + "\n".join(lines) + "\n\n")
+
+
+def since_morning(isl: Island, vil: Villager) -> str:
+    """Prompt version 8: what changed in a villager's pockets, bells and recipes since the day began."""
+    m = (getattr(isl, "morning_state", None) or {}).get(vil.name)
+    if not m:
+        return ""
+    now = Counter({k: c for k, c in vil.inventory.items() if c > 0})
+    gained, lost = now - m["inventory"], m["inventory"] - now
+    parts = [f"+{n} {k}" for k, n in gained.items()] + [f"−{n} {k}" for k, n in lost.items()]
+    if vil.bells != m["bells"]:
+        parts.append(f"bells {m['bells']} → {vil.bells}")
+    parts += [f"learned the {r} recipe" for r in sorted(vil.recipes - m["recipes"])]
+    return "Since this morning: " + ("; ".join(parts) if parts else "nothing changed") + "\n"
+
+
+_OFFER_STATUS = {"accepted": "accepted", "rejected": "turned down", "countered": "answered with a counter-offer",
+                 "failed": "fell through", "expired": "expired"}
+
+
+def offer_line(o, me: str) -> str:
+    terms = f"{_count(o.give)} for {_count(o.want)}"
+    if o.sender == me:
+        return (f"[{o.id}] your offer to {o.recipient}, {terms}: "
+                + _OFFER_STATUS.get(o.status, "waiting for their answer"))
+    return f"[{o.id}] {o.sender}'s offer to you, {terms}: " + _OFFER_STATUS.get(o.status, "waiting for your answer")
+
+
+def night_facts(isl: Island, vil: Villager, offers: list | None) -> str:
+    """Prompt version 8, for the nightly page: facts the island keeps, without telling anyone what to make
+    of them. What changed hands today, what they have now, and their open requests and offers."""
+    d, me = isl.day, vil.name
+    today = [e for e in getattr(isl, "exchanges", []) if e["day"] == d and me in (e["from"], e["to"])]
+    mine = [o for o in (offers or []) if me in (o.sender, o.recipient)
+            and (o.status == "pending" or o.day >= d - 1)]
+    requests = isl.favor_lines(me)
+    return ("Things that changed hands today:\n"
+            + ("\n".join(f"- {exchange_line(e, me)}" for e in today) or "(nothing)") + "\n\n"
+            f"What you have tonight:\nBells: {vil.bells}\n{pockets_text(isl, vil)}\n"
+            f"Recipes you know: {', '.join(sorted(vil.recipes)) or 'none'}\n"
+            + since_morning(isl, vil) + "\n"
+            "Open requests and recent offers:\n"
+            + ("\n".join([f"- {r}" for r in requests] + [f"- {offer_line(o, me)}" for o in mine]) or "(none)")
+            + "\n\n")
 
 
 def light_system_prompt(spec: AgentSpec, self_doc: str | None = None) -> str:
@@ -594,14 +701,17 @@ def notice_prompt(isl: Island, vil: Villager, place: str, hour: int, nearby: lis
     )
 
 
-def reflect_prompt(isl: Island, vil: Villager, max_words: int, memory: dict | None = None) -> str:
+def reflect_prompt(isl: Island, vil: Villager, max_words: int, memory: dict | None = None,
+                   offers: list | None = None) -> str:
     """Free-form and deliberately open: no topics, questions or format beyond a length cap.
     With long-term memory on, they can also name what to hold on to, and nothing more is asked."""
     today = "\n".join(f"- {r}" for r in vil.today) or "(nothing)"
     notes = "\n".join(f"- (day {d}) {n}" for d, n in vil.notes) or "(none)"
     last = vil.self_doc.strip() or "(nothing yet)"
     head = (f"PHASE: reflect\nIt is the end of day {isl.day}. You are {vil.name}, at home before sleep.\n\n"
-            f"What happened today:\n{today}\n\nYour notes:\n{notes}\n\n")
+            f"What happened today:\n{today}\n\n"
+            + (night_facts(isl, vil, offers) if _v(isl) >= 8 else "")
+            + f"Your notes:\n{notes}\n\n")
     page = (f"This page is private; nobody else will read it. Write whatever you like, in any form, up to "
             f"{max_words} words. It replaces what you wrote last night, and you will see it again tomorrow.")
     if not memory:

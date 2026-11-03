@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import copy
 import random
+import re
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -137,7 +138,7 @@ ORDINANCE_TEXT = {
 TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 7  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+LATEST_PROMPT_VERSION = 8  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
 AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
 MAP = "island map"  # from Tom Nook or Isabelle; carried, it shows the island's layout in plans (prompt version 3 on)
@@ -145,6 +146,34 @@ MAP = "island map"  # from Tom Nook or Isabelle; carried, it shows the island's 
 
 def recipe_of_card(item: str) -> str | None:
     return item[: -len(CARD)] if item.endswith(CARD) else None
+
+
+def _item_words(name: str) -> tuple[str, ...]:
+    """An item name as words, each without a plural s: "fishing baits" -> ("fishing", "bait")."""
+    return tuple(w[:-1] if len(w) > 3 and w.endswith("s") and not w.endswith("ss") else w
+                 for w in re.findall(r"[a-z0-9']+", name.lower()))
+
+
+def resolve_item(name, pool) -> str:
+    """The item in `pool` that a villager most likely means by `name`, or `name` cleaned up if none is clear.
+    Exact names win; then the same words ignoring plurals ("maps" -> "map"); then the one item whose name
+    contains all the words ("map" -> "island map", "bait" -> "fishing bait"). Two or more candidates are
+    ambiguous, so the name is kept as it was ("fish" stays "fish"). Bells are always bells."""
+    name = re.sub(r"\s+x\s*\d+$", "", str(name).strip().lower())
+    name = re.sub(r"^(?:a|an|the|some|your|my)\s+", "", name)
+    pool = [str(k).lower() for k in pool]
+    if name in ("bells", "bell") or name in pool:
+        return "bells" if name == "bell" else name
+    want = _item_words(name)
+    if not want:
+        return name
+    for match in (lambda k: _item_words(k) == want, lambda k: set(want) <= set(_item_words(k))):
+        hits = sorted({k for k in pool if match(k)})
+        if len(hits) == 1:
+            return hits[0]
+        if hits:
+            return name
+    return name
 
 
 # Who you can ask, and where to find them.
@@ -339,6 +368,28 @@ class Island:
         if need and vil.inventory[need] < 1:
             return None, f"you have no {need}"
         return need, None
+
+    def item_names(self) -> set[str]:
+        """Every item name the island knows: what can be sold, the catalogue, clothes, the map, and whatever
+        anyone carries now."""
+        names = set(self.prices) | set(self.w.get("items") or {}) | set(self.w.get("clothing") or {}) | {MAP}
+        for vil in self.v.values():
+            names |= {k for k, n in vil.inventory.items() if n > 0}
+        return names
+
+    def resolve_side(self, holder: str | None, items: dict) -> dict:
+        """Item names as the sim knows them: matched against what `holder` carries first (what they can
+        give), then against every item name. Quantities of names that resolve to the same item add up."""
+        carried = [k for k, n in self.v[holder].inventory.items() if n > 0] if holder in self.v else []
+        names = None
+        out: dict[str, int] = {}
+        for k, n in items.items():
+            r = resolve_item(k, carried)
+            if r not in carried and r != "bells":
+                names = names if names is not None else self.item_names()
+                r = resolve_item(r, names)
+            out[r] = out.get(r, 0) + n
+        return out
 
     def is_tool(self, item: str) -> bool:
         return (self.w.get("items") or {}).get(item, {}).get("kind") == "tool"
@@ -782,7 +833,7 @@ class Island:
     def transfer(self, giver: str, taker: str, items: dict) -> tuple[bool, str]:
         """Hand items (or bells) from one villager to another, in person."""
         g, t = self.v[giver], self.v[taker]
-        items = {str(k).lower(): int(n) for k, n in items.items() if int(n) > 0}
+        items = self.resolve_side(giver, {str(k).lower(): int(n) for k, n in items.items() if int(n) > 0})
         if not items:
             return False, "nothing to give"
         for k, n in items.items():
@@ -799,6 +850,10 @@ class Island:
         items = {str(k).lower(): int(n) for k, n in items.items() if int(n) > 0}
         if not items or asked not in self.v or asked == asker:
             return None
+        items = self.resolve_side(asked, items)
+        for f in self.favors:  # asking again for the same thing doesn't open a second request
+            if f["status"] == "open" and f["asker"] == asker and f["asked"] == asked and f["items"] == items:
+                return f
         f = {"id": f"f{len(self.favors) + 1}", "day": self.day, "asker": asker, "asked": asked,
              "items": items, "status": "open", "done_day": None}
         self.favors.append(f)
@@ -807,7 +862,7 @@ class Island:
     def _settle_favors(self, giver: str, taker: str, items: dict) -> None:
         for f in self.favors:
             if f["status"] == "open" and f["asker"] == taker and f["asked"] == giver \
-                    and all(items.get(k, 0) >= n for k, n in f["items"].items()):
+                    and all(items.get(resolve_item(k, items), 0) >= n for k, n in f["items"].items()):
                 f["status"], f["done_day"] = "done", self.day
                 self.favors_done_today.append(f)
 

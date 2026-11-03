@@ -19,9 +19,17 @@ _ACTIONS = [
 
 def _inventory(prompt: str) -> dict[str, int]:
     m = re.search(r"^Inventory: (.*)$", prompt, re.M)
-    if not m or m.group(1) == "nothing":
-        return {}
-    return {k.strip(): int(n) for k, n in re.findall(r"([^,]+?) x(\d+)", m.group(1))}
+    if m:
+        return {} if m.group(1) == "nothing" else {k.strip(): int(n) for k, n in re.findall(r"([^,]+?) x(\d+)", m.group(1))}
+    inv = {}  # prompt version 8: tools (a count only when more than one), then everything else
+    for line in re.findall(r"^(?:Tools|Other things) you carry: (.*)$", prompt, re.M):
+        for part in line.split(", "):
+            k, _, n = part.strip().rpartition(" x")
+            if k and n.isdigit():
+                inv[k] = int(n)
+            elif part.strip() not in ("none", "nothing", ""):
+                inv[part.strip()] = 1
+    return inv
 
 
 def _recipes(prompt: str) -> list[str]:

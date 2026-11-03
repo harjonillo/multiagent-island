@@ -348,7 +348,10 @@ The persona and these rules make up the system prompt. Plan calls add a compact 
 adds:
 - the date, weather, ordinance, their bells, loan, home, neighbors, inventory, clothes,
   furniture and open requests
-- the recipes they know and the Cranny prices they have seen (they learn prices by selling)
+- the recipes they know and the Cranny prices they have seen (they learn prices by selling).
+  From prompt version 8 their pockets are split into tools and other things, each recipe says
+  how much of what it needs they have and how many of the thing they carry, and recipe cards they
+  already know are marked "(you know it)" in the shop
 - the museum, the bridge fund and today's shop stock
 - what they remember and their notes from the last 2 days (see [Long-term memory](#long-term-memory)),
   yesterday's actions and today's so far
@@ -465,6 +468,20 @@ it goes into both villagers' record of the day.
 **Gifts and requests.** In any conversation, either villager can hand the other something
 from their pockets (`"give"`) or ask for something (`"ask"`). A request stays open, shown to
 both, until the other gives at least that much, in person or by parcel. Nothing enforces it.
+Asking again for the same thing doesn't open a second request.
+
+**Item names.** Villagers don't always use an item's exact name ("map" for `island map`, "bait"
+for `fishing bait`). Gifts, parcels and trade offers match what they say against what the giver
+carries, and requests against what the other villager carries and then every item the island
+knows: first the exact name, then the same words ignoring plurals, then the one item whose name
+contains all the words. A name that fits two or more items ("fish") is left as it was and fails.
+Before 2026-11-03 names had to match exactly, so a gift of "map" from someone carrying an island
+map failed and requests in loose names never closed. Requests stored that way still settle.
+
+**Who gave what to whom.** The sim keeps a record of everything that changes hands between two
+villagers: gifts in person, parcels and accepted trades, and whether a gift answered a request.
+From prompt version 8, a villager meeting someone sees the latest 6 of these between the two of
+them ("Between you and Kit so far"), and the nightly page shows the day's.
 
 **Visits.** `visit` is an action. If the host is awake, at home and not busy, they let the
 guest in: the guest sees the furniture inside and they talk, with gifts and requests as
@@ -610,7 +627,11 @@ that is, luck, and who they meet.
 
 **Reflection.** Each night, one call per villager gives them a private page to write on, free
 form, at most 150 words (`reflection.max_words`; a length cap only). They see what happened that
-day, their notes, and what they wrote the night before. The prompt gives no topics, questions or
+day, their notes, and what they wrote the night before. From prompt version 8 it also shows
+facts the sim keeps, without saying what to make of them: what changed hands today, their bells,
+pockets and recipes, what changed since the morning, and their open requests and recent trade
+offers. Before that, nothing at night said what they had, and pages carried goals forward that
+were already done (buying a recipe they knew, crafting a tool they carried). The prompt gives no topics, questions or
 format, and doesn't frame the page as a self-description, so whatever they choose to write about
 is part of what emerges. The new page replaces the old one, and from the next day it sits in
 their prompts under "What you wrote to yourself last night". That is the feedback loop through

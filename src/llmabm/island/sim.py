@@ -137,6 +137,18 @@ class Offer:
     parent: str | None = None
 
 
+def _failed_give(isl, giver: str, taker: str, items: dict) -> str:
+    """What both villagers see when a gift in person doesn't go through (prompt version 8 on): what was
+    missing, said the same way to both of them."""
+    g = isl.v[giver]
+    for k, n in items.items():
+        have = g.bells if k == "bells" else g.inventory[k]
+        if have < n:
+            short = f"had only {have}" if have else f"had no {k}"
+            return f"tried to give {n} {k} but {short}"
+    return f"tried to give {', '.join(f'{n} {k}' for k, n in items.items())} but {taker} had no room"
+
+
 def _clean_side(d) -> dict:
     if not isinstance(d, dict):
         return {}
@@ -324,7 +336,7 @@ class IslandSimulation:
         who = [n for n in who if self.choices[n]["write"]]
 
         def reflect(name):
-            user = reflect_prompt(isl, isl.v[name], max_words, isl.memory)
+            user = reflect_prompt(isl, isl.v[name], max_words, isl.memory, list(self.offers.values()))
             if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             return self._call(name, user, f"d{d:03d}_reflect", system=self.light_systems[name], free_text=True,
@@ -511,6 +523,7 @@ class IslandSimulation:
         if d == 0:
             self._settle_all(d)
         self._deliver_mail(d)
+        self._morning_state()
         slots = self._plan_slots()
         for h in range(cal["day_start"], cal["day_start"] + cal.get("day_length", 24)):
             self.hour = h
@@ -542,6 +555,22 @@ class IslandSimulation:
                   f"bridge {isl.bridge_fund}, trades {trades}, calls so far {self.calls}, "
                   f"provider tokens so far {self.provider_tokens:,} ({self.reasoning_tokens:,} reasoning)", flush=True)
 
+    # --- who gave what to whom ------------------------------------------------
+    def _exchange(self, d: int, how: str, giver: str, taker: str, items: dict, got: dict | None = None,
+                  **extra) -> None:
+        """Remember something changing hands between two villagers: a gift in person, a parcel, or a trade
+        (`got` is what the giver received back). From prompt version 8 each villager sees their own history
+        with someone when they meet, and the day's exchanges at night. Recorded in every run."""
+        asked = any(f["asker"] == taker and f["asked"] == giver for f in self.isl.favors_done_today)
+        self.isl.exchanges = getattr(self.isl, "exchanges", [])
+        self.isl.exchanges.append({"day": d, "hour": self.hour, "how": how, "from": giver, "to": taker,
+                                   "items": dict(items), "got": dict(got or {}), "asked": asked, **extra})
+
+    def _morning_state(self) -> None:
+        """What each villager has as the day begins, to tell them at night what changed."""
+        self.isl.morning_state = {n: {"inventory": Counter({k: c for k, c in v.inventory.items() if c > 0}),
+                                      "bells": v.bells, "recipes": set(v.recipes)} for n, v in self.isl.v.items()}
+
     # --- mail ----------------------------------------------------------------
     def _deliver_mail(self, d: int) -> None:
         """Morning: letters and parcels sent before today arrive. A parcel that doesn't fit in
@@ -561,6 +590,7 @@ class IslandSimulation:
                 vil.inbox.append(f"(sent day {m['sent_day']}) parcel from {m['from']}: {what}"
                                  + (f' ("{m["note"]}")' if m.get("note") else ""))
                 isl._settle_favors(m["from"], m["to"], got)
+                self._exchange(d, "by mail", m["from"], m["to"], got, sent_day=m["sent_day"])
                 self.log("gift", day=d, giver=m["from"], receiver=m["to"], items=got, ok=True, how="by mail",
                          result=what, sent_day=m["sent_day"])
                 for f in isl.favors_done_today:
@@ -699,15 +729,24 @@ class IslandSimulation:
         acts = []
         give = obj.get("give")
         if isinstance(give, dict) and _clean_side(give):
-            ok, what = isl.transfer(speaker, other, _clean_side(give))
-            self.log("gift", day=d, giver=speaker, receiver=other, items=_clean_side(give), ok=ok, how="in person",
-                     result=what)
-            acts.append(f"gave {what}" if ok else f"tried to give something but {what}")
+            items = isl.resolve_side(speaker, _clean_side(give))
+            ok, what = isl.transfer(speaker, other, items)
+            self.log("gift", day=d, giver=speaker, receiver=other, items=items, ok=ok, how="in person",
+                     result=what, **({"said": _clean_side(give)} if items != _clean_side(give) else {}))
+            if ok:
+                self._exchange(d, "in person", speaker, other, items)
+                acts.append(f"gave {what}")
+            elif getattr(self, "prompt_version", 1) >= 8:
+                acts.append(_failed_give(isl, speaker, other, items))
+            else:
+                acts.append(f"tried to give something but {what}")
         ask = obj.get("ask")
         if isinstance(ask, dict) and _clean_side(ask):
+            before = len(isl.favors)
             f = isl.ask_favor(speaker, other, _clean_side(ask))
             if f:
-                self.log("favor_asked", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
+                if len(isl.favors) > before:
+                    self.log("favor_asked", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
                 acts.append("asked for " + ", ".join(f"{n} {k}" for k, n in f["items"].items()))
         for f in isl.favors_done_today:
             self.log("favor_done", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
@@ -1179,7 +1218,7 @@ class IslandSimulation:
             if not isinstance(m, dict):
                 continue
             to = who(m.get("to"))
-            items = _clean_side(m.get("items"))
+            items = isl.resolve_side(name, _clean_side(m.get("items")))
             parcel = isl.take_items(vil, items) if to and to != name and items else None
             if parcel is None:
                 log("invalid", day=d, agent=name, what="parcel", detail=m)
@@ -1211,6 +1250,7 @@ class IslandSimulation:
             vil.notes.append((d, note))
 
     def _new_offer(self, d, sender, recipient, give, want, note, parent=None):
+        give, want = self.isl.resolve_side(sender, give), self.isl.resolve_side(recipient, want)
         self._oid += 1
         o = Offer(f"o{self._oid}", d, sender, recipient, give, want, note, parent=parent)
         self.offers[o.id] = o
@@ -1250,6 +1290,8 @@ class IslandSimulation:
         o.status = "accepted"
         if not o.want:  # a gift by mail can fulfil an open request
             isl._settle_favors(o.sender, o.recipient, o.give)
+        self._exchange(d, "trade" if o.give and o.want else "offer", o.sender, o.recipient, o.give, o.want, offer=o.id)
+        if not o.want:
             for f in isl.favors_done_today:
                 self.log("favor_done", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
             isl.favors_done_today = []

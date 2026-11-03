@@ -2,6 +2,27 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-03 12:20
+  what: "test1: who gave what to whom, filled in for days 0-2"
+  when: test1 only, from day 3 (the end-of-day-2 checkpoint; the original is checkpoint.pkl.before-exchanges)
+  details:
+    - "the exchange record (gifts, parcels, trades) for days 0-2, rebuilt from the event log: 9 exchanges"
+    - "Kit's 3 requests to Fen for a map closed as done on day 1, when Fen gave Kit an island map. Under the old exact-name rule they never closed"
+- time: 2026-11-03 01:30
+  what: Prompt version 8, for new runs
+  when: new runs from now on; running ones keep theirs
+  details:
+    - "pockets: tools apart from other things. Each recipe they know says how much of what it needs they have, and how many of the thing they carry. Recipe cards they already know are marked in the shop"
+    - "meeting someone: the latest 6 things that changed hands between the two of them"
+    - "the nightly page: what changed hands today, what they have and what changed since the morning, and their open requests and recent offers. The page itself is as open as before"
+    - "a gift that doesn't go through says what was missing, the same way to both"
+- time: 2026-11-03 01:25
+  what: Item names in gifts, requests, parcels and offers
+  when: every run, from its next day
+  details:
+    - "a loose name matches the item meant when only one fits: \"map\" is the island map, \"bait\" is fishing bait. Before, a gift of \"map\" from someone carrying an island map failed, and requests in loose names never closed"
+    - "asking someone again for the same thing doesn't open a second request"
+    - "the sim records who gave what to whom (gifts, parcels, trades), for prompt version 8 and analysis"
 - time: 2026-11-02 18:10
   what: Shorter reports from Isabelle
   when: every run, from its next day

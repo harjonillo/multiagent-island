@@ -1418,3 +1418,62 @@ def test_from_version_7_the_plaza_is_open_all_day_and_energy_is_planned():
         # Offers wait for an answer on the day they're made and the next, then expire.
         assert all(o.status != "pending" for o in sim.offers.values() if o.day <= 0)
         assert not any(p.get("habit") for p in run.of("plan"))
+
+
+def test_item_names_resolve_for_gifts_requests_and_offers():
+    from llmabm.island.world import MAP, resolve_item
+
+    assert resolve_item("map", [MAP, "wood"]) == MAP
+    assert resolve_item("maps", [MAP]) == MAP and resolve_item("bait", ["fishing bait"]) == "fishing bait"
+    assert resolve_item("wood x10", ["wood", "hardwood"]) == "wood"  # hardwood isn't wood
+    assert resolve_item("fish", ["loka fish", "gormo fish"]) == "fish"  # ambiguous: left as it was
+    assert resolve_item("bell", []) == "bells"
+    isl = _island(("A", "B"))
+    isl.v["B"].inventory[MAP] = 1
+    # A request made in a looser name is stored as the item, and asking again doesn't open a second one.
+    f = isl.ask_favor("A", "B", {"map": 1})
+    assert f["items"] == {MAP: 1} and isl.ask_favor("A", "B", {"island map": 1}) is f and len(isl.favors) == 1
+    ok, _ = isl.transfer("B", "A", {"map": 1})  # the giver calls it "map"; they carry an island map
+    assert ok and isl.v["A"].inventory[MAP] == 1 and f["status"] == "done"
+    # A request stored under an old loose name (runs from before this fix) still settles.
+    old = {"id": "f9", "day": 1, "asker": "B", "asked": "A", "items": {"map": 1}, "status": "open", "done_day": None}
+    isl.favors.append(old)
+    assert isl.transfer("A", "B", {MAP: 1})[0] and old["status"] == "done"
+
+
+def test_prompt_version_8_shows_what_you_have_and_what_changed_hands():
+    from llmabm.island.prompts import encounter_prompt, reflect_prompt, status_block
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=2)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=2, backend_override="mock", verbose=False)
+        sim.run(3)
+        isl = sim.isl
+        assert isl.prompt_version == 8 and hasattr(isl, "morning_state")
+        a, b = sorted(isl.v)[:2]
+        va = isl.v[a]
+        va.inventory["shovel"] = max(va.inventory["shovel"], 1)
+        text = status_block(isl, va, "08:00")
+        assert "Tools you carry: " in text and "shovel" in text.split("Tools you carry: ")[1].split("\n")[0]
+        assert "Inventory:" not in text and "Other things you carry: " in text
+        va.recipes.add("shovel")
+        assert "shovel 500 (you know it)" in status_block(isl, va, "08:00") or "shovel" not in isl.recipe_cards_for_sale()
+        # What changed hands is remembered by person, from both sides.
+        isl.exchanges = [{"day": isl.day, "hour": 9, "how": "in person", "from": a, "to": b, "items": {"wood": 2},
+                          "got": {}, "asked": True},
+                         {"day": isl.day, "hour": 20, "how": "trade", "from": b, "to": a, "items": {"loka fish": 1},
+                          "got": {"bells": 100}, "asked": False}]
+        met = encounter_prompt(isl, va, b, "plaza", 10, [], opener=True)
+        assert f"Between you and {b} so far:" in met and f"you gave {b} 2 wood, which they had asked for" in met
+        assert f"{b} traded you 1 loka fish for your 100 bells" in met
+        night = reflect_prompt(isl, isl.v[b], 150, None, list(sim.offers.values()))
+        assert f"{a} gave you 2 wood, which you had asked for" in night and "What you have tonight:" in night
+        assert "Since this morning:" in night and "Open requests and recent offers:" in night
+        assert "Write whatever you like, in any form" in night  # the page itself is still open
+        # Older runs keep their wording.
+        isl.prompt_version = 7
+        assert "Inventory:" in status_block(isl, va, "08:00") and "Between you" not in encounter_prompt(
+            isl, va, b, "plaza", 10, [], opener=True)
+        assert "What you have tonight" not in reflect_prompt(isl, va, 150)
+        # The real run recorded exchanges too, in the same shape.
+        assert all({"day", "how", "from", "to", "items", "got", "asked"} <= set(e) for e in getattr(sim.isl, "exchanges", []))
