@@ -2,9 +2,16 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-08 23:49
+  what: "test1: prompt version 12 and long-term memory"
+  when: test1 only, from day 8 (the original checkpoint is checkpoint.pkl.before-v12-memory)
+  details:
+    - "prompt version 11 -> 12, with its world: recipe cards cheaper (tools 500 -> 200, the daily card 2000 -> 800) and every tool for sale ready-made at 4x its sell value. Everyone still lives in a tent, so nothing had to move out of anyone's pockets; the board's posts got numbers"
+    - "long-term memory turned on, with the settings new runs use (picks 3, shown 10, stability 4, threshold 0.25, notes_days 2). Before, villagers kept their last 15 notes; now notes last 2 days unless picked at night, and memories fade unless recalled. Nobody has any memories yet"
+    - "Eli's plaza offer to Ari [o36] (day 6) expires at the start of day 8 as it would have anyway; from version 12 trades happen in person"
 - time: 2026-11-08 12:00
   what: Prompt version 12, what villagers have and who they dealt with
-  when: new runs from now on; running ones keep theirs (test1 stays on 11)
+  when: new runs from now on; running ones keep theirs (test1 switched from day 8)
   details:
     - "pockets and home apart: only the pockets (40 slots) go with you. Bells can always be left at home; things only with house storage (a tent has none). A plan made at home can put things away or take them out, which takes no time, and crafting at home can use what is kept there"
     - "what you have: bells in your wallet and at home, each tool with its uses left, a line for what is kept at home, and each recipe counting what you have in your pockets and at home apart"

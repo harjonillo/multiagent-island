@@ -323,6 +323,11 @@ class IslandSimulation:
             sim._intervene(sim.isl.day + 1, f"prompt version {change[0]} -> {change[1]}",
                            [_change_note(v, sim.sc.world) for v in range(change[0] + 1, change[1] + 1) if v in PROMPT_CHANGES]
                            if change[1] > change[0] else [f"back to: {PROMPT_CHANGES[change[1]]}"])
+        # Changes patched into the checkpoint by hand, recorded here so they land in this attempt's log
+        # (a resume that doesn't finish replays from the same checkpoint and records them again).
+        for what, details in getattr(sim, "pending_interventions", []):
+            sim._intervene(sim.isl.day + 1, what, details)
+        sim.pending_interventions = []
         try:
             sim._run_days(days)
         finally:
