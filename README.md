@@ -241,11 +241,14 @@ doesn't count), or one trip whose route climbs a cliff with the ladder or jumps 
 the pole (going home counts as a trip). Without the tool, the action fails before the villager
 sets out ("you have no axe"). Villagers aren't told how worn a tool is; they find out when it
 breaks. From prompt version 10 that result says how many uses it lasted and that it is gone from
-their pockets. A replacement takes the tool's recipe card, always for sale at Nook's Cranny for 500
-bells, and materials: shovel 5 hardwood, stone axe 5 stone, axe 3 wood and 1 iron nugget,
+their pockets. A replacement takes the tool's recipe card, always for sale at Nook's Cranny (200
+bells; 500 in runs started before prompt version 12), and materials: shovel 5 hardwood, stone axe 5 stone, axe 3 wood and 1 iron nugget,
 fishing rod 4 wood, net 4 softwood, ladder 4 wood, 4 hardwood and 4 softwood, vaulting pole 5
 wood. The stone axe takes stone and the shovel wood, so losing one of them never leaves a
-villager stuck. Spare tools can be handed over or mailed, and a worn tool stays worn.
+villager stuck. Spare tools can be handed over or mailed, and a worn tool stays worn. In worlds
+with `shops.cranny.tool_markup` (new runs), the Cranny also sells every tool ready-made, new, at
+4 times its sell value (a vaulting pole about 1,200 bells), so selling one back fetches what a
+crafted one does.
 
 **Recipe cards.** Recipes come on cards: the Cranny's tool cards and one other card a day,
 message bottles on the beach, and other villagers. A card for a recipe you don't know is
@@ -291,10 +294,10 @@ writing, below).
 |---|---|---|---|
 | Resident Services | Tom Nook | all day | house upgrades on an interest-free loan with no deadline; the loan must be paid off before the next upgrade. Takes bridge contributions |
 | Resident Services | Isabelle | all day | sets the island ordinance for 20,000 bells; makes the morning announcement |
-| Nook's Cranny | Timmy and Tommy | 08:00–22:00 | buys almost anything at a fixed price (shop goods and clothes at a quarter of their price). Sells saplings, 2 kinds of flower seeds, 3 rotating items and one DIY recipe card (2,000 bells) each day, plus every tool's recipe card (500 bells) |
+| Nook's Cranny | Timmy and Tommy | 08:00–22:00 | buys almost anything at a fixed price (shop goods and clothes at a quarter of their price). Sells saplings, 2 kinds of flower seeds, 3 rotating items and one DIY recipe card (800 bells) each day, plus every tool's recipe card (200 bells) and every tool ready-made (4x its sell value). Runs started earlier keep 2,000 and 500 and no tools |
 | Able Sisters | the Able Sisters | 09:00–21:00 | 4 pieces of clothing a day, from `clothing` in the world file. The entries are placeholders for your own designs |
 | museum | Blathers | all day | takes the first donation of each fish, bug and fossil species and shows who gave what, with a tally per villager. No bells for it. Assesses fossils for free |
-| plaza | | all day (from prompt version 7; before, 20:00 and 21:00) | the board, trade offers, letters and parcels |
+| plaza | | all day (from prompt version 7; before, 20:00 and 21:00) | the board, letters and parcels; trade offers before prompt version 12 |
 
 **Houses.**
 
@@ -306,7 +309,14 @@ writing, below).
 | house with back room | 240 | 30 | 348,000 |
 | two-story house | 320 | 40 | 548,000 |
 
-Everyone carries 40 items in their pockets; storage adds to that.
+Everyone carries 40 items in their pockets. Before prompt version 12 storage adds to that, as one
+pile. From version 12 the two are apart: only the pockets go with you, so out on the island that
+is all you can use, give, sell or trade, and what is kept at home is reachable only at home. A
+tent has no storage, but bells can always be left at home. A plan made at home (every morning, and
+later plans if they are home then) can put things away or take them out (`"home": {"store": {...},
+"take": {...}}`), which takes no time, and crafting at home can use what is kept there. A tool
+keeps its wear while it is put away. A parcel that doesn't fit in the pockets is left at home if
+there's room. Net worth and the explorer's assets count both.
 
 **The bridge** costs 98,000 bells, anyone can chip in, and it's built the moment it is
 funded. It adds 3 rocks and 10 hardwood trees, and on the grid it is a way across the river
@@ -354,7 +364,14 @@ adds:
 - the recipes they know and the Cranny prices they have seen (they learn prices by selling).
   From prompt version 8 their pockets are split into tools and other things, each recipe says
   how much of what it needs they have and how many of the thing they carry, and recipe cards they
-  already know are marked "(you know it)" in the shop
+  already know are marked "(you know it)" in the shop. From prompt version 12 bells are "in your
+  wallet", each tool says how many uses it has left, what is kept at home has its own line, each
+  recipe counts what they have in their pockets and at home apart, and the price list is labelled
+  as what the Cranny pays. The shop is listed in three parts: things, each with a few words on
+  what it is ("fishing bait 300 (fish with it and a fish is sure to appear)"); tools, ready to
+  use; and recipe cards, named "<thing> recipe" so a card is never mistaken for the thing. A card
+  doesn't say what the recipe needs; learning it does ("learned the vaulting pole recipe (needs
+  wood x5)"), and from then on it is in the recipes they know
 - the museum, the bridge fund and today's shop stock
 - what they remember and their notes from the last 2 days (see [Long-term memory](#long-term-memory)),
   yesterday's actions and today's so far
@@ -394,7 +411,7 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 |---|---|---|---|
 | `craft` | `recipe` | home | use a known recipe; fences make 5 pieces |
 | `sell` | `items: {item: qty}` | Nook's Cranny | sell at the fixed price |
-| `buy` | `shop`: cranny or able; `item` (`"<recipe> recipe"` for a card) | the shop | buy from today's stock, a tool recipe card, or the day's recipe card |
+| `buy` | `shop`: cranny or able; `item` (`"<recipe> recipe"` for a card) | the shop | buy from today's stock, a tool recipe card, the day's recipe card, or (new runs) a tool ready-made. From prompt version 12, `"shovel"` buys the shovel and `"shovel recipe"` its card; before, both bought the card |
 | `donate` | `item` | museum | first of each species only; fossils must be assessed first |
 | `assess` | | museum | Blathers identifies every unassessed fossil you carry |
 | `wear` | `item` | home | others see what you wear |
@@ -475,8 +492,31 @@ it goes into both villagers' record of the day.
 
 **Gifts and requests.** In any conversation, either villager can hand the other something
 from their pockets (`"give"`) or ask for something (`"ask"`). A request stays open, shown to
-both, until the other gives at least that much, in person or by parcel. Nothing enforces it.
-Asking again for the same thing doesn't open a second request.
+both, until the other gives at least that much, in person or by parcel (or, from prompt version
+12, trades it). Nothing enforces it.
+Asking again for the same thing doesn't open a second request. From prompt version 12 a request
+lapses after 3 days (the day it is made and the two after; `REQUEST_DAYS` in `prompts.py`), and
+requests are worded by who wants what from whom ("Ike wants 1 fishing bait from you").
+
+From prompt version 12 a conversation is told from each villager's own side: the tags after
+each line say "Ike handed you 1 wood", "you asked Ike for 1 fishing bait", not "gave" and "asked
+for" with no one named. Before, villagers often copied the other's tag into their own reply and
+handed over the very thing they had wanted. `give` and `ask` start empty in the reply template,
+the prompt lists what is in their pockets right then, and they see the last time they talked
+with that villager before today (up to its last 8 lines).
+
+**Trades, from prompt version 12.** Trades happen in person only, as in the game. A turn can
+put a trade on the table (`"trade": {"give": {...}, "want": {...}}`, both sides needed); nothing
+moves yet. The other villager sees "On the table: Ike offers you 2 wood for your 1 fishing bait",
+and their next turn can accept it (`"accept": true`, offered only to them) or put a different
+one on the table, which replaces it. On acceptance both sides are checked (pockets only) and
+change hands at once, or nothing does and both are told why ("Kit had no fishing bait"). An
+offer nobody accepts ends with the conversation. Tags read "you accepted: you gave Ike 1 fishing
+bait and got 2 wood" and "Kit accepted: you gave Kit 2 wood and got 1 fishing bait". A trade
+closes any open request it covers, either way round, and the request is marked as met in a
+trade (`favor_done` with `"by": "trade"`), so the run summary counts favors done as gifts apart
+from requests met in trades. Logged as `trade_proposed`, `trade` (with `"how": "in person"`)
+and `trade_failed`.
 
 **Item names.** Villagers don't always use an item's exact name ("map" for `island map`, "bait"
 for `fishing bait`). Gifts, parcels and trade offers match what they say against what the giver
@@ -505,6 +545,11 @@ they can notice each other afterwards and choose whether to talk, one to one, as
 Offers can go to any villager, not only those at the plaza; the recipient sees them on their
 next visit, and an offer not answered by the end of the day after it was made expires. There
 are no evening rounds. Turns are logged as `evening_turn` events with `"place": "plaza"`.
+
+**The plaza from prompt version 12** has no trade offers: trades happen in person, and the
+prompt says a post, letter or parcel binds no one. Board posts get numbers (`b1`, `b2`, ...),
+and their author can take them down (`"take_down": ["b3"]`), logged as `board_removed`. The
+board shows its newest 8 posts, plus any older ones of yours still up, with yours marked "you".
 
 **The plaza before prompt version 7** at 20:00 and 21:00 (no action hour). In the first round every awake villager
 who is going gets a call. The second round only includes those with new offers waiting. Who goes:

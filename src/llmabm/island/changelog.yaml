@@ -2,6 +2,18 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-08 12:00
+  what: Prompt version 12, what villagers have and who they dealt with
+  when: new runs from now on; running ones keep theirs (test1 stays on 11)
+  details:
+    - "pockets and home apart: only the pockets (40 slots) go with you. Bells can always be left at home; things only with house storage (a tent has none). A plan made at home can put things away or take them out, which takes no time, and crafting at home can use what is kept there"
+    - "what you have: bells in your wallet and at home, each tool with its uses left, a line for what is kept at home, and each recipe counting what you have in your pockets and at home apart"
+    - "the shop in three parts: things, each saying what it is (\"fishing bait 300 (fish with it and a fish is sure to appear)\"); tools ready to use, always in stock at 4x their sell value; and recipe cards named \"<thing> recipe\". Cards are cheaper (tools 200, the daily card 800) and don't say what the recipe needs: learning one does (\"learned the vaulting pole recipe (needs wood x5)\"). Buying \"shovel\" buys the shovel; \"shovel recipe\" buys its card"
+    - "the price list is labelled as what Nook's Cranny pays, and the fun fact about houses says they give room to keep things at home (not more pockets)"
+    - "requests say who wants what from whom, and lapse after 3 days"
+    - "conversations: each tag says who handed what to whom from your side (\"Ike handed you 1 wood\"); give and ask start empty; the prompt lists your pockets; and you see the last time you talked with them before today"
+    - "trades happen in person only: a turn can put a trade on the table (give and want), and the other's next turn can accept it, when both sides change hands at once or nothing does (and both are told why). A trade closes any request it covers, marked as met in a trade, and the run summary counts those apart from favors done as gifts"
+    - "the plaza has no trade offers anymore: a board post, letter or parcel binds no one. Board posts have numbers, and their author can take them down"
 - time: 2026-11-03 23:30
   what: Prompt version 11, and fishing bait from clams
   when: new runs from now on; running ones keep theirs (test1 switched from day 4)

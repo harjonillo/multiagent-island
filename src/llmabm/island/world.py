@@ -138,7 +138,7 @@ ORDINANCE_TEXT = {
 TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_clam": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 11  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+LATEST_PROMPT_VERSION = 12  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
 AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
 CLAM, BAIT = "manila clam", "fishing bait"  # dug on the beach (dig_clam); one clam crafts one bait
@@ -221,9 +221,21 @@ class Villager:
     wearing: dict = field(default_factory=dict)  # slot -> clothing item; others can see it
     wear: dict = field(default_factory=dict)  # tool -> uses so far of each one they carry, in-use first
     interior: list = field(default_factory=list)  # furniture inside their home; visitors see it
+    # From prompt version 12, `inventory` is only what is in their pockets; what they keep at home is
+    # here, and is only reachable when they are at home.
+    home_items: Counter = field(default_factory=Counter)
+    home_bells: int = 0
+    home_wear: dict = field(default_factory=dict)  # tool -> uses so far of each one kept at home
+
+    def __setstate__(self, state):  # checkpoints from before a field existed get its default
+        fresh = Villager(state.get("name", ""))
+        self.__dict__.update({**fresh.__dict__, **state})
 
     def items(self) -> int:
         return sum(self.inventory.values())
+
+    def home_count(self) -> int:
+        return sum(self.home_items.values())
 
 
 @dataclass
@@ -354,11 +366,72 @@ class Island:
         return int(round(self.prices[item] * self.price_factor()))
 
     # --- capacity ----------------------------------------------------------
+    def split_home(self) -> bool:
+        """From prompt version 12, pockets and home storage are apart: only pockets go with you."""
+        return getattr(self, "prompt_version", 1) >= 12
+
     def capacity(self, vil: Villager) -> int:
+        """Slots for what a villager carries. Before prompt version 12, house storage added to the pockets."""
+        if self.split_home():
+            return self.w["pockets"]
         return self.w["pockets"] + self.w["house_levels"][vil.house]["storage"]
 
     def space(self, vil: Villager) -> int:
         return self.capacity(vil) - vil.items()
+
+    def home_capacity(self, vil: Villager) -> int:
+        return self.w["house_levels"][vil.house]["storage"] if self.split_home() else 0
+
+    def home_space(self, vil: Villager) -> int:
+        return self.home_capacity(vil) - vil.home_count()
+
+    def stash(self, vil: Villager, store: dict | None, take: dict | None) -> list[str]:
+        """At home (prompt version 12): put things from the pockets away, and take things out. Bells can always
+        be left at home; things need storage room. Tools keep their wear either way. Returns what happened,
+        one line per move."""
+        out = []
+        store = self.resolve_side(vil.name, {str(k).lower(): int(n) for k, n in (store or {}).items() if int(n) > 0})
+        for k, n in store.items():
+            have = vil.bells if k == "bells" else vil.inventory[k]
+            if have < 1:
+                out.append(f"couldn't put away {k}: you have none in your pockets")
+                continue
+            n = min(n, have)
+            if k != "bells":
+                room = self.home_space(vil)
+                if room < 1:
+                    out.append(f"couldn't put away {k}: " + ("your tent has no room for things"
+                                                             if self.home_capacity(vil) == 0 else "no room left at home"))
+                    continue
+                n = min(n, room)
+            parcel = self.take_items(vil, {k: n})
+            if k == "bells":
+                vil.home_bells += n
+            else:
+                vil.home_items[k] += n
+                vil.home_wear[k] = sorted(vil.home_wear.get(k, []) + parcel["wear"].get(k, []), reverse=True)
+            out.append(f"put away {n} {k}")
+        pool = ["bells"] + [k for k, c in vil.home_items.items() if c > 0]
+        take = {resolve_item(str(k), pool): int(n) for k, n in (take or {}).items() if int(n) > 0}
+        for k, n in take.items():
+            have = vil.home_bells if k == "bells" else vil.home_items[k]
+            if have < 1:
+                out.append(f"couldn't take out {k}: there is none at home")
+                continue
+            n = min(n, have) if k == "bells" else min(n, have, self.space(vil))
+            if n < 1:
+                out.append(f"couldn't take out {k}: your pockets are full")
+                continue
+            if k == "bells":
+                vil.home_bells -= n
+                vil.bells += n
+            else:
+                worn = sorted(vil.home_wear.get(k, []), reverse=True)
+                moved, vil.home_wear[k] = worn[len(worn) - n:], worn[: len(worn) - n]
+                vil.home_items[k] -= n
+                self.put_items(vil, {"items": {k: n}, "wear": {k: moved}})
+            out.append(f"took out {n} {k}")
+        return out
 
     # --- tools ------------------------------------------------------------
     def tool_for(self, vil: Villager, action: dict) -> tuple[str | None, str | None]:
@@ -486,6 +559,8 @@ class Island:
         """A recipe card reaches a villager: learned if new, kept as a spare if not."""
         if recipe not in vil.recipes:
             vil.recipes.add(recipe)
+            if self.split_home():
+                return f"learned the {recipe} recipe ({self.recipe_needs(recipe)})"
             return f"learned the {recipe} recipe"
         if self.space(vil) < 1:
             return f"already knew the {recipe} recipe, and had no room for the card"
@@ -876,12 +951,38 @@ class Island:
         self.favors.append(f)
         return f
 
-    def _settle_favors(self, giver: str, taker: str, items: dict) -> None:
+    def _settle_favors(self, giver: str, taker: str, items: dict, by: str = "gift") -> None:
+        """Close the taker's open requests of the giver that `items` covers. `by` says how they were met: a
+        "gift" (in person, by parcel, or a plaza offer asking nothing back) or a "trade" (something came back)."""
         for f in self.favors:
             if f["status"] == "open" and f["asker"] == taker and f["asked"] == giver \
                     and all(items.get(resolve_item(k, items), 0) >= n for k, n in f["items"].items()):
-                f["status"], f["done_day"] = "done", self.day
+                f["status"], f["done_day"], f["by"] = "done", self.day, by
                 self.favors_done_today.append(f)
+
+    def trade(self, a: str, b: str, give: dict, want: dict) -> tuple[bool, dict | None]:
+        """A trade in person (prompt version 12): `a` hands `b` `give` and gets `want` back, both at once, or
+        nothing moves. Only pockets count. Returns (True, None), or (False, what stopped it): {"who", "item",
+        "have"} when someone lacks something, {"who", "room": True} when someone has no room."""
+        va, vb = self.v[a], self.v[b]
+        for who, vil, side in ((a, va, give), (b, vb, want)):
+            for k, n in side.items():
+                have = vil.bells if k == "bells" else vil.inventory[k]
+                if have < n:
+                    return False, {"who": who, "item": k, "have": have}
+        things = lambda side: sum(n for k, n in side.items() if k != "bells")  # noqa: E731
+        if self.space(vb) + things(want) < things(give):
+            return False, {"who": b, "room": True}
+        if self.space(va) + things(give) < things(want):
+            return False, {"who": a, "room": True}
+        pa, pb = self.take_items(va, give), self.take_items(vb, want)
+        if pa:
+            self.put_items(vb, pa)
+        if pb:
+            self.put_items(va, pb)
+        self._settle_favors(a, b, give, by="trade")
+        self._settle_favors(b, a, want, by="trade")
+        return True, None
 
     def favor_lines(self, name: str) -> list[str]:
         out = []
@@ -1085,16 +1186,29 @@ class Island:
         if r not in vil.recipes:
             return False, f"you don't know the {r} recipe"
         needs = self.w["recipes"][r]["needs"]
-        short = {k: n - vil.inventory[k] for k, n in needs.items() if vil.inventory[k] < n}
+        home = self.split_home() and a.get("_at_home")  # at home, what is kept there counts too (version 12)
+        have = lambda k: vil.inventory[k] + (vil.home_items[k] if home else 0)  # noqa: E731
+        short = {k: n - have(k) for k, n in needs.items() if have(k) < n}
         if short:
             return False, f"not enough materials for {r}; short {_fmt(Counter(short))}"
         makes = int(self.w["recipes"][r].get("makes", 1))
-        if self.space(vil) + sum(needs.values()) < makes:
+        from_pockets = {k: min(n, vil.inventory[k]) for k, n in needs.items()}
+        room = self.space(vil) + sum(from_pockets.values())
+        if room < makes and not (home and room + self.home_space(vil) >= makes):
             return False, "pockets full"
         for k, n in needs.items():
-            vil.inventory[k] -= n
-        vil.inventory[r] += makes
-        return True, f"crafted {_a(r)}" if makes == 1 else f"crafted {makes} {r} pieces"
+            vil.inventory[k] -= from_pockets[k]
+            vil.home_items[k] -= n - from_pockets[k]
+        kept = max(0, makes - room)  # what doesn't fit in the pockets stays at home
+        vil.inventory[r] += makes - kept
+        vil.home_items[r] += kept
+        used_home = {k: n - from_pockets[k] for k, n in needs.items() if n > from_pockets[k]}
+        msg = f"crafted {_a(r)}" if makes == 1 else f"crafted {makes} {r} pieces"
+        if used_home:
+            msg += f" (using {_fmt(Counter(used_home))} kept at home)"
+        if kept:
+            msg += f"; {kept} stayed at home: no room in your pockets"
+        return True, msg
 
     def _do_sell(self, vil, a, hour):
         items = a.get("items") or ({a["item"]: a.get("qty", 1)} if a.get("item") else {})
@@ -1119,6 +1233,20 @@ class Island:
             msg += " (" + "; ".join(problems) + ")"
         return bool(sold), msg
 
+    def tools_for_sale(self) -> dict[str, int]:
+        """Ready-made tools at Nook's Cranny (worlds with `tool_markup`): every tool, always, at its sell value times
+        the markup, so selling one back fetches what selling a crafted one does."""
+        mult = self.w["shops"]["cranny"].get("tool_markup")
+        if not mult:
+            return {}
+        f = self.price_factor()
+        return {r: int(round(self.w["recipes"][r]["price"] * mult * f)) for r in self.tool_recipes()}
+
+    def recipe_needs(self, recipe: str) -> str:
+        r = self.w["recipes"][recipe]
+        needs = ", ".join(f"{k} x{n}" for k, n in r["needs"].items())
+        return f"needs {needs}" + (f", makes {r['makes']}" if r.get("makes", 1) > 1 else "")
+
     def recipe_cards_for_sale(self) -> dict[str, int]:
         """Recipe cards at Nook's Cranny today: every tool, plus the day's one other card."""
         cr, f = self.w["shops"]["cranny"], self.price_factor()
@@ -1131,6 +1259,16 @@ class Island:
         shop = str(a.get("shop", "cranny")).lower()
         item = str(a.get("item", "")).lower()
         cards = self.recipe_cards_for_sale() if shop == "cranny" else {}
+        tools = self.tools_for_sale() if shop == "cranny" else {}
+        if item in tools:  # the tool itself; its card is "<tool> recipe"
+            price = tools[item]
+            if vil.bells < price:
+                return False, f"a new {item} costs {price} bells; you have {vil.bells}"
+            if self.space(vil) < 1:
+                return False, "pockets full"
+            vil.bells -= price
+            self.put_items(vil, {"items": {item: 1}})
+            return True, f"bought a new {item} for {price} bells ({self.w['tools']['uses']} uses)"
         r = recipe_of_card(item) or (item if item in cards else None)
         if r in cards:
             price = cards[r]
@@ -1283,6 +1421,10 @@ class Island:
             text = (f"Timmy and Tommy: We buy almost anything at a fixed price, and sell a small stock that changes "
                     f"every day, plus one recipe card. Recipe cards for tools ({tools}) are always in stock. "
                     f"For what you're carrying we'd pay: {offer}.")
+            if self.tools_for_sale():
+                text = text.replace(" are always in stock. ", " are always in stock, and so are the tools "
+                                    "themselves, ready to use, for more. A recipe card teaches you to make the "
+                                    "thing as often as you like. ")
         else:
             text = "The Able Sisters: We sell clothes, a few different ones every day. Others see what you wear."
         if who in ("tom nook", "isabelle") and getattr(self, "prompt_version", 1) >= 3 and vil.inventory[MAP] < 1:
@@ -1330,8 +1472,11 @@ class Island:
     def snapshot(self) -> dict:
         return {
             "day": self.day,
-            "villagers": {n: {"bells": v.bells, "loan": v.loan, "house": v.house, "items": v.items(),
+            "villagers": {n: {"bells": v.bells, "home_bells": v.home_bells, "loan": v.loan, "house": v.house,
+                              "items": v.items(),
+                              "home_items": {k: c for k, c in sorted(v.home_items.items()) if c > 0},
                               "inventory_value": sum(self.prices.get(k, 0) * c for k, c in v.inventory.items()),
+                              "home_value": sum(self.prices.get(k, 0) * c for k, c in v.home_items.items()),
                               "inventory": {k: c for k, c in sorted(v.inventory.items()) if c > 0},
                               "recipes": sorted(v.recipes), "interior": list(v.interior),
                               "wearing": dict(v.wearing)} for n, v in self.v.items()},

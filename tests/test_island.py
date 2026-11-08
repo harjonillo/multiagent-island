@@ -556,8 +556,9 @@ def test_tools_wear_out_and_recipe_cards_replace_them():
         assert isl.cranny_recipe not in isl.tool_recipes()
         assert set(isl.tool_recipes()) <= set(isl.recipe_cards_for_sale())
     a.bells = 5000
+    card = isl.recipe_cards_for_sale()["axe"]
     ok, msg = isl.act("A", {"do": "buy", "shop": "cranny", "item": "axe recipe"}, 10)
-    assert ok and "learned the axe recipe" in msg and "axe" in a.recipes and a.bells == 4500
+    assert ok and "learned the axe recipe" in msg and "axe" in a.recipes and a.bells == 5000 - card
     ok, msg = isl.act("A", {"do": "buy", "shop": "cranny", "item": "axe recipe"}, 10)
     assert ok and "kept the card" in msg and a.inventory["axe recipe"] == 1
     # A spare card handed over teaches the recipe to someone who doesn't know it.
@@ -1366,11 +1367,11 @@ def test_announcement_from_version_5_is_short_and_ends_with_a_fun_fact():
 def test_from_version_6_the_plaza_is_opt_in():
     from llmabm.island.prompts import island_rules
 
-    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=7)
     assert "Villagers meet at the plaza" in island_rules(sc.world, 10, version=5)
     assert '"plaza": true' in island_rules(sc.world, 10, version=6)
     with tempfile.TemporaryDirectory() as d:
-        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock", verbose=False)
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=7, backend_override="mock", verbose=False)
         _at_version(sim, 6).run(1)
         run = load_run(Path(d) / "run")
         going = {n: False for n in sc.villagers}  # nobody is going until a plan that day says so
@@ -1414,7 +1415,9 @@ def test_from_version_7_the_plaza_is_open_all_day_and_energy_is_planned():
         assert {(e["day"], e["agent"], e["hour"]) for e in visits} <= planned
         # The plaza turn doesn't say who else is there.
         turn = next(prompts.glob("d*_plaza_*.txt")).read_text()
-        assert "PHASE: plaza" in turn and "Here now" not in turn and "offers expire after 2 days" in turn
+        assert "PHASE: plaza" in turn and "Here now" not in turn
+        # Plaza trade offers until prompt version 12; from 12, trades happen in person.
+        assert ("offers expire after 2 days" in turn) == (sim.isl.prompt_version < 12)
         # The first plan splits the day's energy; later prompts show the plan against what was spent.
         first = next(prompts.glob("d001_p0_*.txt")).read_text()
         assert "Mental energy today: 150" in first and "First, decide how you'll spend" in first
@@ -1471,7 +1474,8 @@ def test_prompt_version_8_shows_what_you_have_and_what_changed_hands():
         assert "Tools you carry: " in text and "shovel" in text.split("Tools you carry: ")[1].split("\n")[0]
         assert "Inventory:" not in text and "Other things you carry: " in text
         va.recipes.add("shovel")
-        assert "shovel 500 (you know it)" in status_block(isl, va, "08:00") or "shovel" not in isl.recipe_cards_for_sale()
+        cards = isl.recipe_cards_for_sale()
+        assert "shovel" not in cards or f"shovel recipe {cards['shovel']} (you know it)" in status_block(isl, va, "08:00")
         # What changed hands is remembered by person, from both sides.
         isl.exchanges = [{"day": isl.day, "hour": 9, "how": "in person", "from": a, "to": b, "items": {"wood": 2},
                           "got": {}, "asked": True},
@@ -1482,7 +1486,8 @@ def test_prompt_version_8_shows_what_you_have_and_what_changed_hands():
         assert f"{b} traded you 1 loka fish for your 100 bells" in met
         night = reflect_prompt(isl, isl.v[b], 150, None, list(sim.offers.values()))
         assert f"{a} gave you 2 wood, which you had asked for" in night and "What you have tonight:" in night
-        assert "Since this morning:" in night and "Open requests and recent offers:" in night
+        assert "Since this morning:" in night and ("Open requests:" in night if isl.prompt_version >= 12
+                                                    else "Open requests and recent offers:" in night)
         assert "Write whatever you like, in any form" in night  # the page itself is still open
         # Older runs keep their wording.
         isl.prompt_version = 7
@@ -1526,7 +1531,7 @@ def test_prompt_version_9_conversations_end_when_someone_leaves():
         sim.energy.new_day()  # a fresh morning's energy, so nobody is too tired to talk
         n = len(isl.v[a].today)
         sim._chat(isl.day, 10, "plaza", a, b, None)
-        assert len(calls) == 5 and "then went their way" in isl.v[a].today[n]
+        assert len(calls) == 5 and "then you went your ways" in isl.v[a].today[n]  # told from their side (version 12)
 
 
 def test_prompt_version_10_trees_around_here_and_tools_breaking():
@@ -1594,3 +1599,181 @@ def test_clams_on_the_beach_make_fishing_bait():
     assert any("manila clam" in f for f in fun_facts(isl))
     isl.prompt_version = 10
     assert not any("manila clam" in f for f in fun_facts(isl))
+
+
+def test_prompt_version_12_pockets_and_home_are_apart():
+    isl = _island()
+    isl.prompt_version = 12
+    a = isl.v["A"]
+    a.inventory.clear()
+    a.bells = 1000
+    a.inventory.update({"wood": 4, "vaulting pole": 1})
+    assert isl.capacity(a) == isl.w["pockets"]  # house storage no longer adds to the pockets
+    # A tent keeps bells but no things.
+    assert a.house == 0 and isl.home_capacity(a) == 0
+    done = isl.stash(a, {"wood": 2, "bells": 400}, {})
+    assert "put away 400 bells" in done and any("tent has no room" in x for x in done)
+    assert a.bells == 600 and a.home_bells == 400 and a.inventory["wood"] == 4
+    assert isl.stash(a, {}, {"bells": 100}) == ["took out 100 bells"] and a.bells == 700 and a.home_bells == 300
+    # A house stores things; tools keep their wear while put away.
+    a.house = 1
+    isl.use_tool(a, "vaulting pole")
+    isl.use_tool(a, "vaulting pole")
+    assert isl.stash(a, {"wood": 3, "pole": 1}, {}) == ["put away 3 wood", "put away 1 vaulting pole"]
+    assert a.inventory["wood"] == 1 and a.inventory["vaulting pole"] == 0 and a.home_items["vaulting pole"] == 1
+    assert isl.stash(a, {}, {"vaulting pole": 1}) == ["took out 1 vaulting pole"] and isl._wear(a, "vaulting pole") == [2]
+    assert "none at home" in isl.stash(a, {}, {"apple": 1})[0]
+    # Crafting at home can use what is kept there; away from home it can't.
+    a.recipes.add("campfire")
+    isl.stash(a, {"wood": 1}, {})
+    a.home_items["wood"] += 2
+    ok, msg = isl.act("A", {"do": "craft", "recipe": "campfire"}, 9)
+    assert not ok and "short wood x3" in msg
+    ok, msg = isl.act("A", {"do": "craft", "recipe": "campfire", "_at_home": True}, 9)
+    assert ok and "kept at home" in msg and a.home_items["wood"] == 3 and a.inventory["campfire"] == 1  # 6 at home, 3 used
+    # Older runs keep one pile.
+    isl.prompt_version = 11
+    assert isl.capacity(a) == isl.w["pockets"] + isl.w["house_levels"][1]["storage"]
+
+
+def test_prompt_version_12_what_villagers_know_and_who_did_what():
+    from llmabm.island.prompts import (REQUEST_DAYS, encounter_prompt, last_chat_with, plan_prompt, status_block,
+                                       turn_act_text)
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
+        sim.run(2)
+        isl = sim.isl
+        assert isl.prompt_version >= 12
+        a, b = sorted(isl.v)[:2]
+        va = isl.v[a]
+        va.inventory["vaulting pole"] = 1
+        va.wear["vaulting pole"] = [25]
+        va.home_bells = 250
+        text = status_block(isl, va, "08:00")
+        assert "vaulting pole (5 uses left)" in text and "Kept at home (" in text and "250 bells" in text
+        assert "in your wallet" in text and "pays when you sell it there" in text
+        # The shop: things say what they are, tools are for sale ready-made, and cards are named as cards
+        # without what they need (that comes with learning one).
+        tools, cards = isl.tools_for_sale(), isl.recipe_cards_for_sale()
+        pole = tools["vaulting pole"]
+        assert pole == round(isl.w["recipes"]["vaulting pole"]["price"] * 4 * isl.price_factor())
+        assert "- tools, ready to use (30 uses each): " in text and f"vaulting pole {pole}" in text
+        assert f"vaulting pole recipe {cards['vaulting pole']}" in text
+        assert "needs wood x5" not in text.split("Nook's Cranny today")[1]
+        assert "sapling" not in isl.cranny_stock or "(a young tree: plant it" in text
+        va.bells, va.recipes = 5000, va.recipes - {"vaulting pole"}
+        va.inventory["vaulting pole"], va.wear["vaulting pole"] = 0, []
+        ok, msg = isl._do_buy(va, {"shop": "cranny", "item": "vaulting pole"}, 10)
+        assert ok and msg == f"bought a new vaulting pole for {pole} bells (30 uses)" and va.bells == 5000 - pole
+        assert va.inventory["vaulting pole"] == 1 and va.wear["vaulting pole"] == [0]
+        assert "vaulting pole" not in va.recipes
+        ok, msg = isl._do_buy(va, {"shop": "cranny", "item": "vaulting pole recipe"}, 10)
+        assert ok and "learned the vaulting pole recipe (needs wood x5)" in msg
+        assert va.bells == 5000 - pole - cards["vaulting pole"]
+        assert "vaulting pole (wood x5;" in status_block(isl, va, "08:00").split("Recipes you know: ")[1]
+        # Requests say who wants what from whom, and lapse.
+        isl.favors = [{"id": "f1", "day": isl.day, "asker": b, "asked": a, "items": {"wood": 1}, "status": "open",
+                       "done_day": None}]
+        assert f"{b} wants 1 wood from you" in status_block(isl, va, "08:00")
+        assert f"you want 1 wood from {a}" in status_block(isl, isl.v[b], "08:00")
+        # Conversation tags are told from each side.
+        t = {"speaker": b, "text": "here", "act": "gave 1 wood; asked for 1 fishing bait",
+             "acts": [{"kind": "gave", "items": {"wood": 1}}, {"kind": "asked", "items": {"fishing bait": 1}}]}
+        assert turn_act_text(t, a, b) == f"{b} handed you 1 wood; {b} asked you for 1 fishing bait"
+        assert turn_act_text(t, b, a) == f"you handed {a} 1 wood; you asked {a} for 1 fishing bait"
+        bad = {"speaker": b, "text": "", "act": "x", "acts": [{"kind": "failed", "items": {"fishing bait": 2},
+                                                             "why": "tried to give 2 fishing bait but had no fishing bait"}]}
+        assert turn_act_text(bad, a, b) == f"{b} tried to hand you 2 fishing bait but {b} had no fishing bait"
+        assert turn_act_text(bad, b, a) == f"you tried to hand {a} 2 fishing bait but you had no fishing bait"
+        # The last conversation before today, and give/ask start empty.
+        isl.chats = [{"day": isl.day - 1, "hour": 9, "place": "river", "a": b, "b": a, "visit": False, "turns": [t]}]
+        assert "at the river" in last_chat_with(isl, a, b) and f"[{b} handed you 1 wood" in last_chat_with(isl, a, b)
+        met = encounter_prompt(isl, va, b, "out for a walk", 10, [t], opener=False)
+        assert "The last time you talked with" in met and "out on a walk" in met and '"give": {} or {' in met
+        from llmabm.island.prompts import at_place
+        assert at_place("river") == "at the river" and at_place("Nook's Cranny") == "at Nook's Cranny"
+        assert "In your pockets right now:" in met
+        # The home option is offered only to someone planning at home.
+        isl.at_home = {a: True}
+        assert '"home": {"store"' in plan_prompt(isl, va, 7, 12, 5, [])
+        isl.at_home = {a: False}
+        assert '"home": {"store"' not in plan_prompt(isl, va, 7, 12, 5, [])
+        # Requests lapse after REQUEST_DAYS days.
+        isl.favors[0]["day"] = isl.day - REQUEST_DAYS + 1
+        sim.run(1)
+        assert sim.isl.favors[0]["status"] == "expired"
+
+
+def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied():
+    from llmabm.island.prompts import encounter_prompt, exchange_line, open_trade, plaza_prompt, turn_act_text
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
+        sim.run(1)
+        events = []
+        sim.log = lambda type_, **data: events.append({"type": type_, **data})  # the run's log is closed
+        isl = sim.isl
+        a, b = sorted(isl.v)[:2]
+        va, vb = isl.v[a], isl.v[b]
+        va.inventory["wood"], va.bells = 5, 0
+        vb.inventory["wood"], vb.inventory["fishing bait"], vb.bells = 0, 2, 0
+        isl.favors = [{"id": "f1", "day": isl.day, "asker": a, "asked": b, "items": {"fishing bait": 1},
+                       "status": "open", "done_day": None},
+                      {"id": "f2", "day": isl.day, "asker": b, "asked": a, "items": {"wood": 2},
+                       "status": "open", "done_day": None}]
+        # a offers 2 wood for 1 bait; b sees it on the table and can accept.
+        turns = []
+        t1 = {"speaker": a, "text": "swap?"}
+        sim._chat_acts(isl.day, a, b, {"trade": {"give": {"wood": 2}, "want": {"fishing bait": 1}}}, t1, turns)
+        turns.append(t1)
+        assert turn_act_text(t1, b, a) == f"{a} offered you 2 wood for your 1 fishing bait"
+        assert turn_act_text(t1, a, b) == f"you offered {b} 2 wood for 1 fishing bait"
+        assert open_trade(turns)["proposer"] == a and va.inventory["wood"] == 5  # nothing moves on an offer
+        pb = encounter_prompt(isl, vb, a, "river", 10, turns, opener=False)
+        assert f"On the table: {a} offers you 2 wood for your 1 fishing bait" in pb and '"accept": true | false' in pb
+        pa = encounter_prompt(isl, va, b, "river", 10, turns, opener=False)
+        assert "waiting for" in pa and '"accept"' not in pa  # you can't accept your own offer
+        t2 = {"speaker": b, "text": "deal"}
+        sim._chat_acts(isl.day, b, a, {"accept": True}, t2, turns)
+        turns.append(t2)
+        assert va.inventory["wood"] == 3 and va.inventory["fishing bait"] == 1
+        assert vb.inventory["wood"] == 2 and vb.inventory["fishing bait"] == 1
+        assert turn_act_text(t2, b, a) == f"you accepted: you gave {a} 1 fishing bait and got 2 wood"
+        assert turn_act_text(t2, a, b) == f"{b} accepted: you gave {b} 2 wood and got 1 fishing bait"
+        assert open_trade(turns) is None
+        assert [e["type"] for e in events if e["type"].startswith("trade")] == ["trade_proposed", "trade"]
+        # Both requests were met by the trade, and are counted as met in a trade.
+        assert [(f["status"], f.get("by")) for f in isl.favors] == [("done", "trade"), ("done", "trade")]
+        e = isl.exchanges[-1]
+        assert exchange_line(e, a) == (f"you traded {b} 2 wood (which {b} had asked for) for 1 fishing bait "
+                                       "(which you had asked for)")
+        # A trade someone can't hold up their end of moves nothing; accepting with nothing on the table says so.
+        t3 = {"speaker": a, "text": ""}
+        sim._chat_acts(isl.day, a, b, {"trade": {"give": {"bells": 500}, "want": {"wood": 1}}}, t3, turns)
+        turns.append(t3)
+        t4 = {"speaker": b, "text": ""}
+        sim._chat_acts(isl.day, b, a, {"accept": True}, t4, turns)
+        turns.append(t4)
+        assert vb.inventory["wood"] == 2 and va.bells == 0
+        assert turn_act_text(t4, b, a) == ("you accepted, but the trade fell through, nothing changed hands: "
+                                           f"{a} had no bells")
+        t5 = {"speaker": a, "text": ""}
+        sim._chat_acts(isl.day, a, b, {"accept": True}, t5, turns)
+        assert turn_act_text(t5, a, b) == f"you accepted, but {b} had no trade on the table"
+        # The plaza: no offers; posts have numbers, and only their author can take them down.
+        txt = plaza_prompt(isl, va, 18, [], isl.board)
+        assert '"take_down"' in txt and '"offers"' not in txt and "doesn't bind anyone" in txt
+        isl.board, sim.hour = [], 18
+        sim._apply_evening(isl.day, 0, a, {"board": "bait for sale", "offers": [{"to": b, "give": {"wood": 1},
+                                                                                "want": {"bells": 9}}]})
+        assert not sim.offers and isl.board[-1][1:] == (a, "bait for sale", isl.board[-1][3])
+        bid = isl.board[-1][3]
+        assert f"[{bid}] (day {isl.day}) you: bait for sale" in plaza_prompt(isl, va, 18, [], isl.board)
+        assert f"[{bid}] (day {isl.day}) {a}: bait for sale" in plaza_prompt(isl, vb, 18, [], isl.board)
+        sim._apply_evening(isl.day, 0, b, {"take_down": [bid]})
+        assert isl.board and "it isn't yours" in vb.today[-1]
+        sim._apply_evening(isl.day, 0, a, {"take_down": bid})
+        assert not isl.board and va.today[-1].endswith(f"took down your board post [{bid}]")

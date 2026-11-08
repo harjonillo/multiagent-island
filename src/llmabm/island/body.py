@@ -66,6 +66,11 @@ class Bodies:
             for note in notes:
                 self.isl.v[name].today.append(f"on the way home, {note}")
 
+    def at_home(self, name: str) -> bool:
+        """Whether the villager is at their own home right now."""
+        home, body = self.home_point(name), self.b[name]
+        return home is not None and body.place == "home" and body.pos is not None and tuple(body.pos) == tuple(home)
+
     def place_at_home(self, name: str) -> None:
         home = self.home_point(name)
         self.b[name].pos, self.b[name].place = (tuple(home) if home else None), "home"
@@ -112,7 +117,7 @@ class Bodies:
             notes = self._trip_wear(name, body.pos, target)
             body.walked_today += d
             body.pos = tuple(target)
-        act = {**action, **extra, **({"_tool": need} if need else {})}
+        act = {**action, **extra, **({"_tool": need} if need else {}), **({"_at_home": True} if place == "home" else {})}
         ok, res = self.isl.act(name, act, hour)
         self.space.after_act(self.isl, name, act, ok)
         if ok and need and not act.get("none_seen"):  # looking around without finding anything doesn't wear it

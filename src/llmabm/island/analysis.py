@@ -18,7 +18,8 @@ def snapshots(run: Run) -> list[dict]:
 
 
 def net_worth(snap: dict) -> dict[str, int]:
-    return {n: v["bells"] + v["inventory_value"] - v["loan"] for n, v in snap["villagers"].items()}
+    return {n: v["bells"] + v.get("home_bells", 0) + v["inventory_value"] + v.get("home_value", 0) - v["loan"]
+            for n, v in snap["villagers"].items()}
 
 
 def gini(xs: list[float]) -> float:
@@ -213,8 +214,11 @@ def trade_stats(run: Run) -> dict:
         elif set(g) == {"bells"} and "bells" not in w and t["want_cranny_value"]:
             ratios.append(g["bells"] / t["want_cranny_value"])
     status = Counter(final.get(o["id"], "pending") for o in offers)
+    proposed = run.of("trade_proposed")  # prompt version 12: trades offered in person
+    if proposed:
+        status["fell through in person"] = len(run.of("trade_failed"))
     pairs = Counter(tuple(sorted((t["seller"], t["buyer"]))) for t in trades)
-    return {"n_offers": len(offers), "n_trades": len(trades), "status": status,
+    return {"n_offers": len(offers) + len(proposed), "n_trades": len(trades), "status": status,
             "counters": sum(1 for o in offers if o.get("parent")), "price_ratios": ratios, "pairs": pairs}
 
 
@@ -441,11 +445,15 @@ def social_ties_lines(run: Run, names: list[str]) -> list[str]:
     got = Counter(g["receiver"] for g in gifts if g["ok"])
     L = ["", f"Visits: {len(visits)} knocks, {sum(let_in.values())} let in. "
          f"Gifts: {sum(gave.values())} ({sum(1 for g in gifts if g['ok'] and g['how'] == 'in person')} in person). "
-         f"Favors: {len(asked)} asked, {len(done)} done.",
-         f"  {'':<8} {'knocked':>8} {'let in':>7} {'hosted':>7} {'gave':>5} {'got':>4} {'asked':>6} {'did':>4}"]
+         f"Favors: {len(asked)} asked, {sum(1 for f in done if f.get('by') != 'trade')} done as gifts, "
+         f"{sum(1 for f in done if f.get('by') == 'trade')} met in trades.",
+         f"  {'':<8} {'knocked':>8} {'let in':>7} {'hosted':>7} {'gave':>5} {'got':>4} {'asked':>6} {'did':>4} "
+         f"{'traded':>7}"]
     for n in names:
         L.append(f"  {n:<8} {made[n]:>8} {let_in[n]:>7} {hosted[n]:>7} {gave[n]:>5} {got[n]:>4} "
-                 f"{sum(1 for f in asked if f['asker'] == n):>6} {sum(1 for f in done if f['asked'] == n):>4}")
+                 f"{sum(1 for f in asked if f['asker'] == n):>6} "
+                 f"{sum(1 for f in done if f['asked'] == n and f.get('by') != 'trade'):>4} "
+                 f"{sum(1 for f in done if f['asked'] == n and f.get('by') == 'trade'):>7}")
     pairs = Counter(tuple(sorted((g["giver"], g["receiver"]))) for g in gifts if g["ok"])
     if pairs:
         L.append("  gift pairs: " + ", ".join(f"{a}-{b} x{k}" for (a, b), k in pairs.most_common(5)))
@@ -634,7 +642,14 @@ def _social_lines(hev: list[dict]) -> list[str]:
         elif t == "favor_asked":
             out.append(f"{e['asker']} asked {e['asked']} for {_side(e['items'])} [{e['id']}]")
         elif t == "favor_done":
-            out.append(f"{e['asked']} did {e['asker']}'s favor [{e['id']}] (asked on day {e['asked_day']})")
+            out.append(f"{e['asked']} did {e['asker']}'s favor [{e['id']}] (asked on day {e['asked_day']})"
+                       + (" in a trade" if e.get("by") == "trade" else ""))
+        elif t == "trade_proposed":
+            out.append(f"{e['proposer']} offered {e['to']} {_side(e['give'])} for {_side(e['want'])} in person")
+        elif t == "trade_failed":
+            out.append(f"{e['accepter']} accepted {e['proposer']}'s trade, but it fell through: {e['problem']}")
+        elif t == "board_removed":
+            out.append(f"{e['author']} took down board post [{e['id']}]")
         elif t == "sighting":
             out.append(f"{e['agent']} spotted " + "; ".join(e["seen"]))
         elif t == "arrival":

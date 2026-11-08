@@ -102,7 +102,8 @@ island:
                                    # clam a villager digs teaches them the fishing bait recipe: 1 clam makes 1 bait
   catch_fail_rate: 0.15            # a fish or bug action can come up empty
 
-pockets: 40                        # item slots everyone carries; house storage adds to this
+pockets: 40                        # item slots everyone carries. Before prompt version 12 house storage adds to
+                                   # this; from version 12 home storage is apart, reachable only at home
 
 house_levels:                      # upgrading takes a Tom Nook loan for `cost`; no interest, no deadline
   # interior: how many pieces of furniture fit inside (decorating; visitors see them)
@@ -348,8 +349,10 @@ shops:
       simple wooden fence: 100
       iron fence: 280
     sells_recipe_daily: true       # one random DIY recipe card per day (never a tool)
-    recipe_price: 2000
-    tool_recipe_price: 500         # every tool's recipe card, always in stock
+    recipe_price: 800              # ASSUMPTION: cheaper than ACNH's, so a card is worth buying
+    tool_recipe_price: 200         # every tool's recipe card, always in stock
+    tool_markup: 4                 # every tool, ready-made, always in stock at 4x its sell value
+                                   # (so selling one back fetches what a crafted one does)
   able:
     name: Able Sisters
     sells_daily: 4                 # drawn from `clothing` above
