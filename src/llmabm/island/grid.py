@@ -1233,6 +1233,8 @@ class GridSpace(Space):
         r = self.sight
         known = self.known.setdefault(name, set())
         seen = self.seen_ids.setdefault(name, set())
+        just = self.__dict__.setdefault("just_seen", {})
+        just[name] = []  # bugs and fish shadows first seen this hour, for a decision to go after one (version 14)
         notes = []
         for spots, word in ((self.shells, "shells on the beach"), (self.dig_spots, "fossil dig spots"),
                             (getattr(self, "clam_spots", []), "clam spots on the beach")):
@@ -1249,6 +1251,7 @@ class GridSpace(Space):
                 notes.append(f"{_article(c['species'])} {self.HAB_WORD.get(c['habitat'], '')} ({self._near_text(c['cell'])})")
             else:
                 notes.append(f"a {c['size']} fish shadow in the {c['habitat']} ({self._near_text(c['cell'])})")
+            just[name].append({**c, "text": notes[-1]})
         if notes:
             sp = island.__dict__.setdefault("spotted", {})
             sp[name] = (sp.get(name, []) + [f"{clock(hour)} {n}" for n in notes])[-8:]

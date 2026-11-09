@@ -2,6 +2,13 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-09 23:00
+  what: Prompt version 14, going after what you spot
+  when: new runs from now on; running ones keep theirs unless resumed with --prompt-version 14
+  details:
+    - "when a bug or fish shadow first comes into view, a villager who carries the net or fishing rod for it, is awake the next hour and has an action for it (or an action planned then to give up) decides in a small call whether to go after it the next hour (PHASE: spot, charged as thinking). Going after it replaces what was planned for that hour; it uses one of the day's actions only if the hour was free"
+    - "at most 3 such calls a villager a day (sightings.max_decisions_per_day). Logged as spot_decision. Shells and dig spots, which stay all day, don't ask"
+    - "before, plans were the only way to act on a sighting: in test1 on day 7, Cal spotted 14 things and caught 1 fish"
 - time: 2026-11-09 14:00
   what: Prompt version 13, trades in a conversation, shorter prompts and a clearer action menu
   when: new runs from now on; running ones keep theirs unless resumed with --prompt-version 13

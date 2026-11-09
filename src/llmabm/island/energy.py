@@ -55,7 +55,7 @@ class MentalEnergy:
         self.reasoning = {n: defaultdict(float) for n in names}  # hidden reasoning tokens today, by call type
         self.cost_sum = defaultdict(float)     # call type -> points, for "typical cost" hints
         self.cost_n = defaultdict(int)
-        self.estimates = {"plan": 12, "notice": 3, "chat": 8, "evening": 12, "reflect": 5, **(cfg.get("estimates") or {})}
+        self.estimates = {"plan": 12, "notice": 3, "spot": 3, "chat": 8, "evening": 12, "reflect": 5, **(cfg.get("estimates") or {})}
         self._pending: list[tuple] = []
         self._lock = threading.Lock()
         self.plans: dict[str, dict | None] = {n: None for n in names}  # today's split, from version 7

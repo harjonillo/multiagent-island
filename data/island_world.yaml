@@ -34,6 +34,12 @@ weather:                           # one weather per day, drawn from these odds;
   autumn: {sunny: 0.45, cloudy: 0.30, rain: 0.25}
   winter: {sunny: 0.35, cloudy: 0.30, snow: 0.35}
 
+sightings:
+  # From prompt version 14: when a bug or fish shadow first comes into view, a villager who
+  # carries the net or rod for it, is awake next hour and has an action for it (or an action
+  # planned then to give up) decides in a small LLM call whether to go after it next hour.
+  max_decisions_per_day: 3
+
 encounters:
   # Three steps, as in ACNH. (1) After each hour, bodies notice who is near whom (no LLM).
   # (2) Each villager who notices someone makes a small LLM call: approach one of them

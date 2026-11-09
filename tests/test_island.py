@@ -1735,7 +1735,8 @@ def test_prompt_version_13_shorter_prompts_and_a_clearer_action_menu():
         assert isl.prompt_version >= 13
         a, b = sorted(isl.v)[:2]
         va = isl.v[a]
-        va.loan, va.home_bells, isl.ordinance, isl.pending_ordinance = 0, 250, "none", None
+        va.loan, va.home_bells, va.house, isl.ordinance, isl.pending_ordinance = 0, 250, 0, "none", None
+        va.home_items.clear()
         va.inventory["wood"], va.home_items["wood"] = 7, 0
         va.recipes = va.recipes | {"log stool"}
         isl.favors = [{"id": "f1", "day": isl.day, "asker": b, "asked": a, "items": {"wood": 1}, "status": "open",
@@ -1954,3 +1955,59 @@ def test_site_page_opening_skips_a_heading_only_first_line():
     long = "Day 0. Arrived at dawn and set up my tent by the river."
     assert page_opening(long + "\nRest.") == (long, "Rest.")
     assert page_opening("") == ("", "") and page_opening("Short.") == ("Short.", "")
+
+
+def test_prompt_version_14_going_after_what_you_spot():
+    from llmabm.island.prompts import spot_prompt
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
+        sim.run(1)
+        assert sim.prompt_version >= 14
+        events, prompts = [], []
+        sim.log = lambda type_, **data: events.append({"type": type_, **data})
+        isl = sim.isl
+        a = sorted(isl.v)[0]
+        va = isl.v[a]
+        wake, _ = isl.awake_window(a)
+        h = wake + 2
+        fish = {"id": "t-fish", "kind": "fish", "habitat": "river", "size": "large", "species": "loka fish",
+                "cell": (1, 1), "text": "a large fish shadow in the river (somewhere)"}
+        sim.space.critters = sim.space._crit() + [fish]
+        sim.spots_today, sim.used = {}, {n: 0 for n in isl.v}
+        go = {"go": 1}
+
+        def call(name, user, *args, **kw):
+            prompts.append(user)
+            return None, dict(go), None
+        sim._call = call
+        # With a planned action next hour: going after it takes that hour, and the action count stays.
+        va.inventory["fishing rod"] = 1
+        sim.schedule = {h + 1: [(a, {"do": "chop_wood"})]}
+        sim.space.just_seen = {a: [fish]}
+        sim._spot_decisions(isl.day, h)
+        assert sim.schedule[h + 1] == [(a, {"do": "fish", "where": "river", "size": "large"})] and sim.used[a] == 0
+        assert "1. a large fish shadow in the river" in prompts[-1] and "you planned: chop_wood" in prompts[-1]
+        assert "instead of what you planned" in prompts[-1] and '"go": <the number' in prompts[-1]
+        assert events[-1]["type"] == "spot_decision" and events[-1]["outcome"] == "went after it, instead of chop_wood"
+        assert "went after it at" in va.today[-1]
+        # A free hour: it uses one of the day's actions; letting it be changes nothing.
+        sim.schedule = {}
+        sim._spot_decisions(isl.day, h)
+        assert sim.schedule[h + 1][0][1]["do"] == "fish" and sim.used[a] == 1
+        go["go"] = 0
+        sim.schedule = {}
+        sim._spot_decisions(isl.day, h)
+        assert not sim.schedule.get(h + 1) and events[-1]["outcome"] == "let it be"
+        # Not asked without the rod, past the day's cap, or with no actions left and nothing planned.
+        n = len(prompts)
+        va.inventory["fishing rod"] = 0
+        sim._spot_decisions(isl.day, h)
+        va.inventory["fishing rod"] = 1
+        sim.spots_today[a] = 3
+        sim._spot_decisions(isl.day, h)
+        sim.spots_today[a], sim.used[a] = 0, sc.world["calendar"]["actions_per_day"]
+        sim._spot_decisions(isl.day, h)
+        assert len(prompts) == n
+        assert "at home." in spot_prompt(isl, va, "home", h, ["x"], None, 3, 10)

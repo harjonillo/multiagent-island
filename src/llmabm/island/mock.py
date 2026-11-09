@@ -232,6 +232,13 @@ def encounter_reply(prompt: str, rng: random.Random) -> str:
     return json.dumps(out)
 
 
+def spot_reply(prompt: str, rng: random.Random) -> str:
+    """Prompt version 14: go after something just spotted, about half the time."""
+    n = len(re.findall(r"^\d+\. ", prompt, re.M))
+    go = rng.randint(1, n) if n and rng.random() < 0.5 else 0
+    return json.dumps({"thoughts": "worth a try" if go else "not now", "go": go})
+
+
 def notice_reply(prompt: str, rng: random.Random) -> str:
     near = re.search(r"^Nearby: (.*)\.$", prompt, re.M).group(1).split(", ")
     if rng.random() < 0.4:

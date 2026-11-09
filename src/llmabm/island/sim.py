@@ -36,7 +36,7 @@ from ..llm import DailyLimit, LLMError
 from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, TRADE_TRIES, _count, keep_chat, open_trade,
                       problem_text, trade_tries, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, OFFER_DAYS,
                       REQUEST_DAYS, at_place, turn_act_text,
-                      encounter_prompt, evening_prompt, plaza_prompt,
+                      encounter_prompt, evening_prompt, plaza_prompt, spot_prompt, action_text,
                       announcement_text, inbox_text, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
                       isabelle_summary_prompt, plan_prompt, system_prompt)
@@ -536,6 +536,7 @@ class IslandSimulation:
         self.noticed = {n: [] for n in isl.v}
         self.chats_today = {n: 0 for n in isl.v}
         self.decisions_today = {n: 0 for n in isl.v}
+        self.spots_today = {n: 0 for n in isl.v}
         if getattr(self, "prompt_version", 1) >= 6:  # the plaza is opt-in: nobody is going until a plan says so
             for n in isl.v:
                 self.choices[n]["plaza"] = False
@@ -728,6 +729,75 @@ class IslandSimulation:
                 self._chat(d, h, self.bodies.b[name].place, name, target, _turn_cap(cfg),
                            opener={"speaker": name, "text": opener, "thoughts": _thoughts(obj), "error": err,
                                    "_obj": obj or {}})
+
+    SPOT_TOOL = {"fish": "fishing rod", "bug": "net"}
+
+    def _spot_decisions(self, d: int, h: int) -> None:
+        """Prompt version 14: a villager who has just seen a bug or fish shadow, carries the net or rod for it,
+        is awake next hour and has an action for it (or an action planned then to give up), decides in a small
+        call whether to go after one of them next hour. At most `sightings.max_decisions_per_day` such calls a
+        day each (default 3). Going after it replaces what was planned for that hour, if anything."""
+        isl = self.isl
+        just = getattr(self.space, "__dict__", {}).get("just_seen") or {}
+        cap = int((self.sc.world.get("sightings") or {}).get("max_decisions_per_day", 3))
+        budget = self.sc.world["calendar"]["actions_per_day"]
+        spots = self.__dict__.setdefault("spots_today", {})
+        nxt = h + 1
+        if not any(just.values()):
+            return
+        live = {c["id"] for c in self.space._crit()}
+        cands, planned, finds = [], {}, {}
+        for n, seen in just.items():
+            if not seen or not isl.is_awake(n, h) or not isl.is_awake(n, nxt) or spots.get(n, 0) >= cap:
+                continue
+            inv = isl.v[n].inventory
+            ok = [c for c in seen if c["id"] in live and inv[self.SPOT_TOOL[c["kind"]]] > 0]
+            mine = [act for m, act in self.schedule.get(nxt, []) if m == n]
+            act_planned = mine[0] if mine and str(mine[0].get("do")).lower() != "plaza" else None
+            if not ok or (act_planned is None and self.used[n] >= budget):
+                continue
+            cands.append(n)
+            planned[n], finds[n] = (mine[0] if mine else None), ok
+        if not cands:
+            return
+
+        def decide(name):
+            p = planned[name]
+            user = spot_prompt(isl, isl.v[name], self.bodies.b[name].place, h, [c["text"] for c in finds[name]],
+                               action_text(p) if p else None, budget - self.used[name], budget)
+            if not self.energy.can(name, self._need(name, user)):
+                return TIRED
+            return self._call(name, user, f"d{d:03d}_h{h % 24:02d}_spot", system=self.light_systems[name],
+                              max_tokens=400, kind="thinking", what="spot")
+
+        results = self._parallel(decide, cands)
+        for name in cands:
+            spots[name] = spots.get(name, 0) + 1
+            texts = [c["text"] for c in finds[name]]
+            if results[name] is TIRED:
+                self.energy.skip(name, "thinking")
+                self.log("spot_decision", day=d, hour=h, agent=name, seen=texts, planned=planned[name], go=None,
+                         outcome="too tired to decide", thoughts="", error=None, raw=None)
+                continue
+            reply, obj, err = results[name]
+            try:
+                go = int(str((obj or {}).get("go") or 0).strip().lstrip("#"))
+            except ValueError:
+                go = 0
+            act, outcome = None, "let it be"
+            if 1 <= go <= len(finds[name]):
+                c = finds[name][go - 1]
+                act = ({"do": "fish", "where": c["habitat"], "size": c["size"]} if c["kind"] == "fish"
+                       else {"do": "catch_bug", "where": c["habitat"], "species": c["species"]})
+                p = planned[name]
+                self.schedule[nxt] = [(m, a) for m, a in self.schedule.get(nxt, []) if m != name] + [(name, act)]
+                if p is None or str(p.get("do")).lower() == "plaza":
+                    self.used[name] += 1
+                outcome = "went after it" + (f", instead of {action_text(p)}" if p else "")
+                isl.v[name].today.append(f"{clock(h)} spotted {texts[go - 1]} and went after it at {clock(nxt)}"
+                                         + (f" instead of {action_text(p)}" if p else ""))
+            self.log("spot_decision", day=d, hour=h, agent=name, seen=texts, planned=planned[name], go=go or None,
+                     action=act, outcome=outcome, thoughts=_thoughts(obj), error=err, raw=reply.text if reply else None)
 
     def _chat(self, d: int, h: int, place: str, a: str, b: str, n_turns: int | None, opener: dict | None = None,
               visit: bool = False) -> None:
@@ -1199,6 +1269,8 @@ class IslandSimulation:
         busy: set[str] = set()
         self._visits(d, h, doing, ok_by, busy)
         self._encounters(d, h, [n for n in out if n not in busy], near)
+        if getattr(self, "prompt_version", 1) >= 14:
+            self._spot_decisions(d, h)
         villagers = {}
         for n, vil in isl.v.items():
             if isl.arrived[n] is None:

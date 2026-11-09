@@ -201,7 +201,8 @@ class MockBackend:
         rng = random.Random(hashlib.sha256(prompt.encode()).hexdigest())
         routes = {"PHASE: plan": island_mock.plan_reply,
                   "PHASE: isabelle": island_mock.isabelle_reply, "PHASE: encounter": island_mock.encounter_reply,
-                  "PHASE: notice": island_mock.notice_reply, "PHASE: reflect": island_mock.reflect_reply}
+                  "PHASE: notice": island_mock.notice_reply, "PHASE: reflect": island_mock.reflect_reply,
+                  "PHASE: spot": island_mock.spot_reply}
         fn = next((f for k, f in routes.items() if prompt.startswith(k)), island_mock.evening_reply)
         return Completion(fn(prompt, rng))
 

@@ -66,6 +66,9 @@ PROMPT_CHANGES = {
         "its instructions are shorter. The action menu says what fishing bait, visit and ask are for, and what "
         "isn't an action (talking, giving and trading; the board, letters and parcels; walking), and what each tool "
         "is for",
+    14: "going after what you spot: when a bug or fish shadow first comes into view and you carry the net or "
+        "fishing rod for it, you can decide right then to go after it the next hour (an action), instead of what "
+        "you had planned for that hour if anything",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -1190,6 +1193,34 @@ def notice_prompt(isl: Island, vil: Villager, place: str, hour: int, nearby: lis
         '{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", '
         '"say": "<your opening line if you approach, or empty>"}'
     )
+
+
+def spot_prompt(isl: Island, vil: Villager, place: str, hour: int, finds: list[str], planned: str | None,
+                left: int, budget: int) -> str:
+    """Prompt version 14: a bug or fish shadow just came into view; go after one of them next hour, or not."""
+    today = "\n".join(f"- {r}" for r in vil.today[-5:]) or "(nothing yet)"
+    nxt = clock(hour + 1)
+    en = getattr(isl, "energy", None)
+    return (
+        f"PHASE: spot\nDay {isl.day} ({isl.date_text()}), {clock(hour)}. You are {vil.name}, "
+        f"{'at home' if place == 'home' else at_place(place)}.\n"
+        "You just spotted:\n" + "\n".join(f"{i}. {f}" for i, f in enumerate(finds, 1)) + "\n"
+        f"Earlier today:\n{today}\n{memory_block(isl, vil, notes_limit=6, memories_limit=4)}\n"
+        + (f"At {nxt} you planned: {planned}.\n" if planned else f"At {nxt} you have nothing planned.\n")
+        + f"Actions left today: {left} of {budget}."
+        + (f" Mental energy left today: {round(en.left[vil.name])}." if en is not None and en.enabled else "") + "\n"
+        + f"\nYou can go after one of them at {nxt}: it takes that hour and is one of your actions"
+        + (", instead of what you planned" if planned else "")
+        + ". It may be gone by then or get away. You don't have to.\n"
+        "Respond with one JSON object and nothing else:\n"
+        '{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}'
+    )
+
+
+def action_text(act: dict) -> str:
+    """A planned action in a few words: "fish (where: river, size: large)"."""
+    rest = ", ".join(f"{k}: {v}" for k, v in act.items() if k not in ("do", "hour") and not str(k).startswith("_"))
+    return f"{act.get('do', '?')}" + (f" ({rest})" if rest else "")
 
 
 def reflect_prompt(isl: Island, vil: Villager, max_words: int, memory: dict | None = None,

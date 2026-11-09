@@ -266,6 +266,18 @@ looking around. A fish shows only its shadow size (tiny to huge) until it's caug
 and fossil dig spots are new every morning and are only known once seen. Each prompt lists
 what the villager spotted today, so a rare bug can be shared or kept quiet.
 
+**Going after what you spot, from prompt version 14.** Plans are made twice a day, so before
+version 14 a bug or fish shadow seen mid-morning could only be acted on at the next plan, by
+which time it was often gone. Now, when one first comes into view, a villager who carries the
+net or fishing rod for it, is awake the next hour and has an action for it (or an action planned
+then to give up) makes a small decision call (`PHASE: spot`, charged as thinking): what they just
+spotted, numbered; what they planned for the next hour; actions and energy left. They answer with
+`"go"`: the number of the one to go after, or 0. Going after it schedules `fish` (habitat and
+shadow size) or `catch_bug` (habitat and species) for the next hour, in place of what was planned;
+it uses one of the day's actions only if the hour was free. At most 3 such calls a villager a day
+(`sightings.max_decisions_per_day`). Logged as `spot_decision`. Shells and dig spots, which stay
+all day, don't ask.
+
 **Shared resources.** Everything refills at 05:00 unless noted.
 
 | resource | supply | notes |
