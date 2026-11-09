@@ -138,7 +138,7 @@ ORDINANCE_TEXT = {
 TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_clam": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 12  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+LATEST_PROMPT_VERSION = 13  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
 AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
 CLAM, BAIT = "manila clam", "fishing bait"  # dug on the beach (dig_clam); one clam crafts one bait
@@ -997,6 +997,16 @@ class Island:
                 return {"who": who, "item": k, "have": have}
         return None
 
+    def room_problem(self, who: str, out: dict, back: dict) -> dict | None:
+        """{"who", "room": True} if `who`'s pockets, handing over `out`, have no room for `back` (bells take none)."""
+        things = lambda side: sum(n for k, n in side.items() if k != "bells")  # noqa: E731
+        return {"who": who, "room": True} if self.space(self.v[who]) + things(out) < things(back) else None
+
+    def accept_problem(self, who: str, table: dict) -> dict | None:
+        """Prompt version 13: what stops `who` from holding up their side of the trade on the table (they give its
+        "want" and get its "give"), from their own pockets only: they lack something, or have no room."""
+        return self.lacking(who, table["want"]) or self.room_problem(who, table["want"], table["give"])
+
     def give_problem(self, giver: str, taker: str, items: dict) -> dict:
         """Why a gift in person can't go through: the giver lacks something, or else the taker has no room."""
         return self.lacking(giver, items) or {"who": taker, "room": True}
@@ -1010,14 +1020,10 @@ class Island:
         nothing moves. Only pockets count. Returns (True, None), or (False, what stopped it): {"who", "item",
         "have"} when someone lacks something, {"who", "room": True} when someone has no room."""
         va, vb = self.v[a], self.v[b]
-        lacks = self.lacking(a, give) or self.lacking(b, want)
-        if lacks:
-            return False, lacks
-        things = lambda side: sum(n for k, n in side.items() if k != "bells")  # noqa: E731
-        if self.space(vb) + things(want) < things(give):
-            return False, {"who": b, "room": True}
-        if self.space(va) + things(give) < things(want):
-            return False, {"who": a, "room": True}
+        problem = (self.lacking(a, give) or self.lacking(b, want)
+                   or self.room_problem(b, want, give) or self.room_problem(a, give, want))
+        if problem:
+            return False, problem
         pa, pb = self.take_items(va, give), self.take_items(vb, want)
         if pa:
             self.put_items(vb, pa)

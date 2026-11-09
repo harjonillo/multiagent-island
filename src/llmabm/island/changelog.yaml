@@ -2,6 +2,20 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-09 14:00
+  what: Prompt version 13, trades in a conversation, shorter prompts and a clearer action menu
+  when: new runs from now on; running ones keep theirs unless resumed with --prompt-version 13
+  details:
+    - "a conversation holds at most 3 trade offers, from both villagers together (like a villager in the game giving up after a few tries). Each turn says how many are left; after the third, \"trade\" is gone from the reply, and the last offer on the table can still be accepted"
+    - "on day 8 of test1, Ike and Ari put 8 trades on the table in one conversation (neither had the bait both wanted) until Ari was too tired to talk"
+    - "an offer past the third puts nothing on the table, tells both sides why, and is logged as trade_over"
+    - "the trade on the table is spelled out: \"On the table from Ike: you give 1 fishing bait (you have none), you get 1 wood.\" Before, it read \"Ike offers you 1 wood for your 1 fishing bait\", and on day 8 Ike and Ari each read the other's offer as giving them bait"
+    - "a trade offer's tag in the conversation reads the same way: \"[Ike's offer: you give 1 fishing bait, you get 1 wood]\", \"[your offer: you give 1 wood, you get 1 fishing bait]\" (was \"Ike offered you 1 wood for your 1 fishing bait\")"
+    - "\"accept\" is offered only if the accepter's own pockets can hold up their side: enough of what they'd give, and room for what they'd get. Otherwise the line says \"You can't accept it\" (with \"(no room)\" when that's why). What the proposer lacks isn't checked, so nobody learns the other's pockets that way; such a trade still falls through when accepted"
+    - "shorter prompts everywhere: no ordinance line when there is none and no loan line when nothing is owed; \"At home (a tent holds only bells): 0 bells\"; requests say \"(until day 8)\"; recipes \"log stool (wood x3; 7 in pockets)\"; \"Nook's Cranny buys at (prices you've heard)\"; and a shorter energy rule"
+    - "a conversation leaves out what only plans use: rocks, buildings and trees with their distances (the first Getting around line and the island map stay), what you spotted, the museum, the bridge, what shop goods are, and the energy plan. Pockets are listed once, next to the reply, and the instructions are shorter. On test1's day 8 checkpoint a conversation turn goes from about 1,600 words to about 1,230"
+    - "the action menu says bait uses 1 fishing bait from your pockets (leave it out if you have none), visit is for villagers (shops and services have their own actions), ask is for the NPCs only, and what isn't an action: talking, giving and trading (when you meet someone), the board, letters and parcels (at the plaza), and walking. Up to day 8 of test1, plans tried trade, post, talk, walk, travel or give as actions 22 times, fished with bait they didn't have 81 times, and tried to visit a building or NPC about 40 times"
+    - "the same goes for offering one: an offer the proposer's own pockets can't hold up (not enough of what they'd give, or no room for what they'd get) isn't put on the table, counts as one of the 3, tells both sides why, and is logged as trade_cant_offer"
 - time: 2026-11-08 23:49
   what: "test1: prompt version 12 and long-term memory"
   when: test1 only, from day 8 (the original checkpoint is checkpoint.pkl.before-v12-memory)

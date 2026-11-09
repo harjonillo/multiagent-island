@@ -30,6 +30,11 @@ def _inventory(prompt: str) -> dict[str, int]:
                 inv[k] = int(n)
             elif part.strip() not in ("none", "nothing", ""):
                 inv[part.strip()] = 1
+    if not inv and (m := re.search(r"^In your pockets right now: \d+ bells(?:, (.*))?$", prompt, re.M)):
+        for part in (m.group(1) or "").split(", "):  # prompt version 13: a conversation lists the pockets only here
+            k, _, n = part.strip().rpartition(" x")
+            if k and n.isdigit() and part.strip() != "nothing else":
+                inv[k] = int(n)
     return inv
 
 
@@ -80,7 +85,7 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
             acts.append({"do": "contribute_bridge", "bells": rng.randint(500, bells // 2)})
         elif r < 0.32:
             acts.append({"do": "upgrade_house"})
-        elif r < 0.35 and bells > 1000 and "Loan owed to Tom Nook: 0." not in prompt:
+        elif r < 0.35 and bells > 1000 and re.search(r"Loan owed to Tom Nook: [1-9]", prompt):  # none: no line (v13)
             acts.append({"do": "pay_loan", "bells": bells // 2})
         elif r < 0.45 and r >= 0.39:
             acts.append(rng.choice([
@@ -138,7 +143,7 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
         if '"energy": {"inward"' in prompt and rng.random() < 0.8:
             out["energy"] = {"inward": rng.randint(20, 80), "outward": rng.randint(20, 80)}
     if '"home": {"store"' in prompt and rng.random() < 0.3:  # prompt version 12: at home, put things away or take them out
-        kept = re.search(r"^Kept at home \([^)]*\): (\d+) bells(?:, (.*))?$", prompt, re.M)
+        kept = re.search(r"^(?:Kept at home|At home)(?: \([^)]*\))?: (\d+) bells(?:, (.*))?$", prompt, re.M)
         home_items = re.findall(r"([^,]+?) x(\d+)", (kept.group(2) or "") if kept else "")
         if home_items and rng.random() < 0.5:
             k, n = rng.choice(home_items)
@@ -206,9 +211,9 @@ def encounter_reply(prompt: str, rng: random.Random) -> str:
     other = next((g for g in m.groups() if g), "") if m else ""
     inv = _inventory(prompt)
     asked = re.findall(rf"{re.escape(other)} asked you for (\d+) ([^(;]+?) \(day", prompt) if other else []
-    asked += re.findall(rf"{re.escape(other)} wants (\d+) ([^(;]+?) from you \(asked", prompt) if other else []
-    table = re.search(r"^On the table: .+? offers you", prompt, re.M)
-    if table and '"accept": true | false' in prompt and rng.random() < 0.6:  # prompt version 12
+    asked += re.findall(rf"{re.escape(other)} wants (\d+) ([^(;]+?) from you \((?:asked|until)", prompt) if other else []
+    table = re.search(r"^On the table(: .+? offers you| from (?!you:))", prompt, re.M)  # versions 12 and 13
+    if table and '"accept": true | false' in prompt and rng.random() < 0.6:
         out["accept"] = True
         out["say"] = "Deal."
     elif asked and inv.get(asked[0][1].strip(), 0) >= int(asked[0][0]) and rng.random() < 0.7:

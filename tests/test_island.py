@@ -1515,8 +1515,13 @@ def test_prompt_version_9_conversations_end_when_someone_leaves():
         a, b = sorted(isl.v)[:2]
         turns = [{"speaker": b, "text": "Hi!"}]
         reply = encounter_prompt(isl, isl.v[a], b, "plaza", 10, turns, opener=False)
+        assert '"leave": true ends it after this line' in reply  # the version 13 wording
+        assert ("Each line costs about" in reply) == isl.energy.enabled
+        isl.prompt_version = 12
+        reply = encounter_prompt(isl, isl.v[a], b, "plaza", 10, turns, opener=False)
         assert '"leave": true' in reply and "You decide when to stop" in reply
         assert ("Each thing you say costs about" in reply) == isl.energy.enabled
+        isl.prompt_version = 13
         assert "last thing you can say" in encounter_prompt(isl, isl.v[a], b, "plaza", 10, turns, opener=False, last="turns")
         isl.prompt_version = 8
         assert '"leave"' not in encounter_prompt(isl, isl.v[a], b, "plaza", 10, turns, opener=False)
@@ -1649,7 +1654,7 @@ def test_prompt_version_12_what_villagers_know_and_who_did_what():
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
         sim.run(2)
         isl = sim.isl
-        assert isl.prompt_version >= 12
+        isl.prompt_version = sim.prompt_version = 12  # the version 12 wording; version 13 shortens some of it
         a, b = sorted(isl.v)[:2]
         va = isl.v[a]
         va.inventory["vaulting pole"] = 1
@@ -1719,6 +1724,120 @@ def test_prompt_version_12_what_villagers_know_and_who_did_what():
         assert sim.isl.favors[0]["status"] == "expired"
 
 
+def test_prompt_version_13_shorter_prompts_and_a_clearer_action_menu():
+    from llmabm.island.prompts import action_menu, encounter_prompt, island_rules, plan_prompt, status_block
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
+        sim.run(1)
+        isl = sim.isl
+        assert isl.prompt_version >= 13
+        a, b = sorted(isl.v)[:2]
+        va = isl.v[a]
+        va.loan, va.home_bells, isl.ordinance, isl.pending_ordinance = 0, 250, "none", None
+        va.inventory["wood"], va.home_items["wood"] = 7, 0
+        va.recipes = va.recipes | {"log stool"}
+        isl.favors = [{"id": "f1", "day": isl.day, "asker": b, "asked": a, "items": {"wood": 1}, "status": "open",
+                       "done_day": None}]
+        isl.spotted = {a: ["07:00 a fish shadow in the river"]}
+        isl.where_notes[a] = "You are at the beach.\nRocks: 1 (about 5 steps)\nBuildings: museum (about 9 steps)"
+        plan = status_block(isl, va, "08:00")
+        assert "Island ordinance" not in plan and "Loan owed" not in plan
+        assert "At home (a tent holds only bells): 250 bells" in plan and "Kept at home" not in plan
+        assert f"{b} wants 1 wood from you (until day {isl.day + 2})" in plan
+        assert "log stool (wood x3; 7 in pockets)" in plan
+        assert "Nook's Cranny buys at (prices you've heard):" in plan
+        assert "Museum:" in plan and "Rocks: 1" in plan and "You spotted today" in plan and "Tools you carry" in plan
+        va.loan, isl.ordinance = 5000, "bell_boom"
+        plan = status_block(isl, va, "08:00")
+        assert "Loan owed to Tom Nook: 5000." in plan and "Island ordinance: Bell Boom" in plan
+        # A conversation leaves out what only plans use, and lists the pockets once.
+        talk = encounter_prompt(isl, va, b, "river", 10, [{"speaker": b, "text": "hi"}], opener=False)
+        for gone in ("Museum:", "Bridge:", "Rocks: 1", "Buildings:", "You spotted today", "Tools you carry",
+                     "Typical costs", "(a young tree", "a card teaches you"):
+            assert gone not in talk, gone
+        assert "Getting around: You are at the beach." in talk and talk.count("wood x7") == 1
+        assert "In your pockets right now:" in talk and "Nook's Cranny today" in talk
+        assert ("Your island map:" in talk) == (va.inventory["island map"] > 0 and bool(isl.map_text))
+        assert "Reply, or say nothing to end it." in talk and "One or two sentences" in talk
+        # The rules and the action menu.
+        rules = island_rules(sc.world, 10, 13)
+        assert "back each morning" in rules and "Each morning you decide how much" not in rules
+        menu = action_menu(13)
+        assert "bait? (true uses 1 fishing bait from your pockets; if you have none, leave it out)" in menu
+        assert "Shops and services are reached by their own actions" in menu and "only, not villagers" in menu
+        assert "Not actions: talking, giving and trading happen when you meet someone" in menu
+        assert "Not actions" not in action_menu(12)
+        assert "Not actions" in sim.systems[a] and "Not actions" not in sim.talk_systems[a]
+
+
+def test_prompt_version_13_a_conversation_holds_at_most_three_trade_offers():
+    from llmabm.island.prompts import TRADE_TRIES, encounter_prompt, open_trade, trade_tries, turn_act_text
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
+        sim.run(1)
+        events = []
+        sim.log = lambda type_, **data: events.append({"type": type_, **data})
+        isl = sim.isl
+        assert isl.prompt_version >= 13 and TRADE_TRIES == 3
+        a, b = sorted(isl.v)[:2]
+        va, vb = isl.v[a], isl.v[b]
+        va.inventory["wood"], vb.inventory["fishing bait"] = 5, 1
+        turns = []
+        assert "Trade offers left in this conversation (from either of you): 3 of 3." in encounter_prompt(
+            isl, va, b, "river", 10, turns, opener=False)
+        for i, (sp, ot) in enumerate([(a, b), (b, a), (a, b)]):
+            t = {"speaker": sp, "text": "how about this?"}
+            give, want = ({"wood": i + 1}, {"fishing bait": 1}) if sp == a else ({"fishing bait": 1}, {"wood": 3})
+            sim._chat_acts(isl.day, sp, ot, {"trade": {"give": give, "want": want}}, t, turns)
+            turns.append(t)
+        assert trade_tries(turns) == 3 and open_trade(turns)["proposer"] == a
+        pb = encounter_prompt(isl, vb, a, "river", 10, turns, opener=False)
+        assert "Trade offers left in this conversation (from either of you): 0 of 3." in pb
+        assert '"trade":' not in pb and '"accept": true | false' in pb  # the last offer can still be accepted
+        assert (f"On the table from {a}: you give 1 fishing bait (you have 1), you get 3 wood. "
+                '"accept": true makes the trade.\n') in pb  # no "or offer another" with no tries left
+        # With nothing to hold up their side, there is no "accept", and the line says why.
+        vb.inventory["fishing bait"] = 0
+        pb = encounter_prompt(isl, vb, a, "river", 10, turns, opener=False)
+        assert (f"On the table from {a}: you give 1 fishing bait (you have none), you get 3 wood. "
+                "You can't accept it.\n") in pb and '"accept"' not in pb
+        assert isl.accept_problem(b, open_trade(turns)) == {"who": b, "item": "fishing bait", "have": 0}
+        vb.inventory["fishing bait"] = 1
+        isl.room_problem = lambda who, out, back: {"who": who, "room": True}
+        assert "You can't accept it (no room)." in encounter_prompt(isl, vb, a, "river", 10, turns, opener=False)
+        del isl.room_problem
+        # An offer the proposer's own pockets can't hold up isn't put on the table (version 13); it is a try.
+        turns2 = []
+        t0 = {"speaker": b, "text": "bait for wood?"}
+        sim._chat_acts(isl.day, b, a, {"trade": {"give": {"fishing bait": 5}, "want": {"wood": 1}}}, t0, turns2)
+        turns2.append(t0)
+        assert open_trade(turns2) is None and trade_tries(turns2) == 1
+        assert turn_act_text(t0, b, a, True) == ("your offer: you give 5 fishing bait, you get 1 wood, but you had "
+                                                 "only 1 fishing bait, so trade failed")
+        assert turn_act_text(t0, a, b, True) == (f"{b}'s offer: you give 1 wood, you get 5 fishing bait, but {b} had "
+                                                 "only 1 fishing bait, so trade failed")
+        assert events[-1]["type"] == "trade_cant_offer"
+        # A fourth offer puts nothing on the table, and both sides are told why.
+        t4 = {"speaker": b, "text": "one more?"}
+        sim._chat_acts(isl.day, b, a, {"trade": {"give": {"fishing bait": 1}, "want": {"wood": 1}}}, t4, turns)
+        turns.append(t4)
+        assert open_trade(turns)["proposer"] == a and trade_tries(turns) == 3
+        assert turn_act_text(t4, a, b) == f"{b} tried to offer another trade, but none were left"
+        assert [e["type"] for e in events if e["type"].startswith("trade")] == ["trade_proposed"] * 3 + ["trade_cant_offer", "trade_over"]
+        # Before version 13 there is no limit.
+        isl.prompt_version = sim.prompt_version = 12
+        pb = encounter_prompt(isl, vb, a, "river", 10, turns, opener=False)
+        assert '"trade":' in pb and "Trade offers left" not in pb
+        assert f"On the table: {a} offers you 3 wood for your 1 fishing bait" in pb  # the version 12 wording
+        t5 = {"speaker": b, "text": ""}
+        sim._chat_acts(isl.day, b, a, {"trade": {"give": {"fishing bait": 1}, "want": {"wood": 1}}}, t5, turns)
+        assert t5["acts"][-1]["kind"] == "proposed" and not t5["acts"][-1].get("over")
+
+
 def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied():
     from llmabm.island.prompts import encounter_prompt, exchange_line, open_trade, plaza_prompt, turn_act_text
 
@@ -1742,13 +1861,19 @@ def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied():
         t1 = {"speaker": a, "text": "swap?"}
         sim._chat_acts(isl.day, a, b, {"trade": {"give": {"wood": 2}, "want": {"fishing bait": 1}}}, t1, turns)
         turns.append(t1)
-        assert turn_act_text(t1, b, a) == f"{a} offered you 2 wood for your 1 fishing bait"
+        assert turn_act_text(t1, b, a) == f"{a} offered you 2 wood for your 1 fishing bait"  # version 12
         assert turn_act_text(t1, a, b) == f"you offered {b} 2 wood for 1 fishing bait"
+        assert turn_act_text(t1, b, a, True) == f"{a}'s offer: you give 1 fishing bait, you get 2 wood"  # 13
+        assert turn_act_text(t1, a, b, True) == "your offer: you give 2 wood, you get 1 fishing bait"
+        assert f"{a}: swap? [{a}'s offer: you give 1 fishing bait, you get 2 wood]" in encounter_prompt(
+            isl, vb, a, "river", 10, turns, opener=False)
         assert open_trade(turns)["proposer"] == a and va.inventory["wood"] == 5  # nothing moves on an offer
         pb = encounter_prompt(isl, vb, a, "river", 10, turns, opener=False)
-        assert f"On the table: {a} offers you 2 wood for your 1 fishing bait" in pb and '"accept": true | false' in pb
+        assert (f"On the table from {a}: you give 1 fishing bait (you have 2), you get 2 wood." in pb
+                and '"accept": true | false' in pb)
         pa = encounter_prompt(isl, va, b, "river", 10, turns, opener=False)
-        assert "waiting for" in pa and '"accept"' not in pa  # you can't accept your own offer
+        assert f"On the table from you: you give 2 wood, you get 1 fishing bait, if {b} accepts." in pa
+        assert '"accept"' not in pa  # you can't accept your own offer
         t2 = {"speaker": b, "text": "deal"}
         sim._chat_acts(isl.day, b, a, {"accept": True}, t2, turns)
         turns.append(t2)
@@ -1765,14 +1890,14 @@ def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied():
                                        "(which you had asked for)")
         # A trade someone can't hold up their end of moves nothing; accepting with nothing on the table says so.
         t3 = {"speaker": a, "text": ""}
-        sim._chat_acts(isl.day, a, b, {"trade": {"give": {"bells": 500}, "want": {"wood": 1}}}, t3, turns)
+        sim._chat_acts(isl.day, a, b, {"trade": {"give": {"wood": 1}, "want": {"fishing bait": 5}}}, t3, turns)
         turns.append(t3)
         t4 = {"speaker": b, "text": ""}
-        sim._chat_acts(isl.day, b, a, {"accept": True}, t4, turns)
+        sim._chat_acts(isl.day, b, a, {"accept": True}, t4, turns)  # not offered to b, but sent anyway
         turns.append(t4)
-        assert vb.inventory["wood"] == 2 and va.bells == 0
+        assert va.inventory["wood"] == 3 and vb.inventory["fishing bait"] == 1
         assert turn_act_text(t4, b, a) == ("you accepted, but the trade fell through, nothing changed hands: "
-                                           f"{a} had no bells")
+                                           "you had only 1 fishing bait")
         t5 = {"speaker": a, "text": ""}
         sim._chat_acts(isl.day, a, b, {"accept": True}, t5, turns)
         assert turn_act_text(t5, a, b) == f"you accepted, but {b} had no trade on the table"

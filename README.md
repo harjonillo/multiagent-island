@@ -379,6 +379,26 @@ adds:
 - unread letters, what they spotted, and on the grid, where they are, what tools they carry
   and what they can reach
 
+**Shorter prompts, from prompt version 13.** The ordinance line is left out when there is none
+and the loan when nothing is owed; home reads "At home (a tent holds only bells): 0 bells",
+requests "(until day 8)", recipes "log stool (wood x3; 7 in pockets)", and the price list
+"Nook's Cranny buys at (prices you've heard)". The energy rule is about a third shorter. A
+conversation turn leaves out what only plans use: the rocks, buildings and trees around with
+their distances (the first "Getting around" line and the island map stay), what they spotted,
+the museum, the bridge, what each shop good is, and the energy plan with its typical costs
+(the cost of a line stays). Pockets are listed once, next to the reply. The conversation
+instructions are shorter too. In test1's day 8 checkpoint this takes a conversation turn from
+about 1,600 words to about 1,230; plans lose about 50.
+
+**The action menu, from prompt version 13**, says what three of the actions are for, and what
+isn't an action: `bait` uses 1 fishing bait from the pockets (leave it out if you have none);
+`visit` is for villagers, and shops and services are reached by their own actions (buy, sell,
+donate, ask); `ask` is for the NPCs only, not villagers; and a closing line says talking,
+giving and trading happen when you meet someone (visit them to meet on purpose), the board,
+letters and parcels are at the plaza, and you walk wherever an action takes you. In test1 up to
+day 8, plans tried `trade`, `post`, `talk`, `walk`, `travel` and `give` as actions 22 times, fished
+with bait they didn't have 81 times, and tried to `visit` a building or NPC about 40 times.
+
 **Privacy.** Every reply has a `thoughts` field and an optional `note`. Both are private:
 villagers never see each other's. You see the thoughts in the logs, marked 🔒. Villagers are
 told that others only learn what they choose to say, what they are seen doing, and public
@@ -517,6 +537,24 @@ closes any open request it covers, either way round, and the request is marked a
 trade (`favor_done` with `"by": "trade"`), so the run summary counts favors done as gifts apart
 from requests met in trades. Logged as `trade_proposed`, `trade` (with `"how": "in person"`)
 and `trade_failed`.
+
+From prompt version 13 a conversation holds at most 3 trade offers (`TRADE_TRIES`), from both
+villagers together, counting ones that named nothing real. Each turn says how many are left;
+after the third, `"trade"` is gone from the reply template and the last offer can still be
+accepted. An offer past that puts nothing on the table, tells both sides why, and is logged as
+`trade_over`. The offer on the table is spelled out as what you'd give and get: "On the table
+from Ike: you give 1 fishing bait (you have none), you get 1 wood" ("On the table from you: you
+give 1 wood, you get 1 fishing bait, if Ike accepts"), since the version 12 wording ("Ike offers
+you 1 wood for your 1 fishing bait") was often read the wrong way round. `"accept"` is offered
+only if your own pockets can hold up your side (enough of what you'd give, room for what you'd
+get); otherwise the line says "You can't accept it" (or "(no room)"). What the
+proposer lacks isn't checked there, so the field doesn't give away their pockets; accepting
+such a trade still falls through, and both are told why. The same check applies to the proposer
+when they make an offer: one their own pockets can't hold up isn't put on the table, still counts
+as one of the 3, tells both sides why ("Ike's offer: you give 1 wood, you get 5 fishing bait,
+but Ike had only 1 fishing bait, so trade failed"), and is logged as `trade_cant_offer`. In the
+conversation so far, an offer's tag reads the same way: "[Ike's offer: you give 1 fishing bait,
+you get 1 wood]" and "[your offer: you give 1 wood, you get 1 fishing bait]".
 
 **Item names.** Villagers don't always use an item's exact name ("map" for `island map`, "bait"
 for `fishing bait`). Gifts, parcels and trade offers match what they say against what the giver

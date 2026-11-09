@@ -33,7 +33,8 @@ import yaml
 
 from ..agent import AgentSpec, load_agent_file
 from ..llm import DailyLimit, LLMError
-from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, _count, keep_chat, open_trade, problem_text, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, OFFER_DAYS,
+from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, TRADE_TRIES, _count, keep_chat, open_trade,
+                      problem_text, trade_tries, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, OFFER_DAYS,
                       REQUEST_DAYS, at_place, turn_act_text,
                       encounter_prompt, evening_prompt, plaza_prompt,
                       announcement_text, inbox_text, isabelle_announce_prompt,
@@ -787,7 +788,7 @@ class IslandSimulation:
                 else (f"ran into {other} {at_place(place)}" if v12 else f"ran into {other} at the {place}")
             if spoken:
                 lines = "; ".join(f'{"you" if t["speaker"] == me else other} said "{t["text"][:220]}"'
-                                  + (f" [{turn_act_text(t, me, other) if v12 else t['act']}]"
+                                  + (f" [{turn_act_text(t, me, other, self.prompt_version >= 13) if v12 else t['act']}]"
                                      if t.get("act") else "") for t in spoken)
                 isl.v[me].today.append(f"{clock(h)} {where}: {lines}")
             else:
@@ -834,18 +835,26 @@ class IslandSimulation:
         trade = obj.get("trade")
         if self.v12 and isinstance(trade, dict) and \
                 (_clean_side(trade.get("give")) or _clean_side(trade.get("want"))):
-            self._propose_trade(d, speaker, other, trade, acts, said)
+            self._propose_trade(d, speaker, other, trade, acts, said, turns or [])
         self._log_favors_done(d)
         if acts:
             turn["act"] = "; ".join(acts)
         if said:
             turn["acts"] = said
 
-    def _propose_trade(self, d: int, speaker: str, other: str, trade: dict, acts: list, said: list) -> None:
-        """Prompt version 12: put a trade on the table. It waits for the other's next turn."""
+    def _propose_trade(self, d: int, speaker: str, other: str, trade: dict, acts: list, said: list,
+                       turns: list) -> None:
+        """Prompt version 12: put a trade on the table. It waits for the other's next turn. From prompt version
+        13 a conversation holds at most TRADE_TRIES offers; one past that puts nothing on the table, and so does
+        one the proposer's own pockets can't hold up (not enough of what they give, or no room for what they get)."""
         isl = self.isl
         give = isl.resolve_side(speaker, _clean_side(trade.get("give")))
         want = isl.resolve_side(other, _clean_side(trade.get("want")))
+        if self.prompt_version >= 13 and trade_tries(turns) >= TRADE_TRIES:
+            acts.append("tried to offer another trade, but none were left")
+            said.append({"kind": "proposed", "give": give, "want": want, "over": True})
+            self.log("trade_over", day=d, proposer=speaker, to=other, give=give, want=want)
+            return
         unknown = isl.unknown_items({**give, **want})
         if unknown:
             acts.append(f"proposed a trade, but there's nothing called {' or '.join(unknown)} on this island")
@@ -853,6 +862,11 @@ class IslandSimulation:
         elif not (give and want):
             acts.append("proposed a trade with nothing on one side")
             said.append({"kind": "proposed", "give": give, "want": want, "one_sided": True})
+        elif self.prompt_version >= 13 and (problem := isl.lacking(speaker, give)
+                                            or isl.room_problem(speaker, give, want)):
+            acts.append(f"tried to offer a trade: {_count(give)} for {_count(want)}, but {problem_text(problem)}")
+            said.append({"kind": "proposed", "give": give, "want": want, "problem": problem})
+            self.log("trade_cant_offer", day=d, proposer=speaker, to=other, give=give, want=want, problem=problem)
         else:
             acts.append(f"offered a trade: {_count(give)} for {_count(want)}")
             said.append({"kind": "proposed", "give": give, "want": want})
