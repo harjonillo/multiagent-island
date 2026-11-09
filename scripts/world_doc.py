@@ -226,8 +226,11 @@ def items_section(w: dict) -> str:
             if info.get("outdoor") is False:
                 what += ", indoor only"
             shop_rows.append([k, "Nook's Cranny", note, n(v), what])
-    shop_rows.append([f"every tool's recipe card", "Nook's Cranny", "always in stock", n(cr.get("tool_recipe_price", 500)),
+    shop_rows.append([f"every tool's recipe card", "Nook's Cranny", "always in stock", n(cr["tool_recipe_price"]),
                       "learn to make that tool"])
+    if cr.get("tool_markup"):
+        shop_rows.append(["every tool, ready-made", "Nook's Cranny", "always in stock",
+                          f"{cr['tool_markup']}x its sell value", "a new tool"])
     shop_rows.append([f"one other recipe card", "Nook's Cranny", "1 a day, never a tool", n(cr["recipe_price"]),
                       "learn the recipe"])
     for k, v in (w.get("clothing") or {}).items():
@@ -310,14 +313,17 @@ def tools_section(w: dict) -> str:
     rows = [[k, wears.get(k, ""), needs(rec[k]["needs"]) if k in rec else ""]
             for k in t["start_with"] + [r for r in rec if (w.get("items") or {}).get(r, {}).get("kind") == "tool"
                                         and r not in t["start_with"]]]
+    mult = w["shops"]["cranny"].get("tool_markup")
+    ready = f", or the tool itself, ready-made ({mult}x its sell value)" if mult else ""
     return f"""## Tools
 
 Everyone starts with one of each, except the axe, which is an upgrade (its recipe card is at
 Nook's Cranny); nobody knows how to make them. Each breaks after {t['uses']}
 uses. Without the tool an action fails before the villager sets out. Villagers aren't told how worn a
-tool is; they find out when it breaks. A replacement takes the tool's recipe card (always at Nook's
-Cranny, {n(w['shops']['cranny'].get('tool_recipe_price', 500))} bells) and materials. Spare tools can be
-handed over or mailed, and a worn tool stays worn.
+tool is; they find out when it breaks (from prompt version 12 they see each tool's uses left). A
+replacement takes the tool's recipe card (always at Nook's Cranny,
+{n(w['shops']['cranny']['tool_recipe_price'])} bells) and materials{ready}. Spare tools can be handed over
+or mailed, and a worn tool stays worn.
 
 {table(["tool", "worn by", "made from"], rows)}
 """
@@ -339,7 +345,8 @@ def services_section(w: dict) -> str:
 | the Able Sisters | Able Sisters | {fmt_window(hrs['able'])} | sell clothes |
 | Blathers | museum | {fmt_window(hrs['museum'])} | takes the first of each fish, bug and fossil and keeps a public tally of donors; pays nothing; assesses fossils for free |
 
-Everyone carries {w['pockets']} items; a bigger house adds storage.
+Everyone carries {w['pockets']} items. From prompt version 12 a house's storage is room to keep things at
+home, reachable only there (a tent has none); before, it added to what you could carry.
 
 {houses}
 

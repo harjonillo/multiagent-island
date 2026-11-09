@@ -111,11 +111,12 @@ morning, and a villager only knows the ones they have seen. Fish and bugs come a
 ## Tools
 
 Everyone starts with one of each, except the axe, which is an upgrade (its recipe card is at
-Nook's Cranny); nobody knows how to make them. Each breaks after 50
+Nook's Cranny); nobody knows how to make them. Each breaks after 30
 uses. Without the tool an action fails before the villager sets out. Villagers aren't told how worn a
-tool is; they find out when it breaks. A replacement takes the tool's recipe card (always at Nook's
-Cranny, 500 bells) and materials. Spare tools can be
-handed over or mailed, and a worn tool stays worn.
+tool is; they find out when it breaks (from prompt version 12 they see each tool's uses left). A
+replacement takes the tool's recipe card (always at Nook's Cranny,
+200 bells) and materials, or the tool itself, ready-made (4x its sell value). Spare tools can be handed over
+or mailed, and a worn tool stays worn.
 
 | tool | worn by | made from |
 |---|---|---|
@@ -142,8 +143,9 @@ handed over or mailed, and a worn tool stays worn.
 | gold nugget | mine_rock, rarely | 10,000 |
 | apple | shake_tree; eat one to break_rock | 100 |
 | sapling | Nook's Cranny | 160 |
+| manila clam |  | 100 |
 
-### Recipes (27)
+### Recipes (28)
 
 Everyone knows the ones marked ★ from day 0, plus 3 drawn at random from the
 rest (never a tool). More come on recipe cards: the Cranny's tool cards and its one other card a
@@ -179,6 +181,7 @@ out in pieces of one tile.
 | golden candlestick | 1 gold nugget, 3 iron nugget | 12,000 |  |
 | ironwood dresser | 4 iron nugget, 8 hardwood, 4 wood | 3,400 | 2 x 1 tiles |
 | ★ simple wooden fence | 3 wood | 60 | makes 5 |
+| fishing bait | 1 manila clam | 75 |  |
 | stone fence | 3 stone | 75 | makes 5 |
 | iron fence | 2 iron nugget | 150 | makes 5 |
 
@@ -200,8 +203,9 @@ Shop goods sell back for a quarter of their price.
 | record player | Nook's Cranny | 3 a day | 9,800 | furniture |
 | simple wooden fence | Nook's Cranny | 3 a day | 100 | fence, makes a 1-tile piece |
 | iron fence | Nook's Cranny | 3 a day | 280 | fence, makes a 1-tile piece |
-| every tool's recipe card | Nook's Cranny | always in stock | 500 | learn to make that tool |
-| one other recipe card | Nook's Cranny | 1 a day, never a tool | 2,000 | learn the recipe |
+| every tool's recipe card | Nook's Cranny | always in stock | 200 | learn to make that tool |
+| every tool, ready-made | Nook's Cranny | always in stock | 4x its sell value | a new tool |
+| one other recipe card | Nook's Cranny | 1 a day, never a tool | 800 | learn the recipe |
 | straw hat | Able Sisters | 4 a day | 800 | hat: a wide-brimmed straw hat |
 | sundress | Able Sisters | 4 a day | 1,400 | dress: a light cotton sundress |
 | denim jacket | Able Sisters | 4 a day | 2,200 | top: a faded denim jacket |
@@ -309,7 +313,8 @@ between 1,000 and 10,000.
 | the Able Sisters | Able Sisters | 09:00-21:00 | sell clothes |
 | Blathers | museum | all day | takes the first of each fish, bug and fossil and keeps a public tally of donors; pays nothing; assesses fossils for free |
 
-Everyone carries 40 items; a bigger house adds storage.
+Everyone carries 40 items. From prompt version 12 a house's storage is room to keep things at
+home, reachable only there (a tent has none); before, it added to what you could carry.
 
 | house | storage | furniture inside | costs (Tom Nook loan) |
 |---|---|---|---|

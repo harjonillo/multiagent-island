@@ -17,9 +17,13 @@ def snapshots(run: Run) -> list[dict]:
     return run.of("snapshot")
 
 
+def assets(v: dict) -> int:
+    """A villager's bells and things at Cranny prices, in their pockets and (from prompt version 12) at home."""
+    return v["bells"] + v.get("home_bells", 0) + v["inventory_value"] + v.get("home_value", 0)
+
+
 def net_worth(snap: dict) -> dict[str, int]:
-    return {n: v["bells"] + v.get("home_bells", 0) + v["inventory_value"] + v.get("home_value", 0) - v["loan"]
-            for n, v in snap["villagers"].items()}
+    return {n: assets(v) - v["loan"] for n, v in snap["villagers"].items()}
 
 
 def gini(xs: list[float]) -> float:

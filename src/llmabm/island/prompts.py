@@ -6,7 +6,7 @@ from collections import Counter
 
 from ..agent import AgentSpec
 from .memory import memory_lines
-from .world import CARD, LATEST_PROMPT_VERSION, MAP, ORDINANCE_TEXT, Island, Villager, _fmt, clock, fmt_window
+from .world import CARD, LATEST_PROMPT_VERSION, MAP, ORDINANCE_TEXT, Island, Villager, _fmt, clock, fmt_window, tool_uses
 
 # Prompt wording has versions so that a resumed run keeps the wording it started with, unless
 # it is switched on purpose (`llmabm resume --prompt-version`), which is logged as an intervention.
@@ -48,8 +48,8 @@ PROMPT_CHANGES = {
         "tent has none) are reachable only there. A plan made at home can put things away or take them out, which "
         "takes no time, and crafting at home can use what is kept there. Tools say how many uses each has left. "
         "The shop lists things (with what each is), tools ready to use, and recipe cards (named \"<thing> recipe\") "
-        "apart; tools are always for sale, and cards are cheaper. Learning a recipe says what it needs. Requests say who wants what from whom, and lapse after "
-        "3 days. In a conversation each tag says who handed what to whom from your side (\"Ike handed you 1 wood\"), "
+        "apart; tools are always for sale, and cards are cheaper. Learning a recipe says what it needs. Requests "
+        "say who wants what from whom, and lapse after 3 days. In a conversation each tag says who handed what to whom from your side (\"Ike handed you 1 wood\"), "
         "give and ask start empty, and you see the last time you talked with them before today. Trades happen in "
         "person only: a turn can offer a trade (\"trade\": give and want), and the other's next turn can accept it, "
         "when both sides change hands at once or nothing does. Any trade or gift that covers a request closes it. "
@@ -235,37 +235,29 @@ def _count(d: dict) -> str:
 
 
 def pockets_text(isl: Island, vil: Villager) -> str:
-    """Prompt version 8: tools apart from everything else, so what you already carry is easy to see."""
+    """Prompt version 8: tools apart from everything else, so what you already carry is easy to see. From
+    version 12 each tool says the uses it has left, and what is kept at home follows."""
+    v12 = _v(isl) >= 12
     carried = {k: n for k, n in vil.inventory.items() if n > 0}
     tools = [k for k in carried if isl.is_tool(k)]
     other = [k for k in carried if k not in tools]
-    return (f"Tools you carry: {', '.join(k + (f' x{carried[k]}' if carried[k] > 1 else '') for k in tools) or 'none'}\n"
-            f"Other things you carry: {', '.join(f'{k} x{carried[k]}' for k in other) or 'nothing'}")
+    tool_list = ", ".join(k + (f" x{carried[k]}" if carried[k] > 1 else "")
+                          + (f" ({_uses_left(isl, vil, k)})" if v12 else "") for k in tools)
+    return (f"Tools you carry: {tool_list or 'none'}\n"
+            f"Other things you carry: {', '.join(f'{k} x{carried[k]}' for k in other) or 'nothing'}"
+            + (f"\n{home_text(isl, vil)}" if v12 else ""))
 
 
 def _uses_left(isl: Island, vil: Villager, tool: str) -> str:
     """Prompt version 12: how many uses each tool of a kind has left, the one in use first."""
-    from .world import tool_uses
     left = [tool_uses(isl) - u for u in isl._wear(vil, tool)]
     return f"{left[0]} uses left" if len(left) == 1 else "uses left: " + ", ".join(str(n) for n in left)
-
-
-def pockets_text_v12(isl: Island, vil: Villager) -> str:
-    """Prompt version 12: pockets, each tool with the uses it has left, then what is kept at home."""
-    carried = {k: n for k, n in vil.inventory.items() if n > 0}
-    tools = [k for k in carried if isl.is_tool(k)]
-    other = [k for k in carried if k not in tools]
-    return (f"Tools you carry: "
-            + (", ".join(k + (f" x{carried[k]}" if carried[k] > 1 else "") + f" ({_uses_left(isl, vil, k)})"
-                         for k in tools) or "none") + "\n"
-            f"Other things you carry: {', '.join(f'{k} x{carried[k]}' for k in other) or 'nothing'}\n"
-            + home_text(isl, vil))
 
 
 def home_text(isl: Island, vil: Villager) -> str:
     """Prompt version 12: what a villager keeps at home, reachable only there."""
     cap = isl.home_capacity(vil)
-    kept = ", ".join(f"{k} x{n}" for k, n in sorted(vil.home_items.items()) if n > 0)
+    kept = _fmt(Counter(dict(sorted(vil.home_items.items()))))
     room = (f"{vil.home_count()}/{cap} slots" if cap else
             f"your {isl.w['house_levels'][vil.house]['name']} has no room for things, only bells")
     return (f"Kept at home ({room}; only reachable at home): {vil.home_bells} bells"
@@ -291,14 +283,11 @@ def recipe_text(isl: Island, vil: Villager, r: str) -> str:
     """Prompt version 8: a recipe with how much of what it needs you have, and how many of the thing you carry.
     From version 12, what you keep at home is counted apart."""
     needs = Counter(isl.w["recipes"][r]["needs"])
-    if _v(isl) >= 12:
-        pocket = ", ".join(f"{k} {vil.inventory[k]}" for k in needs if vil.inventory[k] > 0)
-        home = ", ".join(f"{k} {vil.home_items[k]}" for k in needs if vil.home_items[k] > 0)
-        have = "; ".join(x for x in ((f"in your pockets {pocket}" if pocket else ""),
-                                     (f"at home {home}" if home else "")) if x)
-        out = f"{r} ({_fmt(needs)}; " + (f"you have {have}" if have else "you have none of these")
-        return out + (f"; you carry {vil.inventory[r]} {r}" if vil.inventory[r] > 0 else "") + ")"
     have = ", ".join(f"{k} {vil.inventory[k]}" for k in needs if vil.inventory[k] > 0)
+    if _v(isl) >= 12:
+        home = ", ".join(f"{k} {vil.home_items[k]}" for k in needs if vil.home_items[k] > 0)
+        have = "; ".join(x for x in ((f"in your pockets {have}" if have else ""),
+                                     (f"at home {home}" if home else "")) if x)
     out = f"{r} ({_fmt(needs)}; " + (f"you have {have}" if have else "you have none of these")
     return out + (f"; you carry {vil.inventory[r]} {r}" if vil.inventory[r] > 0 else "") + ")"
 
@@ -324,7 +313,7 @@ def shop_text(isl: Island, vil: Villager) -> str:
     """Prompt version 12: what the shops sell today, each kind of thing said plainly. Recipe cards are named
     "<thing> recipe", so a card is never mistaken for the thing; what a recipe needs is learned with it."""
     f = isl.price_factor()
-    goods = ", ".join(f"{k} {round(p * f)}" + (f" ({_what_it_is(isl, k)})" if _what_it_is(isl, k) else "")
+    goods = ", ".join(f"{k} {round(p * f)}" + (f" ({what})" if (what := _what_it_is(isl, k)) else "")
                       for k, p in isl.cranny_stock.items())
     out = [f"Nook's Cranny today ({fmt_window(isl.shop_hours('cranny'))}), prices in bells:",
            f"- things: {goods or 'nothing'}"]
@@ -351,8 +340,7 @@ def status_block(isl: Island, vil: Villager, when: str) -> str:
     house = w["house_levels"][vil.house]
     v8 = _v(isl) >= 8
     v12 = _v(isl) >= 12
-    inv = (pockets_text_v12(isl, vil) if v12 else pockets_text(isl, vil)) if v8 else \
-        "Inventory: " + (_fmt(vil.inventory) or "nothing")
+    inv = pockets_text(isl, vil) if v8 else "Inventory: " + (_fmt(vil.inventory) or "nothing")
     recipes = "; ".join(recipe_text(isl, vil, r) if v8 else f"{r} ({_fmt(Counter(w['recipes'][r]['needs']))})"
                         for r in sorted(vil.recipes)) or "none"
     known = lambda r: " (you know it)" if v8 and r in vil.recipes else ""  # noqa: E731
@@ -364,20 +352,20 @@ def status_block(isl: Island, vil: Villager, when: str) -> str:
              + f"\nAble Sisters today ({fmt_window(isl.shop_hours('able'))}): "
              + ", ".join(f"{k} {round(p * f)}" for k, p in isl.able_stock.items()))
     bridge = "built" if isl.bridge_built else f"{isl.bridge_fund}/{w['bridge']['cost']} bells raised"
+    requests = request_lines(isl, vil.name) if v12 else isl.favor_lines(vil.name)
+    wallet = " in your wallet" if v12 else ""
     return (
         f"Day {isl.day} ({isl.date_text()}), {when}. You are {vil.name}.\n"
         f"You are usually up from {clock(wake)} to {clock(sleep)}.\n"
         f"Island ordinance: {ORDINANCE_TEXT.get(isl.ordinance, isl.ordinance)}"
         + (f" (changing to {isl.pending_ordinance[0].replace('_', ' ')} tomorrow)" if isl.pending_ordinance else "") + "\n"
-        + (f"Bells: {vil.bells} in your wallet. " if v12 else f"Bells: {vil.bells}. ")
+        + f"Bells: {vil.bells}{wallet}. "
         + f"Loan owed to Tom Nook: {vil.loan}. Home: {house['name']} {home_txt}. "
         f"Carrying {vil.items()}/{isl.capacity(vil)} items.\n"
         f"{inv}\n"
         + (f"Wearing: {', '.join(vil.wearing.values())}\n" if vil.wearing else "")
         + f"Inside your home ({len(vil.interior)}/{isl.interior_slots(vil)}): {', '.join(vil.interior) or 'nothing yet'}\n"
-        + ((f"Open requests: {'; '.join(request_lines(isl, vil.name))}\n" if request_lines(isl, vil.name) else "")
-           if v12 else
-           (f"Open requests: {'; '.join(isl.favor_lines(vil.name))}\n" if isl.favor_lines(vil.name) else ""))
+        + (f"Open requests: {'; '.join(requests)}\n" if requests else "")
         + f"Recipes you know: {recipes}\n"
         + (f"What Nook's Cranny pays when you sell it there (prices you've heard): {prices}\n" if v12 else
            f"Prices you have seen at Nook's Cranny: {prices}\n")
@@ -424,12 +412,11 @@ def fun_facts(isl: Island) -> list[str]:
         f"Did you know anyone can pay Isabelle {w['ordinances']['cost']:,} bells to set an island ordinance?",
     ]
     if tools.get("uses"):
-        facts.append(f"Did you know tools break after {tools['uses']} uses, and Nook's Cranny always has their recipes?"
-                     if not w["shops"]["cranny"].get("tool_markup") else
-                     f"Did you know tools break after {tools['uses']} uses, and Nook's Cranny always sells new ones?")
+        cranny = "always sells new ones" if w["shops"]["cranny"].get("tool_markup") else "always has their recipes"
+        facts.append(f"Did you know tools break after {tools['uses']} uses, and Nook's Cranny {cranny}?")
     if len(houses) > 1:
         facts.append(f"Did you know a house from Tom Nook adds {houses[1]['storage']} storage to your {w['pockets']} pockets?"
-                     if getattr(isl, "prompt_version", 1) < 12 else
+                     if v < 12 else
                      f"Did you know a house from Tom Nook gives you room to keep {houses[1]['storage']} things at home?")
     if getattr(isl, "map_text", None):
         facts.append("Did you know a ladder climbs one cliff and a vaulting pole crosses the river?")
@@ -614,7 +601,7 @@ def evening_prompt(isl: Island, vil: Villager, round_: int, hour: int, offers: l
     done = "\n".join(f"- {r}" for r in vil.today) or "(nothing)"
     inbox = inbox_text(vil)
     others = ", ".join(n for n in isl.v if n != vil.name)
-    board_txt = "\n".join(f"- (day {d}) {a}: {t}" for d, a, t, *_ in board) or "(empty)"
+    board_txt = "\n".join(f"- (day {d}) {a}: {t}" for d, a, t, _ in board) or "(empty)"
     offer_txt = "\n".join(
         f"[{o.id}] {o.sender} offers you {_fmt_side(o.give)} in exchange for {_fmt_side(o.want)}"
         + (f' ("{o.note}")' if o.note else "") for o in offers) or "(none)"
@@ -648,7 +635,7 @@ def plaza_prompt(isl: Island, vil: Villager, hour: int, offers: list, board: lis
     done = "\n".join(f"- {r}" for r in vil.today) or "(nothing)"
     inbox = inbox_text(vil)
     others = ", ".join(n for n in isl.v if n != vil.name)
-    board_txt = "\n".join(f"- (day {d}) {a}: {t}" for d, a, t, *_ in board) or "(empty)"
+    board_txt = "\n".join(f"- (day {d}) {a}: {t}" for d, a, t, _ in board) or "(empty)"
     offer_txt = "\n".join(
         f"[{o.id}] {o.sender} offers you {_fmt_side(o.give)} in exchange for {_fmt_side(o.want)}"
         + (f' ("{o.note}")' if o.note else "") for o in offers) or "(none)"
@@ -773,13 +760,30 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
     elif visit == "host":
         meet = f"{other} has come to visit you at your home."
     else:
-        meet = f"You ran into {other} {at_place(place)}." if _v(isl) >= 12 else f"You ran into {other} at the {place}."
+        meet = f"You ran into {other} {at_place(place)}." if v12 else f"You ran into {other} at the {place}."
     v9 = _v(isl) >= 9
     situation = (f"{meet} You can start a short conversation, or say nothing."
                  if opener else f"{meet} So far:\n{said}\n\nYou can reply, or say nothing.")
     if v9 and not opener:
         situation += (" You decide when to stop: add \"leave\": true to say this and then go your ways. "
                       "Saying nothing ends it too.")
+    if v12:
+        table = open_trade(turns)
+        options = (f"You can also hand {other} something from your pockets right now (\"give\"), ask them for "
+                   f"something you want from them (\"ask\"; a request stays open until they give or trade it to you, "
+                   f"for up to {REQUEST_DAYS} days), or offer a trade (\"trade\": what you'd give for what you want "
+                   "from them). A trade happens only if the other one accepts: then both sides change hands at once, "
+                   "or nothing does. Leave any of them empty ({}) if you don't want to.\n"
+                   + trade_table_text(table, vil.name, other)
+                   + f"In your pockets right now: {pocket_summary(isl, vil)}\n")
+        fields = ('"give": {} or {"<item or bells from your pockets>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, '
+                  '"trade": {} or {"give": {"<item or bells from your pockets>": <qty>}, '
+                  '"want": {"<item or bells>": <qty>}}, '
+                  + ('"accept": true | false, ' if table and table["proposer"] == other else ""))
+    else:
+        options = (f"You can also hand {other} something from your pockets right now (\"give\"), or ask them for "
+                   "something (\"ask\"); a request stays open until they give it to you.\n")
+        fields = '"give": {"<item or bells>": <qty>}, "ask": {"<item or bells>": <qty>}, '
     return (
         "PHASE: encounter\n" + status_block(isl, vil, clock(hour))
         + f"\n\nSo far today you:\n" + ("\n".join(f"- {r}" for r in vil.today) or "(nothing yet)")
@@ -787,29 +791,17 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
         + (last_chat_with(isl, vil.name, other) if v12 else "")
         + f"{situation}\nKeep it to one or two sentences, the way you would actually talk. Only {other} hears it.\n"
         + (talk_cost_text(isl, vil, last) if v9 else "")
-        + (f"You can also hand {other} something from your pockets right now (\"give\"), ask them for something "
-           f"you want from them (\"ask\"; a request stays open until they give or trade it to you, for up to "
-           f"{REQUEST_DAYS} days), or offer a trade (\"trade\": what you'd give for what you want from them). A "
-           "trade happens only if the other one accepts: then both sides change hands at once, or nothing does. "
-           "Leave any of them empty ({}) if you don't want to.\n"
-           + trade_table_text(turns, vil.name, other)
-           + f"In your pockets right now: {pocket_summary(isl, vil)}\n" if v12 else
-           f"You can also hand {other} something from your pockets right now (\"give\"), or ask them for something "
-           "(\"ask\"); a request stays open until they give it to you.\n")
+        + options
         + "Respond with one JSON object and nothing else:\n"
         '{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", '
-        + ('"give": {} or {"<item or bells from your pockets>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, '
-           '"trade": {} or {"give": {"<item or bells from your pockets>": <qty>}, "want": {"<item or bells>": <qty>}}, '
-           + ('"accept": true | false, ' if (open_trade(turns) or {}).get("proposer") == other else "")
-           if v12 else '"give": {"<item or bells>": <qty>}, "ask": {"<item or bells>": <qty>}, ')
+        + fields
         + ('"leave": true | false, ' if v9 else "")
         + '"note": "<optional private note to your future self>"}'
     )
 
 
-def trade_table_text(turns: list[dict], me: str, other: str) -> str:
-    """Prompt version 12: the trade on the table in this conversation, if any."""
-    t = open_trade(turns)
+def trade_table_text(t: dict | None, me: str, other: str) -> str:
+    """Prompt version 12: the trade on the table in this conversation (from `open_trade`), if any."""
     if not t:
         return ""
     if t["proposer"] == me:
@@ -821,7 +813,7 @@ def trade_table_text(turns: list[dict], me: str, other: str) -> str:
 
 def pocket_summary(isl: Island, vil: Villager) -> str:
     """Prompt version 12: everything in the pockets on one line, bells first."""
-    things = ", ".join(f"{k} x{n}" for k, n in vil.inventory.items() if n > 0)
+    things = _fmt(vil.inventory)
     return f"{vil.bells} bells" + (f", {things}" if things else ", nothing else")
 
 
@@ -841,25 +833,30 @@ def turn_act_text(t: dict, me: str, other: str) -> str:
         if a["kind"] == "gave":
             parts.append(f"you handed {other} {what}" if mine else f"{speaker} handed you {what}")
         elif a["kind"] == "failed":
-            why = a.get("why", "")
-            rest = why.split(" but ", 1)[1] if " but " in why else "it didn't go through"
-            if mine:
-                rest = rest.replace("had ", "you had ", 1) if rest.startswith("had ") else rest
-                parts.append(f"you tried to hand {other} {what} but {rest}")
-            else:
-                rest = rest.replace(f"{me} had no room", "you had no room")
-                rest = f"{speaker} {rest}" if rest.startswith("had ") else rest
-                parts.append(f"{speaker} tried to hand you {what} but {rest}")
+            why = problem_text(a["problem"], me)
+            parts.append(f"you tried to hand {other} {what} but {why}" if mine
+                         else f"{speaker} tried to hand you {what} but {why}")
         elif a["kind"] == "asked":
             line = f"you asked {other} for {what}" if mine else f"{speaker} asked you for {what}"
             if a.get("unknown"):
                 line += f", but there's nothing called {' or '.join(a['unknown'])} on this island"
             parts.append(line)
     for a in acts:
-        parts += [p for p in [_trade_act_text(a, speaker, me, other)] if p]
+        if trade := _trade_act_text(a, speaker, me, other):
+            parts.append(trade)
     if t.get("leave"):
         parts.append("then you went your ways")
     return "; ".join(parts)
+
+
+def problem_text(p: dict, me: str | None = None) -> str:
+    """Why a gift or trade in person didn't go through, from `p` as `Island.give_problem` or `Island.trade` give
+    it ({"who", "item", "have"} or {"who", "room": True}): "Kit had no fishing bait", "you had no room". With no
+    `me`, everyone is named (for the record)."""
+    subj = "you" if p["who"] == me else p["who"]
+    if p.get("room"):
+        return f"{subj} had no room"
+    return f"{subj} had only {p['have']} {p['item']}" if p["have"] else f"{subj} had no {p['item']}"
 
 
 def _trade_act_text(a: dict, speaker: str, me: str, other: str) -> str:
@@ -881,11 +878,7 @@ def _trade_act_text(a: dict, speaker: str, me: str, other: str) -> str:
         who = "you accepted" if mine else f"{speaker} accepted"
         if k == "traded":
             return f"{who}: you gave {other} {_count(gave)} and got {_count(got)}"
-        p = a["problem"]
-        subj = "you" if p["who"] == me else p["who"]
-        why = (f"{subj} had no room" if p.get("room") else
-               f"{subj} had only {p['have']} {p['item']}" if p["have"] else f"{subj} had no {p['item']}")
-        return f"{who}, but the trade fell through, nothing changed hands: {why}"
+        return f"{who}, but the trade fell through, nothing changed hands: {problem_text(a['problem'], me)}"
     if k == "no_trade":
         return (f"you accepted, but {other} had no trade on the table" if mine
                 else f"{speaker} accepted, but you had no trade on the table")
@@ -908,17 +901,30 @@ def open_trade(turns: list[dict]) -> dict | None:
 def at_place(place: str) -> str:
     """Prompt version 12: "at the river" and "at Nook's Cranny", but "out on a walk" rather than "at the out for a
     walk"."""
-    named = place[:1].isupper()  # Nook's Cranny, Resident Services, Able Sisters, Ari's home
-    return {"out for a walk": "out on a walk", "around the island": "around the island"}.get(
-        place, f"at {place}" if named else f"at the {place}")
+    if place == "out for a walk":
+        return "out on a walk"
+    if place == "around the island":
+        return place
+    return f"at {place}" if place[:1].isupper() else f"at the {place}"  # Nook's Cranny, Ari's home: no "the"
 
 
 LAST_CHAT_LINES = 8  # from prompt version 12: the latest lines of the last conversation before today
 
 
+def keep_chat(isl: Island, chat: dict) -> None:
+    """Prompt version 12: remember a conversation for `last_chat_with`. Per pair, only the latest one from an
+    earlier day and the ones from the latest day are kept, each cut to the lines that are shown."""
+    pair = frozenset((chat["a"], chat["b"]))
+    chat = {**chat, "turns": [{**t, "text": t["text"][:200]} for t in chat["turns"][-LAST_CHAT_LINES:]]}
+    kept = getattr(isl, "last_chats", {}).get(pair, [])
+    earlier = [c for c in kept if c["day"] < chat["day"]]
+    isl.last_chats = getattr(isl, "last_chats", {})
+    isl.last_chats[pair] = earlier[-1:] + [c for c in kept if c["day"] == chat["day"]] + [chat]
+
+
 def last_chat_with(isl: Island, me: str, other: str) -> str:
     """Prompt version 12: the last time two villagers talked before today, from `me`'s side."""
-    chats = [c for c in getattr(isl, "chats", []) if {c["a"], c["b"]} == {me, other} and c["day"] < isl.day]
+    chats = [c for c in getattr(isl, "last_chats", {}).get(frozenset((me, other)), []) if c["day"] < isl.day]
     if not chats:
         return ""
     c = chats[-1]
@@ -1003,14 +1009,14 @@ def night_facts(isl: Island, vil: Villager, offers: list | None) -> str:
     today = [e for e in getattr(isl, "exchanges", []) if e["day"] == d and me in (e["from"], e["to"])]
     mine = [o for o in (offers or []) if me in (o.sender, o.recipient)
             and (o.status == "pending" or o.day >= d - 1)]
-    requests = request_lines(isl, me) if _v(isl) >= 12 else isl.favor_lines(me)
+    v12 = _v(isl) >= 12
+    requests = request_lines(isl, me) if v12 else isl.favor_lines(me)
     return ("Things that changed hands today:\n"
             + ("\n".join(f"- {exchange_line(e, me)}" for e in today) or "(nothing)") + "\n\n"
-            + (f"What you have tonight:\nBells: {vil.bells} in your wallet\n{pockets_text_v12(isl, vil)}\n"
-               if _v(isl) >= 12 else f"What you have tonight:\nBells: {vil.bells}\n{pockets_text(isl, vil)}\n")
+            + f"What you have tonight:\nBells: {vil.bells}{' in your wallet' if v12 else ''}\n{pockets_text(isl, vil)}\n"
             + f"Recipes you know: {', '.join(sorted(vil.recipes)) or 'none'}\n"
             + since_morning(isl, vil) + "\n"
-            + ("Open requests:\n" if _v(isl) >= 12 else "Open requests and recent offers:\n")
+            + ("Open requests:\n" if v12 else "Open requests and recent offers:\n")
             + ("\n".join([f"- {r}" for r in requests] + [f"- {offer_line(o, me)}" for o in mine]) or "(none)")
             + "\n\n")
 

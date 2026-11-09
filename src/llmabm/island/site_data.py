@@ -15,7 +15,7 @@ from collections import Counter
 from pathlib import Path
 
 from ..analysis import Run, load_run
-from .analysis import (RESOURCES, _side, action_mix, extraction_shares, gini, hhi, llm_calls, net_worth,
+from .analysis import (RESOURCES, _side, action_mix, assets, extraction_shares, gini, hhi, llm_calls, net_worth,
                        reply_errors, run_out, snapshots)
 from .world import CATEGORIES, clock
 
@@ -272,8 +272,7 @@ def home_data(run: Run) -> dict:
         villagers.append({
             "name": n, "home": (last.get("home_areas") or {}).get(n, ""),
             "house": levels[s["house"]]["name"] + (f", {s['loan']:,} loan" if s["loan"] else ""),
-            "assets": [sn["villagers"][n]["bells"] + sn["villagers"][n].get("home_bells", 0)
-                       + sn["villagers"][n]["inventory_value"] + sn["villagers"][n].get("home_value", 0) for sn in snaps],
+            "assets": [assets(sn["villagers"][n]) for sn in snaps],
             "spotted": sightings[n],
             "talk_share": round(talk[n] / spent[n], 3) if spent[n] else None,
             "top": [[k.replace("_", " "), v] for k, v in mix[n].most_common(3)],

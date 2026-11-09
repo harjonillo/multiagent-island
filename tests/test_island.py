@@ -1450,8 +1450,8 @@ def test_item_names_resolve_for_gifts_requests_and_offers():
     # Something that isn't anything on the island ("selit bait") isn't kept as a request.
     assert isl.unknown_items(isl.resolve_side("B", {"selit bait": 1})) == ["selit bait"]
     assert isl.ask_favor("A", "B", {"selit bait": 1}) is None and not isl.unknown_items({"bells": 5, "wood": 1})
-    from llmabm.island.sim import _offer_id
-    assert _offer_id("18") == _offer_id("[o18]") == _offer_id(18) == "o18"
+    from llmabm.island.sim import _ref_id
+    assert _ref_id("18") == _ref_id("[o18]") == _ref_id(18) == "o18"
     # A request stored under an old loose name (runs from before this fix) still settles.
     old = {"id": "f9", "day": 1, "asker": "B", "asked": "A", "items": {"map": 1}, "status": "open", "done_day": None}
     isl.favors.append(old)
@@ -1684,12 +1684,21 @@ def test_prompt_version_12_what_villagers_know_and_who_did_what():
         assert turn_act_text(t, a, b) == f"{b} handed you 1 wood; {b} asked you for 1 fishing bait"
         assert turn_act_text(t, b, a) == f"you handed {a} 1 wood; you asked {a} for 1 fishing bait"
         bad = {"speaker": b, "text": "", "act": "x", "acts": [{"kind": "failed", "items": {"fishing bait": 2},
-                                                             "why": "tried to give 2 fishing bait but had no fishing bait"}]}
+                                                             "problem": {"who": b, "item": "fishing bait", "have": 0}}]}
         assert turn_act_text(bad, a, b) == f"{b} tried to hand you 2 fishing bait but {b} had no fishing bait"
         assert turn_act_text(bad, b, a) == f"you tried to hand {a} 2 fishing bait but you had no fishing bait"
+        full = {**bad, "acts": [{**bad["acts"][0], "problem": {"who": a, "room": True}}]}
+        assert turn_act_text(full, a, b) == f"{b} tried to hand you 2 fishing bait but you had no room"
         # The last conversation before today, and give/ask start empty.
-        isl.chats = [{"day": isl.day - 1, "hour": 9, "place": "river", "a": b, "b": a, "visit": False, "turns": [t]}]
+        from llmabm.island.prompts import keep_chat
+        keep_chat(isl, {"day": isl.day - 2, "hour": 9, "place": "pond", "a": b, "b": a, "visit": False, "turns": [t]})
+        keep_chat(isl, {"day": isl.day - 1, "hour": 9, "place": "river", "a": b, "b": a, "visit": False, "turns": [t]})
         assert "at the river" in last_chat_with(isl, a, b) and f"[{b} handed you 1 wood" in last_chat_with(isl, a, b)
+        # Per pair, only the latest conversation from an earlier day is kept, next to today's.
+        keep_chat(isl, {"day": isl.day, "hour": 9, "place": "sea", "a": a, "b": b, "visit": False, "turns": [t]})
+        keep_chat(isl, {"day": isl.day, "hour": 11, "place": "sea", "a": a, "b": b, "visit": False, "turns": [t]})
+        assert [c["day"] for c in isl.last_chats[frozenset((a, b))]] == [isl.day - 1, isl.day, isl.day]
+        assert "at the river" in last_chat_with(isl, a, b)
         met = encounter_prompt(isl, va, b, "out for a walk", 10, [t], opener=False)
         assert "The last time you talked with" in met and "out on a walk" in met and '"give": {} or {' in met
         from llmabm.island.prompts import at_place

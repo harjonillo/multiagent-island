@@ -128,14 +128,14 @@ flowchart TD
     classDef file fill:#f1f0ec,stroke:#8a8984,color:#0b0b0b
     classDef gate fill:#fdf3d6,stroke:#eda100,color:#0b0b0b
 
-    social{"20:00 or 21:00?"}
+    social{"Anyone's plaza hour?<br/>before version 7: 20:00 or 21:00"}
     subgraph plaza["Plaza round"]
-        pwho["20:00: everyone awake who chose 'plaza: true'<br/>21:00: only those with new trade offers waiting"]
+        pwho["Each villager whose plan set this hour aside for the plaza and who can walk there<br/>before version 7: 20:00 everyone who chose 'plaza: true', 21:00 those with new offers"]
         pafford{"Enough energy?"}
-        eve(["LLM: plaza<br/>rules without the action menu<br/>letters, board, offers waiting"])
-        papply["Answer offers: accept = trade swaps on the spot, counter, reject<br/>a board post, new offers<br/>letters and parcels leave now, arrive tomorrow morning"]
+        eve(["LLM: plaza<br/>rules without the action menu<br/>letters, the board (and offers waiting, before version 12)"])
+        papply["A board post; from version 12, own posts taken down<br/>letters and parcels leave now, arrive tomorrow morning<br/>before version 12: answer offers (accept swaps on the spot, counter, reject) and make new ones"]
         pskip["Skips the plaza"]
-        pev[("events.jsonl: evening_turn, message, parcel<br/>board, offer, offer_update, trade")]
+        pev[("events.jsonl: evening_turn, message, parcel<br/>board, board_removed, offer, offer_update, trade")]
         pwho --> pafford
         pafford -- yes --> eve --> papply --> pev
         pafford -- no --> pskip --> pev
@@ -144,7 +144,7 @@ flowchart TD
     tick["Grid: bugs and fish shadows appear and leave"]
     order["Scheduled actions this hour<br/>ordered by walking distance, ties are luck"]
     act["Body: no tool for it? fail without setting out<br/>find the target, walk there with the ladder and pole carried<br/>World: apply the rule, or say why it failed<br/>the hour is used either way"]
-    wear["Wear: the tool used, and the ladder or pole if the route climbed or jumped<br/>50 uses and it breaks"]
+    wear["Wear: the tool used, and the ladder or pole if the route climbed or jumped<br/>30 uses and it breaks"]
     aev[("events.jsonl: action, tool_broke<br/>result, delta, pools_delta, position")]
     free["Everyone else: asleep at home, at home,<br/>or a short walk, and the trip home wears the ladder or pole too"]
     look["Each awake villager sees what's within 8 tiles<br/>bugs, fish shadows, shells, dig spots"]
@@ -207,9 +207,9 @@ can't be afforded isn't made.
 | call | who | when | system prompt | reply | if it can't be afforded | logged as |
 |---|---|---|---|---|---|---|
 | plan | each awake villager with actions left | on waking and halfway through their waking hours, unless they chose habit | full rules + action menu | JSON: thoughts, actions, note, plaza / write / next | repeats yesterday | `plan` |
-| plaza | villagers who chose to go | 20:00; 21:00 only with new offers waiting | rules, no menu | JSON: thoughts, letters, board, offers, responses, parcels, note | skips the plaza | `evening_turn` and more |
+| plaza | villagers whose plan set an hour aside for it (before version 7: who chose to go) | that hour (before version 7: 20:00; 21:00 only with new offers waiting) | rules, no menu | JSON: thoughts, letters, board, take_down (version 12), parcels, note; offers and responses before version 12 | skips the plaza | `evening_turn` and more |
 | notice | a villager with someone nearby, out of the house | any hour, up to 4 a day | short: persona, nightly page | JSON: thoughts, approach, opening line | too tired to talk | `encounter_decision` |
-| chat turn | the one who was approached, then back and forth | right after a notice or a visit | rules, no menu | JSON: thoughts, say, give, ask, note | just nods | `encounter` |
+| chat turn | the one who was approached, then back and forth | right after a notice or a visit | rules, no menu | JSON: thoughts, say, give, ask, trade and accept (version 12), leave (version 9), note | just nods | `encounter`, and `trade_proposed`, `trade`, `trade_failed` |
 | nightly page | villagers who chose to write | end of day | short: persona, nightly page | free text, up to 150 words, then optionally `Remember:` and up to 3 things to hold on to | doesn't write; old page stays, nothing new is remembered | `reflection` |
 | Isabelle's report | Isabelle (not charged) | end of day, if `isabelle.summary` (on) | Isabelle | free text, at most 120 words | always made | `isabelle_summary` |
 | Isabelle's announcement | Isabelle (not charged) | end of day, if `isabelle.announce` | Isabelle | free text, read in the next morning's plan | always made | `isabelle_announcement` |

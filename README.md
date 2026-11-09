@@ -152,7 +152,7 @@ run, a day and an hour, with every LLM call and output file, are in
 | when each villager wakes up | their first plan, for the first half of their waking hours, starting with Isabelle's announcement |
 | 05:00–04:00 | the engine steps hour by hour. Each scheduled action takes one hour. Villagers with nothing scheduled are at home or wandering |
 | halfway through their waking hours | their second and last plan, until bedtime |
-| 20:00, 21:00 | the plaza: the bulletin board, trade offers, and letters and parcels (which arrive the next morning) |
+| any free hour a plan sets aside (from prompt version 7; before, 20:00 and 21:00) | the plaza: the bulletin board, letters and parcels (which arrive the next morning), and trade offers before prompt version 12 |
 | end of day | snapshot, optional nightly reflection, Isabelle's report, checkpoint |
 
 - Each villager plans **twice a day on their own clock** (`calendar.plans_per_day`), so early

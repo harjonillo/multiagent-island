@@ -33,7 +33,7 @@ import yaml
 
 from ..agent import AgentSpec, load_agent_file
 from ..llm import DailyLimit, LLMError
-from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, open_trade, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, OFFER_DAYS,
+from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, _count, keep_chat, open_trade, problem_text, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, OFFER_DAYS,
                       REQUEST_DAYS, at_place, turn_act_text,
                       encounter_prompt, evening_prompt, plaza_prompt,
                       announcement_text, inbox_text, isabelle_announce_prompt,
@@ -138,27 +138,13 @@ class Offer:
     parent: str | None = None
 
 
-def _failed_give(isl, giver: str, taker: str, items: dict) -> str:
-    """What both villagers see when a gift in person doesn't go through (prompt version 8 on): what was
-    missing, said the same way to both of them."""
-    g = isl.v[giver]
-    for k, n in items.items():
-        have = g.bells if k == "bells" else g.inventory[k]
-        if have < n:
-            short = f"had only {have}" if have else f"had no {k}"
-            return f"tried to give {n} {k} but {short}"
-    return f"tried to give {', '.join(f'{n} {k}' for k, n in items.items())} but {taker} had no room"
-
-
-def _fmt_items(items: dict) -> str:
-    return ", ".join(f"{n} {k}" for k, n in items.items())
-
-
-def _trade_problem(p: dict) -> str:
-    """Why a trade in person fell through, plainly (for the neutral record; each side is told it their way)."""
+def _failed_give(items: dict, taker: str, p: dict) -> str:
+    """What both villagers see when a gift in person doesn't go through (prompt versions 8 to 11), from
+    `Island.give_problem`: what was missing, said the same way to both of them."""
     if p.get("room"):
-        return f"{p['who']} had no room"
-    return f"{p['who']} had only {p['have']} {p['item']}" if p["have"] else f"{p['who']} had no {p['item']}"
+        return f"tried to give {_count(items)} but {taker} had no room"
+    short = f"had only {p['have']}" if p["have"] else f"had no {p['item']}"
+    return f"tried to give {items[p['item']]} {p['item']} but {short}"
 
 
 MAX_CHAT_LINES = 40  # a conversation with no set length still stops here (it matters only without mental energy)
@@ -171,10 +157,10 @@ def _turn_cap(cfg: dict) -> int | None:
     return None if n is None else int(n)
 
 
-def _offer_id(x) -> str:
-    """An offer id as villagers write it: "o18", "[o18]", "18" or 18 are all offer o18."""
+def _ref_id(x, prefix: str = "o") -> str:
+    """An offer or board-post id as villagers write it: "o18", "[o18]", "18" or 18 are all offer o18."""
     x = str(x or "").strip().strip("[]").strip().lower()
-    return f"o{x}" if x.isdigit() else x
+    return f"{prefix}{x}" if x.isdigit() else x
 
 
 def _clean_side(d) -> dict:
@@ -250,6 +236,17 @@ class IslandSimulation:
         m.setdefault("interventions", []).append({"from_day": from_day, "what": what, "details": details})
         (self.run_dir / "manifest.json").write_text(json.dumps(m, indent=2, ensure_ascii=False))
 
+    @property
+    def v12(self) -> bool:
+        """Prompt version 12 on: pockets and home apart, trades in person, numbered board posts."""
+        return self.prompt_version >= 12
+
+    def _log_favors_done(self, d: int) -> None:
+        """Log the requests closed since the last call, and clear the list."""
+        for f in self.isl.favors_done_today:
+            self.log("favor_done", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
+        self.isl.favors_done_today = []
+
     def _checkpoint(self) -> None:
         self._log_offset = self._raw_log.f.tell()  # where the log ends for this checkpoint
         tmp = self.run_dir / "checkpoint.pkl.tmp"
@@ -299,6 +296,7 @@ class IslandSimulation:
         if not hasattr(sim, "prompt_version"):  # runs from before prompt versions used the original wording
             sim.prompt_version = 1
         sim.isl.prompt_version = sim.prompt_version
+        sim.isl.number_board()  # checkpoints from before board posts had numbers
         change = None
         if prompt_version is not None:
             new = PROMPT_VERSION if str(prompt_version) == "latest" else int(prompt_version)
@@ -553,7 +551,7 @@ class IslandSimulation:
                 if o.status == "pending" and o.day <= d - OFFER_DAYS:
                     o.status = "expired"
                     log("offer_update", **asdict(o))
-        if getattr(self, "prompt_version", 1) >= 12:  # requests stay open REQUEST_DAYS days
+        if self.v12:  # requests stay open REQUEST_DAYS days
             for f in isl.favors:
                 if f["status"] == "open" and f["day"] <= d - REQUEST_DAYS:
                     f["status"], f["done_day"] = "expired", d
@@ -597,7 +595,8 @@ class IslandSimulation:
     def _exchange(self, d: int, how: str, giver: str, taker: str, items: dict, got: dict | None = None,
                   **extra) -> None:
         """Remember something changing hands between two villagers: a gift in person, a parcel, or a trade
-        (`got` is what the giver received back). From prompt version 8 each villager sees their own history
+        (`got` is what the giver received back). `asked`: the items answered a request of the taker's;
+        `asked_back`: `got` answered one of the giver's. From prompt version 8 each villager sees their own history
         with someone when they meet, and the day's exchanges at night. Recorded in every run."""
         asked = any(f["asker"] == taker and f["asked"] == giver for f in self.isl.favors_done_today)
         asked_back = any(f["asker"] == giver and f["asked"] == taker for f in self.isl.favors_done_today)
@@ -628,46 +627,29 @@ class IslandSimulation:
                 continue
             got, left = isl.put_items(vil, m["parcel"])
             if got:
-                what = ", ".join(f"{n} {k}" for k, n in got.items())
-                vil.inbox.append(f"(sent day {m['sent_day']}) parcel from {m['from']}: {what}"
-                                 + (f' ("{m["note"]}")' if m.get("note") else ""))
-                isl._settle_favors(m["from"], m["to"], got)
-                self._exchange(d, "by mail", m["from"], m["to"], got, sent_day=m["sent_day"])
-                self.log("gift", day=d, giver=m["from"], receiver=m["to"], items=got, ok=True, how="by mail",
-                         result=what, sent_day=m["sent_day"])
-                for f in isl.favors_done_today:
-                    self.log("favor_done", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
-                isl.favors_done_today = []
+                self._parcel_received(d, m, got, f"(sent day {m['sent_day']}) parcel from {m['from']}: {_count(got)}"
+                                      + (f' ("{m["note"]}")' if m.get("note") else ""))
             if left and isl.split_home():  # version 12: what doesn't fit in the pockets is left at home if there's room
-                stored = {}
-                for k, n in left["items"].items():
-                    fit = min(n, isl.home_space(vil))
-                    if fit:
-                        vil.home_items[k] += fit
-                        worn = left.get("wear", {}).get(k, [])[:fit]
-                        vil.home_wear[k] = sorted(vil.home_wear.get(k, []) + worn + [0] * (fit - len(worn)),
-                                                  reverse=True) if isl.is_tool(k) else vil.home_wear.get(k, [])
-                        stored[k] = fit
+                stored, left = isl.put_home(vil, left)
                 if stored:
-                    what = ", ".join(f"{n} {k}" for k, n in stored.items())
-                    vil.inbox.append(f"(sent day {m['sent_day']}) parcel from {m['from']}, left at your home "
-                                     f"(no room in your pockets): {what}")
-                    isl._settle_favors(m["from"], m["to"], stored)
-                    self._exchange(d, "by mail", m["from"], m["to"], stored, sent_day=m["sent_day"])
-                    self.log("gift", day=d, giver=m["from"], receiver=m["to"], items=stored, ok=True, how="by mail",
-                             result=what + " (left at home)", sent_day=m["sent_day"])
-                    for f in isl.favors_done_today:
-                        self.log("favor_done", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
-                    isl.favors_done_today = []
-                left_items = {k: n - stored.get(k, 0) for k, n in left["items"].items() if n > stored.get(k, 0)}
-                left = ({"items": left_items, "wear": {k: left.get("wear", {}).get(k, [])[stored.get(k, 0):]
-                                                       for k in left_items}} if left_items else {})
+                    self._parcel_received(d, m, stored, f"(sent day {m['sent_day']}) parcel from {m['from']}, left at "
+                                          f"your home (no room in your pockets): {_count(stored)}", " (left at home)")
             if left:
                 vil.inbox.append(f"a parcel from {m['from']} with {', '.join(f'{n} {k}' for k, n in left['items'].items())} "
                                  "is waiting for you: no room in your pockets"
                                  + (" or at home" if isl.split_home() else ""))
                 waiting.append({**m, "parcel": left})
         isl.mail = waiting
+
+    def _parcel_received(self, d: int, m: dict, items: dict, line: str, where: str = "") -> None:
+        """A parcel (or the part of it that fit) reached its recipient: tell them, close requests it answers,
+        and record the gift."""
+        self.isl.v[m["to"]].inbox.append(line)
+        self.isl._settle_favors(m["from"], m["to"], items)
+        self._exchange(d, "by mail", m["from"], m["to"], items, sent_day=m["sent_day"])
+        self.log("gift", day=d, giver=m["from"], receiver=m["to"], items=items, ok=True, how="by mail",
+                 result=_count(items) + where, sent_day=m["sent_day"])
+        self._log_favors_done(d)
 
     # --- arrivals ----------------------------------------------------------
     def _settle_all(self, d: int) -> None:
@@ -792,12 +774,11 @@ class IslandSimulation:
                 turn["leave"] = True
                 turn["act"] = "; ".join(x for x in (turn.get("act"), "then went their way") if x)
                 break
-        v12 = getattr(self, "prompt_version", 1) >= 12
+        v12 = self.v12
         if v12:
-            isl.chats = getattr(isl, "chats", [])
-            isl.chats.append({"day": d, "hour": h, "place": place, "a": a, "b": b, "visit": visit,
-                              "turns": [{k: t[k] for k in ("speaker", "text", "act", "acts", "leave") if k in t}
-                                        for t in turns if t["text"] or t.get("act")]})
+            keep_chat(isl, {"day": d, "hour": h, "place": place, "a": a, "b": b, "visit": visit,
+                            "turns": [{k: t[k] for k in ("speaker", "text", "act", "acts", "leave") if k in t}
+                                      for t in turns if t["text"] or t.get("act")]})
         self.chats_today[a] = self.chats_today.get(a, 0) + 1
         self.chats_today[b] = self.chats_today.get(b, 0) + 1
         spoken = [t for t in turns if t["text"] or t.get("act")]
@@ -818,7 +799,7 @@ class IslandSimulation:
         the conversation so far, for the trade on the table."""
         isl = self.isl
         acts, said = [], []  # `said`: the same, structured, so each side can be told it their way (version 12)
-        if getattr(self, "prompt_version", 1) >= 12 and obj.get("accept") is True:
+        if self.v12 and obj.get("accept") is True:
             self._accept_trade(d, speaker, other, open_trade(turns or []), acts, said)
         give = obj.get("give")
         if isinstance(give, dict) and _clean_side(give):
@@ -831,8 +812,9 @@ class IslandSimulation:
                 acts.append(f"gave {what}")
                 said.append({"kind": "gave", "items": dict(items)})
             elif getattr(self, "prompt_version", 1) >= 8:
-                acts.append(_failed_give(isl, speaker, other, items))
-                said.append({"kind": "failed", "items": dict(items), "why": _failed_give(isl, speaker, other, items)})
+                problem = isl.give_problem(speaker, other, items)
+                acts.append(_failed_give(items, other, problem))
+                said.append({"kind": "failed", "items": dict(items), "problem": problem})
             else:
                 acts.append(f"tried to give something but {what}")
         ask = obj.get("ask")
@@ -850,12 +832,10 @@ class IslandSimulation:
                 acts.append("asked for " + ", ".join(f"{n} {k}" for k, n in f["items"].items()))
                 said.append({"kind": "asked", "items": dict(f["items"])})
         trade = obj.get("trade")
-        if getattr(self, "prompt_version", 1) >= 12 and isinstance(trade, dict) and \
+        if self.v12 and isinstance(trade, dict) and \
                 (_clean_side(trade.get("give")) or _clean_side(trade.get("want"))):
             self._propose_trade(d, speaker, other, trade, acts, said)
-        for f in isl.favors_done_today:
-            self.log("favor_done", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
-        isl.favors_done_today = []
+        self._log_favors_done(d)
         if acts:
             turn["act"] = "; ".join(acts)
         if said:
@@ -874,7 +854,7 @@ class IslandSimulation:
             acts.append("proposed a trade with nothing on one side")
             said.append({"kind": "proposed", "give": give, "want": want, "one_sided": True})
         else:
-            acts.append(f"offered a trade: {_fmt_items(give)} for {_fmt_items(want)}")
+            acts.append(f"offered a trade: {_count(give)} for {_count(want)}")
             said.append({"kind": "proposed", "give": give, "want": want})
             self.log("trade_proposed", day=d, proposer=speaker, to=other, give=give, want=want)
 
@@ -888,16 +868,15 @@ class IslandSimulation:
             return
         give, want = table["give"], table["want"]
         ok, problem = isl.trade(other, speaker, give, want)
-        value = lambda side: sum(n if k == "bells" else n * isl.prices.get(k, 0) for k, n in side.items())  # noqa: E731
         if ok:
             self._exchange(d, "trade", other, speaker, give, want, place="in person")
             self.log("trade", day=d, offer=None, how="in person", seller=other, buyer=speaker, give=give, want=want,
-                     give_cranny_value=value(give), want_cranny_value=value(want))
-            acts.append(f"accepted the trade: {_fmt_items(give)} for {_fmt_items(want)}")
+                     give_cranny_value=isl.cranny_value(give), want_cranny_value=isl.cranny_value(want))
+            acts.append(f"accepted the trade: {_count(give)} for {_count(want)}")
             said.append({"kind": "traded", "proposer": other, "give": give, "want": want})
         else:
             self.log("trade_failed", day=d, proposer=other, accepter=speaker, give=give, want=want, problem=problem)
-            acts.append(f"accepted the trade, but it fell through: {_trade_problem(problem)}")
+            acts.append(f"accepted the trade, but it fell through: {problem_text(problem)}")
             said.append({"kind": "trade_failed", "proposer": other, "give": give, "want": want, "problem": problem})
 
     def _visits(self, d: int, h: int, doing: dict, ok_by: dict, busy: set) -> None:
@@ -1260,16 +1239,11 @@ class IslandSimulation:
             isl.v[n].today.append(f"{clock(h)} went to the plaza{res}")
             line[n] = len(isl.v[n].today) - 1
         there = sorted(line)
-        if getattr(self, "prompt_version", 1) >= 12:  # a run switched to 12: number the posts already up
-            for i, p in enumerate(isl.board):
-                if len(p) == 3:
-                    isl.board_seq = getattr(isl, "board_seq", 0) + 1
-                    isl.board[i] = (*p, f"b{isl.board_seq}")
 
         def turn(name):
             vil = isl.v[name]
             waiting = [o for o in self.offers.values() if o.recipient == name and o.status == "pending"]
-            user = plaza_prompt(isl, vil, h, waiting, isl.board if getattr(self, "prompt_version", 1) >= 12 else isl.board[-8:])
+            user = plaza_prompt(isl, vil, h, waiting, isl.board if self.v12 else isl.board[-8:])
             if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             mail = inbox_text(vil) if vil.inbox else ""
@@ -1349,11 +1323,11 @@ class IslandSimulation:
         def who(x):
             return lower.get(str(x or "").strip().lower())
 
-        v12 = getattr(self, "prompt_version", 1) >= 12  # no plaza trade offers: trades happen in person
+        v12 = self.v12  # no plaza trade offers: trades happen in person
         for resp in ([] if v12 else obj.get("responses") or []):
             if not isinstance(resp, dict):
                 continue
-            o = self.offers.get(_offer_id(resp.get("offer")))
+            o = self.offers.get(_ref_id(resp.get("offer")))
             if not o or o.recipient != name or o.status != "pending":
                 log("invalid", day=d, agent=name, what="response", detail=resp)
                 continue
@@ -1398,9 +1372,8 @@ class IslandSimulation:
 
         down = obj.get("take_down") if v12 else None
         for bid in ([down] if isinstance(down, (str, int)) else down if isinstance(down, list) else []):
-            bid = str(bid).strip().strip("[]").lower()
-            bid = f"b{bid}" if bid.isdigit() else bid
-            post = next((p for p in isl.board if p[3:] and p[3] == bid), None)
+            bid = _ref_id(bid, "b")
+            post = next((p for p in isl.board if p[3] == bid), None)
             if post and post[1] == name:
                 isl.board.remove(post)
                 vil.today.append(f"{clock(self.hour)} took down your board post [{bid}]")
@@ -1412,15 +1385,10 @@ class IslandSimulation:
 
         post = str(obj.get("board") or "").strip()[:BOARD_CHARS]
         if post:
+            bid = isl.post(d, name, post)
             if v12:
-                isl.board_seq = getattr(isl, "board_seq", 0) + 1
-                bid = f"b{isl.board_seq}"
-                isl.board.append((d, name, post, bid))
                 vil.today.append(f"{clock(self.hour)} posted on the board [{bid}]: \"{post[:80]}\"")
-                log("board", day=d, round=r, author=name, content=post, id=bid)
-            else:
-                isl.board.append((d, name, post))
-                log("board", day=d, round=r, author=name, content=post)
+            log("board", day=d, round=r, author=name, content=post, id=bid)
 
         for o in ([] if v12 else obj.get("offers") or []):
             if not isinstance(o, dict):
@@ -1486,13 +1454,10 @@ class IslandSimulation:
             isl._settle_favors(o.sender, o.recipient, o.give)
         self._exchange(d, "trade" if o.give and o.want else "offer", o.sender, o.recipient, o.give, o.want, offer=o.id)
         if not o.want:
-            for f in isl.favors_done_today:
-                self.log("favor_done", day=d, **{k: v for k, v in f.items() if k != "day"}, asked_day=f["day"])
-            isl.favors_done_today = []
-        value = lambda side: sum(n if k == "bells" else n * isl.prices.get(k, 0) for k, n in side.items())  # noqa: E731
+            self._log_favors_done(d)
         self.log("offer_update", **asdict(o))
         self.log("trade", day=d, offer=o.id, seller=o.sender, buyer=o.recipient, give=o.give, want=o.want,
-                 give_cranny_value=value(o.give), want_cranny_value=value(o.want))
+                 give_cranny_value=isl.cranny_value(o.give), want_cranny_value=isl.cranny_value(o.want))
         a.inbox.append(f"(day {d}) {b.name} accepted your offer [{o.id}]")
 
     def _write_manifest(self, days: int) -> None:
