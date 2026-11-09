@@ -120,6 +120,10 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font
 .items span { font-size: var(--step--1); padding: 2px 6px; background: var(--fill-soft); border: 1px solid var(--border); }
 .alist { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 4px 8px; margin-top: 10px; font-size: var(--step--1); }
 .alist .k { color: var(--ink-muted); }
+.econ { width: 100%; border-collapse: collapse; font-size: var(--step--1); font-variant-numeric: tabular-nums; }
+.econ th { font-weight: 400; color: var(--ink-muted); text-align: right; padding: 0 0 4px 8px; }
+.econ td { text-align: right; padding: 3px 0 3px 8px; border-top: 1px solid var(--border); }
+.econ th:first-child, .econ td:first-child { text-align: left; padding-left: 0; }
 .dlabel { font-size: var(--step--1); font-weight: 600; color: var(--ink-muted); margin: 8px 0 2px; }
 .hrow { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; font-size: var(--step-0); padding: 5px 0; line-height: 1.4; }
 .hrow .h, .arow .h { color: var(--ink-muted); }
@@ -540,6 +544,7 @@ function days() {
           <div class="stats">${[[nActs, "actions"], [nFail, "failed"], [nSeen, "discoveries"], [nTalk, "talks and mail"]].map(([n, l]) => `<div><div class="n">${fmt(n)}</div><div class="small">${l}</div></div>`).join("")}</div>
         </div>
         ${assetsHTML(name, sel)}
+        ${econHTML(name, sel)}
         <div class="sec"><div class="label">Plans</div>${plans}</div>
         <div class="sec"><div class="label">Actions and attempts</div>${acts}</div>
         <div class="sec"><div class="label">Discoveries</div>${seen}</div>
@@ -548,6 +553,33 @@ function days() {
       </div>
     </aside>
   </main>`;
+}
+
+// What a villager gathered and sold on the days picked, by kind of thing, and their bells in and out by
+// action (gifts, trades and parcels aren't actions, so they aren't here). Older site data has no econ.
+const GATHER_KINDS = ["fish", "bugs", "shells", "fruit", "clams", "wood", "stone and ores", "fossils", "other"];
+function econHTML(name, sel) {
+  if (!sel.some((L) => L.econ)) return "";
+  const rows = {}, bells = {};
+  sel.forEach((L) => {
+    const E = (L.econ || {})[name];
+    if (!E) return;
+    Object.entries(E.rows).forEach(([k, r]) => { rows[k] = (rows[k] || [0, 0, 0, 0]).map((x, i) => x + r[i]); });
+    Object.entries(E.bells).forEach(([k, b]) => { bells[k] = (bells[k] || 0) + b; });
+  });
+  const kinds = GATHER_KINDS.filter((k) => rows[k]);
+  const signed = (b) => `${b > 0 ? "+" : "−"}${fmt(Math.abs(b))}`;
+  const flows = Object.entries(bells).filter(([, b]) => b).sort((x, y) => y[1] - x[1]);
+  const table = kinds.length
+    ? `<table class="econ"><thead><tr><th></th><th>gathered</th><th>worth</th><th>sold</th><th>for</th></tr></thead><tbody>
+        ${kinds.map((k) => { const [g, w, n, b] = rows[k];
+          return `<tr><td>${esc(k)}</td><td>${g ? fmt(g) : "–"}</td><td>${g ? fmt(w) : "–"}</td><td>${n ? fmt(n) : "–"}</td><td>${n ? fmt(b) : "–"}</td></tr>`; }).join("")}
+      </tbody></table>
+      <div class="small" style="margin-top:6px">Worth: what Nook's Cranny would pay for what they gathered.</div>`
+    : '<div class="small">Gathered nothing and sold nothing.</div>';
+  return `<div class="sec"><div class="label">Gathered and sold${sel.length > 1 ? ` · days ${sel[0].day}–${sel[sel.length - 1].day}` : ""}</div>
+    ${table}
+    <div class="alist"><div class="k">bells</div><div>${flows.length ? flows.map(([k, b]) => `${signed(b)} ${esc(k)}`).join(" · ") : "nothing earned or spent by an action"}</div></div></div>`;
 }
 
 // A villager's assets at the end of the last day picked (with the change since the first, if several):

@@ -64,7 +64,8 @@ PROMPT_CHANGES = {
         "conversation leaves out what only plans use (rocks, buildings and trees with their distances, what you "
         "spotted, the museum, the bridge, what shop goods are, the energy plan) and lists your pockets once, and "
         "its instructions are shorter. The action menu says what fishing bait, visit and ask are for, and what "
-        "isn't an action (talking, giving and trading; the board, letters and parcels; walking)",
+        "isn't an action (talking, giving and trading; the board, letters and parcels; walking), and what each tool "
+        "is for",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -126,7 +127,10 @@ _MENU_CHANGES = {
          ("or a part of the island such as \"north beach\".",
           "or a part of the island such as \"north beach\".\nNot actions: talking, giving and trading happen when "
           "you meet someone (visit them to meet on purpose); the board, letters and parcels are at the plaza; and "
-          "you walk wherever an action takes you, so there is no walk or travel.")],
+          "you walk wherever an action takes you, so there is no walk or travel.\n"
+          "Tools: shovel (mine_rock, dig_fossil, dig_clam, dig_stump, break_rock); axe or stone axe (chop_wood); "
+          "fishing rod (fish); net (catch_bug); ladder (climbs one cliff up or down); vaulting pole (jumps across "
+          "the river). You use a ladder or vaulting pole you carry whenever your way needs it.")],
 }
 
 

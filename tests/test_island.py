@@ -1768,7 +1768,10 @@ def test_prompt_version_13_shorter_prompts_and_a_clearer_action_menu():
         assert "bait? (true uses 1 fishing bait from your pockets; if you have none, leave it out)" in menu
         assert "Shops and services are reached by their own actions" in menu and "only, not villagers" in menu
         assert "Not actions: talking, giving and trading happen when you meet someone" in menu
-        assert "Not actions" not in action_menu(12)
+        assert ("Tools: shovel (mine_rock, dig_fossil, dig_clam, dig_stump, break_rock); axe or stone axe (chop_wood); "
+                "fishing rod (fish); net (catch_bug); ladder (climbs one cliff up or down); vaulting pole (jumps across "
+                "the river).") in menu
+        assert "Not actions" not in action_menu(12) and "Tools: shovel" not in action_menu(12)
         assert "Not actions" in sim.systems[a] and "Not actions" not in sim.talk_systems[a]
 
 
@@ -1915,3 +1918,29 @@ def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied():
         assert isl.board and "it isn't yours" in vb.today[-1]
         sim._apply_evening(isl.day, 0, a, {"take_down": bid})
         assert not isl.board and va.today[-1].endswith(f"took down your board post [{bid}]")
+
+
+def test_site_econ_counts_what_was_gathered_and_sold():
+    from llmabm.island.site_data import econ_of, gather_kind
+    from llmabm.island.world import sell_prices
+
+    import json as _json
+    w = _json.loads((ROOT / "runs/test1/manifest.json").read_text())["world"]
+    prices = sell_prices(w)
+    fish = next(iter(w["fish"]))
+    shell = next(iter(w["shells"]))
+    assert gather_kind(w, fish) == "fish" and gather_kind(w, shell) == "shells"
+    assert gather_kind(w, w["island"]["native_fruit"]) == "fruit" and gather_kind(w, "hardwood") == "wood"
+    acts = [
+        {"ok": True, "action": {"do": "fish"}, "delta": {"items": {fish: 2}}},
+        {"ok": True, "action": {"do": "beachcomb"}, "delta": {"items": {shell: 3}}},
+        {"ok": False, "action": {"do": "fish"}, "delta": {}},
+        {"ok": True, "action": {"do": "sell"}, "delta": {"bells": prices[fish] + 2 * prices[shell],
+                                                          "items": {fish: -1, shell: -2}}},
+        {"ok": True, "action": {"do": "buy"}, "delta": {"bells": -300, "items": {"fishing bait": 1}}},
+        {"ok": True, "action": {"do": "mine_rock"}, "delta": {"bells": 450}},
+    ]
+    e = econ_of(acts, w, prices)
+    assert e["rows"] == {"fish": [2, 2 * prices[fish], 1, prices[fish]],
+                         "shells": [3, 3 * prices[shell], 2, 2 * prices[shell]]}
+    assert e["bells"] == {"from selling": prices[fish] + 2 * prices[shell], "at the shops": -300, "from rocks": 450}

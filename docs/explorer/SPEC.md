@@ -177,6 +177,12 @@ Failure buckets, matched on the action's `result` text (first match wins):
   x = hour 07 to 23 (from `hour_state.pools`; note each `hour_state` is the state after that hour).
 - **Villager tabs** (10 buttons) and the selected villager's day card:
   - stats: actions, failed, discoveries, talks and mail
+  - **Gathered and sold** (site data version 8): per kind of thing (fish, bugs, shells, fruit, clams,
+    wood, stone and ores, fossils, other), how many they gathered and what that is worth at Cranny
+    prices, and how many they sold and for how many bells, summed over the days picked; then their bells
+    in and out by action (from selling, from rocks, at the shops, to the bridge, on the loan or house).
+    From `action.delta`; a sale's bells are split across what was sold by Cranny price. Gifts, trades
+    and parcels aren't actions, so they aren't counted here
   - **Plans:** each `plan` event's hour, private `thoughts`, then muted `N actions scheduled, N dropped`
     and the `note` if any
   - **Actions and attempts:** hour, location, `result`, ok/failed

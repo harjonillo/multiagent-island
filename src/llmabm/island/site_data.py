@@ -17,10 +17,11 @@ from pathlib import Path
 from ..analysis import Run, load_run
 from .analysis import (RESOURCES, _side, action_mix, assets, extraction_shares, gini, hhi, llm_calls, net_worth,
                        reply_errors, run_out, snapshots)
-from .world import CATEGORIES, clock
+from .world import CATEGORIES, CLAM, FOSSIL, clock, sell_prices
 
-VERSION = 7  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
+VERSION = 8  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
 # 7: what each thing on the map is, for hovering (objects.info), buildings' tiles, and each day's house names
+# 8: what each villager gathered and sold each day, and where their bells came from and went (econ)
 
 # Why actions failed, matched on the result text; the first match wins.
 FAIL_BUCKETS = [
@@ -329,6 +330,67 @@ def _assets(v: dict, world: dict) -> dict:
             "interior": v.get("interior") or [], "wearing": v.get("wearing") or {}}
 
 
+# What the island gives, in the order the villager panel lists it.
+GATHER_KINDS = ["fish", "bugs", "shells", "fruit", "clams", "wood", "stone and ores", "fossils", "other"]
+GATHER_ACTIONS = {"fish", "catch_bug", "beachcomb", "shake_tree", "chop_wood", "chop_down_tree", "mine_rock",
+                  "break_rock", "dig_fossil", "dig_clam", "dig_stump"}
+# Where bells come from and go, by action; anything else (a gift, a trade, a parcel) isn't an action.
+BELL_FLOWS = {"sell": "from selling", "mine_rock": "from rocks", "buy": "at the shops",
+              "contribute_bridge": "to the bridge", "pay_loan": "on the loan", "upgrade_house": "on the house",
+              "move_house": "on the house", "set_ordinance": "on an ordinance"}
+
+
+def gather_kind(w: dict, item: str) -> str:
+    """Which of GATHER_KINDS an item is."""
+    if item in w["fish"]:
+        return "fish"
+    if item in w["bugs"]:
+        return "bugs"
+    if item in w["shells"]:
+        return "shells"
+    if item == w["island"]["native_fruit"]:
+        return "fruit"
+    if item == CLAM:
+        return "clams"
+    if item in ("wood", "softwood", "hardwood"):
+        return "wood"
+    if item in ("stone", "clay", "iron nugget", "gold nugget"):
+        return "stone and ores"
+    if item == FOSSIL or item in w["fossils"]:
+        return "fossils"
+    return "other"
+
+
+def econ_of(actions: list[dict], w: dict, prices: dict) -> dict:
+    """One villager's day as the villager panel shows it: per kind of thing, how many they gathered and what
+    that is worth at Cranny prices, how many they sold and for how many bells; and their bells in and out by
+    action. A sale's bells are split across what was sold in proportion to the Cranny's prices."""
+    rows: dict[str, list[int]] = {}  # kind -> [gathered, worth, sold, bells]
+    flows: Counter = Counter()
+    for e in actions:
+        if not e.get("ok"):
+            continue
+        do = str((e.get("action") or {}).get("do") or "").lower()
+        delta = e.get("delta") or {}
+        items = delta.get("items") or {}
+        if do in GATHER_ACTIONS:
+            for k, n in items.items():
+                if n > 0:
+                    r = rows.setdefault(gather_kind(w, k), [0, 0, 0, 0])
+                    r[0] += n
+                    r[1] += n * prices.get(k, 0)
+        if do == "sell":
+            sold = {k: -n for k, n in items.items() if n < 0}
+            worth = sum(n * prices.get(k, 0) for k, n in sold.items()) or 1
+            for k, n in sold.items():
+                r = rows.setdefault(gather_kind(w, k), [0, 0, 0, 0])
+                r[2] += n
+                r[3] += round(delta.get("bells", 0) * n * prices.get(k, 0) / worth)
+        if delta.get("bells") and do in BELL_FLOWS:
+            flows[BELL_FLOWS[do]] += delta["bells"]
+    return {"rows": {k: rows[k] for k in GATHER_KINDS if k in rows}, "bells": dict(flows)}
+
+
 def _isabelle(start: dict | None, events: list[dict], llm_announce: bool) -> dict:
     """What Isabelle said that day. The morning announcement is the day_start event's `heard`, exactly as the
     villagers' first plan of the day showed it; older runs didn't record it, and are rebuilt from the same event
@@ -409,6 +471,9 @@ def day_detail(run: Run) -> list[dict]:
 
         acts_all = of("action")
         snap = snaps[d]
+        world = run.manifest["world"]
+        prices = sell_prices(world)
+        econ = {n: econ_of([a for a in acts_all if a["agent"] == n], world, prices) for n in snap["villagers"]}
         out.append({
             "day": d,
             "counts": {"actions": len(acts_all), "failed": sum(1 for a in acts_all if not a["ok"]),
@@ -419,6 +484,7 @@ def day_detail(run: Run) -> list[dict]:
                        for n, v in snap["villagers"].items()},
             "plans": plans, "acts": acts, "seen": seen, "pages": pages, "talks": talks, "mail": mail,
             "assets": {n: _assets(v, run.manifest["world"]) for n, v in snap["villagers"].items()},
+            "econ": econ,
             "isabelle": _isabelle(start, ev, bool(((run.manifest.get("scenario_config") or {}).get("isabelle") or {}).get("announce"))),
         })
     return out

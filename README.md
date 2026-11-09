@@ -395,7 +395,12 @@ isn't an action: `bait` uses 1 fishing bait from the pockets (leave it out if yo
 `visit` is for villagers, and shops and services are reached by their own actions (buy, sell,
 donate, ask); `ask` is for the NPCs only, not villagers; and a closing line says talking,
 giving and trading happen when you meet someone (visit them to meet on purpose), the board,
-letters and parcels are at the plaza, and you walk wherever an action takes you. In test1 up to
+letters and parcels are at the plaza, and you walk wherever an action takes you. A last line
+says what each tool is for: the shovel for `mine_rock`, `dig_fossil`, `dig_clam`, `dig_stump` and
+`break_rock`; either axe for `chop_wood`; the fishing rod for `fish`; the net for `catch_bug`; the
+ladder climbs one cliff up or down and the vaulting pole jumps the river, used on the way when
+carried. (Up to day 8 of test1, villagers carrying a ladder kept hoping it, or a better path,
+would get them across the river to the plaza.) In test1 up to
 day 8, plans tried `trade`, `post`, `talk`, `walk`, `travel` and `give` as actions 22 times, fished
 with bait they didn't have 81 times, and tried to `visit` a building or NPC about 40 times.
 
