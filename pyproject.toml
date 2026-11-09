@@ -19,4 +19,4 @@ llmabm = "llmabm.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"llmabm.island" = ["site_template.html", "site_experiments.html", "site_tokens.css", "changelog.yaml"]
+"llmabm.island" = ["site_template.html", "site_experiments.html", "site_tokens.css", "changelog.yaml", "door_art/*.png"]
