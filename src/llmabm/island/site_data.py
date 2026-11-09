@@ -19,9 +19,10 @@ from .analysis import (RESOURCES, _side, action_mix, assets, extraction_shares, 
                        reply_errors, run_out, snapshots)
 from .world import CATEGORIES, CLAM, FOSSIL, clock, sell_prices
 
-VERSION = 8  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
+VERSION = 9  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
 # 7: what each thing on the map is, for hovering (objects.info), buildings' tiles, and each day's house names
 # 8: what each villager gathered and sold each day, and where their bells came from and went (econ)
+# 9: a nightly page's opening on the home page takes in the line after a heading-only first line (pages.rest)
 
 # Why actions failed, matched on the result text; the first match wins.
 FAIL_BUCKETS = [
@@ -286,8 +287,9 @@ def home_data(run: Run) -> dict:
             continue
         skipped = e.get("skipped")
         text = (e.get("self_doc") or "").strip()
+        first, rest = page_opening(text)
         pages[e["agent"]][index[e["day"]]] = ({"skipped": skipped} if skipped else
-                                               {"first": text.splitlines()[0] if text else "", "text": text})
+                                               {"first": first, "rest": rest, "text": text})
 
     shares = extraction_shares(run)
     commons = []
@@ -300,6 +302,18 @@ def home_data(run: Run) -> dict:
     return {"kpis": kpis, "caption": caption, "trends": trends, "fails": fail_rows, "failed": len(failed),
             "actions": len(acts), "villagers": villagers, "gini": round(gini(list(net_worth(last).values())), 2),
             "pages": pages, "commons": commons, "run_out": gone}
+
+
+def page_opening(text: str, at_least: int = 40) -> tuple[str, str]:
+    """A nightly page's opening line for the home page grid, and the rest. A first line that is only a heading
+    ("Day 7.") takes in the lines after it, until the opening has `at_least` characters."""
+    lines = [ln.strip() for ln in text.splitlines()]
+    first, i = "", 0
+    while i < len(lines) and (len(first) < at_least or not first):
+        if lines[i]:
+            first = f"{first} {lines[i]}".strip()
+        i += 1
+    return first, "\n".join(lines[i:]).strip()
 
 
 def _pools(p: dict) -> dict:

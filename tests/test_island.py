@@ -1944,3 +1944,13 @@ def test_site_econ_counts_what_was_gathered_and_sold():
     assert e["rows"] == {"fish": [2, 2 * prices[fish], 1, prices[fish]],
                          "shells": [3, 3 * prices[shell], 2, 2 * prices[shell]]}
     assert e["bells"] == {"from selling": prices[fish] + 2 * prices[shell], "at the shops": -300, "from rocks": 450}
+
+
+def test_site_page_opening_skips_a_heading_only_first_line():
+    from llmabm.island.site_data import page_opening
+
+    assert page_opening("Day 7.  \nThe plaza feels empty today; I kept coming back.\nMore tomorrow.") == (
+        "Day 7. The plaza feels empty today; I kept coming back.", "More tomorrow.")
+    long = "Day 0. Arrived at dawn and set up my tent by the river."
+    assert page_opening(long + "\nRest.") == (long, "Rest.")
+    assert page_opening("") == ("", "") and page_opening("Short.") == ("Short.", "")

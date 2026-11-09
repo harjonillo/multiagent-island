@@ -63,7 +63,7 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font
 .private { color: var(--private-ink); }
 .private .label, .label.private { color: var(--private-ink); display: flex; gap: 6px; align-items: center; }
 .pages { display: grid; gap: 6px 8px; align-items: stretch; }
-.pages .nm { font-size: var(--step-0); font-weight: 600; align-self: center; }
+.pages .nm { font-size: var(--step-0); font-weight: 600; align-self: stretch; display: flex; align-items: center; position: sticky; left: 0; z-index: 1; background: var(--panel); }
 .cell { font-size: var(--step-0); padding: 7px 10px; line-height: 1.35; background: var(--panel); border: 1px solid var(--border); min-width: 0; }
 .cell.same { background: var(--private-fill); border-color: transparent; }
 .cell.skip { color: var(--ink-muted); font-style: italic; background: var(--ground); border-color: transparent; }
@@ -333,14 +333,17 @@ function home() {
   const maxAssets = Math.max(...H.villagers.flatMap((v) => v.assets), 1);
   const maxFail = Math.max(...H.fails.map((f) => f.n), 1);
   const nights = D.days.map((d) => d.day);
-  const pageCell = (cells, i) => {
+  const pageCell = (cells, i, name) => {
     const c = cells[i];
     if (!c) return `<div class="cell skip">–</div>`;
     if (c.skipped) return `<div class="cell skip">${esc(c.skipped)}</div>`;
     const prev = i > 0 ? cells[i - 1] : null;
     const same = prev && !prev.skipped && prev.text === c.text;
-    const body = c.text && c.text !== c.first
-      ? `<details><summary>${esc(c.first)}</summary>${esc(c.text.slice(c.first.length)).trim().replace(/\n/g, "<br>")}</details>` : esc(c.first || "(blank)");
+    // Older site data has no `rest`: the opening was the first line, so the rest is what follows it.
+    const rest = c.rest !== undefined ? c.rest : (c.text || "").slice((c.first || "").length).trim();
+    const link = `<button class="linkbtn" data-go="${daysHref(name, [nights[i]])}">Night ${nights[i]} on the Days page</button>`;
+    const body = rest
+      ? `<details><summary>${esc(c.first)} <span class="small">…</span></summary>${esc(rest).replace(/\n/g, "<br>")}<div style="margin-top:6px">${link}</div></details>` : esc(c.first || "(blank)");
     return `<div class="cell private${same ? " same" : ""}"${same ? ' title="Same as the night before"' : ""}>${body}</div>`;
   };
   const ro = H.run_out, roText = (k, name) => ro[k].days ? `${name} ran out around ${ro[k].hour} on ${ro[k].days} of ${R.days} days` : `${name} never`;
@@ -373,10 +376,10 @@ function home() {
       </div>
       <div class="card">
         <div class="label private" style="margin-bottom:4px">${LOCK} Nightly pages, night by night</div>
-        <div class="small" style="margin-bottom:10px">First line of what each villager wrote to themselves (private; click a line for the rest). Tinted: the same as the night before.</div>
-        <div class="scroll"><div class="pages" style="grid-template-columns: 56px repeat(${nights.length}, minmax(180px, 1fr)); min-width:${56 + nights.length * 188}px">
+        <div class="small" style="margin-bottom:10px">The opening of what each villager wrote to themselves (private; click it for the rest), latest night on the right. Tinted: the same as the night before.</div>
+        <div class="scroll" id="pages-scroll"><div class="pages" style="grid-template-columns: 56px repeat(${nights.length}, minmax(180px, 1fr)); min-width:${56 + nights.length * 188}px">
           <div></div>${nights.map((n) => `<div class="label" style="font-size: var(--step--1)">Night ${n}</div>`).join("")}
-          ${R.villagers.map((n) => `<div class="nm">${esc(n)}</div>${nights.map((_, i) => pageCell(H.pages[n], i)).join("")}`).join("")}
+          ${R.villagers.map((n) => `<div class="nm">${esc(n)}</div>${nights.map((_, i) => pageCell(H.pages[n], i, n)).join("")}`).join("")}
         </div></div>
       </div>
       <div class="card">
@@ -746,6 +749,8 @@ function show() {
   document.querySelectorAll(".tabs button").forEach((b) => { if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
   $("#view").innerHTML = tab === "days" ? days() : tab === "social" ? social() : home();
   if (tab !== shownTab) window.scrollTo(0, 0);
+  const pagesScroll = $("#pages-scroll");  // the nightly pages open on the latest night, as the Days page does
+  if (pagesScroll && tab !== shownTab) pagesScroll.scrollLeft = pagesScroll.scrollWidth;
   shownTab = tab;
 }
 // Buttons that change the view carry the link they lead to.

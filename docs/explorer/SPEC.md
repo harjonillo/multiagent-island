@@ -153,8 +153,11 @@ Subtitle: `<n> days, <first date> to <last date> · <n> villagers · <n> LLM cal
    sparkline over days with the latest value (assets = bells + items at Cranny prices, loans not
    subtracted; also print the net worth Gini from the summary), things spotted, share of energy spent
    talking, three most frequent actions with counts.
-6. **Nightly pages, night by night:** villagers × nights grid of the first line of each page. A cell is
-   tinted `--private-fill` when it repeats the night before; "chose not to write" in muted italics.
+6. **Nightly pages, night by night:** villagers × nights grid of the opening of each page: its first
+   line, or if that is only a heading ("Day 7."), the lines after it up to about 40 characters. Clicking
+   it shows the rest and a link to that night on the Days page. The grid opens scrolled to the latest
+   night, as the Days page does, with the villager names kept in view. A cell is tinted `--private-fill`
+   when it repeats the night before; "chose not to write" in muted italics.
 7. **Who took the commons:** per resource, HHI and the top three takers with shares; then one line on
    when rocks, shells and fossil spots typically ran out.
 
