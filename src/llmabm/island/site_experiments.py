@@ -1,4 +1,5 @@
-"""The explorer's Experiments page ("pick a door"): one pixel-art door per run in a runs folder.
+"""The explorer's Experiments page ("pick a door"): one pixel-art door per run in a runs folder (Hannah's
+drawn door, see site_doors.py), and a faded empty slot for the next one.
 
 Each door links to that run's explorer page (<run>/site/index.html). The card under a door tells the
 experiments apart (agents, scenario, start date) and opens to show the initial conditions: what every
@@ -15,7 +16,7 @@ import time
 from pathlib import Path
 from urllib.parse import urlparse
 
-from .site_doors import EMPTY_DOOR, KNOB, OPEN_WIDTHS, PANEL, SIGN, door_svg, frame_svg, knob_svg
+from .site_doors import EMPTY_DOOR, FRAME_MS, FRAMES, LEAF, PANEL, SIGN, door_svg, frame_svg, sprite_css
 
 TEMPLATE = Path(__file__).with_name("site_experiments.html")
 TOKENS = Path(__file__).with_name("site_tokens.css")
@@ -220,14 +221,7 @@ def door_html(e: dict) -> str:
     return f"""
     <div class="slot">
       <a class="door" href="{html.escape(e['href'])}" aria-label="{html.escape(label)}">
-        {frame_svg()}
-        <div class="panel-box" style="{_pos(PANEL)}">
-          <div class="panel">
-            {door_svg(20)}
-            {_sign(n, e['scenario'])}
-            <div class="knob" style="{_pos(KNOB)}"><span class="up">{knob_svg(False)}</span><span class="down">{knob_svg(True)}</span></div>
-          </div>
-        </div>
+        <span class="spr" aria-hidden="true"></span><span class="leaf" style="{_pos(LEAF)}"></span>
       </a>
       <div class="card">
         <div class="card-head">
@@ -253,12 +247,12 @@ def empty_html(number: int, runs_dir: Path) -> str:
     cmd = f"llmabm run scenarios/island_blank.yaml --backend groq --seed 0 --run-dir {runs_dir.name}/exp{number:02d}"
     return f"""
     <div class="slot">
-      <div class="door empty" aria-hidden="true">
+      <div class="door-box"><div class="door empty" aria-hidden="true">
         {frame_svg()}
         <div class="panel-box" style="{_pos(PANEL)}">
-          <div class="panel">{door_svg(20, EMPTY_DOOR)}{_sign(number, 'empty lot')}</div>
+          <div class="panel">{door_svg(EMPTY_DOOR)}{_sign(number, 'empty lot')}</div>
         </div>
-      </div>
+      </div></div>
       <div class="card next">
         <div class="title">Next experiment</div>
         A new door appears here when another run directory exists, for example a real model on the same scenario:
@@ -316,14 +310,15 @@ def build_experiments(runs_dir: Path, out_dir: Path | None = None) -> Path:
         e["has_site"] = page.exists()
     out_dir = Path(out_dir) if out_dir else runs_dir / "site"
     out_dir.mkdir(parents=True, exist_ok=True)
-    frames = [door_svg(w) for w in OPEN_WIDTHS[1:]]
     doors = "".join(door_html(e) for e in exps) + empty_html(len(exps), runs_dir)
     page = (TEMPLATE.read_text().replace("__TOKENS__", TOKENS.read_text())
             .replace("__COUNT__", f"{len(exps)} experiment" + ("" if len(exps) == 1 else "s"))
             .replace("__DOORS__", doors)
             .replace("__CHANGELOG__", changelog_html([c for e in exps for c in changes(runs_dir / e["dir"], e)]
                                                      + sim_changes()))
-            .replace("__FRAMES__", json.dumps(frames).replace("</", "<\\/")))
+            .replace("__SPRITES__", sprite_css())
+            .replace("__FRAMES__", str(FRAMES - 1))
+            .replace("__FRAME_MS__", str(FRAME_MS)))
     out = out_dir / "index.html"
     out.write_text(page)
     return out

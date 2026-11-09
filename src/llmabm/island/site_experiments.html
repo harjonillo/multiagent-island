@@ -24,19 +24,21 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-4); font
 main { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 48px; padding: 28px 0 0; }
 .slot { width: 300px; display: flex; flex-direction: column; }
 
-/* The door: frame, then the panel over the doorway, then sign and handle. Sprites only, no transforms. */
-.door { position: relative; display: block; width: 240px; margin: 0 auto; text-decoration: none; cursor: pointer; }
+/* An experiment's door: Hannah's drawn sprite (sizes, sprites and frames come from site_doors.sprite_css, below), with
+   an outline around the door leaf on hover and focus. Sprite swaps only, no transforms or transitions. */
+.door { position: relative; display: block; margin: 0 auto; text-decoration: none; cursor: pointer; }
 .door:focus { outline: none; }
+.leaf { position: absolute; pointer-events: none; }
+.door:hover:not([data-frame]) .leaf, .door:focus-visible:not([data-frame]) .leaf { box-shadow: 0 0 0 3px var(--tabbar-rule); }
+/* The empty slot keeps the earlier code-drawn door, faded, standing on the same ground line. */
+.door-box { position: relative; margin: 0 auto; }
 .door.empty { filter: grayscale(0.6); opacity: 0.55; cursor: default; }
 .panel-box { position: absolute; }
 .panel { position: relative; width: 100%; height: 100%; }
-.door:hover .panel, .door:focus-visible .panel { box-shadow: 0 0 0 3px var(--tabbar-rule); }
 .sign { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ink);
   text-align: center; line-height: 1.05; pointer-events: none; font-family: var(--font-display); }
-.sign .exp { font-size: var(--step-2); } .sign .scn { font-size: var(--step--1); margin-top: 4px; }
-.knob { position: absolute; }
-.knob .down, .door:hover .knob .up, .door:focus-visible .knob .up { display: none; }
-.door:hover .knob .down, .door:focus-visible .knob .down { display: block; }
+.sign .exp { font-size: var(--step-0); } .sign .scn { font-size: 9px; margin-top: 3px; }
+__SPRITES__
 
 /* The card under a door. */
 .card { background: var(--panel); border: 2px solid var(--border); box-shadow: var(--card-shadow); padding: 14px 16px; margin-top: 16px; font-size: var(--step-0); }
@@ -118,21 +120,18 @@ main { display: flex; flex-wrap: wrap; justify-content: center; align-items: fle
 __CHANGELOG__
 <script>
 "use strict";
-// Opening a door: four sprite frames about 110 ms apart, then go to the run's page 300 ms later.
-// Without JS (or with reduced motion) the door is a plain link.
-const FRAMES = __FRAMES__;
+// Opening a door: the sheet's frames 1..N, FRAME_MS apart (data-frame picks one in the CSS), then go to
+// the run's page 300 ms after the last. Without JS (or with reduced motion) the door is a plain link.
+const OPEN_FRAMES = __FRAMES__, FRAME_MS = __FRAME_MS__;
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const closed = new Map();
-document.querySelectorAll("a.door").forEach((door) => {
-  const box = door.querySelector(".panel-box");
-  closed.set(box, box.innerHTML);
+const doors = document.querySelectorAll("a.door");
+doors.forEach((door) => {
   door.addEventListener("click", (e) => {
     if (reduced || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
-    if (door.dataset.opening) return;
-    door.dataset.opening = "1";
-    FRAMES.forEach((svg, i) => setTimeout(() => { box.innerHTML = svg; }, (i + 1) * 110));
-    setTimeout(() => { location.href = door.href; }, FRAMES.length * 110 + 300);
+    if (door.dataset.frame) return;
+    for (let i = 1; i <= OPEN_FRAMES; i++) setTimeout(() => { door.dataset.frame = i; }, (i - 1) * FRAME_MS);
+    setTimeout(() => { location.href = door.href; }, (OPEN_FRAMES - 1) * FRAME_MS + 300);
   });
 });
 // The changelog folds to a tab and back. Where it has room beside the doors, the choice is remembered
@@ -158,7 +157,7 @@ document.addEventListener("keydown", (e) => {
 // Coming back with the browser's back button shows the doors closed again.
 window.addEventListener("pageshow", (e) => {
   if (!e.persisted) return;
-  closed.forEach((html, box) => { box.innerHTML = html; delete box.closest("a.door").dataset.opening; });
+  doors.forEach((door) => { delete door.dataset.frame; });
 });
 </script>
 </body>

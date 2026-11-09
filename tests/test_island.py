@@ -989,6 +989,10 @@ def test_site_data_and_page_for_a_mock_run():
         doors = (Path(d) / "site" / "index.html").read_text()
         assert 'href="../real/site/index.html"' in doors and "../run/site" not in doors
         assert "1 experiment<" in doors and "EXP 00" in doors and "EXP 01" in doors  # 01: the empty lot
+        # The drawn door: its two sprites embedded once for every door, five opening frames 80 ms apart, and
+        # no sign on it (the number is on the card); only the empty lot keeps the old door and its sign.
+        assert doors.count("data:image/png;base64,") == 2 and doors.count('class="sign"') == 1
+        assert '.door[data-frame="5"]' in doors and "OPEN_FRAMES = 5, FRAME_MS = 80" in doors
         e = experiment(real, 0)
         assert e["agents"].startswith("groq · ") and e["days_done"] == 2
         kit, island = dict(e["conditions"]["villager"]), dict(e["conditions"]["island"])

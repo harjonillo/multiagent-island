@@ -9,6 +9,10 @@ on the design canvas, and their full markup and logic are in `mockups/` (see "Th
 Updated Oct 31, 23:45: added the Experiments page, the door sprites (`door_sprites.py`) and the link back
 to the experiments page in the top bar.
 
+Updated Nov 9: each experiment's door is now Hannah's hand-drawn door (`door_art/`), with no sign on it:
+the number is on the card only. The empty "next experiment" slot keeps the code-drawn door from
+`door_sprites.py`.
+
 ## Recommended shape
 
 - A new command, `llmabm explore <run_dir>`, writes `<run_dir>/explorer/index.html`: one self-contained
@@ -82,20 +86,24 @@ each in a 300px column with its card below.
 
 - **One door per run directory**, oldest first, numbered `EXP 00`, `EXP 01`, ... in that order (in the
   repo: from 00, the first test run, and mock-backend runs are left out).
-- **The door** is pixel art, 240px wide, built from the sprites in `door_sprites.py`: the frame (with a
-  dark doorway and a stone step), the door panel on top of it (mint planks, two braces, a sign board, a
-  handle backplate), and the lever handle on top of that. All sprites are SVG `<rect>`s with
-  `shape-rendering="crispEdges"`; never scale them with smooth transforms.
-- **The sign on the door:** `EXP NN` in Silkscreen 24px and the scenario name in Silkscreen 11px, dark
-  ink, centred on the sign board (`SIGN` in `door_sprites.py`). Shown on the closed door only.
-- **Hover or keyboard focus:** swap the handle to its turned-down sprite (`knob_svg(True)`) and draw a 3px
-  `--tabbar-rule` outline around the door panel. No rotation animation: it is a sprite swap.
-- **Click (or Enter):** play the opening as four sprite frames, about 110 ms apart (`door_svg(14)`,
-  `(9)`, `(5)`, `(2)`): the door narrows toward its left hinge with a dark edge for its thickness, and the
-  dark doorway shows through. About 300 ms after the last frame, go to that run's Home. Swap frames by
-  replacing the SVG; no CSS transitions or 3D transforms, so it stays pixel art. With
-  `prefers-reduced-motion`, skip straight to navigation. The whole door is one link (`<a href>` with an
-  `aria-label` such as `Open experiment 01: blank villagers, mock backend`), so it works without JS.
+- **The door** is Hannah's hand-drawn door from `door_art/` (64 x 64 PNGs: the frame, an arched mint
+  door with its lever, a stone step and two potted plants), drawn at 5x so every pixel is 5 x 5 px, with
+  `image-rendering: pixelated`. The transparent margins around the art are cropped (it spans sprite pixels
+  x 9..58, y 8..57), so the door is 250 x 250 px, centred over its card, and the card sits 16px under the
+  step. The page is self-contained, so the sprites are
+  embedded once as data URIs in its CSS: `door_open_sheet.png` (frames 0 to 5 in a row; 0 is the closed
+  door) and `door_hover.png`. Never scale them with smooth transforms or by a fraction.
+- **No sign on the door.** The door carries no text; `EXP NN` and the scenario are on the card under it.
+- **Hover or keyboard focus:** swap to `door_hover.png` (the lever turned 45 degrees down) and draw a 3px
+  `--tabbar-rule` outline around the door leaf (sprite pixels x 20..43, y 11..48). No rotation animation:
+  it is a sprite swap.
+- **Click (or Enter):** play frames 1 to 5 of the sheet, 80 ms apart, starting at once: the lever turns,
+  the door narrows toward its left hinge and darkens, and the dark room shows through. About 300 ms after
+  the last frame, go to that run's Home. Swap frames by stepping the sheet's `background-position`; no CSS
+  transitions or 3D transforms, so it stays pixel art. Coming back with the back button shows the door
+  closed again. With `prefers-reduced-motion`, skip straight to navigation. The whole door is one link
+  (`<a href>` with an `aria-label` such as `Open experiment 01: blank villagers, mock backend`), so it
+  works without JS (hover and focus are CSS only).
 - **The card under each door** (panel style, 13px): `Experiment NN` in Silkscreen 18px with a chip
   `day X of Y` (2px `--selected-border`), then three rows, label muted on the left:
   `agents` (backend and model, e.g. `groq · llama-3.1-8b-instant`, or `mock backend`),
@@ -108,9 +116,13 @@ each in a 300px column with its card below.
   fossils, wild flower patches), then a muted note that wood, rocks, shells and fossils refill each
   morning. Bells come from the scenario config, tools and recipes from the run's world in
   `manifest.json`, the island's counts from day 0's `day_start` event (`pools`).
-- **An empty slot** after the last door: the same door faded (grayscale 60%, opacity 0.55, `EMPTY_DOOR`
-  colours), sign with the next number / `empty lot`, and a dashed card "Next experiment" with an example command
-  for starting another run. Not a link.
+- **An empty slot** after the last door keeps the earlier code-drawn door from `door_sprites.py` (SVG
+  `<rect>`s with `shape-rendering="crispEdges"`: the frame with a dark doorway and a stone step, and the
+  door panel with planks, two braces, a sign board and a handle backplate), faded (grayscale 60%, opacity
+  0.55, `EMPTY_DOOR` colours), with its sign showing the next number (`EXP NN`, Silkscreen 15px) and
+  `empty lot` (Silkscreen 9px). It is drawn with 6 px cells, so it is 144px wide (about as wide as the drawn
+  door's frame) and stands on the same ground line, the step's bottom edge. Then a dashed card "Next
+  experiment" with an example command for starting another run. Not a link.
 - **Changelog** (added Nov 1, in the repo): a sidebar fixed in the page's right margin, 280px, panel
   style, headed `Changelog` (Silkscreen label) with a fold button (a pixel chevron). Entries newest first
   on a timeline (2px rule, a 10px square per entry): the real date, then `EXP NN` (linking to the run) and

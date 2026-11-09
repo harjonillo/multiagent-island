@@ -11,11 +11,14 @@ and the "← experiments" link in the top bar of a run's pages. Everything else 
 | `tokens.css` | the "Island Pixel" design tokens: colours, fonts, borders, shadows |
 | `export_map.py` | reference code for rendering the pixel island map and the overlay positions |
 | `door_sprites.py` | the pixel-art door, its four opening frames and the handle, as SVG; run it for a preview page |
+| `door_art/` | Nov 9: Hannah's hand-drawn door, its hover sprite and six opening frames, replacing the door from `door_sprites.py`. Its README lists where it differs from SPEC.md and has a prompt |
 | `mockups/doors.dc.html`, `home.dc.html`, `days.dc.html`, `social.dc.html` | the mockup sources from the design canvas: inline styles and sample data to match visually (not standalone pages) |
 
 Design canvas with the interactive mockups: https://claude.ai/artifact/M9KbZmd6cyo24Xsd4crVgq
 
 ## Suggested prompt
+
+For the new door art only, use the prompt in `door_art/README.md`.
 
 Put this folder in the repo (for example `docs/explorer/`), then in Claude Code:
 
