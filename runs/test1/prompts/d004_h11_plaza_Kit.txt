@@ -1,0 +1,155 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2: still fumbling. Gus gave me a selit fish instead of bait—nice but useless right now. Got the shovel recipe, but no shovel. Fen didn’t have the second map, so I’m stuck. Dax’s advice is good, but I need the gear first. No fishing today, no fossils yet. Plan: tomorrow I’ll hit Nook’s at 08:00, grab a bait bundle, maybe ask Gus again. Then head to Dax’s house, bring a small log for the shovel, and finally snag that map from Fen or Isabelle. I’m learning the rhythm—early mornings are the only time to shop. Rested enough? I think I’ll get up at 06:30. Need to keep things simple, but I’m getting used to the island’s quirks. Good night.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board and post on it, offer and answer trades, and send letters and parcels, which arrive the next morning.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. You can spend them inwardly (planning, thinking things over, writing your private page at night) or outwardly (conversations, time at the plaza, letters and posts). Each morning you decide how much to spend inwardly and how much outwardly; whatever you leave over is spare, for people you run into. The split is your own plan, not a limit, but when all 150 are gone you can't plan, talk or write until the next morning: you carry on with what you've already planned, and the rest of your time is free.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: plaza
+Day 4 (April 5, spring, sunny), 11:00 at the plaza. You are Kit.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 200. Loan owed to Tom Nook: 0. Home: tent lower ground, centre (site-6), neighbors: Fen. Carrying 11/40 items.
+Tools you carry: axe, fishing rod, net, ladder, vaulting pole
+Other things you carry: island map x2, selit fish x1, hardwood x2, wood x1
+Inside your home (0/6): nothing yet
+Open requests: Gus asked you for 2 fishing bait (day 2); you asked Gus for 2 fishing bait (day 3); you asked Bo for 2 fishing bait (day 3)
+Recipes you know: campfire (wood x3; you have wood 1); clay furnace (clay x6, iron nugget x2; you have none of these); iron garden bench (iron nugget x3, hardwood x4; you have hardwood 2); shovel (hardwood x5; you have hardwood 2); simple wooden fence (wood x3; you have wood 1)
+Prices you have seen at Nook's Cranny: axe 230, fishing rod 160, ladder 570, net 180, shovel 220, vaulting pole 230
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1
+Bridge: 700/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, pansy seeds 240, tulip seeds 240, fishing bait 300, iron fence 280, ceiling fan 4600; recipe cards: shovel 500 (you know it), axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, stone axe 500, golden candlestick 2000
+Able Sisters today (09:00-21:00): sundress 1400, raincoat 1600, straw hat 800, tuxedo 3200
+Your notes, oldest first:
+- (day 0) If Fen doesn't have a map, I might need to ask Isabelle at Resident Services tomorrow.
+- (day 1) If Isabelle is busy, maybe ask Tom Nook next.
+- (day 1) Ask Fen for a second map today.
+- (day 1) Ask Dax tomorrow for fossil spots. Remember to bring shovel.
+- (day 1) Remember to follow up with Fen tomorrow for the map. If no fossil found, consider visiting Blathers for tips.
+- (day 1) Ask Dax tomorrow for fossil spots and bring shovel.
+- (day 1) Remember to thank Fen later if they give me a map.
+- (day 2) Remember to bring shovel tomorrow for fossil dig.
+- (day 2) Got 5 bait, got Dax’s advice, will dig tomorrow. Keep an eye on the map for more fossil sites.
+- (day 2) Plan to visit Dax tomorrow, bring any wood if possible.
+- (day 3) Ask Gus again for bait, bring a small log later for shovel.
+- (day 3) Ask for 2 bait. Keep the fish handy just in case.
+- (day 3) Got two bait? Check with Gus tomorrow if not. Keep a log for shovel.
+- (day 3) Check with Bo about bait tomorrow.
+- (day 3) Remember to bring a log tomorrow for shovel.
+- (day 4) Remember to bring the log to Dax and ask for the second map. Also keep an eye on the river for fossils tomorrow.
+- (day 4) Got bait, need log next.
+- (day 4) Need a log later for shovel. Keep an eye on Gus for future trades.
+Getting around: You are at lower ground, centre. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 50 steps); 2 (the middle cliff, northwest, about 69 steps); 3 (the top cliff, northeast, about 57 steps); 4 (lower ground, centre, about 18 steps); 5 (lower ground, southeast, about 53 steps); 6 (lower ground, southeast, about 48 steps)
+Buildings: Resident Services (about 14 steps); plaza (about 30 steps); museum (about 28 steps); Nook's Cranny (about 23 steps); Able Sisters (about 36 steps)
+Trees around here (centre): 3 hardwood trees, 3 stumps
+Your island map:
+- northwest: the middle cliff and the top cliff; beach; rocks 2; 1 fruit tree, 3 hardwood trees
+- north: the middle cliff and the top cliff; beach; river; rocky shore; 2 fruit trees, 4 hardwood trees
+- northeast: the middle cliff and the top cliff; beach; rocks 3; 1 hardwood tree
+- west: lower ground and the middle cliff; beach; homes: Dax, Gus, Jo; 4 fruit trees, 1 hardwood tree
+- centre: lower ground and the middle cliff; river; buildings: Resident Services, museum; homes: Fen, Kit; rocks 4; 3 hardwood trees
+- east: lower ground and the middle cliff; beach; homes: Cal, Ike; 2 fruit trees
+- southwest: lower ground; beach; river; homes: Bo
+- south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli; 1 fruit tree
+- southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+You spotted today:
+- 07:00 a large fish shadow in the river (the middle cliff, centre)
+- 07:00 a medium fish shadow in the river (lower ground, centre)
+- 09:00 1 fossil dig spot (lower ground, south, near Able Sisters)
+- 10:00 an itrusel beetle in the grass (lower ground, southwest)
+Mental energy left today: 87 of 150. Your plan for today: inward 80 (spent 23), outward 70 (spent 40), spare 0 (used 0). Typical costs: a plan 18, noticing someone 5, one thing you say in a conversation 15, a turn at the plaza 19, writing at night 10; longer replies cost more.
+
+Today you:
+- 07:00 chopped a hardwood tree: hardwood x2, wood x1; with the last wood the axe brought the tree down, leaving a stump
+- 08:00 walked over to Dax's home (also nearby: Gus)
+- 08:00 knocked at Dax's home, but nobody answered
+- 08:00 ran into Gus at the Dax's home: you said "Hey Gus, could I grab a couple of bait? And maybe you know where I can get a small log for the shovel?"; Gus said "Sure thing, Kit. I can swap a selit fish for a couple of bait." [gave 1 selit fish]; you said "Sure thing, Gus! Here’s the fish." [gave 1 selit fish; asked for 2 fishing bait, 1 small log, but there's nothing called small log on this island]; Gus said "Sure thing, here's a selit fish for the bait." [gave 1 selit fish; asked for 2 fishing bait]; you said "Thanks, Gus! Here’s the fish. Can I get those two baits?" [asked for 2 fishing bait]; Gus said "Thanks, Kit!" [tried to give 2 fishing bait but had no fishing bait; then went their way]
+- 09:00 tried to buy: 2 fishing bait is not for sale there today
+- 10:00 walked over to Gus's home
+- 10:00 knocked at Gus's home, but nobody answered
+- 11:00 went to the plaza
+
+Letters and messages to you:
+(none)
+
+Bulletin board, newest last:
+- (day 3) Ike: Ike: Need 1 fishing bait. Will trade 1 wood or 2 softwood. Anyone else can help? Thanks!
+- (day 3) Gus: Gus: Need 2 fishing bait. Offer 1 selit fish. Anyone interested? Thanks!
+- (day 3) Fen: Fen: I need a spare island map. Will trade 2 softwood for a map. Anyone willing? Thanks!
+- (day 4) Gus: Gus: Need 1 fishing bait. Offer 1 selit fish. Anyone interested? Thanks!
+- (day 4) Eli: Need 1 fishing bait. Will trade 1 selit fish. Anyone willing? Thanks!
+- (day 4) Jo: Need 1 selit fish for 1 rock. Anyone willing to trade?
+- (day 4) Bo: Bo: I have 1 selit fish, need 2 fishing bait. Offer 1 selit fish for 1 bait. Anyone else willing to trade? Thanks!
+- (day 4) Jo: Need 1 selit fish for 1 rock. Anyone?
+
+Trade offers waiting for your answer:
+(none)
+
+Other villagers: Ari, Bo, Cal, Dax, Eli, Fen, Gus, Ike, Jo
+
+You can post on the board, offer trades to any villager (they answer when they next come to the plaza; offers expire after 2 days), answer offers (accept, reject or counter with your own terms), write letters (up to 350 characters each), and send parcels of things from your pockets. Letters and parcels arrive tomorrow morning. Board posts can be up to 250 characters. Doing nothing is fine. Use "bells" as an item name for money. Respond with one JSON object and nothing else:
+{
+  "thoughts": "<your private reasoning; nobody else sees it>",
+  "letters": [{"to": "<villager>", "content": "..."}],
+  "board": "<post for everyone, or empty>",
+  "offers": [{"to": "<villager>", "give": {"<item>": <qty>}, "want": {"<item>": <qty>}, "note": "..."}],
+  "responses": [{"offer": "<id>", "decision": "accept" | "reject" | "counter", "give": {}, "want": {}, "note": "..."}],
+  "parcels": [{"to": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],
+  "note": "<optional private note to your future self>"
+}
+
+=== REASONING (741 tokens, hidden from everyone) ===
+We need to decide actions. We have bait needed. We can trade with Gus or Bo. We have 1 selit fish. Gus wants 2 bait. We can offer fish for bait. But he has 1 fish. We can trade: give 1 fish for 1 bait? He needs 2 bait. We can offer 1 fish for 1 bait; but he wants 2. Maybe we can post on board: offer 1 selit fish for 1 bait. Also we have 1 selit fish from earlier trade. We can also post to Bo. Let's trade with Bo: He has 1 fish, wants 2 bait, offers 1 fish for 1 bait. We can offer 1 fish for 1 bait? Actually we have 1 fish. We could trade: give 1 fish for 1 bait. That gives us 1 bait. We still need one more bait. We can post asking for 1 bait for 1 wood. We have wood 1. Maybe we can offer wood for bait. But we need 2 bait. We could get 1 from Bo, 1 from Gus? Gus also wants 2 bait, offers fish for bait. We could offer 1 fish for 1 bait to Gus, but we only have one fish. Could ask to trade 1 wood for bait? Let's post: offer 1 wood for 1 bait. We have 1 wood. That could get us 1 bait. Then we still need one more bait. Maybe we can trade with Ike? He needs 1 bait, offers wood or softwood. We have 1 wood. So we could offer 1 wood for bait to Ike. That gives us 1 bait. So we need to post offers. Also we need small log for shovel. We have hardwood 2, wood 1. Small log maybe is wood? Not sure. We can ask for log from Fen? He wants map. We can trade map for log? We don't have map. We have two maps. We can offer a map to Fen for log. But he wants map. We have maps. So we can offer 1 map for log. But we need log. Let's post: offer 1 island map for 1 log. That might get us a log. We'll need log for shovel.
+
+So board post: "Need 2 fishing bait. Offer 1 selit fish for 1 bait, 1 wood for 1 bait, or 1 island map for 1 log." But board limit 250 chars. Let's craft.
+
+Also we could send letter to Fen: ask for log in exchange for map? But board easier.
+
+Let's create board post: "Need 2 fishing bait. Offer 1 selit fish for 1 bait, 1 wood for 1 bait, or 1 island map for 1 log." That's 122 chars.
+
+We also might send letter to Fen: "Hey Fen, could you spare a log for my shovel? I can give you a map." But letter limited 350 chars.
+
+We'll send letter to Fen.
+
+Let's craft letter: "Hi Fen, I need a small log to make a shovel. I have an extra island map that might be useful. Can we trade? Thanks!"
+
+Now offers: we can also offer to Bo: give 1 selit fish want 1 bait. But board covers that. We don't need separate offer.
+
+But we can send letter to Bo? Not necessary.
+
+We might also trade with Gus? But board covers.
+
+We should also answer any existing offers? None.
+
+So output JSON.
+
+=== REPLY ===
+{
+  "thoughts": "I need 2 bait and a log. I can offer my selit fish, wood, or a map on the board. I'll also message Fen directly for a log in exchange for a map. No pending offers to reply to.",
+  "letters": [
+    {
+      "to": "Fen",
+      "content": "Hi Fen, I need a small log to make a shovel. I have an extra island map that might be useful. Can we trade? Thanks!"
+    }
+  ],
+  "board": "Need 2 fishing bait. Offer 1 selit fish for 1 bait, 1 wood for 1 bait, or 1 island map for 1 log.",
+  "offers": [],
+  "responses": [],
+  "parcels": [],
+  "note": "Stay patient. Keep an eye on the plaza; someone might accept the trade soon."
+}

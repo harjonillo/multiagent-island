@@ -1,0 +1,41 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 0. You are Eli, at home before sleep.
+
+What happened today:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, south (site-12)
+- 05:00 tried to visit: there is no home of Resident Services to visit
+- 06:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Jo, Dax)
+- 06:00 ran into Jo at the Resident Services: you said "Hey Jo, heard you're busy. Got any thoughts on the bridge or the new house loan?"; Jo said "Sure, I can chip in for the bridge. Tell me what’s needed next." [tried to give something but Jo doesn't have 2000 bells]
+- 07:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Kit, Jo, Dax)
+- 07:00 ran into Jo at the Resident Services: you said "Hey Jo, could you help with the bridge? I need 2000 bells to start the fund."; Jo said "Sorry, I don’t have 2000 bells right now, but I can give something else if that helps."
+- 08:00 tried to visit: there is no home of Nook's Cranny to visit (also nearby: Kit)
+- 09:00 bought a fishing bait for 300 bells (also nearby: Jo, Kit, Ari, Fen)
+- 10:00 threw bait in the river and a medium shadow appeared: caught a selzalne fish (also nearby: Ari, Dax)
+- 11:00 chopped a tree: wood x2, softwood x1
+- 12:00 tried to fish: you have no fishing bait
+- 14:00 looked around but saw no fossil dig spots there
+- 15:00 tried to visit: there is no home of Timmy and Tommy to visit
+
+Your notes:
+- (day 0) Keep energy low; maybe skip extra actions later.
+- (day 0) If I miss any, I’ll just rest for that hour.
+- (day 0) Remember to keep energy low tomorrow.
+
+What you wrote last night:
+(nothing yet)
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (5 tokens, hidden from everyone) ===
+Need private diary.
+
+=== REPLY ===
+Day 0. Arrived at dawn, cold wind, Tom’s tent ready. I offered him a house loan—no interest, 98k, must pay before next upgrade. He seemed relieved. I tried to rally Jo for the bridge, but he only has a few bells. I bought bait, caught a selzalne, got a couple of logs. No fish today, no fossils, no other houses. The island feels quiet, almost empty. I’m low on energy, so I’ll sleep early. Tomorrow: keep energy low, maybe find a free homesite, see if Jo can chip in, and keep an eye on that bridge. I’ll note any new spots, but for now, just rest.

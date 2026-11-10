@@ -1,0 +1,37 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, 03 h.  
+Sun’s up, but still no bait. Dax keeps his wood, Jo’s home empty again. I’m stuck with selzalne and loka, no selit. I’ll trade the two selzalne for a wood and see if Dax will give me a bait later. The river feels empty—maybe the map’s wrong. I’ll keep the ladder and net ready, just in case. Isabelle’s ordinance still a mystery; maybe it’s about fishing limits. I’m low on bells, but I’ve got a few extra wood and fish to trade. I’ll try to catch a big one before sunset, but I’ll also ask Dax for a spot. Tonight I’ll rest, maybe the next morning I’ll get a better idea of where the fish are.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 4 (April 5, spring, sunny), 09:00. You are Cal, at the river.
+Nearby: Jo.
+Earlier today:
+- 07:00 tried to fish: you have no fishing bait (also nearby: Dax)
+- 07:00 ran into Dax at the river: you said "Hey Dax, got any bait? I can trade my selzalne for some."; Dax said "Here’s some bait, Cal! In return, could I grab a piece of wood for my own stash?" [gave 1 selzalne fish; asked for 1 wood]; you said "Sure thing, Dax. Here’s a wood." [gave 1 wood; then went their way]
+- 08:00 tried to fish: you have no fishing bait
+- 09:00 tried to fish: you have no fishing bait (also nearby: Jo)
+Your notes:
+- (day 3) Remember to ask Jo again tomorrow if she has more bait. Keep an eye on the river.
+- (day 3) Ask Dax for wood tomorrow if he still has none. Try to trade for more bait at Jo’s next visit.
+- (day 3) Keep an eye on Dax's next plaza visit.
+- (day 3) Check Dax for wood, trade for more bait. Post trade at plaza.
+- (day 4) Try to get at least 4 more fish before heading to Dax. If Dax gives wood, trade for more bait tomorrow.
+- (day 4) Got bait, traded 1 wood. Keep an eye on Dax tomorrow for more wood or bait.
+Mental energy left today: 112 (about 14 for each thing you say). Your plan for today: inward 80 (spent 19), outward 70 (spent 19), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (61 tokens, hidden from everyone) ===
+Need to choose to talk to Jo or Dax. We have wood, need bait. Dax gave bait earlier and asked for wood; we gave wood. He might have more wood? But we need more bait. Jo likely has bait? We should ask Jo for more bait. Approach Jo.
+
+=== REPLY ===
+{"thoughts":"Need more bait, Jo probably has some. Offer trade if needed.", "approach":"Jo", "say":"Hey Jo, got any extra bait? I could trade you some selzalne."}

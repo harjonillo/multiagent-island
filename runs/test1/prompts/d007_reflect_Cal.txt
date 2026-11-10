@@ -1,0 +1,82 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 6, 23 h.  
+Morning: Gus gave me wood—small win. Dax still silent, maybe tired or busy. I’ve got no bait, no fish shadows, no chance to catch anything. My fishing rod and net sit idle; the ladder and shovel feel useless tonight. I’m stuck with selit, loka, selzalne, and a lone piren. Bells are decent, but I can’t afford a bait yet. I’ll keep an eye on Dax tomorrow, maybe trade those selzalne for more wood or bait. I’ll also try Jo again—she’s been evasive but maybe she’ll have something. The river looks empty, but I’ll keep walking, maybe a new spot appears. Sleep now; hope tomorrow brings a splash.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 7. You are Cal, at home before sleep.
+
+What happened today:
+- 08:00 bought a fishing bait for 300 bells
+- 09:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 750 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. And here's a map of the island; keep it with you and you'll always know where things are. (You got an island map.)
+- 12:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 12:00 ran into Ike at the Cal's home: Ike said "Hey Cal, any spare logs you could spare?"; you said "Sure thing, Ike!" [gave 1 wood; then went their way]
+- 13:00 walked over to Jo's home
+- 13:00 knocked at Jo's home, but nobody answered
+- 14:00 tried to ask: Jo is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Jo, meet them around the island, visit their home, or write to them at the plaza
+- 15:00 looked for fish in the river, but there were no fish shadows in sight
+- 16:00 fished for a small shadow in the pond: caught a moitbas fish
+- 17:00 walked over to Dax's home (also nearby: Jo)
+- 17:00 inside Dax's home: not much furniture yet
+- 17:00 visited Dax at home: you said "Hey Dax, any wood you need?" [tried to give 1 wood but had no wood; asked for 1 wood]; Dax said "" [just nodded (too tired to talk)]
+- 18:00 rested
+- 19:00 walked over to Jo's home (also nearby: Jo)
+- 19:00 knocked at Jo's home, but nobody answered
+- 20:00 walked over to Jo's home (also nearby: Jo)
+- 20:00 knocked at Jo's home, but nobody answered
+- 21:00 Ike visited you at home: Ike said "Thanks again, Cal. Got any more logs? Maybe a bait?" [asked for 1 wood, 1 fishing bait]; you said "Sure thing, Ike!" [asked for 1 wood, 1 fishing bait]; Ike said "Thanks! I'll trade you a fish for a log and some bait." [gave 1 selzalne fish; asked for 1 wood, 1 fishing bait; then went their way]
+
+Things that changed hands today:
+- you gave Ike 1 wood
+- Ike gave you 1 selzalne fish
+
+What you have tonight:
+Bells: 100
+Tools you carry: shovel, axe, fishing rod, net, ladder
+Other things you carry: selit fish x2, loka fish x4, fishing bait x1, island map x1, selzalne fish x5, piren fish x1, moitbas fish x1
+Recipes you know: campfire, gold crown, ironwood dresser, simple wooden fence
+Since this morning: +1 fishing bait; +1 island map; +1 selzalne fish; +1 moitbas fish; −1 wood; bells 400 → 100
+
+Open requests and recent offers:
+- you asked Jo for 1 fishing bait (day 2)
+- you asked Dax for 1 fishing bait (day 5)
+- you asked Dax for 1 wood (day 7)
+- Ike asked you for 1 wood, 1 fishing bait (day 7)
+- you asked Ike for 1 wood, 1 fishing bait (day 7)
+
+Your notes:
+- (day 5) Post trades now. Hope Jo or Ari reply soon.
+- (day 5) Track bait trade next day.
+- (day 5) Ask Dax for bait again, trade selzalne if needed. Keep an eye on Jo tomorrow.
+- (day 5) Keep an eye on Dax tomorrow for more bait.
+- (day 5) Remember to trade selzalne for wood tomorrow if Dax has it.
+- (day 6) If Dax gives more wood, consider trading it for extra bait tomorrow.
+- (day 6) Try to get wood from Gus today. If he says no, maybe ask about bait next.
+- (day 6) Remember to ask Dax for more wood tomorrow if he has any left. Keep an eye on Jo for bait next day.
+- (day 6) Try to trade 2 selzalne for wood at Dax tomorrow.
+- (day 7) Remember to ask Jo about bait tomorrow if Dax still silent.
+- (day 7) Keep an eye on Jo’s reply. If she has bait, great. If not, maybe trade selzalne later.
+- (day 7) Keep an eye on Ike for future trade.
+- (day 7) Keep eye on Dax tomorrow for bait trade.
+- (day 7) Ask Jo for bait tomorrow if she replies.
+- (day 7) Ask for wood & bait, keep inventory low.
+
+What you wrote last night:
+Day 6, 23 h.  
+Morning: Gus gave me wood—small win. Dax still silent, maybe tired or busy. I’ve got no bait, no fish shadows, no chance to catch anything. My fishing rod and net sit idle; the ladder and shovel feel useless tonight. I’m stuck with selit, loka, selzalne, and a lone piren. Bells are decent, but I can’t afford a bait yet. I’ll keep an eye on Dax tomorrow, maybe trade those selzalne for more wood or bait. I’ll also try Jo again—she’s been evasive but maybe she’ll have something. The river looks empty, but I’ll keep walking, maybe a new spot appears. Sleep now; hope tomorrow brings a splash.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (6 tokens, hidden from everyone) ===
+Need short private note.
+
+=== REPLY ===
+Day 7, 23 h.  
+Got bait, still only 100 bells. Ike helped with a selzalne, but wood’s scarce. Tried Jo, no luck. I’ll keep asking Dax for wood and bait—maybe swap more selzalne. Plan: trade 2 selzalne for 1 wood tomorrow, then buy more bait. Need to finish the bridge to open new spots; maybe chip in 10k. Also consider moving Tom’s house if I can afford the loan—could get extra storage. Sleep now, hope tomorrow brings more fish shadows and a reply from Jo.

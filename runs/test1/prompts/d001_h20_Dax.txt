@@ -1,0 +1,150 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0, the island feels like a blank slate. Tom Nook set up my tent at site‑13, and I offered him a house loan—maybe I’ll build it myself if I can afford the 98k. No Resident Services yet, so I’m still in the dark about ordinances, but Cal’s curiosity keeps me on the lookout. I’m gathering wood, fossils, and a fishing bait—could be useful. I’m not sure where the museum is, so I’ll ask Blathers tomorrow. The bridge to the north bank is expensive, but it could open up a lot of resources. I need to keep my eyes peeled for any council announcements and find a map. Sleep now; tomorrow is another day of exploration.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- Villagers meet at the plaza at 20:00 and 21:00.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or write until the next morning.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: evening (round 0)
+Day 1 (April 2, spring, cloudy), 20:00 at the plaza. You are Dax.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 600. Loan owed to Tom Nook: 0. Home: tent lower ground, west (site-13), neighbors: Gus, Jo. Carrying 13/40 items.
+Inventory: shovel x1, axe x1, fishing rod x1, net x1, ladder x1, vaulting pole x1, simple wooden fence x1, wood x2, softwood x1, fishing bait x1, island map x1, tuashne fossil x1
+Inside your home (0/6): nothing yet
+Recipes you know: clay furnace (clay x6, iron nugget x2); iron garden bench (iron nugget x3, hardwood x4); simple wooden fence (wood x3); wooden bookshelf (wood x6, hardwood x4)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none)
+Bridge: 0/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, cosmos seeds 240, tulip seeds 240, ceiling fan 4600, fishing bait 300, iron fence 280; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, stone fence 2000
+Able Sisters today (09:00-21:00): raincoat 1600, bowler hat 900, tuxedo 3200, kimono 4800
+Your notes, oldest first:
+- (day 0) Remember to ask Tom Nook about any island maps or guidance. Also note the location of the museum for future fossil identification.
+- (day 0) Remember to check island council later if any ordinance appears.
+- (day 0) Get that map asap, maybe ask for a fishing rod later.
+- (day 1) Ask for map and museum location. Assess fossil now.
+- (day 1) Remember to bring fossil for donation tomorrow.
+Getting around: You are at lower ground, centre. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 42 steps); 2 (the middle cliff, northwest, about 77 steps); 3 (the top cliff, northeast, about 67 steps); 4 (lower ground, centre, about 20 steps); 5 (lower ground, southeast, about 45 steps); 6 (lower ground, southeast, about 40 steps)
+Buildings: Resident Services (about 0 steps); museum (about 24 steps); Nook's Cranny (about 15 steps); Able Sisters (about 24 steps)
+Your island map:
+- northwest: the middle cliff and the top cliff; beach; rocks 2; 1 fruit tree, 3 hardwood trees
+- north: the middle cliff and the top cliff; beach; river; rocky shore; 2 fruit trees, 5 hardwood trees
+- northeast: the middle cliff and the top cliff; beach; rocks 3; 1 hardwood tree
+- west: lower ground and the middle cliff; beach; homes: Dax, Gus, Jo; 4 fruit trees, 4 hardwood trees
+- centre: lower ground and the middle cliff; river; buildings: Resident Services, museum; homes: Fen, Kit; rocks 4; 6 hardwood trees
+- east: lower ground and the middle cliff; beach; homes: Cal, Ike; 2 fruit trees
+- southwest: lower ground; beach; river; homes: Bo; 2 hardwood trees
+- south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli; 1 fruit tree, 2 hardwood trees
+- southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6; 1 hardwood tree
+You spotted today:
+- 07:00 a medium fish shadow in the river (lower ground, south, near Nook's Cranny)
+Mental energy left today: 91 of 150. Typical costs: a plan 14, noticing someone 5, one thing you say in a conversation 13, an evening at the plaza 14, writing at night 6; longer replies cost more.
+
+Today you:
+- 07:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. And here's a map of the island; keep it with you and you'll always know where things are. (You got an island map.) (also nearby: Kit, Fen)
+- 08:00 tried to visit: Blathers doesn't live in a house you can visit; they work at the museum. To talk to them, use ask (who: Blathers). Visiting is for other villagers' homes (also nearby: Fen, Cal)
+- 08:00 ran into Cal at the visiting: you said "Hey Cal, any idea where Blathers works?"; Cal said "Blathers runs the museum over there, near the center of the island."
+- 09:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none).
+- 10:00 Blathers assessed 1 fossil: tuashne fossil x1 (also nearby: Kit)
+- 10:00 ran into Kit at the museum: you said "Hey Kit, got any good spots for fossils around here?"; Kit said "I haven’t found any fossils yet, but where should I look?"
+- 11:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Fen)
+- 12:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none).
+- 13:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Fen, Cal)
+- 14:00 tried to visit: Blathers doesn't live in a house you can visit; they work at the museum. To talk to them, use ask (who: Blathers). Visiting is for other villagers' homes (also nearby: Fen)
+- 15:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none).
+- 16:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none).
+
+Letters and messages to you:
+(none)
+
+Bulletin board, newest last:
+- (day 0) Ari: Hey folks! Need wood for fences and some fishing bait. Anyone selling? Or know where I can get them? Thanks!
+- (day 0) Bo: Anyone have wood? I’m looking to craft a shovel. I can trade a shell or any other small item. Thanks!
+- (day 0) Eli: Hey folks! I’m helping with the bridge to the north bank. We need 20,000 bells total. Anyone can chip in. I can offer 10 wood and 2 softwood for 2000 bells, or just a small donation. Let’s get this done!
+- (day 0) Jo: Anyone with extra bells or who can help with the bridge? I'm looking to contribute 2000 bells, but I only have 300 right now. Any ideas? Thanks!
+- (day 0) Gus: Hi, I'm Gus. New to the island, looking forward to meeting everyone!
+- (day 0) Cal: Anyone know if there’s an island ordinance? Will ask Isabelle tomorrow morning. Thanks!
+
+Trade offers waiting for your answer:
+(none)
+
+Other villagers: Ari, Bo, Cal, Eli, Fen, Gus, Ike, Jo, Kit
+
+You can post on the board, offer trades to villagers here, answer offers (accept, reject or counter with your own terms), write letters (up to 350 characters each), and send parcels of things from your pockets. Letters and parcels arrive tomorrow morning. Board posts can be up to 250 characters. Doing nothing is fine. Use "bells" as an item name for money. Respond with one JSON object and nothing else:
+{
+  "thoughts": "<your private reasoning; nobody else sees it>",
+  "letters": [{"to": "<villager>", "content": "..."}],
+  "board": "<post for everyone, or empty>",
+  "offers": [{"to": "<villager>", "give": {"<item>": <qty>}, "want": {"<item>": <qty>}, "note": "..."}],
+  "responses": [{"offer": "<id>", "decision": "accept" | "reject" | "counter", "give": {}, "want": {}, "note": "..."}],
+  "parcels": [{"to": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],
+  "note": "<optional private note to your future self>"
+}
+
+=== REASONING (670 tokens, hidden from everyone) ===
+Need to decide actions. We have items: ladder, vault pole, 13/40. We could post a trade for wood and bait. We have wood x2, softwood x1, fishing bait x1. Maybe trade for more wood. Also we have island map. Maybe offer to others. Also consider posting to board to ask for wood. But we have some wood already.
+
+We can send a letter to Eli offering 2 wood for 2000 bells? No. We have no bells. We could offer our ladder for something? But we have none.
+
+Maybe trade with Ari for wood? Ari's post: "Need wood for fences and some fishing bait. Anyone selling?" We can reply: offer fishing bait x1 for 2 wood? But we only have 2 wood. We can offer 1 fishing bait for 2 wood. But we need wood for fences. Let's trade with Ari: give fishing bait 1, want 2 wood. But we already have 2 wood. We might need more. We can offer 1 fishing bait for 1 wood? We need more wood.
+
+We can also trade with Bo: wants wood for shovel. We can offer 1 wood for 1 shell? No shell.
+
+We can offer to Cal? He wants nothing.
+
+We can post board: asking for wood. Let's post: "Anyone with extra hardwood or softwood? I have a ladder, vault pole, fishing bait, and a map. I can trade." But we don't have bells.
+
+We can offer our ladder for 1 wood? But ladder is valuable.
+
+Better to trade for wood: we have 2 wood, 1 softwood. Maybe we can trade our ladder for 1 wood? But ladder is needed for cliffs. But maybe we can trade ladder for 2 wood? That would give us 4 wood. Might be useful.
+
+Let's send a letter to Ari: give fishing bait 1, want 2 wood. Also maybe send to Bo: give 1 wood, want 1 shovel? But we don't have shovel.
+
+We can send to Jo: offer 1 fishing bait for 2000 bells? She wants bells.
+
+We can send to Eli: offer 1 wood for 2000 bells? He wants bells.
+
+We can send board: "Need more wood, trading ladder, vault pole, fishing bait for wood." But we don't have bells.
+
+Ok decide: send letter to Ari: trade fishing bait for 2 wood. Also to Bo: trade 1 wood for 1 shovel? We don't have shovel.
+
+We could trade to Bo: give 1 wood for 1 shovel? He wants wood for shovel, but we can trade for shovel? He sells shovel at 500. So we could offer 1 wood for 500 bells? But we don't have bells. So no.
+
+Thus just trade with Ari. Also maybe with Jo: give fishing bait for 2000 bells? She wants bells. She has 300 bells, but we can ask? We don't have bells.
+
+Let's just send letter to Ari. Also maybe to Jo: ask for 2000 bells? But we don't have.
+
+We can post on board: "Need wood, trading ladder and fishing bait for hardwood." That could get replies.
+
+Ok.
+
+=== REPLY ===
+{
+  "thoughts": "I only have a few items and no bells. I need more wood for fences and to explore. I can trade my fishing bait for wood from Ari. I’ll also post on the board to ask for extra hardwood or softwood in exchange for my ladder and vault pole. No other villagers need what I have, so keep the trade simple.",
+  "letters": [
+    {
+      "to": "Ari",
+      "content": "Hey Ari, I have a fishing bait and would love 2 wood in return. I can also offer a ladder if that helps. Let me know if that works."
+    }
+  ],
+  "board": "Need more hardwood or softwood. I have a ladder, a vault pole, and a fishing bait. Trade for any wood you can spare. Happy to trade for more items too. Thanks!",
+  "offers": [],
+  "responses": [],
+  "parcels": [],
+  "note": "Keep the ladder for the cliffs and hope for some wood replies."
+}

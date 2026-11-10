@@ -1,0 +1,38 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2, night.  
+Morning chaos—Nook's closed, I traded a selit fish for a single bait, then got another from Dax. Ended day with two bait and a gormo. Energy 120. Dax still silent; maybe he’s busy. No bridge yet, no money saved. I’ll grab the umbrella, maybe try fishing early tomorrow to catch more before rain. Need to plan a visit to Dax’s tomorrow, maybe trade more fish for bait. I’m getting used to trading, but still feel lost. The island is quiet at night; I’ll rest, hope tomorrow brings more fish and a clue to the bridge.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 3 (April 4, spring, cloudy), 09:00. You are Gus, at the river.
+Nearby: Kit.
+Earlier today:
+- 07:00 tried to fish: you have no fishing bait
+- 08:00 walked over to Dax's home
+- 08:00 inside Dax's home: not much furniture yet
+- 08:00 visited Dax at home: you said "Hey Dax, got any bait?" [gave 1 selzalne fish; asked for 1 fishing bait]; Dax said "Sorry, I don’t have any bait right now." [asked for 1 selit bait]
+- 09:00 tried to fish: you have no fishing bait (also nearby: Jo, Kit)
+Your notes:
+- (day 2) Ask for 2 bait, try to keep budget tight.
+- (day 2) Ask Dax for more bait tomorrow. Maybe trade a fish for a bait. Also consider buying from Nook's Cranny tomorrow if possible.
+- (day 2) Tomorrow: try to buy more bait at Nook's Cranny, maybe trade a fish for extra. Also consider asking Dax for more bait if he has any left.
+- (day 2) Keep energy for tomorrow's fishing and visit Dax.
+- (day 3) Try to get a second bait from Dax today. Keep an eye on the weather for rain.
+- (day 3) Ask for bait and trade a fish.
+Mental energy left today: 117 (about 13 for each thing you say). Your plan for today: inward 80 (spent 19), outward 70 (spent 14), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (4 tokens, hidden from everyone) ===
+Need JSON.
+
+=== REPLY ===
+{"thoughts":"Need bait urgently, Dax has none now, maybe Kit has? I'll ask Kit for a quick trade, keep it short.","approach":"Kit","say":"Hey Kit, got any bait?"}

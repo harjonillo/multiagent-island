@@ -1,0 +1,34 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, 01:00.  
+Bait crisis continues—no bait, only rocks, no rocks. Bo wants a rock, I have none. Cal gave me a selit, now I have 2. Selzalne up to 3, tugorpi 2, fossil 2. Bells still 100. Bridge still 2k away. Dax silent, maybe sleeping. Plan: post on board for bait tomorrow, trade selzalne for wood if Dax offers. Keep 2 selit for fishing, maybe 1 for trade. Remember to ask Eli about exact bridge fund tomorrow. Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 6 (April 7, spring, cloudy), 07:00. You are Jo, at the plaza.
+Nearby: Bo, Eli.
+Earlier today:
+- 07:00 went to the plaza (also nearby: Bo, Eli)
+Your notes:
+- (day 5) Got bait for Kit, keep 1 selit for tomorrow.
+- (day 5) Remember to trade the rock for wood tomorrow.
+- (day 5) Keep the selzalne handy for future trades; maybe ask Dax tomorrow for a rock.
+- (day 5) Remember to keep an eye on any new rocks that appear; maybe someone else will have one to trade.
+- (day 6) Remember to keep at least 1 selit for tomorrow’s fishing.
+- (day 6) Keep the selit for tomorrow. Stay close to the plaza for quick replies.
+Mental energy left today: 115 (about 15 for each thing you say). Your plan for today: inward 60 (spent 19), outward 90 (spent 16), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (9 tokens, hidden from everyone) ===
+Need to pick someone, maybe Eli.
+
+=== REPLY ===
+{"thoughts":"Need wood, rock, maybe help with bridge fund. Talk to Eli first to get info on bridge and maybe trade wood for selzalne.","approach":"Eli","say":"Morning Eli, got a minute?"}

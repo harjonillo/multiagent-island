@@ -1,0 +1,29 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 0 (April 1, spring, rain), 10:00. You are Fen, at the Resident Services.
+Nearby: Cal.
+Earlier today:
+- 07:00 chopped a tree: softwood x1, wood x2
+- 08:00 tried to fish: you have no fishing bait
+- 09:00 bought a fishing bait for 300 bells (also nearby: Jo, Kit, Eli, Ari)
+- 09:00 ran into Kit at the Nook's Cranny: you said "Hey Kit, got a minute?"; Kit said "Hey Fen, do you have a map of the island?" [asked for 1 map]
+- 10:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Cal)
+Your notes:
+- (day 0) Remember to ask about any loan options and check island ordinance after tomorrow.
+Mental energy left today: 138 (about 11 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (23 tokens, hidden from everyone) ===
+We need to choose a villager: Cal is nearby. Also Kit was earlier. Probably talk to Cal.
+
+=== REPLY ===
+{"thoughts":"Need to check loan options and island ordinance tomorrow. Maybe ask Cal about any local info or if he's aware of the bridge plan. Also might need to confirm if I can pay the 98000 bell loan soon. I'll keep it short.","approach":"Cal","say":"Hey Cal, got a sec?"}

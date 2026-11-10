@@ -1,0 +1,37 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 4: Quiet grind. Got wood from Cal, hardwood from Ari—still no bait. Fishing still a gamble; only one ashpimo. Bridge still empty, but I’ll chip in tomorrow. Wonder if I should keep trying to get selit bait from Gus or just make my own from wood and selzalne. No house loan yet—98k feels like a mountain. Still thinking about Tom’s loan terms. The island feels calm but the tasks pile up. I’ll map the beach more tonight, maybe catch a bigger fish tomorrow. Rest, but stay alert for any new offers. The map’s getting clearer, and my stash of wood is growing. Maybe tomorrow I’ll finally get that selit bait and start fishing properly. Sleep now.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 5 (April 6, spring, sunny), 12:00. You are Dax, at the visiting.
+Nearby: Cal.
+Earlier today:
+- 09:00 ran into Cal at the Jo's home: you said "Hey Cal, got any selzalne fish or wood to trade?"; Cal said "Hey Dax, here's a selzalne. Got any bait for me?" [gave 1 selzalne fish; asked for 1 fishing bait; then went their way]
+- 10:00 walked over to Cal's home
+- 10:00 knocked at Cal's home, but nobody answered
+- 11:00 rested
+- 12:00 tried to visit: there is no villager called Gus's home to visit (also nearby: Cal, Gus, Ari)
+Your notes:
+- (day 4) Keep an eye on wood stock, maybe trade for more next day.
+- (day 4) Keep track of bait supply for tomorrow.
+- (day 4) Make sure to check the plaza tomorrow for any bait or wood offers.
+- (day 4) Keep wood handy for future bait trade.
+- (day 5) Remember to ask Cal for selzalne fish if he has any, and see if Gus will trade wood for bait.
+- (day 5) Keep wood stash for future trades.
+Mental energy left today: 103 (about 15 for each thing you say). Your plan for today: inward 50 (spent 42), outward 80 (spent 5), spare 20 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (12 tokens, hidden from everyone) ===
+We should choose a villager. Probably Cal again.
+
+=== REPLY ===
+{"thoughts":"Need bait, Cal has selzalne and asked for bait. I have wood, could trade. Also ask about Gus for wood trade. Focus on Cal first.", "approach":"Cal", "say":"Hey Cal, any selzalne left? I’ve got some wood if you need it for bait."}

@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7, night.  
+Woke up with a knot in my stomach—no bait, no fish, no bridge. Kit was generous but I’m still stuck with a single selit. Dax stays silent, maybe he’s busy or hiding something. I’m running out of energy; the island feels colder without the sun. I’ll grab my umbrella, hope rain’s light. Tomorrow: try Dax again, maybe Bo, or even Jo if he’s around. Need to trade more selit for bait—maybe offer a loka or a gormo. I’m tired, but I’ll keep the campfire lit and hope the next day brings a clue. Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 9 (April 10, spring, cloudy), 16:00. You are Gus, at home.
+You just spotted:
+1. a nevin moth on a tree (lower ground, west)
+Earlier today:
+- 10:00 rested
+- 11:00 rested
+- 14:00 spotted a small fish shadow in the sea (lower ground, west) and went after it at 15:00
+- 15:00 fished for a small shadow in the sea: caught a tubas fish
+- 16:00 Dax visited you at home: Dax said "Hey Gus, I got a selit fish—want to swap for a bait?" [Dax's offer: you give 1 fishing bait, you get 1 selit fish; then you went your ways]
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 8) Keep an eye on Kit’s stock, maybe he’ll have more bait tomorrow.
+- (day 8) Ask for a single bait, offer a selit or selzalne. If he’s not there, just rest and try tomorrow.
+- (day 9) If Dax doesn't trade, try Fen tomorrow. Keep an eye on bait balance.
+- (day 9) Trade with Bo for bait
+- (day 9) Remember to bring wood next time so I can trade for bait.
+- (day 9) Remember to gather wood tomorrow.
+At 17:00 you have nothing planned.
+Actions left today: 4 of 10. Mental energy left today: 51.
+
+You can go after one of them at 17:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (69 tokens, hidden from everyone) ===
+We need to choose an action. We have 4 actions left. We can go to chase something. Options: maybe chase small fish shadow? But it's gone. Could chase nevin moth? Or maybe nothing. Since nothing planned, could rest. But we need action count. We can choose 0 to not go. Provide JSON.
+
+=== REPLY ===
+{"thoughts":"No urgent leads today, but I’ll keep an eye out for more selit or bait. I’ll wait and see if anyone shows up or if I spot anything useful before the evening.", "go": 0}

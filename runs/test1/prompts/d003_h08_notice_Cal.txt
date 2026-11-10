@@ -1,0 +1,38 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2, 21 h.  
+River: one selit with bait, then nothing.  No bait left – need to ask Dax or Jo.  Blathers still empty, no donations yet.  Felt stuck.  The map is useless for fishing; maybe different spot.  I’m running low on bells – 700 left, 300 spent.  I’ll try to trade for bait tomorrow, ask Dax again, maybe steal a small amount from Jo.  Still curious about Isabelle’s ordinance – will see if anyone talks about it.  Need more fish to feel useful.  Hope tomorrow brings a big catch.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 3 (April 4, spring, cloudy), 08:00. You are Cal, at the Jo's home.
+Nearby: Jo.
+Earlier today:
+- 07:00 walked over to Dax's home
+- 07:00 inside Dax's home: not much furniture yet
+- 07:00 visited Dax at home: you said "Hey Dax, could you spare a bit of bait?" [asked for 1 selit bait]; Dax said "Sorry, I don't have any selit bait right now." [asked for 1 wood]
+- 08:00 walked over to Jo's home (also nearby: Jo)
+- 08:00 knocked at Jo's home, but nobody answered
+Your notes:
+- (day 2) If I miss a large fish, try again tomorrow or ask Dax for a better spot. Keep the map handy.
+- (day 2) Keep map handy, maybe try a different spot tomorrow.
+- (day 2) Ask for selzalne or generic fishing bait
+- (day 2) Send offer to Dax now. Keep an eye on his reply tomorrow. Keep the map handy for fishing spots.
+- (day 3) If I get bait early, skip the last fishing attempt.
+- (day 3) Ask for selit bait, hope they have some.
+Mental energy left today: 121 (about 13 for each thing you say). Your plan for today: inward 50 (spent 18), outward 100 (spent 11), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (13 tokens, hidden from everyone) ===
+We need choose. Nearby Jo. Likely ask bait.
+
+=== REPLY ===
+{"thoughts":"Need bait, Jo might have some. Ask politely.", "approach":"Jo", "say":"Hey Jo, could you spare a bit of selit bait?"}

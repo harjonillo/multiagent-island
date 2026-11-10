@@ -1,0 +1,87 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No luck getting the bait—Ari keeps offering fish, I keep offering wood. The trade loop is still stuck. I finally got a wood back from Ari, so I have 3 now, but the bait is still missing. Cal is sleeping, no answer. I’m exhausted; will try to fish for gormo tomorrow, hoping a single fish will fetch some bells. I’ll keep posting the bait request on the board tonight. I need to salvage a stick for a pole, but first I’ll see if anyone has a spare ladder to trade for a ladder. Maybe Bo will help.  
+— Ike
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 9. You are Ike, at home before sleep.
+
+What happened today:
+- 07:00 tried to post: 'post' is not something you can do
+- 08:00 walked over to Cal's home (also nearby: Dax, Jo)
+- 08:00 knocked at Cal's home, but nobody answered
+- 08:00 spotted a large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 09:00 instead of visit (who: Ari)
+- 09:00 fished for a large shadow in the pond: caught a miruru fish (also nearby: Jo)
+- 09:00 spotted an ashrumo moth on a rock (lower ground, southeast, near rock 1) and went after it at 10:00 instead of rest
+- 10:00 went bug catching by the rocks: caught an ashrumo moth
+- 12:00 rested
+- 13:00 rested
+- 13:00 Ari visited you at home: Ari said "Hey Ike, can I trade a wood for a bait?" [Ari's offer: you give 1 fishing bait, you get 1 wood; then you went your ways]
+- 14:00 rested
+- 14:00 Cal visited you at home: Cal said "" [just nodded (too tired to talk)]
+- 15:00 rested
+- 16:00 rested
+- 17:00 rested
+
+Things that changed hands today:
+(nothing)
+
+What you have tonight:
+Bells: 0 in your wallet
+Tools you carry: shovel (29 uses left), axe (30 uses left), fishing rod (25 uses left), net (29 uses left), ladder (27 uses left)
+Other things you carry: selzalne fish x1, fossil x1, wood x3, gormo fish x1, miruru fish x1, ashrumo moth x1
+At home (a tent holds only bells): 0 bells
+Recipes you know: clay furnace, golden candlestick, iron worktable, simple wooden fence
+Since this morning: +1 miruru fish; +1 ashrumo moth
+
+Open requests:
+- you want 1 wood, 1 fishing bait from Cal (until day 9)
+- Cal wants 1 wood, 1 fishing bait from you (until day 9)
+- Ari wants 1 fishing bait from you (until day 10)
+
+Your notes:
+- (day 8) If trade fails, post on board for bait next day.
+- (day 8) Need bait ASAP. Trade wood for bait next.
+- (day 8) If they decline, I'll have to look for another bait source tomorrow. Keep an eye on the board.
+- (day 8) Need bait ASAP, trade with Ari. If fails, post on board tomorrow.
+- (day 8) Confirm trade with Ari, keep track of bait request.
+- (day 9) Tomorrow I’ll head to Nook’s Cranny to buy fishing bait. Keep an eye on Cal for wood trade.
+- (day 9) Tomorrow head to Nook's Cranny for fishing bait. Keep an eye on Cal's wood supply.
+
+Things you remember, numbered:
+1. (day 8) Got 1 wood back from Ari today.
+2. (day 8) Still no fishing bait.
+3. (day 8) Gormo fish might sell for bells tomorrow.
+
+What you wrote last night:
+Day 8, night.  
+No luck getting the bait—Ari keeps offering fish, I keep offering wood. The trade loop is still stuck. I finally got a wood back from Ari, so I have 3 now, but the bait is still missing. Cal is sleeping, no answer. I’m exhausted; will try to fish for gormo tomorrow, hoping a single fish will fetch some bells. I’ll keep posting the bait request on the board tonight. I need to salvage a stick for a pole, but first I’ll see if anyone has a spare ladder to trade for a ladder. Maybe Bo will help.  
+— Ike
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something you already remember that is still on your mind. Anything you don't hold on to fades over the next days; what you come back to stays longer.
+
+=== REASONING (15 tokens, hidden from everyone) ===
+Need to write diary entry ~150 words, then optional Remember lines.
+
+=== REPLY ===
+Day 9, night.  
+I’m still stuck on the bait.  Ari keeps swapping wood for fish, and Cal is still out of the woods.  The pond gave me a miruru and an ashrumo moth, but I’m still 0 bells.  I’ll try the fishing rod again tomorrow; maybe a gormo will fetch something.  No trades today, so I keep my 3 woods and 1 fish.  I’ll post a request on the board tonight – “Need 1 fishing bait, will trade 1 wood.”  I’m tired but hopeful.  Maybe Bo will have a ladder, or someone will bring a spare.  The island feels quiet, but the water’s still alive.  I’ll keep an eye on the rocks for more bugs and the pond for more fish.  
+
+I’ll sleep early, maybe get some rest.
+
+Remember:
+- Got miruru fish, ashrumo moth
+- Still 0 bells
+- Still 3 woods, 1 fish, 1 bait needed
+
+---

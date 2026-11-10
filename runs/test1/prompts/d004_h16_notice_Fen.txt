@@ -1,0 +1,38 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2, night.  
+The bridge still feels like a distant dream—500/98k, plus the 100 from Dax. I’ve got a selzalne in my bag now, maybe a good sell later. Tried to give Kit the map, but I only have one. Maybe I should ask Tom for a second copy—no loan yet, but if he says no, I’ll have to consider the 98k. The fence is up; I can store a few tools, but my space is tight. I’m thinking of asking for a small loan to buy a house upgrade instead of the big bridge loan. Tomorrow: check ordinance, ask Tom about a map, maybe bump the bridge contribution a bit. Sleep, rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 4 (April 5, spring, sunny), 16:00. You are Fen, at the plaza.
+Nearby: Ike.
+Earlier today:
+- 13:00 walked over to Kit's home
+- 13:00 knocked at Kit's home, but nobody answered
+- 14:00 tried to ask: Kit is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Kit, meet them around the island, visit their home, or write to them at the plaza
+- 15:00 went to the plaza (also nearby: Cal)
+- 16:00 went to the plaza, but were too tired to do anything there (also nearby: Cal, Ari, Bo, Dax, Ike, Kit)
+Your notes:
+- (day 3) Keep an eye on the bridge fund tomorrow; maybe chip in 2000 bells later if needed.
+- (day 4) Keep track of Kit’s recipe offer.
+- (day 4) Ask Kit later about map again
+- (day 4) Check if Gus has more maps tomorrow; if not, ask Kit or someone else.
+- (day 4) Remember to check if Kit has a spare map and offer the shovel recipe in exchange.
+- (day 4) Got softwood, still need a log for Kit later.
+Mental energy left today: 25 (about 15 for each thing you say). Your plan for today: inward 70 (spent 57), outward 80 (spent 68), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (32 tokens, hidden from everyone) ===
+Need to choose a villager. Ike nearby. Maybe ask him about map? Or talk to Cal? I have to keep energy. Let's approach Ike.
+
+=== REPLY ===
+{"thoughts":"I want to get a map from Kit, but no direct contact. Ike might know something about the map or have spare. Also could ask for a shovel recipe. Energy okay. Approach Ike.", "approach":"Ike", "say":"Hey Ike, have you heard anything about Kit's spare map?"}

@@ -1,0 +1,40 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, 01:00.  
+Bait crisis continues—no bait, only rocks, no rocks. Bo wants a rock, I have none. Cal gave me a selit, now I have 2. Selzalne up to 3, tugorpi 2, fossil 2. Bells still 100. Bridge still 2k away. Dax silent, maybe sleeping. Plan: post on board for bait tomorrow, trade selzalne for wood if Dax offers. Keep 2 selit for fishing, maybe 1 for trade. Remember to ask Eli about exact bridge fund tomorrow. Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 8 (April 9, spring, rain), 12:00. You are Jo, at the out for a walk.
+Nearby: Cal.
+Earlier today:
+- 09:00 knocked at Dax's home, but nobody answered
+- 09:00 ran into Bo at Dax's home: Bo said "Hey Jo, got any fishing bait?"; you said "Sure, I’ve got a selzalne if you need it." [you offered Bo 1 selzalne fish for 1 fishing bait]; Bo said "No thanks, I need the bait."; you said "Sure thing!" [you offered Bo 1 selzalne fish for 1 fishing bait]; Bo said "Sorry, I need the bait." [then you went your ways]
+- 10:00 walked over to Dax's home
+- 10:00 knocked at Dax's home, but nobody answered
+- 12:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 7) Try to get a rock from Dax tonight. If not, trade wood for rock tomorrow. Keep 1 selit for tomorrow fishing.
+- (day 7) Ask for bait tonight, hope Dax has some. If not, trade wood tomorrow.
+- (day 8) Ask for rock, bait, give softwood. If no rock, trade wood later.
+- (day 8) Trade one selzalne for bait, keep 3 selzalne and the selit for tomorrow.
+- (day 8) Keep a selit for tomorrow fishing.
+- (day 8) If Dax gives wood, trade for rock. If no rock, keep wood for future use.
+Mental energy left today: 53 (about 17 for each thing you say). Your plan for today: inward 120 (spent 51), outward 30 (spent 46: 16 more than planned, from your spare), spare 0 (used 16).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (15 tokens, hidden from everyone) ===
+Need to decide approach. Nearby: Cal. Maybe talk to him.
+
+=== REPLY ===
+{"thoughts":"Need more bait and maybe wood. Cal might have stuff or know Dax. Ask him about Dax and if he can trade a rock or bait. Keep opening friendly.", "approach":"Cal", "say":"Hey Cal, got a minute? I could use some bait or maybe a rock, and I heard you might know where Dax is."}

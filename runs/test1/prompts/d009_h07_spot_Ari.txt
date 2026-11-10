@@ -1,0 +1,38 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7: Dawn silent, still no wood to chop. Went to Ike’s, no answer, but he dropped a selzalne fish after I gave him wood. Dax gave me wood again, but still no bait. I traded a wood for a selzalne fish, hoping to trade back later. The ladder’s still out of reach; the plaza feels distant. I’ll keep trading softwood and hardwood for bait, and watch the board. Maybe tomorrow I can buy a bait at Cranny if I can get there. Rest tonight; 200 bells, 8 wood, 2 selzalne fish, still no fishing bait. Hope the next day brings a path or a trade.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 9 (April 10, spring, cloudy), 07:00. You are Ari, around the island.
+You just spotted:
+1. a large fish shadow in the river (lower ground, southeast, near rock 6)
+Earlier today:
+- 07:00 tried to home: 'home' is not something you can do
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 8) Track if bait arrives next day
+- (day 8) Need to get bait soon.
+- (day 8) Keep offering bait trade until I get one.
+- (day 8) Got bait, trade down wood for future use.
+- (day 8) Keep trading wood for bait if possible.
+- (day 9) If Dax not there, try Ike next.
+At 08:00 you planned: visit (who: Dax).
+Actions left today: 5 of 10. Mental energy left today: 127.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (19 tokens, hidden from everyone) ===
+Need choose go 1 for Dax or 2 for Ike. Probably Dax.
+
+=== REPLY ===
+{"thoughts":"Dax might still have bait. I'll head there first.", "go":1}

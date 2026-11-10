@@ -1,0 +1,37 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 4. Dawn gray, still cold. Went to plaza, traded 1 softwood to Ari for hardwood, then gave 1 hardwood to Ike for bait. Still no bait, no money to buy. Caught a selzalne today, still only 100 bells. Jo and Ari still MIA. I’ll try to get some wood tomorrow, maybe ask Cal for more selit fish, or post a request on the board. Need that bridge donation info from Jo. Energy low, but I’ll keep trying. Rest tonight.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 5 (April 6, spring, sunny), 11:00. You are Eli, at the plaza.
+Nearby: Bo, Jo.
+Earlier today:
+- 08:00 knocked at Jo's home, but nobody answered
+- 09:00 walked over to Ari's home
+- 09:00 knocked at Ari's home, but nobody answered
+- 10:00 looked for fish in the river, but there were no fish shadows in sight
+- 11:00 went to the plaza (also nearby: Bo, Gus, Ike, Jo, Kit)
+Your notes:
+- (day 4) Got the bait. Keep an eye on the bridge fund tomorrow.
+- (day 4) Tomorrow try to trade a log for bait with Ari or ask Jo for a small donation for the bridge.
+- (day 5) Ask Jo about bridge donation and see if any bait available.
+- (day 5) Got bait from Cal. Keep an eye on Jo for bridge donation tomorrow.
+- (day 5) Trade 1 softwood for bait. Keep track of bait count.
+- (day 5) Ask Jo tomorrow for bridge donation too.
+Mental energy left today: 79 (about 15 for each thing you say). Your plan for today: inward 60 (spent 19), outward 90 (spent 52), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (13 tokens, hidden from everyone) ===
+Need to decide. Probably talk to Jo about bridge donation.
+
+=== REPLY ===
+{"thoughts":"Need bridge donation. Jo might help. Go talk to Jo.","approach":"Jo","say":"Hey Jo, any news on the bridge donation?"}

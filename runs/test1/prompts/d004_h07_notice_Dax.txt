@@ -1,0 +1,34 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2: Shovel recipe unlocked, wood stock up. Gave Gus a bait, Fen a bit for the bridge. First fossil in museum, good start. Fishing still tough—only one ashpimo so far. No interest in the house loan yet; 98k feels big. Maybe wait until I have a better idea of needs. Bridge still empty—could chip in more tomorrow. Need to map fishing spots better, ask Cal for tips. Still feeling cautious but excited. Tomorrow: dig for more fossils, try to catch a bigger fish, maybe talk to Tom about loan terms. Rest now, island’s quiet tonight.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 4 (April 5, spring, sunny), 07:00. You are Dax, at the Cal's home.
+Nearby: Cal.
+Earlier today:
+- 07:00 walked over to Cal's home (also nearby: Cal)
+- 07:00 knocked at Cal's home, but nobody answered
+Your notes:
+- (day 3) Need to collect wood soon to make bait.
+- (day 3) Got the rock. Keep an eye on wood supply.
+- (day 3) Maybe ask Gus for selit bait tomorrow, keep track of wood supply.
+- (day 3) Keep track of wood stock tomorrow. Maybe ask Gus for selit bait later.
+- (day 3) Remember to ask Cal for selit bait tomorrow and keep track of wood supply.
+- (day 4) Remember to ask Cal for wood next day, maybe bring some bait soon.
+Mental energy left today: 131 (about 14 for each thing you say). Your plan for today: inward 80 (spent 19), outward 70 (spent 0), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (8 tokens, hidden from everyone) ===
+We choose to talk to Cal.
+
+=== REPLY ===
+{"thoughts":"Need wood for bait, Cal might have some. Also could get selit bait info.", "approach":"Cal", "say":"Hey Cal, could you spare some wood? I’m making bait for fishing."}

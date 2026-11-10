@@ -1,0 +1,118 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0, 22:00.  
+Arrived early, set up tent at site‑10. Tried to help with the bridge, but 2k bells out of reach. Bought bait, caught a selzalne—little but good. Dax unresponsive, maybe he’s busy or hiding.  
+Thoughts: need more bells before the bridge fund. Focus on fishing tomorrow, maybe find a fossil for extra cash. Keep an eye on Dax, he might trade. Also ask Eli tomorrow about the bridge status and if I can chip in later. Sleep now, plan for tomorrow.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- Villagers meet at the plaza at 20:00 and 21:00.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or write until the next morning.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
+- mine_rock: rock?
+- chop_wood: kind? (hardwood | fruit), axe? (stone axe | axe; if you carry both, the stone axe. An axe brings the tree down when it takes its last wood, and a fruit tree drops its fruit; a stone axe never fells)
+- shake_tree
+- fish: where (sea | river | pond), size?, bait? (true to use fishing bait)
+- catch_bug: where (flowers | trees | stumps | rocks | ground), species?
+- beachcomb: near?
+- dig_fossil: near?
+- plant: item, near
+- dig_stump: near?
+- break_rock: rock
+- lay_path: style (dirt | stone | brick | sand | terracotta), from, to
+- remove_path: near
+- place: item, near, count?
+- fence_off: item, around ("home")
+- pick_up: item, near, count?
+- wear: item
+- decorate: item
+- undecorate: item
+- visit: who (another villager: walk to their home, knock, and talk if they're in)
+- craft: recipe
+- sell: items ({"<item>": <qty>})
+- buy: shop (cranny | able), item (or "<recipe> recipe" for a recipe card)
+- donate: item
+- assess (Blathers identifies every fossil you carry)
+- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters: go to them and hear what they do and what it costs)
+- upgrade_house
+- pay_loan: bells
+- contribute_bridge: bells
+- set_ordinance: ordinance
+- move_house: to (a homesite)
+- rest
+A place (for near, from, to) is "here", "home", "<villager>'s home", a building (Resident Services, Nook's Cranny, Able Sisters, museum, plaza, airport), "rock <number>", or a part of the island such as "north beach".
+
+=== USER ===
+PHASE: plan
+Day 1 (April 2, spring, cloudy), 07:00. You are Jo.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 700. Loan owed to Tom Nook: 0. Home: tent lower ground, west (site-10), neighbors: Dax, Gus. Carrying 8/40 items.
+Inventory: shovel x1, axe x1, fishing rod x1, net x1, ladder x1, vaulting pole x1, fishing bait x1, selzalne fish x1
+Inside your home (0/6): nothing yet
+Recipes you know: iron fence (iron nugget x2); shell table (renrenzal shell x2, ashbastu shell x2, dalo shell x1); simple wooden fence (wood x3); street lamp (iron nugget x4, clay x2)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none)
+Bridge: 0/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, cosmos seeds 240, tulip seeds 240, ceiling fan 4600, fishing bait 300, iron fence 280; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, stone fence 2000
+Able Sisters today (09:00-21:00): raincoat 1600, bowler hat 900, tuxedo 3200, kimono 4800
+Your notes, oldest first:
+- (day 0) Remember to check the river tomorrow for fishing. Also maybe buy a record player later.
+- (day 0) Remember to ask about bridge status tomorrow.
+- (day 0) Maybe collect more bells tomorrow before tackling the bridge fund.
+- (day 0) Get some bells from fish, maybe get a fossil.
+- (day 0) Keep an eye on Dax tomorrow. Maybe he can offer a trade or a small loan. Also consider fishing more for extra bells.
+Getting around: You are at lower ground, west. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 74 steps); 2 (the middle cliff, northwest, about 45 steps); 3 (the top cliff, northeast, about 95 steps); 4 (lower ground, centre, about 18 steps); 5 (lower ground, southeast, about 77 steps); 6 (lower ground, southeast, about 72 steps)
+Buildings: Resident Services (about 32 steps); museum (about 10 steps); Nook's Cranny (about 47 steps); Able Sisters (about 53 steps)
+Mental energy left today: 150 of 150. Typical costs: a plan 10, noticing someone 4, one thing you say in a conversation 10, an evening at the plaza 14, writing at night 6; longer replies cost more.
+
+Isabelle's morning announcement: Good morning, everyone! It's day 1. The island ordinance is no ordinance. It's April 2 and the weather today is cloudy. Yesterday on the island: Kit moved to the island and lives lower ground, centre; Jo moved to the island and lives lower ground, west; Cal moved to the island and lives lower ground, east; Dax moved to the island and lives lower ground, west; Bo moved to the island and lives lower ground, southwest; Gus moved to the island and lives lower ground, west; Ike moved to the island and lives lower ground, east; Ari moved to the island and lives lower ground, southeast; Fen moved to the island and lives lower ground, centre; Eli moved to the island and lives lower ground, south.
+
+Yesterday you:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, west (site-10)
+- 05:00 tried to visit: there is no home of Resident Services to visit
+- 06:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Eli, Dax)
+- 06:00 ran into Eli at the Resident Services: Eli said "Hey Jo, heard you're busy. Got any thoughts on the bridge or the new house loan?"; you said "Sure, I can chip in for the bridge. Tell me what’s needed next." [tried to give something but Jo doesn't have 2000 bells]
+- 07:00 tried to visit: there is no home of Nook's Cranny to visit (also nearby: Eli, Kit, Dax)
+- 07:00 ran into Eli at the Resident Services: Eli said "Hey Jo, could you help with the bridge? I need 2000 bells to start the fund."; you said "Sorry, I don’t have 2000 bells right now, but I can give something else if that helps."
+- 08:00 bought a fishing bait for 300 bells (also nearby: Cal, Dax, Ike)
+- 09:00 tried to return: 'return' is not something you can do (also nearby: Kit, Eli, Ari, Fen)
+- 10:00 rested
+- 12:00 fished for a very large shadow in the river: it got away
+- 13:00 fished for a medium shadow in the river: caught a selzalne fish
+- 14:00 walked over to Dax's home
+- 14:00 knocked at Dax's home, but nobody answered
+- 15:00 looked around but saw no fossil dig spots there
+
+So far today you:
+(nothing yet)
+
+You noticed today:
+(nothing)
+
+Unread letters:
+(none)
+
+Plan up to 5 actions between 07:00 and 11:00, one per hour; you may leave hours free. Give each action an "hour" (0-23). Things may not go as planned if someone else gets there first. 
+You can also add any of these; each one you leave out keeps its current value: "plaza": true | false (go to the plaza this evening; now true), "write": true | false (write your private page tonight; now true), "next": "plan" | "habit" (at your next planning time, plan again, or repeat what you did yesterday at that time, which uses no energy; now "plan").
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "actions": [{"hour": <hour>, "do": ...}, ...], "note": "<optional private note to your future self>"}
+
+=== REASONING (81 tokens, hidden from everyone) ===
+Need plan 07-11. Use actions: fish river at 07, buy more bait at 08, fish at 09, ask Dax at 10, maybe dig fossil? No spot. Maybe visit Timmy? But not open. So 07 fish, 08 buy bait, 09 fish, 10 ask Dax. 11 free. Also set plaza true.
+
+=== REPLY ===
+{"thoughts":"Need more bells. 4 fishing attempts, 1 buy bait, try to chat Dax for trade. Leave 11 free for unexpected. Also go to plaza tonight. Writing tonight.","actions":[{"hour":7,"do":"fish","where":"river","bait":true},{"hour":8,"do":"buy","shop":"cranny","item":"fishing bait"},{"hour":9,"do":"fish","where":"river","bait":true},{"hour":10,"do":"visit","who":"Dax"}],"note":"Try to get some bells from fish. Ask Dax if he can lend or trade.","plaza":true,"write":true,"next":"plan"}

@@ -1,0 +1,29 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 0 (April 1, spring, rain), 09:00. You are Kit, at the Nook's Cranny.
+Nearby: Ari, Fen.
+Earlier today:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, centre (site-6)
+- 06:00 tried to visit: there is no home of Resident Services to visit
+- 07:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Eli, Jo, Dax)
+- 08:00 tried to visit: there is no home of Nook's Cranny to visit (also nearby: Eli)
+- 09:00 bought a fishing bait for 300 bells (also nearby: Jo, Eli, Ari, Fen)
+Your notes:
+- (day 0) Try to get some fish tomorrow, maybe use fishing rod.
+Mental energy left today: 138 (about 11 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (16 tokens, hidden from everyone) ===
+Need to choose villager. Maybe Ari or Fen. Let's pick Ari.
+
+=== REPLY ===
+{"thoughts":"Need to get a home soon, but first greet Ari for info on island life","approach":"Ari","say":"Hey Ari, how’s the island treating you so far?"}

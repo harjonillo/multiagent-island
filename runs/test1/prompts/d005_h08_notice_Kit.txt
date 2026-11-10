@@ -1,0 +1,35 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2: still fumbling. Gus gave me a selit fish instead of bait—nice but useless right now. Got the shovel recipe, but no shovel. Fen didn’t have the second map, so I’m stuck. Dax’s advice is good, but I need the gear first. No fishing today, no fossils yet. Plan: tomorrow I’ll hit Nook’s at 08:00, grab a bait bundle, maybe ask Gus again. Then head to Dax’s house, bring a small log for the shovel, and finally snag that map from Fen or Isabelle. I’m learning the rhythm—early mornings are the only time to shop. Rested enough? I think I’ll get up at 06:30. Need to keep things simple, but I’m getting used to the island’s quirks. Good night.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 5 (April 6, spring, sunny), 08:00. You are Kit, at the Nook's Cranny.
+Nearby: Bo, Gus.
+Earlier today:
+- 07:00 tried to buy: Nook's Cranny is closed at 07:00 (open 08:00-22:00) (also nearby: Gus)
+- 07:00 ran into Gus at the Nook's Cranny: Gus said "Hey Kit, got a moment?"; you said "Hey, got a fish for you." [gave 1 selit fish; asked for 2 fishing bait]; Gus said "Got one more selit for you, need two bait in return." [gave 1 selit fish; asked for 2 fishing bait]; you said "Thanks, Gus! Here’s another fish. Can I get those 2 bait, please?" [gave 1 selit fish; asked for 2 fishing bait]; Gus said "Here’s a selit for your bait." [gave 1 selit fish]; you said "Sure, here's another fish and I could use those 2 bait." [gave 1 selit fish; asked for 2 fishing bait]; Gus said "Thanks, Kit! Here’s the bait." [tried to give 2 fishing bait but had no fishing bait; then went their way]
+- 08:00 tried to buy: fishing bait costs 300 bells; you have 200 (also nearby: Bo, Gus)
+Your notes:
+- (day 4) Keep an eye on Bo tomorrow for trade
+- (day 4) Remember to bring a small log tomorrow for shovel. Maybe ask Dax if he has a log. Also try to trade selit fish for bait again. Keep an eye on the plaza for any bait offers.
+- (day 5) Remember to ask Dax for a small log. If he says no, try Fen for the second map.
+- (day 5) Ask for 2 bait, keep the fish trade simple.
+- (day 5) Remember to bring a small log to Dax tomorrow for shovel.
+- (day 5) Trade back at Gus for bait tomorrow.
+Mental energy left today: 72 (about 15 for each thing you say). Your plan for today: inward 60 (spent 23), outward 90 (spent 55), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (12 tokens, hidden from everyone) ===
+We should pick someone: maybe Gus to trade bait.
+
+=== REPLY ===
+{"thoughts":"Need bait now, Gus is best for trade. Offer fish to get bait. Keep it short.","approach":"Gus","say":"Hey Gus, trade me two bait for a selit fish?"}

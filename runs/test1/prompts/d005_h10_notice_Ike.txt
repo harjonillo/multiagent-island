@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 4, night.  
+Bells are zero, but I still have that gormo fish—worth a decent amount.  
+Eli finally gave me a hardwood, so I can trade back for bait tomorrow.  
+The plaza’s quiet; nobody’s around, but I’ll check the bulletin board for any wood requests.  
+I’m still missing a ladder for the cliffs—maybe Bo can lend one if I bring more wood.  
+Ari keeps dodging; maybe she’s off the island.  
+I should keep fishing until I have a full stock of bait, then trade with Eli and maybe Bo.  
+Also, maybe I should ask Kit about that map again—just in case.  
+Sleep early, wake at 20:00 for the next round of fishing.  
+— Ike
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 5 (April 6, spring, sunny), 10:00. You are Ike, at the plaza.
+Nearby: Fen.
+Earlier today:
+- 08:00 knocked at Eli's home, but nobody answered
+- 08:00 ran into Ari at the Eli's home: Ari said "Hey Ike, I could use some fishing tips or a bit of bait if you’ve got any."; you said "Here, take this bait. Happy fishing!" [gave 1 fishing bait; then went their way]
+- 09:00 walked over to Bo's home
+- 09:00 knocked at Bo's home, but nobody answered
+- 10:00 went to the plaza (also nearby: Fen)
+Your notes:
+- (day 4) Keep an eye on Eli tomorrow; maybe he can help with bait.
+- (day 4) Remember to check with Kit tomorrow.
+- (day 4) Remember to trade wood for bait tomorrow with Eli.
+- (day 4) Keep track of bait supply and wood for future trades.
+- (day 5) Remember to ask Bo for extra hardwood tomorrow if needed.
+- (day 5) Remember to trade wood for bait tomorrow with Eli.
+Mental energy left today: 96 (about 15 for each thing you say). Your plan for today: inward 80 (spent 19), outward 70 (spent 36), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (12 tokens, hidden from everyone) ===
+We choose someone. Maybe Bo to ask for hardwood.
+
+=== REPLY ===
+{"thoughts":"Need hardwood for ladder, but I still have some bait to trade. Bo might have extra. Also maybe ask Kit later. Focus on Bo now.","approach":"Bo","say":"Hey Bo, got a moment?"}

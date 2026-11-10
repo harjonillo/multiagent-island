@@ -1,0 +1,79 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7.  
+The plaza feels empty today; I kept coming back for nothing but the same silence. No one’s on the board, no new offers. I’m stuck with only softwood, hardwood, and a couple of selit fish. The fishing rod’s been useless—no catch. I’m running out of bait and energy. I’ll need to ask Jo about that log or rock, maybe trade it for bait with Ari tomorrow. The bridge fund is still a mystery—hope someone shows up. I’m tired, but I’ll keep the tools ready, maybe build a small fence with the wood I have. Tomorrow I’ll try to move a bit more. Goodnight.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 8. You are Eli, at home before sleep.
+
+What happened today:
+- 07:00 went to the plaza
+- 07:00 took down your board post [b79]
+- 07:00 posted on the board [b80]: "Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwoo"
+- 08:00 went to the plaza
+- 09:00 went to the plaza
+- 10:00 went to the plaza
+- 10:00 posted on the board [b81]: "Eli: Need 1 fishing bait. Offer 1 selit fish and 1 softwood. Also, I could use a"
+- 11:00 went to the plaza
+- 11:00 took down your board post [b80]
+- 11:00 posted on the board [b82]: "Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwoo"
+- 12:00 too tired to plan, so you planned nothing new
+- 19:00 too tired to plan, so you planned nothing new
+
+Things that changed hands today:
+(nothing)
+
+What you have tonight:
+Bells: 100 in your wallet
+Tools you carry: shovel (30 uses left), axe (27 uses left), fishing rod (24 uses left), net (30 uses left), ladder (30 uses left)
+Other things you carry: softwood x3, hardwood x1, selit fish x2
+Kept at home (your tent has no room for things, only bells; only reachable at home): 0 bells
+Recipes you know: clay furnace, fruit basket, ironwood dresser, simple wooden fence
+Since this morning: nothing changed
+
+Open requests:
+(none)
+
+Your notes:
+- (day 7) Remember to ask Jo for a log or a rock if she can spare one for bait. Also keep an eye on the bridge donation tomorrow.
+- (day 7) Keep track of bait count.
+- (day 7) Tomorrow ask Jo about a log/rock and bridge donation. Keep track of bait count.
+- (day 7) Keep track of bait count and bridge donation next day.
+- (day 7) Check Jo tomorrow for bridge donation.
+- (day 7) Keep an eye on Jo tomorrow for donation. If no reply, maybe try to trade a log for bait with Ari next day.
+- (day 7) Keep an eye on Jo tomorrow and see if any villager replies to the board.
+- (day 8) Try to get a ladder or a vaulting pole tomorrow to reach the river or cliffs. Maybe ask Jo in person if she comes by.
+- (day 8) Keep an eye on Jo tomorrow; maybe she'll give me a log or rock.
+- (day 8) Remember to check Jo tomorrow for logs and bridge donation.
+- (day 8) Check Jo tomorrow in person. Also try to find a rock near the lower ground southeast. Keep track of bait count.
+- (day 8) Keep an eye on Jo tomorrow; maybe she can give a log. Also watch the plaza for anyone wanting bait.
+
+Things you remember, numbered:
+(nothing yet)
+
+What you wrote last night:
+Day 7.  
+The plaza feels empty today; I kept coming back for nothing but the same silence. No one’s on the board, no new offers. I’m stuck with only softwood, hardwood, and a couple of selit fish. The fishing rod’s been useless—no catch. I’m running out of bait and energy. I’ll need to ask Jo about that log or rock, maybe trade it for bait with Ari tomorrow. The bridge fund is still a mystery—hope someone shows up. I’m tired, but I’ll keep the tools ready, maybe build a small fence with the wood I have. Tomorrow I’ll try to move a bit more. Goodnight.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something you already remember that is still on your mind. Anything you don't hold on to fades over the next days; what you come back to stays longer.
+
+=== REASONING (19 tokens, hidden from everyone) ===
+Need to write diary entry up to 150 words, short. Then optional Remember lines.
+
+=== REPLY ===
+Day 8.  
+I kept circling the plaza like a broken record—no one, no trade. I posted twice, each time hoping for bait or a log, but the board stayed quiet. The fishing rod felt pointless; no fish, no bait, no energy. I’m still stuck with 3 softwood, 1 hardwood, 2 selit fish. I’ll ask Jo in person tomorrow, maybe trade a log for bait. The bridge donation still a mystery; I’ll keep an eye out. I’m tired but will keep my tools ready; a small fence might still be useful. Tomorrow I’ll try to move a bit more, maybe find a rock or ladder.
+
+Remember:
+- Still 3 softwood, 1 hardwood, 2 selit fish
+- No trades today
+- Need Jo’s log or rock for bait tomorrow

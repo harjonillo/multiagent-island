@@ -1,0 +1,131 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, 01:00.  
+Bait crisis continues—no bait, only rocks, no rocks. Bo wants a rock, I have none. Cal gave me a selit, now I have 2. Selzalne up to 3, tugorpi 2, fossil 2. Bells still 100. Bridge still 2k away. Dax silent, maybe sleeping. Plan: post on board for bait tomorrow, trade selzalne for wood if Dax offers. Keep 2 selit for fishing, maybe 1 for trade. Remember to ask Eli about exact bridge fund tomorrow. Sleep.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board and post on it, offer and answer trades, and send letters and parcels, which arrive the next morning.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. You can spend them inwardly (planning, thinking things over, writing your private page at night) or outwardly (conversations, time at the plaza, letters and posts). Each morning you decide how much to spend inwardly and how much outwardly; whatever you leave over is spare, for people you run into. The split is your own plan, not a limit, but when all 150 are gone you can't plan, talk or write until the next morning: you carry on with what you've already planned, and the rest of your time is free.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
+- mine_rock: rock?
+- chop_wood: kind? (hardwood | fruit), axe? (stone axe | axe; if you carry both, the stone axe. An axe brings the tree down when it takes its last wood, and a fruit tree drops its fruit; a stone axe never fells)
+- shake_tree
+- fish: where (sea | river | pond), size?, bait? (true to use fishing bait)
+- catch_bug: where (flowers | trees | stumps | rocks | ground), species?
+- beachcomb: near?
+- dig_fossil: near?
+- dig_clam: near? (a clam spot on the beach)
+- plant: item, near
+- dig_stump: near?
+- break_rock: rock
+- lay_path: style (dirt | stone | brick | sand | terracotta), from, to
+- remove_path: near
+- place: item, near, count?
+- fence_off: item, around ("home")
+- pick_up: item, near, count?
+- wear: item
+- decorate: item
+- undecorate: item
+- visit: who (another villager: walk to their home, knock, and talk if they're in)
+- craft: recipe
+- sell: items ({"<item>": <qty>})
+- buy: shop (cranny | able), item (or "<recipe> recipe" for a recipe card)
+- donate: item
+- assess (Blathers identifies every fossil you carry)
+- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters: go to them and hear what they do and what it costs)
+- upgrade_house
+- pay_loan: bells
+- contribute_bridge: bells
+- set_ordinance: ordinance
+- move_house: to (a homesite)
+- rest
+- plaza (not one of your actions: you spend that free hour at the plaza)
+A place (for near, from, to) is "here", "home", "<villager>'s home", a building (Resident Services, Nook's Cranny, Able Sisters, museum, plaza, airport), "rock <number>", or a part of the island such as "north beach".
+
+=== USER ===
+PHASE: plan
+Day 7 (April 8, spring, sunny), 07:00. You are Jo.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 50. Loan owed to Tom Nook: 0. Home: tent lower ground, west (site-10), neighbors: Dax, Gus. Carrying 16/40 items.
+Tools you carry: shovel, axe, fishing rod, net, ladder
+Other things you carry: selzalne fish x4, selit fish x1, loka fish x1, fossil x2, tugorpi fish x2, softwood x1
+Inside your home (0/6): nothing yet
+Open requests: Cal asked you for 1 fishing bait (day 2); Kit asked you for 2 fishing bait (day 5)
+Recipes you know: iron fence (iron nugget x2; you have none of these); shell table (renrenzal shell x2, ashbastu shell x2, dalo shell x1; you have none of these); simple wooden fence (wood x3; you have none of these); street lamp (iron nugget x4, clay x2; you have none of these)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1
+Bridge: 750/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, hyacinth seeds 240, pansy seeds 240, iron fence 280, fishing bait 300, ceiling fan 4600; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, stone axe 500, stone lion-dog 2000
+Able Sisters today (09:00-21:00): kimono 4800, sundress 1400, rose crown 1200, tuxedo 3200
+Your notes, oldest first:
+- (day 5) Post for 1 bait, offer 1 selzalne for 1 selit with Cal. Keep 2 selit for tomorrow.
+- (day 5) Remember to keep 2 selit for tomorrow's fishing.
+- (day 5) Keep 2 selit for tomorrow fishing. Remember to post bait tomorrow.
+- (day 5) Got bait for Kit, keep 1 selit for tomorrow.
+- (day 5) Remember to trade the rock for wood tomorrow.
+- (day 5) Keep the selzalne handy for future trades; maybe ask Dax tomorrow for a rock.
+- (day 5) Remember to keep an eye on any new rocks that appear; maybe someone else will have one to trade.
+- (day 6) Remember to keep at least 1 selit for tomorrow’s fishing.
+- (day 6) Keep the selit for tomorrow. Stay close to the plaza for quick replies.
+- (day 6) Remember to keep at least one selit for tomorrow’s fishing.
+- (day 6) Keep at least 1 selit for tomorrow's fishing.
+- (day 6) Ask for log, keep selzalne for future trade.
+- (day 6) Remember to post on plaza tomorrow for bait.
+- (day 6) Ask for a rock, keep selit for tomorrow.
+- (day 6) Keep an eye out for rocks—maybe Dax or someone else will have one soon.
+Getting around: You are at lower ground, west. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 173 steps); 2 (the middle cliff, northwest, about 45 steps); 3 (the top cliff, northeast, about 104 steps); 4 (lower ground, centre, about 18 steps); 5 (lower ground, southeast, about 176 steps); 6 (lower ground, southeast, about 171 steps)
+Buildings: Resident Services (about 133 steps); plaza (out of reach for you right now); museum (about 10 steps); Nook's Cranny (about 146 steps); Able Sisters (out of reach for you right now)
+Trees around here (west): 1 hardwood tree, 4 fruit trees, 4 stumps
+Mental energy today: 150. Typical costs: a plan 19, noticing someone 5, one thing you say in a conversation 16, a turn at the plaza 20, writing at night 11; longer replies cost more.
+
+Isabelle's morning announcement: Good morning, everyone! It's day 7. The island ordinance is no ordinance. It's April 8 and the weather today is sunny. Nothing much to report from yesterday. Did you know a shaken fruit tree grows its fruit back in 3 days?
+
+Yesterday you:
+- 07:00 went to the plaza (also nearby: Bo, Eli)
+- 07:00 ran into Bo at the plaza: Bo said "Hey Jo, could I borrow a rock for my ladder?"; you said "Sure thing." [tried to give 1 rock but had no rock]; Bo said "Thanks, Jo! Here you go." [tried to give 1 rock but had no rock; then went their way]
+- 08:00 went to the plaza (also nearby: Eli, Ike)
+- 08:00 ran into Eli at the Ari's home: Eli said "Good morning, Jo. I hope you slept well. I was wondering if you could spare a log for bait in exchange for the bridge donation we discussed?"; you said "" [asked for 1 log, but there's nothing called log on this island]; Eli said "Sorry, I have no logs, but I can offer a softwood if you need one." [gave 1 softwood; asked for 1 log, but there's nothing called log on this island]; you said "Thanks, Eli. I’m short on logs—could I get a selzalne fish instead?" [asked for 1 selzalne fish]; Eli said "Sure, here's a selzalne fish for you." [gave 1 selzalne fish; asked for 1 log, but there's nothing called log on this island]; you said "Thanks for the softwood, Eli! Could I borrow a rock instead?" [asked for 1 rock, but there's nothing called rock on this island]; Eli said "Thanks, Jo! If you need any more softwood, just let me know."; you said "Thanks for the softwood, Eli! I’ll head back to the plaza." [then went their way]
+- 09:00 walked over to Dax's home; your vaulting pole broke after 30 uses and is gone from your pockets (also nearby: Cal)
+- 09:00 knocked at Dax's home, but nobody answered
+- 10:00 walked over to Bo's home (also nearby: Ike)
+- 10:00 knocked at Bo's home, but nobody answered
+- 11:00 put 50 bells toward the bridge to the north bank (750/98000)
+- 12:00 too tired to plan, so you planned nothing new
+- 19:00 too tired to plan, so you planned nothing new
+
+So far today you:
+(nothing yet)
+
+You noticed today:
+(nothing)
+
+Unread letters:
+(sent day 6) letter from Eli: Hey Jo, I hope you’re doing well. I was wondering if you could spare a little for the bridge fund? Any help would be great. Thanks!
+
+Plan up to 5 actions between 07:00 and 11:00, one per hour; you may leave hours free. Give each action an "hour" (0-23). Things may not go as planned if someone else gets there first. 
+You can also spend any free hour at the plaza: add {"hour": <hour>, "do": "plaza"}. It isn't one of your actions.
+First, decide how you'll spend today's 150 points of mental energy: "energy": {"inward": <points>, "outward": <points>}. Inward is planning, thinking and writing tonight; outward is conversations, the plaza, letters and posts; whatever you leave over is spare, for people you run into. It's your plan, not a limit.
+You can also add "write": true | false (write your private page tonight; now true). If you leave it out, it stays as it is.
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "do": ...}, ...], "note": "<optional private note to your future self>"}
+
+=== REASONING (54 tokens, hidden from everyone) ===
+Need to plan 5 actions between 7-11. Need to get rock for Bo, maybe get rock from Dax or others. Also need to post bait tomorrow. Today energy: maybe 60 inward, 90 outward. Write true. Provide actions.
+
+=== REPLY ===
+{"thoughts":"Need a rock for Bo. Dax likely has one. I'll head to Dax first, then to Bo. Also want to post bait tomorrow, so I’ll post a request now. I’ll also offer a selzalne for a log, but I have none. Maybe just post a request for a log. Keep 1 selit for tomorrow fishing. I’ll spend 70 inward, 80 outward. Write tonight.", "energy":{"inward":70,"outward":80},"actions":[{"hour":7,"do":"visit","who":"Dax"},{"hour":8,"do":"visit","who":"Bo"},{"hour":9,"do":"plaza"},{"hour":10,"do":"plaza"},{"hour":11,"do":"plaza"}],"note":"Remember to ask Dax for a rock, and post bait tomorrow. Keep selit safe."}

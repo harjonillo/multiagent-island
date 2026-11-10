@@ -1,0 +1,104 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0. Arrived at dawn, cold wind, Tom’s tent ready. I offered him a house loan—no interest, 98k, must pay before next upgrade. He seemed relieved. I tried to rally Jo for the bridge, but he only has a few bells. I bought bait, caught a selzalne, got a couple of logs. No fish today, no fossils, no other houses. The island feels quiet, almost empty. I’m low on energy, so I’ll sleep early. Tomorrow: keep energy low, maybe find a free homesite, see if Jo can chip in, and keep an eye on that bridge. I’ll note any new spots, but for now, just rest.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- Villagers meet at the plaza at 20:00 and 21:00.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or write until the next morning.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: evening (round 0)
+Day 1 (April 2, spring, cloudy), 20:00 at the plaza. You are Eli.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 100. Loan owed to Tom Nook: 0. Home: tent lower ground, south (site-12), no neighbors yet. Carrying 17/40 items.
+Inventory: shovel x1, axe x1, fishing rod x1, net x1, ladder x1, vaulting pole x1, fishing bait x1, selzalne fish x1, wood x2, softwood x6, hardwood x1
+Inside your home (0/6): nothing yet
+Recipes you know: clay furnace (clay x6, iron nugget x2); fruit basket (apple x6, softwood x2); ironwood dresser (iron nugget x4, hardwood x8, wood x4); simple wooden fence (wood x3)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none)
+Bridge: 0/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, cosmos seeds 240, tulip seeds 240, ceiling fan 4600, fishing bait 300, iron fence 280; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, stone fence 2000
+Able Sisters today (09:00-21:00): raincoat 1600, bowler hat 900, tuxedo 3200, kimono 4800
+Your notes, oldest first:
+- (day 0) Keep energy low; maybe skip extra actions later.
+- (day 0) If I miss any, I’ll just rest for that hour.
+- (day 0) Remember to keep energy low tomorrow.
+- (day 1) Keep an eye on the bridge fund later, maybe ask Jo again tomorrow.
+- (day 1) If Jo gives bells, contribute bridge.
+Getting around: You are at lower ground, south. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 66 steps); 2 (the middle cliff, northwest, about 76 steps); 3 (the top cliff, northeast, about 109 steps); 4 (lower ground, centre, about 33 steps); 5 (lower ground, southeast, about 69 steps); 6 (lower ground, southeast, about 46 steps)
+Buildings: Resident Services (about 42 steps); museum (about 29 steps); Nook's Cranny (about 43 steps); Able Sisters (about 26 steps)
+You spotted today:
+- 07:00 1 fossil dig spot (lower ground, south, near the plaza)
+- 08:00 a medium fish shadow in the river (lower ground, south, near Nook's Cranny)
+Mental energy left today: 105 of 150. Typical costs: a plan 14, noticing someone 5, one thing you say in a conversation 13, an evening at the plaza 14, writing at night 6; longer replies cost more.
+
+Today you:
+- 07:00 tried to visit: Timmy and Tommy don't live in a house you can visit; they work at Nook's Cranny. To talk to them, use ask (who: Timmy and Tommy). Visiting is for other villagers' homes
+- 08:00 bought a fishing bait for 300 bells (also nearby: Ike, Kit, Jo, Ari)
+- 08:00 ran into Jo at the Nook's Cranny: you said "Hey Jo, any updates on the bridge fund?"; Jo said "Got a selit today, still fishing for more bells. How's the bridge fund going?"
+- 09:00 threw bait in the river and a very large shadow appeared: it got away (also nearby: Jo, Kit)
+- 09:00 ran into Jo at the river: you said "Hey Jo, still any idea how we can raise more bells for the bridge?"; Jo said "How much is the bridge fund up to now?"
+- 10:00 chopped a hardwood tree: hardwood x1, softwood x2; with the last wood the axe brought the tree down, leaving a stump
+- 11:00 rested
+- 12:00 looked for fish in the river, but there were no fish shadows in sight
+- 13:00 chopped a hardwood tree: softwood x3; with the last wood the axe brought the tree down, leaving a stump
+- 14:00 tried to ask: Jo is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Jo, meet them around the island, visit their home, or write to them at the plaza
+- 15:00 bought a fishing bait for 300 bells
+- 16:00 fished for a medium shadow in the river: it got away
+
+Letters and messages to you:
+(none)
+
+Bulletin board, newest last:
+- (day 0) Ari: Hey folks! Need wood for fences and some fishing bait. Anyone selling? Or know where I can get them? Thanks!
+- (day 0) Bo: Anyone have wood? I’m looking to craft a shovel. I can trade a shell or any other small item. Thanks!
+- (day 0) Eli: Hey folks! I’m helping with the bridge to the north bank. We need 20,000 bells total. Anyone can chip in. I can offer 10 wood and 2 softwood for 2000 bells, or just a small donation. Let’s get this done!
+- (day 0) Jo: Anyone with extra bells or who can help with the bridge? I'm looking to contribute 2000 bells, but I only have 300 right now. Any ideas? Thanks!
+- (day 0) Gus: Hi, I'm Gus. New to the island, looking forward to meeting everyone!
+- (day 0) Cal: Anyone know if there’s an island ordinance? Will ask Isabelle tomorrow morning. Thanks!
+
+Trade offers waiting for your answer:
+(none)
+
+Other villagers: Ari, Bo, Cal, Dax, Fen, Gus, Ike, Jo, Kit
+
+You can post on the board, offer trades to villagers here, answer offers (accept, reject or counter with your own terms), write letters (up to 350 characters each), and send parcels of things from your pockets. Letters and parcels arrive tomorrow morning. Board posts can be up to 250 characters. Doing nothing is fine. Use "bells" as an item name for money. Respond with one JSON object and nothing else:
+{
+  "thoughts": "<your private reasoning; nobody else sees it>",
+  "letters": [{"to": "<villager>", "content": "..."}],
+  "board": "<post for everyone, or empty>",
+  "offers": [{"to": "<villager>", "give": {"<item>": <qty>}, "want": {"<item>": <qty>}, "note": "..."}],
+  "responses": [{"offer": "<id>", "decision": "accept" | "reject" | "counter", "give": {}, "want": {}, "note": "..."}],
+  "parcels": [{"to": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],
+  "note": "<optional private note to your future self>"
+}
+
+=== REASONING (181 tokens, hidden from everyone) ===
+We need to post on board maybe ask for bells. We have 100 bells. Offer 2000 bells? can't. Maybe ask Jo for bell donation? We have 100. Could ask for small. We could offer wood for bells? We have 2 wood, 6 softwood, 1 hardwood. We could offer 2 wood and 2 softwood for 2000 bells? too much. Maybe ask Jo for small donation, we have 100, we can offer 100 to Jo. Also ask for any bells. Let's post: "Need 2000 bells for bridge. I can offer 2 wood + 2 softwood for 2000. Anyone else?" Also maybe ask for wood? We need wood for fences. Offer 2000 bells for 1 wood? Eh. We'll just post.
+
+No offers to send. No letters. Let's output.
+
+=== REPLY ===
+{
+  "thoughts": "I have 100 bells and some wood. I want to contribute to the bridge and maybe get some bells back. I'll post asking for a small donation and offer a few wood items for 2000 bells if someone is willing. No trades or letters today.",
+  "letters": [],
+  "board": "Need 2000 bells for bridge fund. I can offer 2 wood + 2 softwood for 2000 bells. Anyone else can chip in? Also looking for extra wood to build fences. Please let me know!",
+  "offers": [],
+  "responses": [],
+  "parcels": [],
+  "note": "Post on board, keep an eye on replies tomorrow. Maybe ask Jo for a small donation."
+}

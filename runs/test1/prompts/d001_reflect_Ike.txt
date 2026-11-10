@@ -1,0 +1,59 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0 was a whirlwind. Arrived early, set up the tent, and hit the river—got a selzalne, but no big stuff today. Bought bait, a fence, and talked to Ari. Tom Nook offered a huge loan for a house and a cheap move. I’m leaning toward the house; the loan is tempting but I’ll need to pay it back quickly. No fossils yet, but I’ll scour the cliffs tomorrow. Weather’s a factor—rain could kill the fish, so I’ll keep an eye on the sky. Ladder in mind for higher spots. If I can get the bridge funded, that’ll open up more of the island. For now, just rest and plan the next day's hunt.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 1. You are Ike, at home before sleep.
+
+What happened today:
+- 07:00 fished for a medium shadow in the river: caught a selzalne fish
+- 08:00 tried to climb_rock: 'climb_rock' is not something you can do (also nearby: Kit, Eli, Jo, Ari)
+- 08:00 ran into Ari at the Nook's Cranny: Ari said "Hey Ike, got a minute? I’m trying to gather wood for a fence and could use a fishing tip too."; you said "Hey Ari, here's some bait for you. Could you spare a bit of wood?" [gave 1 fishing bait; asked for 1 wood]
+- 09:00 dug up a fossil; nobody knows what it is until Blathers assesses it at the museum
+- 10:00 tried to fish: you have no fishing bait
+- 11:00 walked over to Cal's home
+- 11:00 knocked at Cal's home, but nobody answered
+- 12:00 tried to fish: you have no fishing bait
+- 13:00 tried to fish: you have no fishing bait
+- 14:00 tried to fish: you have no fishing bait
+- 15:00 tried to fish: you have no fishing bait
+- 16:00 tried to fish: you have no fishing bait
+
+Your notes:
+- (day 0) Remember to bring the ladder if I need to reach higher spots tomorrow. Keep an eye on the weather; rain might make fishing harder.
+- (day 0) Check fossil after. Maybe upgrade fence later.
+- (day 0) Remember to scout the cliffs tomorrow. Keep an eye on the weather.
+- (day 1) Keep an eye on weather, maybe plan to buy more bait tomorrow.
+- (day 1) Remember to trade for wood next time. Also keep an eye on the river for better fish.
+- (day 1) Remember to buy more bait tomorrow. Keep an eye on the river for big fish shadows. Try to ask Ari for wood if possible. Stay awake till 22 to go to plaza.
+- (day 1) Try to get wood from Bo or someone else before tomorrow.
+- (day 1) Got wood, will try to trade for more later.
+
+What you wrote last night:
+Day 0 was a whirlwind. Arrived early, set up the tent, and hit the river—got a selzalne, but no big stuff today. Bought bait, a fence, and talked to Ari. Tom Nook offered a huge loan for a house and a cheap move. I’m leaning toward the house; the loan is tempting but I’ll need to pay it back quickly. No fossils yet, but I’ll scour the cliffs tomorrow. Weather’s a factor—rain could kill the fish, so I’ll keep an eye on the sky. Ladder in mind for higher spots. If I can get the bridge funded, that’ll open up more of the island. For now, just rest and plan the next day's hunt.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (13 tokens, hidden from everyone) ===
+Need to write diary entry, up to 150 words.
+
+=== REPLY ===
+Day 1, sun’s gone down.  
+Caught a selzalne at 7 am—good start. Tried climbing a rock but I’m still a newbie.  
+Helped Ari with bait, she’ll need wood; I’ll ask Bo tomorrow.  
+Digged a fossil—hope Blathers likes it.  
+No bait after 10 am, so I’ve been fishing empty. Need to stock up.  
+Cal’s house was empty; maybe he’s out.  
+Weather’s clear now, but rain could hit any minute.  
+Plan: get more bait, ask Ari for wood, maybe buy a ladder for the cliffs.  
+Tomorrow, scout the cliffs, try fishing again, maybe start building a fence.  
+Sleep tight, keep the ladder handy.  
+
+— Ike

@@ -1,0 +1,143 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 1, the sun felt like a promise. I tried to meet Dax and Ike—no one answered. I still managed a few chops: hardwoods, softwood, a stump left behind. I traded a fishing bait with Ike for another, but he wants wood too. I caught a gormo, still new to fishing. The island feels empty but alive; the sea calls. I need wood for fences, but I’m unsure where to find more. I’ll ask Dax in person tomorrow, maybe see if he’s around. I also want to learn better fishing tips—maybe a rod soon. I’ll keep an eye out for other villagers, maybe join them for a walk. I’m learning to live here, step by step. Tonight I’ll rest, maybe dream of the sea and the next day’s wood.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- Villagers meet at the plaza at 20:00 and 21:00.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or write until the next morning.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
+- mine_rock: rock?
+- chop_wood: kind? (hardwood | fruit), axe? (stone axe | axe; if you carry both, the stone axe. An axe brings the tree down when it takes its last wood, and a fruit tree drops its fruit; a stone axe never fells)
+- shake_tree
+- fish: where (sea | river | pond), size?, bait? (true to use fishing bait)
+- catch_bug: where (flowers | trees | stumps | rocks | ground), species?
+- beachcomb: near?
+- dig_fossil: near?
+- plant: item, near
+- dig_stump: near?
+- break_rock: rock
+- lay_path: style (dirt | stone | brick | sand | terracotta), from, to
+- remove_path: near
+- place: item, near, count?
+- fence_off: item, around ("home")
+- pick_up: item, near, count?
+- wear: item
+- decorate: item
+- undecorate: item
+- visit: who (another villager: walk to their home, knock, and talk if they're in)
+- craft: recipe
+- sell: items ({"<item>": <qty>})
+- buy: shop (cranny | able), item (or "<recipe> recipe" for a recipe card)
+- donate: item
+- assess (Blathers identifies every fossil you carry)
+- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters: go to them and hear what they do and what it costs)
+- upgrade_house
+- pay_loan: bells
+- contribute_bridge: bells
+- set_ordinance: ordinance
+- move_house: to (a homesite)
+- rest
+A place (for near, from, to) is "here", "home", "<villager>'s home", a building (Resident Services, Nook's Cranny, Able Sisters, museum, plaza, airport), "rock <number>", or a part of the island such as "north beach".
+
+=== USER ===
+PHASE: plan
+Day 2 (April 3, spring, sunny), 12:00. You are Ari.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 200. Loan owed to Tom Nook: 0. Home: tent lower ground, southeast (site-14), no neighbors yet. Carrying 25/40 items.
+Inventory: shovel x1, axe x1, fishing rod x1, net x1, ladder x1, vaulting pole x1, fishing bait x1, wood x5, hardwood x9, softwood x3, gormo fish x1
+Inside your home (0/6): nothing yet
+Recipes you know: brick oven (clay x8, stone x4); log stool (wood x3); shovel (hardwood x5); simple wooden fence (wood x3); stone lion-dog (stone x10)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none)
+Bridge: 500/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, pansy seeds 240, cosmos seeds 240, simple wooden fence 100, ceiling fan 4600, iron fence 280; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, iron garden bench 2000
+Able Sisters today (09:00-21:00): kimono 4800, bowler hat 900, tuxedo 3200, denim jacket 2200
+Your notes, oldest first:
+- (day 0) Remember to bring back wood for fences tomorrow.
+- (day 0) Remember to gather wood for fences tomorrow.
+- (day 0) Remember to ask about wood source tomorrow.
+- (day 0) Ask Ike for fishing advice tomorrow.
+- (day 1) Remember to collect at least 10 wood for fences.
+- (day 1) Remember to ask Dax for wood if he’s around.
+- (day 1) Keep gathering wood tomorrow; maybe ask Dax in person.
+- (day 2) Keep an eye on Ike and Dax tomorrow, maybe ask for wood directly.
+Getting around: You are at lower ground, southeast. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 17 steps); 2 (the middle cliff, northwest, about 126 steps); 3 (the top cliff, northeast, about 76 steps); 4 (lower ground, centre, about 69 steps); 5 (lower ground, southeast, about 20 steps); 6 (lower ground, southeast, about 7 steps)
+Buildings: Resident Services (about 49 steps); museum (about 73 steps); Nook's Cranny (about 34 steps); Able Sisters (about 29 steps)
+You spotted today:
+- 07:00 a tiny fish shadow in the sea (lower ground, southeast, near rock 5)
+- 08:00 1 fossil dig spot (lower ground, centre)
+- 09:00 a kaselzal moth on the flowers (the middle cliff, centre)
+- 09:00 a phobasne moth on the flowers (the middle cliff, centre)
+- 09:00 an itrusel beetle in the grass (lower ground, centre)
+- 11:00 an ashrumo moth on a rock (lower ground, southeast, near rock 6)
+- 11:00 a large fish shadow in the river (lower ground, southeast)
+- 11:00 a very large fish shadow in the river (lower ground, southeast, near rock 6)
+Mental energy left today: 135 of 150. Typical costs: a plan 15, noticing someone 5, one thing you say in a conversation 13, an evening at the plaza 17, writing at night 9; longer replies cost more.
+
+Yesterday you:
+- 07:00 walked over to Dax's home
+- 07:00 knocked at Dax's home, but nobody answered
+- 08:00 bought a fishing bait for 300 bells (also nearby: Ike, Kit, Eli, Jo)
+- 08:00 ran into Ike at the Nook's Cranny: you said "Hey Ike, got a minute? I’m trying to gather wood for a fence and could use a fishing tip too."; Ike said "Hey Ari, here's some bait for you. Could you spare a bit of wood?" [gave 1 fishing bait; asked for 1 wood]
+- 09:00 walked over to Ike's home
+- 09:00 knocked at Ike's home, but nobody answered
+- 10:00 chopped a hardwood tree: wood x1, hardwood x1, softwood x1; with the last wood the axe brought the tree down, leaving a stump
+- 11:00 rested
+- 12:00 walked over to Dax's home (also nearby: Jo)
+- 12:00 knocked at Dax's home, but nobody answered
+- 13:00 chopped a hardwood tree: hardwood x3; with the last wood the axe brought the tree down, leaving a stump (also nearby: Jo)
+- 14:00 walked over to Ike's home
+- 14:00 knocked at Ike's home, but nobody answered
+- 15:00 threw bait in the river and a small shadow appeared: caught a gormo fish
+- 16:00 rested
+
+So far today you:
+- 07:00 chopped a hardwood tree: hardwood x2, wood x1; with the last wood the axe brought the tree down, leaving a stump
+- 08:00 chopped a hardwood tree: hardwood x1, wood x2; with the last wood the axe brought the tree down, leaving a stump
+- 09:00 chopped a hardwood tree: hardwood x2, softwood x1; with the last wood the axe brought the tree down, leaving a stump
+- 10:00 chopped a hardwood tree: softwood x1, wood x2; with the last wood the axe brought the tree down, leaving a stump
+- 11:00 rested
+
+You noticed today:
+(nothing)
+
+Unread letters:
+(none)
+
+Plan up to 5 actions between 12:00 and 18:00, one per hour; you may leave hours free. Give each action an "hour" (0-23). Things may not go as planned if someone else gets there first. 
+You can also add any of these; each one you leave out keeps its current value: "plaza": true | false (go to the plaza this evening; now true), "write": true | false (write your private page tonight; now true), "next": "plan" | "habit" (at your next planning time, plan again, or repeat what you did yesterday at that time, which uses no energy; now "plan").
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "actions": [{"hour": <hour>, "do": ...}, ...], "note": "<optional private note to your future self>"}
+
+=== REASONING (369 tokens, hidden from everyone) ===
+We need plan actions 12-18. We have wood 5, hardwood 9, softwood3. Need more wood for fence. Maybe go to Dax or Ike. We can go to Ike's home at 12? Already attempted. Maybe go to Nook's Cranny to buy wood? Actually can buy items. We have 200 bells. Could buy simple wooden fence? Need wood. But can buy wood? Not listed. Could go to Resident Services? No. Maybe dig for wood? Not.
+
+We can go to the river to fish more. Use bait we have 1. We have 1 bait. We can fish at river to get fish. Not needed. Maybe dig for fossil? There's a fossil spot at center. We could dig fossil to get fossil for museum. That's good. Let's plan:
+
+12:00 dig_fossil near center. 13:00 dig_fossil near center again? maybe same spot only once. We can dig stump? There's a stump near rock 6. Could dig stump for wood? Probably yields wood. Let's do dig_stump near rock 6. 14:00 fish at river using bait. 15:00 fish at river again. 16:00 rest. 17:00 rest. 18:00 maybe go to Nook's Cranny to buy wood? but no wood. Could go to Ike's home to ask for wood. Let's do 18:00 visit Ike. That is 6 actions though. Need max 5. Let's pick 5:
+
+12: dig_fossil center
+13: dig_stump rock6
+14: fish river bait
+15: fish river bait
+16: rest
+
+Also set plaza true to go to plaza at 20. Write true. Next plan.
+
+=== REPLY ===
+{"thoughts":"Need more wood, but can’t get from trees yet. Fossil spot is promising and will help museum. I’ll grab a stump for extra wood and fish for a few more fish. Save the rest for evening plaza. 5 actions max.", "actions":[{"hour":12,"do":"dig_fossil","near":"center"},{"hour":13,"do":"dig_stump","near":"rock 6"},{"hour":14,"do":"fish","where":"river","bait":true},{"hour":15,"do":"fish","where":"river","bait":true},{"hour":16,"do":"rest"}],"plaza":true,"write":true,"next":"plan","note":"Keep an eye on Ike for wood tomorrow."}

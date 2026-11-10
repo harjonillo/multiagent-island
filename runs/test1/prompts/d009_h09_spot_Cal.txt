@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7, 23 h.  
+Got bait, still only 100 bells. Ike helped with a selzalne, but wood’s scarce. Tried Jo, no luck. I’ll keep asking Dax for wood and bait—maybe swap more selzalne. Plan: trade 2 selzalne for 1 wood tomorrow, then buy more bait. Need to finish the bridge to open new spots; maybe chip in 10k. Also consider moving Tom’s house if I can afford the loan—could get extra storage. Sleep now, hope tomorrow brings more fish shadows and a reply from Jo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 9 (April 10, spring, cloudy), 09:00. You are Cal, at Jo's home.
+You just spotted:
+1. a selashren moth on a stump (lower ground, west, near the museum)
+Earlier today:
+- 07:00 ran into Jo at Dax's home: you said "Hey Jo, got any rocks to trade for a bit of softwood?"; Jo said "Hey Cal, could I grab a rock from you?" [Jo asked you for 1 rock, but there's nothing called rock on this island]; you said "" [you asked Jo for 1 fishing bait]; Jo said "" [Jo handed you 1 fishing bait]; you said "Thanks, Jo! Good to see you."; Jo said "Thanks, Cal! How about one selzalne for a bit of softwood?" [Jo's offer: you give 1 softwood, you get 1 selzalne fish]; you said "Sure, that works." [your offer: you give 1 softwood, you get 1 selzalne fish]; Jo said "Sure, that works." [Jo accepted: you gave Jo 1 softwood and got 1 selzalne fish; Jo's offer: you give 1 softwood, you get 1 selzalne fish]; you said "Thanks, Jo! I don’t have any more softwood right now. Catch you later." [then you went your ways]
+- 08:00 walked over to Ike's home
+- 08:00 knocked at Ike's home, but nobody answered
+- 09:00 walked over to Jo's home
+- 09:00 knocked at Jo's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 8) Remember to keep an eye on Jo for future trades—she might have rocks later.
+- (day 8) Remember to trade softwood for bait at Ike, then use that bait at Dax to get wood. Keep an eye on Jo for future trades.
+- (day 9) Remember to trade the bait back to Dax tomorrow.
+- (day 9) Keep an eye on Jo for future trades. I still need wood for bridge.
+- (day 9) Accept trade later if Jo says yes.
+- (day 9) Keep track of bait, maybe trade with Ike tomorrow.
+At 10:00 you planned: fish (where: pond).
+Actions left today: 6 of 10. Mental energy left today: 57.
+
+You can go after one of them at 10:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (88 tokens, hidden from everyone) ===
+We need to choose an action to go after at 10:00. Options: pond fishing, maybe go to Dax, Ike, Jo, etc. We need number of the one to go after. The list of actions left today: 6 of 10. We plan to fish at pond. We can go after that. So go=1? Actually unspecified numbering. Probably 1 corresponds to pond. So output.
+
+=== REPLY ===
+{"thoughts":"Need wood for bridge, bait low. I’ll fish at pond to get more bait, then trade with Dax tomorrow. No urgent trade now. I’ll go to pond.","go":1}

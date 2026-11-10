@@ -1,0 +1,31 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0 was a whirlwind. Arrived early, set up tent, tried to find services but none. Offered Tom Nook a house for a loan—maybe a good start if I can pay back before upgrades. Bought bait, met Fen, but no map. River gave a shadow, maybe a big fish. No fossils today, but I’ll search tomorrow. Need to figure out how to get a map—ask Isabelle or maybe buy one. Also think about moving home to a free site if it’s cheaper. Resting now, hoping for a calm night and a productive tomorrow.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 1 (April 2, spring, cloudy), 07:00. You are Kit, at the Resident Services.
+Nearby: Fen, Dax.
+Earlier today:
+- 07:00 asked Isabelle: The ordinance now is no ordinance. Anyone can pay me 20000 bells to set one for the whole island from the next morning, or to lift it (none). Options: early bird: everyone keeps earlier hours, and the shops open and close earlier; night owl: everyone keeps later hours, and the shops open and close later; bell boom: Nook's Cranny pays more for everything, and everything in the shops costs more. And here's a map of the island; keep it with you and you'll always know where things are. (You got an island map.) (also nearby: Fen, Dax)
+Your notes:
+- (day 0) Try to get some fish tomorrow, maybe use fishing rod.
+- (day 0) Check map tomorrow for rocks and resources.
+- (day 0) If Fen doesn't have a map, I might need to ask Isabelle at Resident Services tomorrow.
+- (day 1) If Isabelle is busy, maybe ask Tom Nook next.
+Mental energy left today: 135 (about 10 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (13 tokens, hidden from everyone) ===
+Need to choose who to talk. Probably Isabelle for map.
+
+=== REPLY ===
+{"thoughts":"Need a map, Isabelle can help, she’s at Resident Services. Ask her before Tom Nook. No urgent other actions. Go to Isabelle.","approach":"Isabelle","say":"Morning, Isabelle! I heard you have a map of the island. Could I see it?"}

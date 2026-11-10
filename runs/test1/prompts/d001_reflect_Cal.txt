@@ -1,0 +1,49 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0 was a whirlwind. I landed at dawn, set up my tent on the lower ground east (site‑8), and realized the island’s services are still figuring out their schedule. No Resident Services, no Nook’s Cranny open yet – I’ll have to wait until 8 AM. I managed to catch a selit and a loka fish, and spent 300 bells on bait. Met Dax and Fen at the river; both say no ordinance yet, but they’ll keep an eye out. I need to keep fishing for larger ones tomorrow and definitely ask Isabelle about the ordinance in the morning. Also, I’ll check the river after using the new bait. If I can get more fish, maybe I’ll trade for something useful. Time to rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 1. You are Cal, at home before sleep.
+
+What happened today:
+- 08:00 asked Isabelle: The ordinance now is no ordinance. Anyone can pay me 20000 bells to set one for the whole island from the next morning, or to lift it (none). Options: early bird: everyone keeps earlier hours, and the shops open and close earlier; night owl: everyone keeps later hours, and the shops open and close later; bell boom: Nook's Cranny pays more for everything, and everything in the shops costs more. And here's a map of the island; keep it with you and you'll always know where things are. (You got an island map.) (also nearby: Fen, Dax)
+- 08:00 ran into Dax at the visiting: Dax said "Hey Cal, any idea where Blathers works?"; you said "Blathers runs the museum over there, near the center of the island."
+- 09:00 fished for a medium shadow in the river: caught a selzalne fish
+- 10:00 fished for a medium shadow in the river: caught a selzalne fish
+- 11:00 fished for a medium shadow in the river: caught a selzalne fish
+- 12:00 fished for a very large shadow in the river: caught a loka fish
+- 13:00 looked for fish in the river, but there were no fish shadows in sight (also nearby: Fen, Dax)
+- 13:00 ran into Fen at the river: Fen said "Hey Cal, quick question—do you know where I can find a map of the island?"; you said "Here’s the map I got from Isabelle." [gave 1 island map]
+- 14:00 fished for a small shadow in the river: it got away (also nearby: Gus)
+- 15:00 fished for a very large shadow in the river: caught a loka fish
+- 16:00 tried to visit: Blathers doesn't live in a house you can visit; they work at the museum. To talk to them, use ask (who: Blathers). Visiting is for other villagers' homes
+- 17:00 rested
+
+Your notes:
+- (day 0) Got 300 bells spent, 700 left. Got 3 fish. Will keep an eye on the river for larger ones tomorrow. Remember to ask Isabelle about the island ordinance tomorrow morning.
+- (day 0) Remember to check the river again tomorrow after bait is in hand.
+- (day 1) Ask Isabelle tomorrow too if nothing changes.
+- (day 1) Try to catch a very large fish before 18.
+- (day 1) Remember to keep the map handy for future reference.
+- (day 1) Keep an eye on the river for larger fish tomorrow and remember to ask Isabelle about ordinance again if anything changes.
+
+What you wrote last night:
+Day 0 was a whirlwind. I landed at dawn, set up my tent on the lower ground east (site‑8), and realized the island’s services are still figuring out their schedule. No Resident Services, no Nook’s Cranny open yet – I’ll have to wait until 8 AM. I managed to catch a selit and a loka fish, and spent 300 bells on bait. Met Dax and Fen at the river; both say no ordinance yet, but they’ll keep an eye out. I need to keep fishing for larger ones tomorrow and definitely ask Isabelle about the ordinance in the morning. Also, I’ll check the river after using the new bait. If I can get more fish, maybe I’ll trade for something useful. Time to rest.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (10 tokens, hidden from everyone) ===
+Need to write diary entry ~150 words.
+
+=== REPLY ===
+Day 1, 20 h.  
+Morning: Isabelle’s big map and the “no ordinance” deal. 20000 bells for a rule?  I’ll see what everyone thinks tomorrow.  Dax asked about Blathers, I pointed him to the center.  Fen wanted a map; I handed over the one from Isabelle.  Fishing: three selzalne, a loka, then a missed small fish when Gus was nearby.  Caught another loka at 15:00.  No fish after that – river looks empty.  Tried to visit Blathers; nothing but his museum.  Rested at 17:00.  
+
+Thoughts: The ordinance is still a gamble.  I need more fish before I can trade or ask for better bait.  Maybe talk to Dax and Fen about fishing spots.  Keep the map handy – it’s the only way to know where the shops are.  Tomorrow: ask Isabelle again if anything changed, try for a very large fish before dusk.  Bells: 700 left, 300 spent on bait.  Feeling hopeful but cautious.

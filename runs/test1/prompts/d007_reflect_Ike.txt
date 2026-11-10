@@ -1,0 +1,118 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 6, night.  
+I’m still zero bells, but the island feels tighter.  
+Got wood from Fen, but I’m out of bait again.  
+Ari kept giving selzalne, so I’m low on fish too.  
+Vaulting pole is gone—maybe I’ll craft a new one tomorrow.  
+I need to find a way to the plaza; the map’s unclear.  
+I’ll try to post a request for fishing bait on the board tonight, maybe someone will trade.  
+If I can’t get wood, I’ll have to trade selzalne for it and hope Bo can help with a ladder.  
+Sleep early, wake at 20:00, fish again, then see if I can make a new vaulting pole.  
+— Ike
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 7. You are Ike, at home before sleep.
+
+What happened today:
+- 07:00 walked over to Ari's home
+- 07:00 knocked at Ari's home, but nobody answered
+- 08:00 walked over to Ari's home
+- 08:00 knocked at Ari's home, but nobody answered
+- 12:00 walked over to Cal's home (also nearby: Cal)
+- 12:00 knocked at Cal's home, but nobody answered
+- 12:00 ran into Cal at the Cal's home: you said "Hey Cal, any spare logs you could spare?"; Cal said "Sure thing, Ike!" [gave 1 wood; then went their way]
+- 13:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 14:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 15:00 tried to fish: you have no fishing bait (also nearby: Ari)
+- 15:00 ran into Ari at the river: you said "Hey Ari, got any extra wood?"; Ari said "Hey, I’ve got some extra wood if you need it." [gave 1 wood]; you said "Thanks for the wood!" [gave 1 selzalne fish; asked for 1 fishing bait; then went their way]
+- 16:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 17:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 18:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 19:00 walked over to Cal's home
+- 19:00 knocked at Cal's home, but nobody answered
+- 20:00 walked over to Cal's home
+- 20:00 knocked at Cal's home, but nobody answered
+- 21:00 walked over to Cal's home
+- 21:00 inside Cal's home: not much furniture yet
+- 21:00 visited Cal at home: you said "Thanks again, Cal. Got any more logs? Maybe a bait?" [asked for 1 wood, 1 fishing bait]; Cal said "Sure thing, Ike!" [asked for 1 wood, 1 fishing bait]; you said "Thanks! I'll trade you a fish for a log and some bait." [gave 1 selzalne fish; asked for 1 wood, 1 fishing bait; then went their way]
+- 22:00 walked over to Ari's home
+- 22:00 inside Ari's home: not much furniture yet
+- 22:00 visited Ari at home: you said "" [just nodded (too tired to talk)]
+- 23:00 rested
+
+Things that changed hands today:
+- Cal gave you 1 wood
+- Ari gave you 1 wood, which you had asked for
+- you gave Ari 1 selzalne fish
+- you gave Cal 1 selzalne fish
+
+What you have tonight:
+Bells: 0
+Tools you carry: shovel, axe, fishing rod, net, ladder
+Other things you carry: selzalne fish x1, fossil x1, wood x2, gormo fish x1
+Recipes you know: clay furnace, golden candlestick, iron worktable, simple wooden fence
+Since this morning: +2 wood; −2 selzalne fish
+
+Open requests and recent offers:
+- you asked Eli for 1 fishing bait (day 2)
+- Eli asked you for 1 fishing bait (day 2)
+- you asked Fen for 1 fishing bait (day 6)
+- Fen asked you for 1 fishing bait (day 6)
+- you asked Ari for 1 fishing bait (day 6)
+- you asked Cal for 1 wood, 1 fishing bait (day 7)
+- Cal asked you for 1 wood, 1 fishing bait (day 7)
+
+Your notes:
+- (day 5) Ask Eli for 1 fishing bait, trade selzalne fish for wood with Bo, post on board for wood
+- (day 5) Got bait today. Plan to fish tomorrow to stock up. Keep an eye on the board for more bait offers.
+- (day 6) Remember to bring a spare log for Bo if possible.
+- (day 6) Remember to keep track of bait trade tomorrow.
+- (day 6) Remember to post on board for extra wood tomorrow.
+- (day 6) Post again tomorrow if no reply.
+- (day 6) Trade selzalne for wood with Ari. Keep track of bait requests tomorrow.
+- (day 6) Try to get at least 2 more hardwood today. If Bo has none, ask Cal for a log.
+- (day 6) Make sure to check the board tomorrow for more bait offers.
+- (day 7) If Ari gives me wood, I'll post for bait tomorrow. If not, I'll try to find a log elsewhere or ask Cal.
+- (day 7) If Cal doesn't have wood, I'll need to find another source tomorrow. Keep an eye on the board for bait offers.
+- (day 7) Remember to post bait request on board tomorrow.
+- (day 7) If Cal runs out of logs, I’ll try Ari next morning. Also remember to post bait request tomorrow.
+- (day 7) Track Cal's willingness to trade logs and bait tomorrow.
+- (day 7) Remember to post bait request tomorrow after this trade.
+
+What you wrote last night:
+Day 6, night.  
+I’m still zero bells, but the island feels tighter.  
+Got wood from Fen, but I’m out of bait again.  
+Ari kept giving selzalne, so I’m low on fish too.  
+Vaulting pole is gone—maybe I’ll craft a new one tomorrow.  
+I need to find a way to the plaza; the map’s unclear.  
+I’ll try to post a request for fishing bait on the board tonight, maybe someone will trade.  
+If I can’t get wood, I’ll have to trade selzalne for it and hope Bo can help with a ladder.  
+Sleep early, wake at 20:00, fish again, then see if I can make a new vaulting pole.  
+— Ike
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (12 tokens, hidden from everyone) ===
+Need short private note, up to 150 words.
+
+=== REPLY ===
+Day 7, night.  
+Still zero bells, but the island feels more like home.  
+Got 2 wood from Cal and Ari—thanks, guys.  
+Lost one selzalne in trade, but that’s the price of progress.  
+Still no fishing bait, so I’m stuck in a loop: I need bait to fish, I need fish to trade for bait.  
+Will post another bait request on the board tonight.  
+If I can’t get bait, I’ll try to fish for gormo next morning—maybe that will fetch some coins.  
+Vaulting pole still missing; I’ll salvage a stick and craft a crude one tomorrow.  
+Plan: trade wood for a ladder with Bo if possible, then head to the plaza.  
+Sleep early, wake at 20:00, hope for a trade.  
+— Ike

@@ -1,0 +1,65 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- Villagers meet at the plaza at 20:00 and 21:00.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or write until the next morning.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 0 (April 1, spring, rain), 09:00. You are Kit.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 700. Loan owed to Tom Nook: 0. Home: tent lower ground, centre (site-6), neighbors: Fen. Carrying 7/40 items.
+Inventory: shovel x1, axe x1, fishing rod x1, net x1, ladder x1, vaulting pole x1, fishing bait x1
+Inside your home (0/6): nothing yet
+Recipes you know: campfire (wood x3); clay furnace (clay x6, iron nugget x2); iron garden bench (iron nugget x3, hardwood x4); simple wooden fence (wood x3)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none)
+Bridge: 0/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, cosmos seeds 240, tulip seeds 240, simple wooden fence 100, fishing bait 300, record player 9800; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, log bench 2000
+Able Sisters today (09:00-21:00): tuxedo 3200, kimono 4800, raincoat 1600, rose crown 1200
+Your notes, oldest first:
+- (day 0) Try to get some fish tomorrow, maybe use fishing rod.
+Getting around: You are at lower ground, centre. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 50 steps); 2 (the middle cliff, northwest, about 69 steps); 3 (the top cliff, northeast, about 57 steps); 4 (lower ground, centre, about 18 steps); 5 (lower ground, southeast, about 53 steps); 6 (lower ground, southeast, about 48 steps)
+Buildings: Resident Services (about 14 steps); museum (about 28 steps); Nook's Cranny (about 23 steps); Able Sisters (about 36 steps)
+You spotted today:
+- 05:00 a large fish shadow in the river (lower ground, centre, near Resident Services)
+- 05:00 a medium fish shadow in the river (lower ground, centre, near Resident Services)
+- 07:00 a medium fish shadow in the river (lower ground, centre, near Resident Services)
+- 07:00 a large fish shadow in the river (lower ground, centre, near Resident Services)
+- 09:00 1 fossil dig spot (lower ground, south, near Nook's Cranny)
+Mental energy left today: 134 of 150. Typical costs: a plan 9, noticing someone 4, one thing you say in a conversation 11, an evening at the plaza 12, writing at night 5; longer replies cost more.
+
+So far today you:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, centre (site-6)
+- 06:00 tried to visit: there is no home of Resident Services to visit
+- 07:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Eli, Jo, Dax)
+- 08:00 tried to visit: there is no home of Nook's Cranny to visit (also nearby: Eli)
+- 09:00 bought a fishing bait for 300 bells (also nearby: Jo, Eli, Ari, Fen)
+
+You ran into Fen at the Nook's Cranny. So far:
+Fen: Hey Kit, got a minute?
+
+You can reply, or say nothing.
+Keep it to one or two sentences, the way you would actually talk. Only Fen hears it.
+You can also hand Fen something from your pockets right now ("give"), or ask them for something ("ask"); a request stays open until they give it to you.
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {"<item or bells>": <qty>}, "ask": {"<item or bells>": <qty>}, "note": "<optional private note to your future self>"}
+
+=== REASONING (10 tokens, hidden from everyone) ===
+Need reply short. Probably ask for map.
+
+=== REPLY ===
+{"thoughts":"Fen just asked, I’ll ask for a map of the island; nothing else needed now. No items to give. Keep note for tomorrow.","say":"Hey Fen, do you have a map of the island?","give":{},"ask":{"map":1},"note":"Check map tomorrow for rocks and resources."}

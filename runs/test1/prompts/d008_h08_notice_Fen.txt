@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7, night.  
+Walk still impossible—maybe the island’s layout is wrong.  
+I offered Tom a house in exchange for a map, but he’s silent.  
+Got a tubas fish; no bait, no bells.  
+Still no bridge rock or map.  
+Hardwood single, wood two, softwood seven.  
+Fence stands, map in hand, but I can’t reach the plaza.  
+Maybe I need a ladder upgrade or another log.  
+Hope tomorrow I’ll find a way to the plaza, trade for bait, and finally get that map.  
+Sleep tight.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 8 (April 9, spring, rain), 08:00. You are Fen, at the Kit's home.
+Nearby: Gus.
+Earlier today:
+- 07:00 tried to break_rock: you need to eat an apple first to be strong enough to break a rock
+- 08:00 walked over to Kit's home (also nearby: Gus)
+- 08:00 knocked at Kit's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 6) Keep an eye on the plaza tomorrow. Maybe ask Tom or someone else.
+- (day 6) If Tom has a map, good. If not, keep asking others tomorrow.
+- (day 7) Remember to try the bridge rock tomorrow.
+- (day 7) Check if anyone else has a map tomorrow, keep trading selzalne fish for bait if needed.
+- (day 7) Hope someone replies tomorrow.
+- (day 8) Post map request tomorrow after seeing if Kit has one.
+Mental energy left today: 126 (about 16 for each thing you say). Your plan for today: inward 80 (spent 24), outward 70 (spent 0), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (8 tokens, hidden from everyone) ===
+We choose to talk to Kit.
+
+=== REPLY ===
+{"thoughts":"Need a map, Kit might have one. Ask politely to save time. Also maybe trade fish for bait?","approach":"Kit","say":"Hey Kit, I was wondering if you have a map of the island?"}

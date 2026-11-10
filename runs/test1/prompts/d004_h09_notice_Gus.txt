@@ -1,0 +1,38 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2, night.  
+Morning chaos—Nook's closed, I traded a selit fish for a single bait, then got another from Dax. Ended day with two bait and a gormo. Energy 120. Dax still silent; maybe he’s busy. No bridge yet, no money saved. I’ll grab the umbrella, maybe try fishing early tomorrow to catch more before rain. Need to plan a visit to Dax’s tomorrow, maybe trade more fish for bait. I’m getting used to trading, but still feel lost. The island is quiet at night; I’ll rest, hope tomorrow brings more fish and a clue to the bridge.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 4 (April 5, spring, sunny), 09:00. You are Gus, at the Kit's home.
+Nearby: Fen.
+Earlier today:
+- 08:00 walked over to Dax's home (also nearby: Kit)
+- 08:00 knocked at Dax's home, but nobody answered
+- 08:00 ran into Kit at the Dax's home: Kit said "Hey Gus, could I grab a couple of bait? And maybe you know where I can get a small log for the shovel?"; you said "Sure thing, Kit. I can swap a selit fish for a couple of bait." [gave 1 selit fish]; Kit said "Sure thing, Gus! Here’s the fish." [gave 1 selit fish; asked for 2 fishing bait, 1 small log, but there's nothing called small log on this island]; you said "Sure thing, here's a selit fish for the bait." [gave 1 selit fish; asked for 2 fishing bait]; Kit said "Thanks, Gus! Here’s the fish. Can I get those two baits?" [asked for 2 fishing bait]; you said "Thanks, Kit!" [tried to give 2 fishing bait but had no fishing bait; then went their way]
+- 09:00 walked over to Kit's home (also nearby: Fen)
+- 09:00 knocked at Kit's home, but nobody answered
+Your notes:
+- (day 3) Keep an eye on replies tomorrow.
+- (day 4) Remember to bring the umbrella if rain comes tomorrow. Keep an eye on Dax’s stock of bait.
+- (day 4) Try to get bait before rain. Keep an eye on Jo tomorrow.
+- (day 4) Got bait, keep eye on Jo tomorrow
+- (day 4) Remember to follow up with Dax for more bait tomorrow.
+- (day 4) Got the bait, will trade later if needed.
+Mental energy left today: 51 (about 14 for each thing you say). Your plan for today: inward 50 (spent 22), outward 100 (spent 77), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (16 tokens, hidden from everyone) ===
+Need JSON with thoughts, approach, say. Choose maybe talk to Kit.
+
+=== REPLY ===
+{"thoughts":"Need more bait before rain. Kit has fish but not log. Maybe ask about logs. Also check Dax later.","approach":"Kit","say":"Hey Kit, you got any idea where I can find a small log for the shovel?"}

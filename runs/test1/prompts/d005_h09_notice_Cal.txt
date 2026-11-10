@@ -1,0 +1,36 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, 03 h.  
+Sun’s up, but still no bait. Dax keeps his wood, Jo’s home empty again. I’m stuck with selzalne and loka, no selit. I’ll trade the two selzalne for a wood and see if Dax will give me a bait later. The river feels empty—maybe the map’s wrong. I’ll keep the ladder and net ready, just in case. Isabelle’s ordinance still a mystery; maybe it’s about fishing limits. I’m low on bells, but I’ve got a few extra wood and fish to trade. I’ll try to catch a big one before sunset, but I’ll also ask Dax for a spot. Tonight I’ll rest, maybe the next morning I’ll get a better idea of where the fish are.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 5 (April 6, spring, sunny), 09:00. You are Cal, at the Jo's home.
+Nearby: Bo, Dax.
+Earlier today:
+- 08:00 went to the plaza
+- 09:00 walked over to Jo's home (also nearby: Bo, Dax)
+- 09:00 knocked at Jo's home, but nobody answered
+Your notes:
+- (day 4) If Dax or Jo are away, trade at plaza instead. Keep an eye on the river for a big one.
+- (day 4) Keep an eye on Eli tomorrow, maybe he'll reply soon.
+- (day 4) Ask Dax for wood again tomorrow. Keep eye on Jo for bait.
+- (day 4) Try to trade with Dax tomorrow for more wood if he still has none.
+- (day 5) Try to finish trade before 11. If Dax leaves, maybe go to Nook's Cranny tomorrow for bait.
+- (day 5) Post trades now. Hope Jo or Ari reply soon.
+Mental energy left today: 115 (about 15 for each thing you say). Your plan for today: inward 50 (spent 18), outward 80 (spent 17), spare 20 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (12 tokens, hidden from everyone) ===
+Need choose villager. Probably Dax for wood.
+
+=== REPLY ===
+{"thoughts":"Need wood for bait, Dax has it. Jo silent. Go to Dax.","approach":"Dax","say":"Morning, Dax! Got some selzalne for a quick trade?"}

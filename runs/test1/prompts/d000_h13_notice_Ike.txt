@@ -1,0 +1,30 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 0 (April 1, spring, rain), 13:00. You are Ike, at the river.
+Nearby: Ari.
+Earlier today:
+- 09:00 looked for fish in the river, but there were no fish shadows in sight
+- 10:00 looked around but saw no fossil dig spots there
+- 11:00 bought a simple wooden fence for 100 bells
+- 12:00 looked around but saw no fossil dig spots there
+- 13:00 fished for a very large shadow in the river: it got away (also nearby: Ari)
+Your notes:
+- (day 0) Remember to bring the ladder if I need to reach higher spots tomorrow. Keep an eye on the weather; rain might make fishing harder.
+- (day 0) Check fossil after. Maybe upgrade fence later.
+Mental energy left today: 128 (about 10 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (20 tokens, hidden from everyone) ===
+Need to respond JSON with thoughts private, approach "Ari" maybe, say opening line.
+
+=== REPLY ===
+{"thoughts":"Need to see if Ari knows any fish spots, maybe ask about ladder. Keep energy low.", "approach":"Ari", "say":"Hey Ari, seen any good fishing spots today?"}

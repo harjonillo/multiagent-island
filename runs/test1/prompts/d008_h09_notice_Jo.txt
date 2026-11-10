@@ -1,0 +1,40 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, 01:00.  
+Bait crisis continues—no bait, only rocks, no rocks. Bo wants a rock, I have none. Cal gave me a selit, now I have 2. Selzalne up to 3, tugorpi 2, fossil 2. Bells still 100. Bridge still 2k away. Dax silent, maybe sleeping. Plan: post on board for bait tomorrow, trade selzalne for wood if Dax offers. Keep 2 selit for fishing, maybe 1 for trade. Remember to ask Eli about exact bridge fund tomorrow. Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 8 (April 9, spring, rain), 09:00. You are Jo, at the Dax's home.
+Nearby: Bo.
+Earlier today:
+- 07:00 knocked at Dax's home, but nobody answered
+- 08:00 walked over to Dax's home
+- 08:00 knocked at Dax's home, but nobody answered
+- 09:00 walked over to Dax's home (also nearby: Bo, Gus)
+- 09:00 knocked at Dax's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 7) If Dax gives me a rock, trade it for wood. If he gives bait, use it tomorrow. Otherwise, try to get a log from someone else.
+- (day 7) Keep 1 selit for tomorrow
+- (day 7) Remember to trade the wood for a rock if possible. Keep selzalne handy.
+- (day 7) Try to get a rock from Dax tonight. If not, trade wood for rock tomorrow. Keep 1 selit for tomorrow fishing.
+- (day 7) Ask for bait tonight, hope Dax has some. If not, trade wood tomorrow.
+- (day 8) Ask for rock, bait, give softwood. If no rock, trade wood later.
+Mental energy left today: 120 (about 16 for each thing you say). Your plan for today: inward 120 (spent 24), outward 30 (spent 5), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (9 tokens, hidden from everyone) ===
+Need to choose. Probably approach Bo.
+
+=== REPLY ===
+{"thoughts":"Need a rock or bait. Dax still silent, Bo nearby. Ask Bo for a rock, offer selzalne or selit in trade.","approach":"Bo","say":"Hey Bo, got any rocks to spare?"}

@@ -1,0 +1,40 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 1, 20 h.  
+Morning: Isabelle’s big map and the “no ordinance” deal. 20000 bells for a rule?  I’ll see what everyone thinks tomorrow.  Dax asked about Blathers, I pointed him to the center.  Fen wanted a map; I handed over the one from Isabelle.  Fishing: three selzalne, a loka, then a missed small fish when Gus was nearby.  Caught another loka at 15:00.  No fish after that – river looks empty.  Tried to visit Blathers; nothing but his museum.  Rested at 17:00.  
+
+Thoughts: The ordinance is still a gamble.  I need more fish before I can trade or ask for better bait.  Maybe talk to Dax and Fen about fishing spots.  Keep the map handy – it’s the only way to know where the shops are.  Tomorrow: ask Isabelle again if anything changed, try for a very large fish before dusk.  Bells: 700 left, 300 spent on bait.  Feeling hopeful but cautious.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 2 (April 3, spring, sunny), 15:00. You are Cal, at the Dax's home.
+Nearby: Jo.
+Earlier today:
+- 12:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none). (also nearby: Dax)
+- 13:00 tried to fish: you have no fishing bait (also nearby: Dax)
+- 14:00 tried to fish: you have no fishing bait
+- 15:00 walked over to Dax's home (also nearby: Jo)
+- 15:00 knocked at Dax's home, but nobody answered
+Your notes:
+- (day 1) Ask Isabelle tomorrow too if nothing changes.
+- (day 1) Try to catch a very large fish before 18.
+- (day 1) Remember to keep the map handy for future reference.
+- (day 1) Keep an eye on the river for larger fish tomorrow and remember to ask Isabelle about ordinance again if anything changes.
+- (day 2) If I miss a large fish, try again tomorrow or ask Dax for a better spot. Keep the map handy.
+- (day 2) Keep map handy, maybe try a different spot tomorrow.
+Mental energy left today: 115 (about 13 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (28 tokens, hidden from everyone) ===
+We need to decide. Nearby: Dax and Jo. We could talk to Dax about fishing spot. So approach Dax.
+
+=== REPLY ===
+{"thoughts":"Need bait and better fishing spot. Ask Dax for tips or a spot. Keep map handy.", "approach":"Dax", "say":"Hey Dax, got any good fishing spots or bait around here?"}

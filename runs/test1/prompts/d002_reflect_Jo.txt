@@ -1,0 +1,57 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 1, 22:30.  
+River’s good—selit, loka, fossil. Still 2k short of bridge. Dax silent, maybe in a trade. Eli’s asking; I’ll ask for exact amount tomorrow. Got 300 bells from bait; can buy more. Might trade selit for bells if Dax offers. Need more fish tomorrow, maybe a bigger catch. Consider asking Eli about a loan or extra help. Sleep. Remember: bridge, Dax, more fish.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 2. You are Jo, at home before sleep.
+
+What happened today:
+- 07:00 fished for a large shadow in the river: caught a selit fish
+- 08:00 fished for a large shadow in the river: caught a selit fish
+- 09:00 fished for a large shadow in the river: caught a tugorpi fish
+- 10:00 fished for a medium shadow in the river: it got away
+- 11:00 fished for a large shadow in the river: caught a tugorpi fish
+- 12:00 threw bait in the river and a medium shadow appeared: caught a selzalne fish (also nearby: Bo)
+- 12:00 ran into Bo at the river: you said "Hey Bo, how’s your fishing going today?"; Bo said "Hey Jo! Catching some fish today?"
+- 13:00 tried to fish: you have no fishing bait
+- 14:00 tried to fish: you have no fishing bait (also nearby: Bo)
+- 15:00 walked over to Dax's home (also nearby: Cal)
+- 15:00 knocked at Dax's home, but nobody answered
+- 15:00 ran into Cal at the Dax's home: you said "Hey Cal, how’s it going today?"; Cal said "Hey Jo, any fishing bait you could spare?" [asked for 1 bait]
+- 16:00 dug up a fossil; nobody knows what it is until Blathers assesses it at the museum
+
+Your notes:
+- (day 0) Remember to check the river tomorrow for fishing. Also maybe buy a record player later.
+- (day 0) Remember to ask about bridge status tomorrow.
+- (day 0) Maybe collect more bells tomorrow before tackling the bridge fund.
+- (day 0) Get some bells from fish, maybe get a fossil.
+- (day 0) Keep an eye on Dax tomorrow. Maybe he can offer a trade or a small loan. Also consider fishing more for extra bells.
+- (day 1) Try to get some bells from fish. Ask Dax if he can lend or trade.
+- (day 1) Ask later about how much already raised.
+- (day 1) Ask Eli for exact amount at next encounter.
+- (day 1) If Dax offers trade, consider swapping selzalne for bells. Keep an eye on bridge fund at next meeting.
+- (day 1) Plan to bring some selit and fossil tomorrow to show for trade.
+- (day 2) If I run out of bait, I’ll have to buy more tomorrow. Remember to ask Dax later about a trade.
+- (day 2) If Dax is still silent, maybe ask Eli at the plaza tomorrow.
+- (day 2) Keep an eye on Dax tomorrow. Maybe he’ll trade ladder for wood later.
+
+What you wrote last night:
+Day 1, 22:30.  
+River’s good—selit, loka, fossil. Still 2k short of bridge. Dax silent, maybe in a trade. Eli’s asking; I’ll ask for exact amount tomorrow. Got 300 bells from bait; can buy more. Might trade selit for bells if Dax offers. Need more fish tomorrow, maybe a bigger catch. Consider asking Eli about a loan or extra help. Sleep. Remember: bridge, Dax, more fish.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (6 tokens, hidden from everyone) ===
+Need short private note.
+
+=== REPLY ===
+Day 2, 23:10.  
+Got 3 selit, 2 tugorpi, 1 selzalne. No bait left, so had to ask Cal for a piece. Dug fossil—hope Blathers likes it. Dax still silent; maybe he’s busy. Still 2k short of bridge. Need more bells, maybe trade selzalne for wood. Plan: fish more tomorrow, buy bait, ask Dax about trade or loan, check bridge progress with Eli. Remember: bring selit & fossil, keep eye on Dax. Sleep.

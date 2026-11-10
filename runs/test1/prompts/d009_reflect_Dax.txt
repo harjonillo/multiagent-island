@@ -1,0 +1,89 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8: Dawn found me chasing wood and bait like a broken loop. Ari traded a selzalne for a fish, but still no bait. Cal offered wood for bait, I slipped it in the back of my mind. Gus, Jo, and Bo all ghosted—maybe they’re busy or away. My tent’s a hole: no room for wood, hardwood, or softwood. I’m stuck with just a single fence piece, a rock, and a handful of fish. The ladder feels useless without a path to the plaza. Still, the map is there, and I keep the ladder as a reminder that tomorrow might bring a new trail. Sleep is thin, but I’ll keep walking.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 9. You are Dax, at home before sleep.
+
+What happened today:
+- 07:00 walked over to Cal's home
+- 07:00 knocked at Cal's home, but nobody answered
+- 07:00 spotted a lobas moth on the flowers (lower ground, southeast, near Nook's Cranny) and went after it at 08:00 instead of visit (who: Bo)
+- 08:00 went bug catching among the flowers: caught a lobas moth (also nearby: Ike, Jo)
+- 08:00 ran into Jo at the flowers: you said "Hey Jo, got some wood—could we trade it for some bait?"; Jo said "Sure, here’s a selit for your wood." [Jo's offer: you give 1 softwood, you get 1 selit fish]; you said "Sure, that works." [you accepted: you gave Jo 1 softwood and got 1 selit fish; your offer: you give 1 softwood, you get 1 selit fish, but you had no softwood, so trade failed; then you went your ways]
+- 09:00 Bo visited you at home: Bo said "Hey Dax, can I trade 3 wood for a fishing bait?" [Bo's offer: you give 1 fishing bait, you get 3 wood]; you said "Sure, I'll trade my wood for your bait." [your offer: you give 1 wood, you get 1 fishing bait]
+- 10:00 rested
+- 10:00 Bo visited you at home: Bo said "Hey Dax, can I trade 3 wood for a fishing bait?" [Bo's offer: you give 1 fishing bait, you get 3 wood; then you went your ways]
+- 12:00 walked over to Jo's home (also nearby: Jo)
+- 12:00 knocked at Jo's home, but nobody answered
+- 13:00 walked over to Bo's home (also nearby: Kit)
+- 13:00 knocked at Bo's home, but nobody answered
+- 14:00 walked over to Cal's home
+- 14:00 knocked at Cal's home, but nobody answered
+- 14:00 spotted a kaselzal moth on the flowers (lower ground, southeast, near Nook's Cranny) and went after it at 15:00 instead of fish (where: river, size: medium, bait: True)
+- 15:00 went bug catching among the flowers: caught a kaselzal moth
+- 16:00 walked over to Gus's home
+- 16:00 inside Gus's home: not much furniture yet
+- 16:00 visited Gus at home: you said "Hey Gus, I got a selit fish—want to swap for a bait?" [your offer: you give 1 selit fish, you get 1 fishing bait; then you went your ways]
+- 16:00 spotted a nevin moth on a tree (lower ground, west) and went after it at 17:00 instead of rest
+- 17:00 went bug catching around the trees: caught a nevin moth (also nearby: Gus)
+- 18:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 19:00 too tired to plan, so you planned nothing new
+
+Things that changed hands today:
+- Jo traded you 1 selit fish for your 1 softwood
+
+What you have tonight:
+Bells: 0 in your wallet
+Tools you carry: shovel (29 uses left), axe (29 uses left), fishing rod (29 uses left), net (27 uses left), ladder (8 uses left)
+Other things you carry: simple wooden fence x1, wood x1, island map x1, ashpimo fish x1, hardwood x1, lobas moth x1, selit fish x1, kaselzal moth x1, nevin moth x1
+At home (a tent holds only bells): 0 bells
+Recipes you know: clay furnace, iron garden bench, shovel, simple wooden fence, wooden bookshelf
+Since this morning: +1 lobas moth; +1 selit fish; +1 kaselzal moth; +1 nevin moth; −1 softwood
+
+Open requests:
+- you want 1 fishing bait from Bo (until day 9)
+- you want 1 fishing bait from Jo (until day 9)
+- Cal wants 1 wood from you (until day 9)
+- Jo wants 1 fishing bait from you (until day 9)
+
+Your notes:
+- (day 8) Remember to trade my wood for bait at Ari today. If Jo or Cal give anything else, take it.
+- (day 8) Ask for bait from Ari today; keep an eye on other bait requests.
+- (day 8) Trade wood for bait with Cal. Keep track of request.
+- (day 8) Keep an eye on Jo’s request for wood; maybe trade later.
+- (day 8) Got bait, keep wood for future.
+- (day 9) Got bait, keep wood for later.
+- (day 9) Remember to keep wood stash for future trades.
+- (day 9) If Jo or Bo not there, I'll trade with whoever shows up first. If I get bait, I'll fish for a selzalne next. Remember to store wood at home when possible.
+- (day 9) If Gus accepts, trade immediately. If not, maybe offer wood later.
+
+Things you remember, numbered:
+1. (day 8) Ari: 1 wood for 1 bait, still pending
+2. (day 8) Cal: offered 1 wood for bait, need to confirm
+3. (day 8) Tent: no storage, only bells allowed
+
+What you wrote last night:
+Day 8: Dawn found me chasing wood and bait like a broken loop. Ari traded a selzalne for a fish, but still no bait. Cal offered wood for bait, I slipped it in the back of my mind. Gus, Jo, and Bo all ghosted—maybe they’re busy or away. My tent’s a hole: no room for wood, hardwood, or softwood. I’m stuck with just a single fence piece, a rock, and a handful of fish. The ladder feels useless without a path to the plaza. Still, the map is there, and I keep the ladder as a reminder that tomorrow might bring a new trail. Sleep is thin, but I’ll keep walking.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something you already remember that is still on your mind. Anything you don't hold on to fades over the next days; what you come back to stays longer.
+
+=== REASONING (7 tokens, hidden from everyone) ===
+Need to write diary entry.
+
+=== REPLY ===
+Day 9: Dawn was gray, but I got a selit fish and a selit moth. I traded my lone softwood to Jo for a selit fish—now I have a selit fish and a selit moth, but no softwood. Bo kept asking for wood, I kept walking. I caught a lobas moth, a kaselzal moth, and a nevin moth. The ladder is still useless; the plaza feels far. I have wood, hardwood, and a fence piece, but my tent holds no wood. I’m stuck, but the map is still there. I’ll keep the ladder; maybe it leads somewhere tomorrow. Sleep is thin, but I’ll keep walking.
+
+Remember:
+- I traded 1 softwood for 1 selit fish with Jo.
+- I have 3 moths: lobas, kaselzal, nevin.
+- I still need fishing bait from Bo and Jo.

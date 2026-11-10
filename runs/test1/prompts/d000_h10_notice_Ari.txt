@@ -1,0 +1,29 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 0 (April 1, spring, rain), 10:00. You are Ari, at the Nook's Cranny.
+Nearby: Dax.
+Earlier today:
+- 06:00 tried to talk: 'talk' is not something you can do
+- 07:00 tried to walk: 'walk' is not something you can do
+- 08:00 tried to visit: there is no home of Timmy and Tommy to visit
+- 09:00 tried to buy: wood x10 is not for sale there today (also nearby: Jo, Kit, Eli, Fen)
+- 10:00 bought the shovel recipe card for 500 bells; learned the shovel recipe (also nearby: Eli, Dax)
+Your notes:
+- (day 0) Remember to bring back wood for fences tomorrow.
+Mental energy left today: 139 (about 11 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (16 tokens, hidden from everyone) ===
+We choose someone: maybe Eli? Dax? Let's pick Dax.
+
+=== REPLY ===
+{"thoughts":"Need wood tomorrow. Dax seems helpful, maybe ask about wood or trade.","approach":"Dax","say":"Hey Dax, got a minute?"}

@@ -1,0 +1,128 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2, night.  
+Got a shovel, but still short on hardwoods for a ladder.  Ike asked for wood—helped, but no reply yet.  Jo was friendly, but no trade.  The river’s been good; gormo caught again.  I’m thinking: maybe dig near the north shore tomorrow—could be fossils.  Need more hardwood, so plan to chop another tree early.  Also, maybe ask Gus about his fishing spots; he might have some extra.  If I can get a ladder, I’ll clear the clearing faster.  Remember: keep the recipe card safe.  Tomorrow: wood, ladder, fish, maybe a new friend.  Sleep.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board and post on it, offer and answer trades, and send letters and parcels, which arrive the next morning.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. You can spend them inwardly (planning, thinking things over, writing your private page at night) or outwardly (conversations, time at the plaza, letters and posts). Each morning you decide how much to spend inwardly and how much outwardly; whatever you leave over is spare, for people you run into. The split is your own plan, not a limit, but when all 150 are gone you can't plan, talk or write until the next morning: you carry on with what you've already planned, and the rest of your time is free.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
+- mine_rock: rock?
+- chop_wood: kind? (hardwood | fruit), axe? (stone axe | axe; if you carry both, the stone axe. An axe brings the tree down when it takes its last wood, and a fruit tree drops its fruit; a stone axe never fells)
+- shake_tree
+- fish: where (sea | river | pond), size?, bait? (true to use fishing bait)
+- catch_bug: where (flowers | trees | stumps | rocks | ground), species?
+- beachcomb: near?
+- dig_fossil: near?
+- plant: item, near
+- dig_stump: near?
+- break_rock: rock
+- lay_path: style (dirt | stone | brick | sand | terracotta), from, to
+- remove_path: near
+- place: item, near, count?
+- fence_off: item, around ("home")
+- pick_up: item, near, count?
+- wear: item
+- decorate: item
+- undecorate: item
+- visit: who (another villager: walk to their home, knock, and talk if they're in)
+- craft: recipe
+- sell: items ({"<item>": <qty>})
+- buy: shop (cranny | able), item (or "<recipe> recipe" for a recipe card)
+- donate: item
+- assess (Blathers identifies every fossil you carry)
+- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters: go to them and hear what they do and what it costs)
+- upgrade_house
+- pay_loan: bells
+- contribute_bridge: bells
+- set_ordinance: ordinance
+- move_house: to (a homesite)
+- rest
+- plaza (not one of your actions: you spend that free hour at the plaza)
+A place (for near, from, to) is "here", "home", "<villager>'s home", a building (Resident Services, Nook's Cranny, Able Sisters, museum, plaza, airport), "rock <number>", or a part of the island such as "north beach".
+
+=== USER ===
+PHASE: plan
+Day 3 (April 4, spring, cloudy), 07:00. You are Bo.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 0. Loan owed to Tom Nook: 0. Home: tent lower ground, southwest (site-7), no neighbors yet. Carrying 26/40 items.
+Tools you carry: shovel x2, axe, fishing rod, net, ladder, vaulting pole
+Other things you carry: wood x3, selit fish x1, softwood x5, selzalne fish x1, miphosel shell x2, ashbastu shell x2, loka fish x2, gormo fish x2, shovel recipe x1
+Inside your home (0/6): nothing yet
+Recipes you know: campfire (wood x3; you have wood 3); clay furnace (clay x6, iron nugget x2; you have none of these); iron worktable (iron nugget x5, wood x4; you have wood 3); shovel (hardwood x5; you have none of these; you carry 2 shovel); simple wooden fence (wood x3; you have wood 3)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1
+Bridge: 700/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, pansy seeds 240, hyacinth seeds 240, record player 9800, wooden mini table 1800, garden lantern 2200; recipe cards: shovel 500 (you know it), axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, simple wooden fence 2000 (you know it)
+Able Sisters today (09:00-21:00): tuxedo 3200, rose crown 1200, denim jacket 2200, sundress 1400
+Your notes, oldest first:
+- (day 0) First day: got some basic stuff. Tomorrow should focus on clearing area and maybe buying a shovel recipe.
+- (day 0) Plan to craft a shovel tomorrow if I have wood.
+- (day 0) Check tomorrow morning if anyone responds. Also consider visiting Nook's Cranny for wood.
+- (day 1) Got 4 wood total, one more needed for shovel tomorrow.
+- (day 1) Got extra wood, keep fishing, maybe explore north shore tomorrow.
+- (day 1) Remember to check Nook's Cranny tomorrow at 08:00 and buy the shovel recipe.
+- (day 2) Got shovel, ready to clear more trees tomorrow.
+- (day 2) Keep 3 wood for own ladder needs.
+- (day 2) Keep 3 wood for ladder, maybe buy more wood later.
+- (day 2) Remember to check the river later for more fish and maybe trade with Jo for a spare rock.
+- (day 2) Keep an eye on the bulletin board for replies; maybe I can trade fish for hardwood or for the shovel recipe if someone offers.
+Getting around: You are at lower ground, southwest. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 92 steps); 2 (the middle cliff, northwest, about 60 steps); 3 (the top cliff, northeast, about 128 steps); 4 (lower ground, centre, about 51 steps); 5 (lower ground, southeast, about 95 steps); 6 (lower ground, southeast, about 80 steps)
+Buildings: Resident Services (about 62 steps); plaza (about 48 steps); museum (about 43 steps); Nook's Cranny (about 65 steps); Able Sisters (about 58 steps)
+Mental energy today: 150. Typical costs: a plan 16, noticing someone 5, one thing you say in a conversation 13, a turn at the plaza 19, writing at night 10; longer replies cost more.
+
+Isabelle's morning announcement: Good morning, everyone! It's day 3. The island ordinance is no ordinance. It's April 4 and the weather today is cloudy. Yesterday on the island: Dax donated a tuashne fossil to the museum. Did you know you can plant an apple, and it grows into a fruit tree?
+
+Yesterday you:
+- 07:00 looked around but saw no fossil dig spots there
+- 08:00 bought the shovel recipe card for 500 bells; already knew the shovel recipe, so you kept the card (also nearby: Gus, Kit, Eli, Ike, Fen, Dax)
+- 08:00 ran into Ike at the Nook's Cranny: Ike said "Hey Bo, any spare wood I could borrow for a ladder?"; you said "Sure thing, Ike." [gave 2 wood]
+- 09:00 tried to craft: not enough materials for shovel; short hardwood x2
+- 10:00 chopped a hardwood tree: hardwood x1, softwood x2; with the last wood the axe brought the tree down, leaving a stump
+- 11:00 rested
+- 12:00 chopped a hardwood tree: softwood x2, hardwood x1; with the last wood the axe brought the tree down, leaving a stump (also nearby: Jo)
+- 12:00 ran into Jo at the river: Jo said "Hey Bo, how’s your fishing going today?"; you said "Hey Jo! Catching some fish today?"
+- 13:00 crafted a shovel
+- 14:00 fished for a small shadow in the river: caught a gormo fish (also nearby: Jo)
+- 15:00 walked over to Ike's home (also nearby: Eli)
+- 15:00 knocked at Ike's home, but nobody answered
+- 16:00 rested
+
+So far today you:
+(nothing yet)
+
+You noticed today:
+(nothing)
+
+Unread letters:
+(none)
+
+Plan up to 5 actions between 07:00 and 11:00, one per hour; you may leave hours free. Give each action an "hour" (0-23). Things may not go as planned if someone else gets there first. 
+You can also spend any free hour at the plaza: add {"hour": <hour>, "do": "plaza"}. It isn't one of your actions.
+First, decide how you'll spend today's 150 points of mental energy: "energy": {"inward": <points>, "outward": <points>}. Inward is planning, thinking and writing tonight; outward is conversations, the plaza, letters and posts; whatever you leave over is spare, for people you run into. It's your plan, not a limit.
+You can also add "write": true | false (write your private page tonight; now true). If you leave it out, it stays as it is.
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "do": ...}, ...], "note": "<optional private note to your future self>"}
+
+=== REASONING (239 tokens, hidden from everyone) ===
+We need plan 5 actions 07-11. We have shovel, ladder, need more hardwood. We have wood 3. We can chop hardwood tree at 07. We have shovel recipe but need 5 hardwood. We have 3 hardwood currently. So need 2 more. Plan: 07 chop hardwood, 08 chop hardwood, 09 chop hardwood, 10 rest? but we need 5 actions. Maybe 07 chop, 08 chop, 09 chop, 10 rest (not action), 11 rest. Actually actions limited to 5. We can do 07 chop, 08 chop, 09 chop, 10 rest? rest is action? rest is action. So 4 actions. We need 5 max. Could add 11 rest. So 5 actions. Also we can go to plaza at free hour. We can use 12? but only up to 11. So include plaza at 12? but not allowed. So maybe 07 chop, 08 chop, 09 chop, 10 rest, 11 rest. Ok.
+
+Energy: inward 100, outward 50. write true.
+
+=== REPLY ===
+{"thoughts":"Need more hardwood for ladder, but also want to clear area. 4 chops gives 4 hardwood, enough for ladder (3) and future shovel. 5th action is rest to keep energy. 5 actions total. 150 points: keep most inward for planning, a little outward for plaza visits.  Write tonight.", "energy":{"inward":120,"outward":30},"actions":[{"hour":7,"do":"chop_wood","kind":"hardwood","axe":"axe"},{"hour":8,"do":"chop_wood","kind":"hardwood","axe":"axe"},{"hour":9,"do":"chop_wood","kind":"hardwood","axe":"axe"},{"hour":10,"do":"rest"},{"hour":11,"do":"rest"}],"note":"Remember to bring extra wood tomorrow for ladder. Also maybe ask Jo for a rock later."}

@@ -1,0 +1,87 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2. Woke before sunrise, still cold, but the wind felt hopeful. Ran into Ike early and got a spare bait—small win. Tried to chat with Jo again; nothing, maybe he’s busy. Spent most of the day at the store, buying bait and a few softwood logs; the prices are steady but the stock changes fast—need to keep an eye. Caught a selzalne fish after a quiet hour by the river; worth 660 bells, so a decent boost. Energy’s low; I’m planning to sleep early tonight. Tomorrow: keep asking Jo about the bridge fund, post on the board for a donation, and look around for a free homesite. Maybe skip some chores if I’m wiped. Hope the next day brings more bells and a chance to settle down.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 3. You are Eli, at home before sleep.
+
+What happened today:
+- 07:00 went to the plaza
+- 08:00 tried to buy: fishing bait is not for sale there today
+- 09:00 walked over to Jo's home
+- 09:00 knocked at Jo's home, but nobody answered
+- 10:00 tried to fish: you have no fishing bait
+- 11:00 Ike visited you at home: Ike said "Hey Eli, here’s some wood." [gave 1 wood; asked for 1 fishing bait]; you said "Got a fish, can I trade for a bait?" [gave 1 selzalne fish; asked for 1 fishing bait]
+- 12:00 went to the plaza (also nearby: Ari, Gus, Jo)
+- 12:00 ran into Ari at the plaza: Ari said "Hey Eli, any chance you have some extra wood or could point me to bait?"; you said "" [gave 1 wood; asked for 1 fishing bait]
+- 13:00 walked over to Jo's home (also nearby: Bo, Dax)
+- 13:00 knocked at Jo's home, but nobody answered
+- 14:00 walked over to Ike's home
+- 14:00 knocked at Ike's home, but nobody answered
+- 15:00 tried to fish: you have no fishing bait
+- 16:00 rested
+- 17:00 tried to buy: shop must be 'cranny' or 'able'
+- 18:00 went to the plaza (also nearby: Dax, Kit)
+- 19:00 too tired to plan, so you planned nothing new
+
+Things that changed hands today:
+- you traded Cal 2 wood for 1 selit fish
+- Ike gave you 1 wood
+- you gave Ike 1 selzalne fish
+- you gave Ari 1 wood
+
+What you have tonight:
+Bells: 100
+Tools you carry: shovel, axe, fishing rod, net, ladder, vaulting pole
+Other things you carry: softwood x6, hardwood x1, selit fish x2
+Recipes you know: clay furnace, fruit basket, ironwood dresser, simple wooden fence
+Since this morning: +1 selit fish; −1 selzalne fish; −2 wood
+
+Open requests and recent offers:
+- Ike asked you for 1 fishing bait (day 2)
+- you asked Ike for 1 fishing bait (day 2)
+- Ike asked you for 1 fishing bait (day 2)
+- you asked Ari for 1 fishing bait (day 3)
+- [o6] Ike's offer to you, 1 wood for 1 fishing bait: fell through
+- [o9] your offer to Jo, 1 wood for 1 fishing bait: fell through
+- [o10] your offer to Ike, 1 wood for 1 fishing bait: fell through
+- [o11] your offer to Cal, 2 wood for 1 selit fish: accepted
+- [o12] your offer to Ari, 3 softwood for 1 fishing bait: fell through
+- [o15] your offer to Jo, 1 selit fish for 1 fishing bait: fell through
+- [o16] your offer to Gus, 2 selit fish for 1 fishing bait: turned down
+- [o17] Ike's offer to you, 1 wood for 1 fishing bait: fell through
+
+Your notes:
+- (day 0) Remember to keep energy low tomorrow.
+- (day 1) Keep an eye on the bridge fund later, maybe ask Jo again tomorrow.
+- (day 1) If Jo gives bells, contribute bridge.
+- (day 1) Post on board, keep an eye on replies tomorrow. Maybe ask Jo for a small donation.
+- (day 2) If the rod doesn’t come, I’ll need to find a cheaper way or wait for the next day.
+- (day 2) Keep energy low, maybe skip some if I feel tired.
+- (day 2) Ask for bait again tomorrow if not given.
+- (day 2) Remember to ask Jo tomorrow for bridge donation.
+- (day 3) Make sure Jo hears about bridge fund and offers a bit.
+- (day 3) Keep an eye on the bridge fund tomorrow.
+- (day 3) Remember to ask Jo about bridge donation tomorrow. Also keep an eye on bait supply.
+- (day 3) Keep an eye on Jo’s response about bridge fund tomorrow
+- (day 3) Keep an eye on Jo's reply tomorrow. If no bait, consider trading wood to Ari later.
+- (day 3) Offer wood, hope he gives bait back.
+- (day 3) Accept trade with Ike, keep eye on Jo's board for more bait.
+
+What you wrote last night:
+Day 2. Woke before sunrise, still cold, but the wind felt hopeful. Ran into Ike early and got a spare bait—small win. Tried to chat with Jo again; nothing, maybe he’s busy. Spent most of the day at the store, buying bait and a few softwood logs; the prices are steady but the stock changes fast—need to keep an eye. Caught a selzalne fish after a quiet hour by the river; worth 660 bells, so a decent boost. Energy’s low; I’m planning to sleep early tonight. Tomorrow: keep asking Jo about the bridge fund, post on the board for a donation, and look around for a free homesite. Maybe skip some chores if I’m wiped. Hope the next day brings more bells and a chance to settle down.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (5 tokens, hidden from everyone) ===
+Need short diary.
+
+=== REPLY ===
+Day 3. Dawn was gray, still cold. Went to the plaza, but bait’s gone. No luck with Jo or Ike – they’re both MIA. Traded wood for a selit fish with Cal; got a bit of fish but lost a selzalne. Ike still wants bait, I still need it. Ran into Ari, gave him a log, but no bait either. No fishing today, energy’s low. I’m stuck with 100 bells, a few logs, two selit fish. I’ll rest, maybe try fishing tomorrow if I can get a rod or a spare bait from someone. Still need that bridge fund info from Jo. Sleep early, keep an eye on the plaza. Hope tomorrow brings a bit more fish and some help.

@@ -1,0 +1,156 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 5. I’m still chasing bait and a log. Gus keeps swapping fish for bait, but I’m low on bells and I can’t afford the 300. Jo helped a bit but gave me more selit instead of what I need. I’ve got two selit, one selzalne, a hardwood log and a wood. My shovel recipe is in my head, but I need a small log and the second map. I’ll try Dax again tomorrow, maybe bring a log and ask for the map. If he says no, Fen might. I’ll also swing by Gus at 07:00 tomorrow to trade the selit for bait—maybe he’ll accept a selzalne or something. I’m tired but hopeful. Tonight I’ll rest, save the bells, and plan the next morning. Good night, island.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
+- mine_rock: rock?
+- chop_wood: kind? (hardwood | fruit), axe? (stone axe | axe; if you carry both, the stone axe. An axe brings the tree down when it takes its last wood, and a fruit tree drops its fruit; a stone axe never fells)
+- shake_tree
+- fish: where (sea | river | pond), size?, bait? (true uses 1 fishing bait from your pockets; if you have none, leave it out)
+- catch_bug: where (flowers | trees | stumps | rocks | ground), species?
+- beachcomb: near?
+- dig_fossil: near?
+- dig_clam: near? (a clam spot on the beach)
+- plant: item, near
+- dig_stump: near?
+- break_rock: rock
+- lay_path: style (dirt | stone | brick | sand | terracotta), from, to
+- remove_path: near
+- place: item, near, count?
+- fence_off: item, around ("home")
+- pick_up: item, near, count?
+- wear: item
+- decorate: item
+- undecorate: item
+- visit: who (a villager: walk to their home, knock, and talk if they're in. Shops and services are reached by their own actions, such as buy, sell, donate or ask)
+- craft: recipe
+- sell: items ({"<item>": <qty>})
+- buy: shop (cranny | able), item (as the shop lists it: a thing, a tool, or "<thing> recipe" for a recipe card)
+- donate: item
+- assess (Blathers identifies every fossil you carry)
+- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters only, not villagers: go to them and hear what they do and what it costs)
+- upgrade_house
+- pay_loan: bells
+- contribute_bridge: bells
+- set_ordinance: ordinance
+- move_house: to (a homesite)
+- rest
+- plaza (not one of your actions: you spend that free hour at the plaza)
+A place (for near, from, to) is "here", "home", "<villager>'s home", a building (Resident Services, Nook's Cranny, Able Sisters, museum, plaza, airport), "rock <number>", or a part of the island such as "north beach".
+Not actions: talking, giving and trading happen when you meet someone (visit them to meet on purpose); the board, letters and parcels are at the plaza; and you walk wherever an action takes you, so there is no walk or travel.
+Tools: shovel (mine_rock, dig_fossil, dig_clam, dig_stump, break_rock); axe or stone axe (chop_wood); fishing rod (fish); net (catch_bug); ladder (climbs one cliff up or down); vaulting pole (jumps across the river). You use a ladder or vaulting pole you carry whenever your way needs it.
+
+=== USER ===
+PHASE: plan
+Day 9 (April 10, spring, cloudy), 07:00. You are Kit.
+You are usually up from 07:00 to 00:00.
+Bells: 200 in your wallet. Home: tent lower ground, centre (site-6), neighbors: Fen. Carrying 12/40 items.
+Tools you carry: axe (29 uses left), fishing rod (29 uses left), net (30 uses left), ladder (18 uses left)
+Other things you carry: island map x2, selit fish x2, hardwood x2, wood x1, selzalne fish x1
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Open requests: Gus wants 1 fishing bait from you (until day 9); Bo wants 1 fishing bait from you (until day 10)
+Recipes you know: campfire (wood x3; 1 in pockets); clay furnace (clay x6, iron nugget x2; you have none); iron garden bench (iron nugget x3, hardwood x4; in pockets: hardwood 2); shovel (hardwood x5; 2 in pockets); simple wooden fence (wood x3; 1 in pockets)
+Nook's Cranny buys at (prices you've heard): axe 230, fishing rod 160, ladder 570, net 180, shovel 220, vaulting pole 230
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1
+Bridge: 750/98000 bells raised
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640 (a young tree: plant it and it's a hardwood tree in 5 days), cosmos seeds 240 (flower seeds: plant them and cosmos grow), hyacinth seeds 240 (flower seeds: plant them and hyacinths grow), fishing bait 300 (fish with it and a fish is sure to appear), wooden mini table 1800 (furniture), simple wooden fence 100 (fencing, one piece per tile)
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards (a card teaches you to craft the thing yourself, as often as you like; buy one as "<thing> recipe"): shovel recipe 200 (you know it), axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, stone fence recipe 800
+Able Sisters today (09:00-21:00), clothes: bowler hat 900, kimono 4800, rose crown 1200, tuxedo 3200
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 7) If Dax refuses, I’ll swing to Fen for the map first thing tomorrow.
+- (day 7) Need to keep 2 bait for tomorrow.
+- (day 7) Got bait, keep 0 selit left.
+- (day 7) Remember to trade selit for bait next time if Gus offers
+- (day 7) Remember to bring a small log tomorrow for shovel.
+- (day 7) Remember to collect a small log tomorrow for the shovel.
+- (day 7) If Gus doesn’t give bait, try trading selit again tomorrow.
+- (day 8) Remember to ask Fen for the second map tomorrow if Dax says no log.
+- (day 8) Remember to keep bait for tomorrow, maybe trade selzalne for extra bait if possible.
+- (day 8) Remember to keep track of bait count.
+- (day 8) If Gus refuses, I'll trade selzalne for bait tomorrow.
+- (day 8) Remember to keep the selit handy for tomorrow's bait trade.
+Getting around: You are at lower ground, centre. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 50 steps); 2 (the middle cliff, northwest, about 94 steps); 3 (the top cliff, northeast, about 57 steps); 4 (lower ground, centre, about 103 steps); 5 (lower ground, southeast, about 53 steps); 6 (lower ground, southeast, about 48 steps)
+Buildings: Resident Services (about 14 steps); plaza (out of reach for you right now); museum (about 113 steps); Nook's Cranny (about 23 steps); Able Sisters (out of reach for you right now)
+Trees around here (centre): 2 hardwood trees, 4 stumps
+Your island map:
+- northwest: the middle cliff and the top cliff; beach; rocks 2; 1 fruit tree, 2 hardwood trees
+- north: the middle cliff and the top cliff; beach; river; rocky shore; 2 fruit trees, 4 hardwood trees
+- northeast: the middle cliff and the top cliff; beach; rocks 3
+- west: lower ground and the middle cliff; beach; homes: Dax, Gus, Jo; 4 fruit trees, 1 hardwood tree
+- centre: lower ground and the middle cliff; river; buildings: Resident Services, museum; homes: Fen, Kit; rocks 4; 2 hardwood trees
+- east: lower ground and the middle cliff; beach; homes: Cal, Ike; 2 fruit trees
+- southwest: lower ground; beach; river; homes: Bo
+- south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli
+- southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+Mental energy today: 150. Typical costs: a plan 20, noticing someone 5, one thing you say in a conversation 17, a turn at the plaza 20, writing at night 12; longer replies cost more.
+
+Isabelle's morning announcement: Good morning, everyone! It's day 9. The island ordinance is no ordinance. It's April 10 and the weather today is cloudy. Nothing much to report from yesterday. Did you know letters and parcels sent at the plaza arrive the next morning?
+
+Yesterday you:
+- 07:00 walked over to Dax's home (also nearby: Gus, Jo)
+- 07:00 knocked at Dax's home, but nobody answered
+- 07:00 ran into Gus at Dax's home: you said "Hey, Gus! Got a minute?"; Gus said "Hey, thanks! I’ve got a selit fish if you need one." [Gus offered you 1 selit fish for your 1 fishing bait]; you said "Sure, I’ll trade you two selit for a fishing bait." [you offered Gus 2 selit fish for 1 fishing bait; then you went your ways]
+- 08:00 walked over to Gus's home (also nearby: Bo)
+- 08:00 knocked at Gus's home, but nobody answered
+- 08:00 ran into Bo at Gus's home: you said "Hey, Bo! Got a minute?"; Bo said "Hey, thanks for stopping by. Any chance you’ve got some fishing bait to spare?" [Bo asked you for 1 fishing bait]; you said "Sure, I can trade you my selit for a fishing bait." [you offered Bo 2 selit fish for 1 fishing bait]; Bo said "No thanks, I need the bait." [then you went your ways]
+- 09:00 tried to fish: you have no fishing bait
+- 10:00 tried to fish: you have no fishing bait
+- 11:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 12:00 walked over to Gus's home (also nearby: Bo)
+- 12:00 knocked at Gus's home, but nobody answered
+- 13:00 walked over to Dax's home (also nearby: Jo, Cal)
+- 13:00 knocked at Dax's home, but nobody answered
+- 14:00 walked over to Fen's home
+- 14:00 knocked at Fen's home, but nobody answered
+- 16:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 17:00 rested
+- 20:00 walked over to Gus's home
+- 20:00 inside Gus's home: not much furniture yet
+- 20:00 visited Gus at home: you said "" [just nodded (too tired to talk)]
+- 21:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+
+So far today you:
+(nothing yet)
+
+You noticed today:
+(nothing)
+
+Unread letters:
+(none)
+
+Plan up to 5 actions between 07:00 and 11:00, one per hour; you may leave hours free. Give each action an "hour" (0-23). Things may not go as planned if someone else gets there first. 
+You can also spend any free hour at the plaza: add {"hour": <hour>, "do": "plaza"}. It isn't one of your actions.
+You're at home, so you can put things from your pockets away or take things out before you go, which takes no time: "home": {"store": {"<item or bells>": <qty>}, "take": {"<item or bells>": <qty>}}.
+First, decide how you'll spend today's 150 points of mental energy: "energy": {"inward": <points>, "outward": <points>}. Inward is planning, thinking and writing tonight; outward is conversations, the plaza, letters and posts; whatever you leave over is spare, for people you run into. It's your plan, not a limit.
+You can also add "write": true | false (write your private page tonight; now true). If you leave it out, it stays as it is.
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "do": ...}, ...], "home": {"store": {}, "take": {}}, "note": "<optional private note to your future self>"}
+
+=== REASONING (276 tokens, hidden from everyone) ===
+Need plan. Use 5 actions 07-11. Plan: 07 visit Dax for map? but he may not answer. Maybe visit Fen for map? But Fen is home center. Better: 07 go to Dax for map? 08 go to Fen for map? 09 ask Fen for second map if Dax says no. 10 fish? but no bait. Need bait. Maybe 07 trade selit for bait with Gus? But Gus not there? Could go to Gus at 07? But 07 is home. Could go 07 visit Gus to trade? He may have selit. We have 2 selit. We can trade 2 selit for 1 bait. Let's do 07: visit Gus. 08: visit Fen for second map. 09: go to Dax for map? but Dax may not have. 10: fish? need bait. we have 1 bait from trade. So fish at 10. 11: rest or plaza? We can go to plaza at 11 free hour. So actions: 07 visit Gus, 08 visit Fen, 09 visit Dax, 10 fish, 11 plaza. Energy: inward 80, outward 70. Write true. Home store maybe store 200 bells? none. We'll store nothing.
+
+=== REPLY ===
+{"thoughts":"Plan: grab bait from Gus, get second map from Fen, try Dax for map, fish with bait, then plaza. Keep energy split 80/70. Write tonight.","energy":{"inward":80,"outward":70},"actions":[{"hour":7,"do":"visit","who":"Gus"},{"hour":8,"do":"visit","who":"Fen"},{"hour":9,"do":"visit","who":"Dax"},{"hour":10,"do":"fish","where":"river","bait":true},{"hour":11,"do":"plaza"}],"home":{"store":{},"take":{}},{"note":"Make sure to trade 2 selit for bait at Gus, keep bait for tomorrow, keep maps."}

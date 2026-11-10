@@ -1,0 +1,34 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 1. Dawn was cold, but the wind cleared my head. I bought bait twice, still no fish. Jo’s still fishing, but he’s got a few bells—maybe he’ll chip in if I keep asking. I chopped a couple of hardwoods, got some softwood, and left a stump; maybe that’ll help the bridge later. I kept energy low, slept early. Tomorrow: keep asking Jo, post on the board, and look for a free homesite. I’ll try to avoid extra chores. Feeling a bit exhausted, but hopeful.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 2 (April 3, spring, sunny), 08:00. You are Eli, at the Nook's Cranny.
+Nearby: Gus, Kit, Ike, Fen, Dax, Bo.
+Earlier today:
+- 07:00 tried to ask: Nook's Cranny is closed at 07:00 (open 08:00-22:00) (also nearby: Kit, Gus)
+- 08:00 asked Timmy and Tommy: We buy almost anything at a fixed price, and sell a small stock that changes every day, plus one recipe card. Recipe cards for tools (shovel, axe, fishing rod, net, ladder, vaulting pole) are always in stock. For what you're carrying we'd pay: axe 230, fishing bait 75, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, shovel 220, softwood 100, vaulting pole 230, wood 90. (also nearby: Gus, Kit, Ike, Fen, Dax, Bo)
+Your notes:
+- (day 0) If I miss any, I’ll just rest for that hour.
+- (day 0) Remember to keep energy low tomorrow.
+- (day 1) Keep an eye on the bridge fund later, maybe ask Jo again tomorrow.
+- (day 1) If Jo gives bells, contribute bridge.
+- (day 1) Post on board, keep an eye on replies tomorrow. Maybe ask Jo for a small donation.
+- (day 2) If the rod doesn’t come, I’ll need to find a cheaper way or wait for the next day.
+Mental energy left today: 131 (about 13 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (35 tokens, hidden from everyone) ===
+Need decide who to talk. Probably ask Jo for bells? but Jo not nearby. Maybe talk to Kit to ask about fishing? He is nearby. Let's approach Kit.
+
+=== REPLY ===
+{"thoughts":"Need more bells for bridge and maybe a tool. Jo not here, so ask Kit about fishing or tools.","approach":"Kit","say":"Hey Kit, got a sec?"}

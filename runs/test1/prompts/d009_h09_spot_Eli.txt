@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8.  
+I kept circling the plaza like a broken record—no one, no trade. I posted twice, each time hoping for bait or a log, but the board stayed quiet. The fishing rod felt pointless; no fish, no bait, no energy. I’m still stuck with 3 softwood, 1 hardwood, 2 selit fish. I’ll ask Jo in person tomorrow, maybe trade a log for bait. The bridge donation still a mystery; I’ll keep an eye out. I’m tired but will keep my tools ready; a small fence might still be useful. Tomorrow I’ll try to move a bit more, maybe find a rock or ladder.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 9 (April 10, spring, cloudy), 09:00. You are Eli, at the flowers.
+You just spotted:
+1. an itrusel beetle in the grass (lower ground, centre, near rock 4)
+Earlier today:
+- 07:00 posted on the board [b83]: "Eli: Need 1 fishing bait. Offer 1 selit fish and 1 softwood. Also could use a lo"
+- 07:00 spotted a medium fish shadow in the river (lower ground, south, near Resident Services) and went after it at 08:00 instead of visit (who: Jo)
+- 08:00 fished for a medium shadow in the river: caught a selzalne fish
+- 08:00 spotted a lobas moth on the flowers (lower ground, centre, near Resident Services) and went after it at 09:00 instead of visit (who: Ari)
+- 09:00 tried to catch_bug: there is no flowers to search you can reach from here with the tools you carry
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still 3 softwood, 1 hardwood, 2 selit fish
+- (day 8) No trades today
+- (day 8) Need Jo’s log or rock for bait tomorrow
+Your notes from the last 2 days:
+- (day 8) Keep an eye on Jo tomorrow; maybe she'll give me a log or rock.
+- (day 8) Remember to check Jo tomorrow for logs and bridge donation.
+- (day 8) Check Jo tomorrow in person. Also try to find a rock near the lower ground southeast. Keep track of bait count.
+- (day 8) Keep an eye on Jo tomorrow; maybe she can give a log. Also watch the plaza for anyone wanting bait.
+- (day 9) Check Jo's home tomorrow for log or rock. Keep an eye on the plaza for anyone wanting bait.
+- (day 9) Keep eye on Jo tomorrow for log/rock. Maybe ask her in person.
+At 10:00 you planned: plaza.
+Actions left today: 8 of 10. Mental energy left today: 98.
+
+You can go after one of them at 10:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (140 tokens, hidden from everyone) ===
+We have 8 actions left. We have spotted beetle and moth earlier but we didn't go. We can go after one now at 10:00. Which is better? We need bait. We have 2 selit fish, 3 softwood, 1 hardwood. We need fishing bait. We could try to get a log from Jo. Maybe go to Jo's home? But action to go after beetle or moth? We could go after beetle to get a beetle? Not helpful. Maybe we can go after the moth to collect? Not sure. Maybe better to go to Jo tomorrow. So at 10:00 we skip. So go=0.
+
+=== REPLY ===
+{"thoughts":"No urgent catch needed, will keep an eye on Jo tomorrow for log/rock, maybe try bridge donation. No action at 10:00.", "go":0}

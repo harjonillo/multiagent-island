@@ -1,0 +1,52 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 1: chaos and progress. Got a map from Isabelle and Fen – good start. Still no fishing gear or bait, so I’ll grab some from Timmy/Tommy tomorrow. Fossil hunting: Dax gave me tips, but I need a shovel and a good spot. No ordinance yet, but I’ll consider the 20k bells plan if it helps the village. Still thinking about a permanent spot for my tent – maybe move to a free site. Rested early, but nerves are high. Tomorrow: fish, buy bait, ask Dax again, maybe talk to Tom Nook about the house loan. Need to keep things simple – one map, one shovel, one fishing rod, one set of bait. Sleep now.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 2. You are Kit, at home before sleep.
+
+What happened today:
+- 07:00 tried to ask: Nook's Cranny is closed at 07:00 (open 08:00-22:00) (also nearby: Eli, Gus)
+- 07:00 ran into Gus at the Nook's Cranny: you said "Hey Gus! Got any fishing gear or bait to sell?"; Gus said "Hey, I don't have cash, but here's a selit fish." [gave 1 selit fish; asked for 2 bait]
+- 08:00 bought the shovel recipe card for 500 bells; learned the shovel recipe (also nearby: Gus, Eli, Ike, Fen, Dax, Bo)
+- 08:00 ran into Fen at the Nook's Cranny: you said "Hey Fen, can I grab that second map you mentioned? I’d love to explore more."; Fen said "Sure thing, here you go." [tried to give something but Fen doesn't have 1 map]
+- 09:00 tried to ask: Dax is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Dax, meet them around the island, visit their home, or write to them at the plaza (also nearby: Eli, Gus, Ike)
+- 10:00 rested
+- 12:00 tried to buy: bait is not for sale there today (also nearby: Eli)
+- 13:00 tried to ask: Dax is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Dax, meet them around the island, visit their home, or write to them at the plaza (also nearby: Eli)
+- 14:00 tried to fish: you have no fishing bait (also nearby: Fen)
+- 15:00 tried to dig_fossil: you have no shovel
+- 16:00 rested
+- 17:00 rested
+
+Your notes:
+- (day 0) Try to get some fish tomorrow, maybe use fishing rod.
+- (day 0) Check map tomorrow for rocks and resources.
+- (day 0) If Fen doesn't have a map, I might need to ask Isabelle at Resident Services tomorrow.
+- (day 1) If Isabelle is busy, maybe ask Tom Nook next.
+- (day 1) Ask Fen for a second map today.
+- (day 1) Ask Dax tomorrow for fossil spots. Remember to bring shovel.
+- (day 1) Remember to follow up with Fen tomorrow for the map. If no fossil found, consider visiting Blathers for tips.
+- (day 1) Ask Dax tomorrow for fossil spots and bring shovel.
+- (day 1) Remember to thank Fen later if they give me a map.
+- (day 2) Remember to bring shovel tomorrow for fossil dig.
+- (day 2) Got 5 bait, got Dax’s advice, will dig tomorrow. Keep an eye on the map for more fossil sites.
+- (day 2) Plan to visit Dax tomorrow, bring any wood if possible.
+
+What you wrote last night:
+Day 1: chaos and progress. Got a map from Isabelle and Fen – good start. Still no fishing gear or bait, so I’ll grab some from Timmy/Tommy tomorrow. Fossil hunting: Dax gave me tips, but I need a shovel and a good spot. No ordinance yet, but I’ll consider the 20k bells plan if it helps the village. Still thinking about a permanent spot for my tent – maybe move to a free site. Rested early, but nerves are high. Tomorrow: fish, buy bait, ask Dax again, maybe talk to Tom Nook about the house loan. Need to keep things simple – one map, one shovel, one fishing rod, one set of bait. Sleep now.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (5 tokens, hidden from everyone) ===
+Need short reflection.
+
+=== REPLY ===
+Day 2: still fumbling. Gus gave me a selit fish instead of bait—nice but useless right now. Got the shovel recipe, but no shovel. Fen didn’t have the second map, so I’m stuck. Dax’s advice is good, but I need the gear first. No fishing today, no fossils yet. Plan: tomorrow I’ll hit Nook’s at 08:00, grab a bait bundle, maybe ask Gus again. Then head to Dax’s house, bring a small log for the shovel, and finally snag that map from Fen or Isabelle. I’m learning the rhythm—early mornings are the only time to shop. Rested enough? I think I’ll get up at 06:30. Need to keep things simple, but I’m getting used to the island’s quirks. Good night.

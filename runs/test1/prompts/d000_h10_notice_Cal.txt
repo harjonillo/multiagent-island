@@ -1,0 +1,29 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 0 (April 1, spring, rain), 10:00. You are Cal, at the river.
+Nearby: Fen.
+Earlier today:
+- 07:00 tried to buy: Nook's Cranny is closed at 07:00 (open 08:00-22:00)
+- 08:00 fished for a large shadow in the river: caught a selit fish (also nearby: Jo, Dax, Ike)
+- 08:00 ran into Dax at the river: you said "Hey Dax, got any info on the island ordinance?"; Dax said "No ordinance yet, but I’ll keep my eyes open for any changes."
+- 09:00 fished for a medium shadow in the river: it got away
+- 10:00 fished for a medium shadow in the river: it got away (also nearby: Fen)
+Your notes:
+- (day 0) Got 300 bells spent, 700 left. Got 3 fish. Will keep an eye on the river for larger ones tomorrow. Remember to ask Isabelle about the island ordinance tomorrow morning.
+Mental energy left today: 138 (about 11 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (16 tokens, hidden from everyone) ===
+We need JSON. Choose someone: Fen nearby. We'll ask about ordinance.
+
+=== REPLY ===
+{"thoughts":"Need to learn about ordinance, talk to Fen nearby","approach":"Fen","say":"Hey Fen, any word on the island ordinance?"}

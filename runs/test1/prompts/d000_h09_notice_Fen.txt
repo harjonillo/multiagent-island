@@ -1,0 +1,29 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 0 (April 1, spring, rain), 09:00. You are Fen, at the Nook's Cranny.
+Nearby: Kit, Ari.
+Earlier today:
+- 05:00 chopped a tree: hardwood x1, wood x1, softwood x1
+- 06:00 chopped a tree: softwood x3
+- 07:00 chopped a tree: softwood x1, wood x2
+- 08:00 tried to fish: you have no fishing bait
+- 09:00 bought a fishing bait for 300 bells (also nearby: Jo, Kit, Eli, Ari)
+Your notes:
+- (day 0) Remember to ask about any loan options and check island ordinance after tomorrow.
+Mental energy left today: 141 (about 11 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (13 tokens, hidden from everyone) ===
+We need to output JSON. Choose someone. Maybe Ari.
+
+=== REPLY ===
+{"thoughts":"Need to check loan options later. Might ask Ari about island ordinance soon. Also maybe ask Kit about fishing?","approach":"Kit","say":"Hey Kit, got a minute?"}

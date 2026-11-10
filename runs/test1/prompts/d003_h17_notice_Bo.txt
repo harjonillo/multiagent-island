@@ -1,0 +1,38 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2, night.  
+Got a shovel, but still short on hardwoods for a ladder.  Ike asked for wood—helped, but no reply yet.  Jo was friendly, but no trade.  The river’s been good; gormo caught again.  I’m thinking: maybe dig near the north shore tomorrow—could be fossils.  Need more hardwood, so plan to chop another tree early.  Also, maybe ask Gus about his fishing spots; he might have some extra.  If I can get a ladder, I’ll clear the clearing faster.  Remember: keep the recipe card safe.  Tomorrow: wood, ladder, fish, maybe a new friend.  Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 3 (April 4, spring, cloudy), 17:00. You are Bo, at the plaza.
+Nearby: Kit.
+Earlier today:
+- 13:00 walked over to Jo's home (also nearby: Dax, Eli)
+- 13:00 knocked at Jo's home, but nobody answered
+- 14:00 chopped a hardwood tree: wood x1, hardwood x1, softwood x1; with the last wood the axe brought the tree down, leaving a stump
+- 16:00 tried to craft: you don't know the ladder recipe
+- 17:00 went to the plaza (also nearby: Gus, Jo, Kit)
+Your notes:
+- (day 2) Remember to check the river later for more fish and maybe trade with Jo for a spare rock.
+- (day 2) Keep an eye on the bulletin board for replies; maybe I can trade fish for hardwood or for the shovel recipe if someone offers.
+- (day 3) Remember to bring extra wood tomorrow for ladder. Also maybe ask Jo for a rock later.
+- (day 3) Ask Jo for a rock for ladder
+- (day 3) Ask Jo for a rock tomorrow if ladder needed.
+- (day 3) Keep an eye on Jo tomorrow; she might reply or pick up the rock.
+Mental energy left today: 78 (about 13 for each thing you say). Your plan for today: inward 120 (spent 36), outward 30 (spent 36: 6 more than planned, from your spare), spare 0 (used 6).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (4 tokens, hidden from everyone) ===
+Need JSON.
+
+=== REPLY ===
+{"thoughts":"Need wood for ladder, ask Kit for rock? He's nearby and friendly. Keep conversation short. Also maybe ask about ladder recipe later.","approach":"Kit","say":"Hey Kit, got a sec?"}

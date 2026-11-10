@@ -1,0 +1,35 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 5.  
+Morning light was still weak, but I made it to the plaza before dawn. Ari was there, offering softwood for bait – I traded one and got a fishing bait back. No reply from Jo or Ari after that, so I went to Jo’s house. She was asleep, just a nod when I asked about the bridge donation. I gave her a selzalne fish, hoping for a favor later. The river was a dead zone at 10 AM, but at 2 PM I finally caught a selzalne. My vaulting pole is gone; I’ll have to find a replacement soon. I’m still short on bait and money. No new plans tonight – just rest and hope the next day brings a little more.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 6 (April 7, spring, cloudy), 08:00. You are Eli, at the Ari's home.
+Nearby: Ike, Jo.
+Earlier today:
+- 07:00 went to the plaza (also nearby: Bo, Jo)
+- 08:00 tried to visit: you can't get to Ari's home from here with the tools you carry (also nearby: Ike, Jo)
+Your notes:
+- (day 5) Ask Jo tomorrow for bridge donation too.
+- (day 5) Keep an eye on Jo’s reply tomorrow, maybe trade a log for bait if no reply.
+- (day 5) Keep an eye on Jo's reply tomorrow; if no bait, consider trading a log for bait with Ari.
+- (day 5) Ask Jo about bridge fund tomorrow if no reply.
+- (day 6) Keep an eye on Jo's reply tomorrow. Maybe trade a log for bait if no reply.
+- (day 6) Keep an eye on Jo tomorrow. If no reply, maybe trade another log or softwood for bait with Ari or Cal.
+Mental energy left today: 108 (about 15 for each thing you say). Your plan for today: inward 60 (spent 20), outward 90 (spent 22), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (28 tokens, hidden from everyone) ===
+We need to output JSON with fields. Choose someone? Maybe talk to Jo about bridge donation. So approach "Jo". Opening line.
+
+=== REPLY ===
+{"thoughts":"Need Jo’s help with bridge funds, but she’s asleep. Maybe wake her up and ask politely. Also could trade log for bait if she’s unresponsive. Stay calm.","approach":"Jo","say":"Good morning, Jo. I hope you slept well. I was wondering if you could spare a log for bait in exchange for the bridge donation we discussed?"}

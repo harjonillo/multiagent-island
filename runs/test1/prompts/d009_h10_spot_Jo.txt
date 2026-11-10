@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, 01:00.  
+Bait crisis continues—no bait, only rocks, no rocks. Bo wants a rock, I have none. Cal gave me a selit, now I have 2. Selzalne up to 3, tugorpi 2, fossil 2. Bells still 100. Bridge still 2k away. Dax silent, maybe sleeping. Plan: post on board for bait tomorrow, trade selzalne for wood if Dax offers. Keep 2 selit for fishing, maybe 1 for trade. Remember to ask Eli about exact bridge fund tomorrow. Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 9 (April 10, spring, cloudy), 10:00. You are Jo, at the pond.
+You just spotted:
+1. a small fish shadow in the pond (lower ground, southeast, near rock 6)
+Earlier today:
+- 08:00 ran into Dax at the flowers: Dax said "Hey Jo, got some wood—could we trade it for some bait?"; you said "Sure, here’s a selit for your wood." [your offer: you give 1 selit fish, you get 1 softwood]; Dax said "Sure, that works." [Dax accepted: you gave Dax 1 selit fish and got 1 softwood; Dax's offer: you give 1 selit fish, you get 1 softwood, but Dax had no softwood, so trade failed; then you went your ways]
+- 08:00 spotted a large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 09:00 instead of visit (who: Dax, where: here)
+- 09:00 fished for a large shadow in the pond: caught a miruru fish (also nearby: Ike)
+- 09:00 spotted a large fish shadow in the pond (lower ground, southeast, near rock 6) and went after it at 10:00 instead of visit (who: Dax, where: here)
+- 10:00 fished for a large shadow in the pond: caught a miruru fish
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 9) Keep an eye on Dax’s movements; if he’s not home, maybe he’s out fishing. If he gives me a rock, trade it for wood next day. If he gives wood, trade it back for rock. Also remember to ask Eli about bridge donation tomorrow.
+- (day 9) Ask for a rock now, maybe trade selzalne later if he wants something else.
+- (day 9) Got the bait, keep an eye on Dax tomorrow.
+- (day 9) Keep the selzalne handy for future trades.
+- (day 9) Got softwood—will use it for bridge plan tomorrow.
+- (day 9) Keep track of selit usage for future fishing trips.
+At 11:00 you have nothing planned.
+Actions left today: 6 of 10. Mental energy left today: 22.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (124 tokens, hidden from everyone) ===
+Need to decide action. At 11:00, can go after fish? small fish shadow at rock 6. Already caught two miruru? Actually two miruru caught. Could fish again. But maybe need wood for bridge. Dax trade? Maybe go to Dax to trade for wood? He had wood earlier but trade failed. He has wood. Maybe ask for rock? But he has wood. So go to Dax at flowers. Go=2? We need mapping: actions: 1 maybe fish small? 2 go to Dax? Not specified. Probably go to Dax.
+
+=== REPLY ===
+{"thoughts":"I should try to get some wood for the bridge. Dax has wood and I still have a selit fish to offer. Going to the flowers to trade now might secure a softwood before the day ends.","go":2}

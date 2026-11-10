@@ -1,0 +1,36 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0, night. I made it to the island early, chopped a few trees, bought bait, and tried to talk to everyone. I offered a loan to Tom, but I’m not sure I’ll take it—98000 bells is a lot, and I still need to see the map and ordinance. I didn’t get a map yet; Kit asked for one, but I have none. I’ll ask Tom tomorrow if there’s a way to get a map without a loan. Also, I need to keep an eye on the bridge fund; maybe we can chip in together. I’ll try to find a good spot to set up a small fence to keep my things safe. Tomorrow: ask about ordinance, map, loan, bridge. Good night.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 1 (April 2, spring, cloudy), 13:00. You are Fen, at the river.
+Nearby: Cal.
+Earlier today:
+- 09:00 knocked at Kit's home, but nobody answered
+- 10:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone.
+- 11:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Dax)
+- 12:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone.
+- 13:00 threw bait in the river and a medium shadow appeared: it got away (also nearby: Cal, Dax)
+Your notes:
+- (day 0) Remember to ask about any loan options and check island ordinance after tomorrow.
+- (day 0) Check for ordinance tomorrow.
+- (day 0) Remember to keep an eye on the bridge funds tomorrow. Also, I might need to ask for a map later, but nothing available now.
+- (day 0) Consider asking Tom for a map later. Keep map request in mind.
+- (day 1) Try to get map without loan. If Tom refuses, consider loan. Keep bridge fund in mind.
+Mental energy left today: 94 (about 11 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (21 tokens, hidden from everyone) ===
+We need to choose a villager: nearby: Cal. So approach Cal. Say opening line.
+
+=== REPLY ===
+{"thoughts":"Need to ask Cal about the map and maybe bridge funds. Keep it friendly.", "approach":"Cal", "say":"Hey Cal, quick question—do you know where I can find a map of the island?"}

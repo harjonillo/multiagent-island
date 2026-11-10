@@ -1,0 +1,82 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, night.  
+Chopped a lot, still only 5 hardwoods.  Got a fossil—hope Blathers likes it.  Jo still silent; maybe she’ll trade rock later.  Kit asked for bait; I’m still low on fish.  I should head to the plaza tomorrow, maybe talk to Gus about fishing spots and ask Jo for a rock.  Need more wood for a ladder to clear the clearing faster.  I’ll try chopping another tree first thing.  No bells yet; that’s okay.  The island feels quieter, but I’m getting my rhythm.  Tomorrow: wood, rock, fish, maybe a new trade.  Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 7. You are Bo, at home before sleep.
+
+What happened today:
+- 07:00 walked over to Jo's home
+- 07:00 knocked at Jo's home, but nobody answered
+- 08:00 walked over to Gus's home (also nearby: Dax)
+- 08:00 knocked at Gus's home, but nobody answered
+- 08:00 ran into Dax at the Gus's home: you said "Hey Dax, got a sec?"; Dax said "Hey Bo, can I trade you a wood for a fishing bait?" [gave 1 wood; asked for 1 fishing bait; then went their way]
+- 09:00 looked for fish in the river, but there were no fish shadows in sight
+- 10:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 11:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 12:00 tried to break_rock: you need to eat an apple first to be strong enough to break a rock
+- 13:00 walked over to Gus's home
+- 13:00 knocked at Gus's home, but nobody answered
+- 14:00 walked over to Gus's home
+- 14:00 knocked at Gus's home, but nobody answered
+- 15:00 walked over to Gus's home
+- 15:00 inside Gus's home: not much furniture yet
+- 15:00 visited Gus at home: you said "Hey Gus, could you spare a fishing bait?" [asked for 1 fishing bait; then went their way]
+- 16:00 rested
+- 17:00 rested
+- 18:00 rested
+- 19:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+
+Things that changed hands today:
+- Dax gave you 1 wood
+
+What you have tonight:
+Bells: 0
+Tools you carry: shovel x2, axe, fishing rod, net, ladder
+Other things you carry: hardwood x7, wood x7, softwood x10, miphosel shell x2, ashbastu shell x2, loka fish x2, gormo fish x2, shovel recipe x1, fossil x1
+Recipes you know: campfire, clay furnace, iron worktable, shovel, simple wooden fence
+Since this morning: +1 wood
+
+Open requests and recent offers:
+- Kit asked you for 2 fishing bait (day 3)
+- you asked Gus for 1 fishing bait (day 5)
+- Gus asked you for 1 fishing bait (day 5)
+- Dax asked you for 1 fishing bait (day 7)
+
+Your notes:
+- (day 5) Ask for bait, trade selzalne.
+- (day 5) Check board tomorrow for replies. Remember to bring extra wood for ladder.
+- (day 5) Got a selzalne back soon, good for bait.
+- (day 5) Get that rock tomorrow, then ladder.
+- (day 6) Ask Gus for bait today, try to get a rock from Jo first thing.
+- (day 6) Check replies tomorrow. If no one trades, I'll head to the river to fish.
+- (day 6) Keep an eye on Jo for a rock later.
+- (day 6) Ask Fen for a rock, keep wood for later.
+- (day 6) Keep an eye on the board tomorrow; maybe someone will reply to my rock offer or give me bait.
+- (day 6) Hope Fen comes by soon. Keep an eye on the board for bait offers.
+- (day 6) Remember to ask for a rock from Jo, offer a selzalne if she has one. Ask Gus for fishing bait, maybe trade a selzalne. If no trades, fish next day. Keep an eye on the board for any offers.
+- (day 7) If Jo gives a rock, keep it. If not, maybe trade a selzalne next time. Stay alert for any rock offers at the plaza.
+- (day 7) Keep an eye on Jo for a rock later. Maybe trade my rock back for bait if she has it.
+- (day 7) Ask for bait again tomorrow if no reply.
+- (day 7) Keep an eye on Jo tomorrow, maybe trade the rock back for bait if she has it.
+
+What you wrote last night:
+Day 3, night.  
+Chopped a lot, still only 5 hardwoods.  Got a fossil—hope Blathers likes it.  Jo still silent; maybe she’ll trade rock later.  Kit asked for bait; I’m still low on fish.  I should head to the plaza tomorrow, maybe talk to Gus about fishing spots and ask Jo for a rock.  Need more wood for a ladder to clear the clearing faster.  I’ll try chopping another tree first thing.  No bells yet; that’s okay.  The island feels quieter, but I’m getting my rhythm.  Tomorrow: wood, rock, fish, maybe a new trade.  Sleep.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (5 tokens, hidden from everyone) ===
+Need short reflection.
+
+=== REPLY ===
+Day 7, night.  
+Still no Jo, Gus, or Dax reply—maybe they’re away.  Dax gave me a wood; I’ll trade it for bait tomorrow.  River’s still empty—maybe I need a better lure.  Ladder’s half‑built; more wood will get me past that block.  I’m still low on fishing bait, so I’ll keep asking.  No bells yet, but I’ll keep the shovel recipe on my mind.  Feeling a bit stuck, but the island’s quiet is oddly comforting.  Tomorrow: wood for bait, rock from Jo if she shows, ladder pieces, maybe a fishing spot tip from Gus.  Sleep.

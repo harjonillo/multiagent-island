@@ -1,0 +1,48 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 9 (April 10, spring, cloudy), 08:00. You are Fen, at the Gus's home.
+Nearby: Kit.
+Earlier today:
+- 07:00 walked over to Kit's home (also nearby: Kit)
+- 07:00 knocked at Kit's home, but nobody answered
+- 07:00 ran into Kit out on a walk: Kit said "Hey Fen, got a minute?"; you said "Hey Kit, mind giving me a map? I can trade you my ladder if you need it." [your offer: you give 1 ladder, you get 1 island map]; Kit said "Sure thing, Fen! Here’s a map." [Kit handed you 1 island map; Kit accepted: you gave Kit 1 ladder and got 1 island map]; you said "Thanks, Kit! Got it."; Kit said "Hey Fen, how about trading a selit for some bait?" [Kit's offer: you give 1 fishing bait, you get 2 selit fish]; you said "I’m sorry, I don’t have any bait right now."; Kit said "Thanks, Fen. Catch you later."; you said "" [you asked Kit for 1 fishing bait]; Kit said "Sure, give me bait when you get some."; you said "Sure thing, Kit. I'll bring you bait as soon as I have some." [you asked Kit for 1 fishing bait]; Kit said "Sure, here’s the selit for the bait." [Kit's offer: you give 1 fishing bait, you get 2 selit fish]; you said "Thanks, Kit! I'll bring you bait soon." [then you went your ways]
+- 08:00 tried to visit: you can't get to Gus's home from here with the tools you carry (also nearby: Kit)
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Need apple before rock break
+- (day 8) Gus traded selzalne for bait, but gave me none
+- (day 8) Still only 1 map in hand, still no path to plaza
+Your notes from the last 2 days:
+- (day 9) Keep selzalne handy for bait trades.
+- (day 9) Ask for map, offer ladder. If he refuses, try Gus tomorrow.
+- (day 9) Map received, ladder gone. Next step: find a way to the plaza. Maybe ask Gus tomorrow for bait.
+- (day 9) Keep the selzalne fish handy for tomorrow's bait trade.
+- (day 9) Keep selzalne handy; maybe trade again tomorrow
+- (day 9) Remember to catch selzalne first, then trade for bait.
+Mental energy left today: 31 (about 17 for each thing you say). Your plan for today: inward 70 (spent 24), outward 80 (spent 95: 15 more than planned, from your spare), spare 0 (used 15).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (43 tokens, hidden from everyone) ===
+Need to decide to talk to Gus? Or stay. Likely talk to Gus for bait? He earlier traded selzalne for bait but gave none. Maybe ask him for bait now. So approach Gus.
+
+=== REPLY ===
+{"thoughts":"Need bait to break rock, Gus might have bait or can trade for selzalne. I have selzalne, map, wood. Ask Gus for bait or trade.", "approach":"Gus","say":"Hey Gus, got a minute? I could trade you a selzalne for some bait if you need it."}

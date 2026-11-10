@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7: Dawn silent, still no wood to chop. Went to Ike’s, no answer, but he dropped a selzalne fish after I gave him wood. Dax gave me wood again, but still no bait. I traded a wood for a selzalne fish, hoping to trade back later. The ladder’s still out of reach; the plaza feels distant. I’ll keep trading softwood and hardwood for bait, and watch the board. Maybe tomorrow I can buy a bait at Cranny if I can get there. Rest tonight; 200 bells, 8 wood, 2 selzalne fish, still no fishing bait. Hope the next day brings a path or a trade.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 9 (April 10, spring, cloudy), 17:00. You are Ari, at home.
+You just spotted:
+1. a medium fish shadow in the river (lower ground, southeast, near rock 6)
+Earlier today:
+- 14:00 tried to fish: you have no fishing bait (also nearby: Cal)
+- 15:00 walked over to Dax's home (also nearby: Bo)
+- 15:00 knocked at Dax's home, but nobody answered
+- 16:00 tried to fish: you have no fishing bait (also nearby: Bo)
+- 17:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 8) Keep offering bait trade until I get one.
+- (day 8) Got bait, trade down wood for future use.
+- (day 8) Keep trading wood for bait if possible.
+- (day 9) If Dax not there, try Ike next.
+- (day 9) If I still can’t get bait, maybe try to trade with Dax at 18. Keep an eye on who shows up.
+- (day 9) Try to get bait today.
+At 18:00 you have nothing planned.
+Actions left today: 1 of 10. Mental energy left today: 83.
+
+You can go after one of them at 18:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (26 tokens, hidden from everyone) ===
+We need to decide action. Need bait. Dax not there. Maybe go to Ike at 18. Let's go.
+
+=== REPLY ===
+{"thoughts":"Need bait. Dax missed. Ike might have it. Go to Ike at 18:00.","go":1}

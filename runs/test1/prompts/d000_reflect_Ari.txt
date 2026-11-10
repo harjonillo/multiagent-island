@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 0. You are Ari, at home before sleep.
+
+What happened today:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, southeast (site-14)
+- 05:00 tried to visit: there is no home of Tom Nook to visit
+- 06:00 tried to talk: 'talk' is not something you can do
+- 07:00 tried to walk: 'walk' is not something you can do
+- 08:00 tried to visit: there is no home of Timmy and Tommy to visit
+- 09:00 tried to buy: wood x10 is not for sale there today (also nearby: Jo, Kit, Eli, Fen)
+- 10:00 bought the shovel recipe card for 500 bells; learned the shovel recipe (also nearby: Eli, Dax)
+- 10:00 ran into Dax at the fields: Dax said "Hey Ari, heard anything new about the island?"; you said "Hey Dax, just got the shovel recipe. Need wood later."
+- 11:00 rested
+- 12:00 tried to visit: there is no home of Resident Services to visit
+- 13:00 looked around but saw no fossil dig spots there (also nearby: Ike)
+- 13:00 ran into Ike at the river: Ike said "Hey Ari, seen any good fishing spots today?"; you said "Hey, any good spots I should check out?"
+- 14:00 tried to fish: you have no fishing bait
+
+Your notes:
+- (day 0) Remember to bring back wood for fences tomorrow.
+- (day 0) Remember to gather wood for fences tomorrow.
+- (day 0) Remember to ask about wood source tomorrow.
+- (day 0) Ask Ike for fishing advice tomorrow.
+
+What you wrote last night:
+(nothing yet)
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (7 tokens, hidden from everyone) ===
+Need to write diary entry.
+
+=== REPLY ===
+Day 0, the wind is still fresh, the sea smells like salt and possibility. I landed at 5 a.m., Tom Nook already set up my tent at the lower ground, southeast of the island. I tried to visit him, but there was no house—maybe he’s a ghost? I spent the morning learning to craft a shovel, paying 500 bells for the recipe card. Dax and Ike were friendly but no new gossip. I realized I need wood for fences tomorrow and a fishing rod or bait. The island feels empty yet alive. I’ll wake early, gather wood, ask Dax where to find it, and see if Ike can point me to a good fishing spot. The night is quiet; I’ll rest and dream of tools and waves.

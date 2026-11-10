@@ -1,0 +1,81 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 5, night.  
+Fence’s done, but bridge still a dream. Got a log from Ike, but still 0 bells. I traded selzalne fish for that wood—worth it? Still need a map. Kit keeps silent, Gus no answer. Maybe I’ll ask Tom tomorrow, or trade my hardwood for a log from someone else. Bridge fund? 500/98k feels pointless without a bell. I’ll keep the home tidy, maybe craft a wooden bookshelf later. Sleep, hope tomorrow brings a map or a log.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 7. You are Fen, at home before sleep.
+
+What happened today:
+- 12:00 tried to walk: 'walk' is not something you can do
+- 13:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 750 raised so far; anyone can chip in, and it opens more rocks and trees to everyone.
+- 14:00 tried to walk: 'walk' is not something you can do
+- 15:00 tried to buy: fishing bait costs 300 bells; you have 0
+- 16:00 fished for a small shadow in the sea: caught a tubas fish
+- 17:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 18:00 rested
+- 19:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 20:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 21:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 22:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 23:00 rested
+
+Things that changed hands today:
+(nothing)
+
+What you have tonight:
+Bells: 0
+Tools you carry: shovel x2, axe, fishing rod, net, ladder
+Other things you carry: hardwood x1, wood x2, softwood x7, simple wooden fence x4, island map x1, selzalne fish x1, tubas fish x1
+Recipes you know: campfire, iron fence, simple wooden fence, wooden bookshelf
+Since this morning: +1 tubas fish
+
+Open requests and recent offers:
+- you asked Gus for 1 island map (day 4)
+- Ike asked you for 1 fishing bait (day 6)
+- you asked Ike for 1 fishing bait (day 6)
+
+Your notes:
+- (day 5) If Kit is still silent, consider trading my selzalne fish for a hardwood log or asking someone else for a log. Also remember to check the bridge fund tomorrow.
+- (day 5) If no reply, maybe try trading selzalne fish for fishing bait later to get wood from someone.
+- (day 5) Keep an eye on the bridge fund tomorrow.
+- (day 5) Fence done. Post map request at plaza. If Gus has more maps, I'll try again tomorrow.
+- (day 5) Keep track of who replies tomorrow.
+- (day 6) Ask Tom for map, see if he has spare. If not, keep looking. Keep fence outside.
+- (day 6) Keep track of bait trade; may need more later.
+- (day 6) Got fishing bait, will start fishing soon.
+- (day 6) Offer wood, ask for rock. Keep an eye on ladder usage.
+- (day 6) Remember to ask someone else for a rock tomorrow or see if anyone has a log to swap for a ladder.
+- (day 6) Keep an eye on the plaza tomorrow. Maybe ask Tom or someone else.
+- (day 6) If Tom has a map, good. If not, keep asking others tomorrow.
+- (day 7) Remember to try the bridge rock tomorrow.
+- (day 7) Check if anyone else has a map tomorrow, keep trading selzalne fish for bait if needed.
+- (day 7) Hope someone replies tomorrow.
+
+What you wrote last night:
+Day 5, night.  
+Fence’s done, but bridge still a dream. Got a log from Ike, but still 0 bells. I traded selzalne fish for that wood—worth it? Still need a map. Kit keeps silent, Gus no answer. Maybe I’ll ask Tom tomorrow, or trade my hardwood for a log from someone else. Bridge fund? 500/98k feels pointless without a bell. I’ll keep the home tidy, maybe craft a wooden bookshelf later. Sleep, hope tomorrow brings a map or a log.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (6 tokens, hidden from everyone) ===
+Need short private note.
+
+=== REPLY ===
+Day 7, night.  
+Walk still impossible—maybe the island’s layout is wrong.  
+I offered Tom a house in exchange for a map, but he’s silent.  
+Got a tubas fish; no bait, no bells.  
+Still no bridge rock or map.  
+Hardwood single, wood two, softwood seven.  
+Fence stands, map in hand, but I can’t reach the plaza.  
+Maybe I need a ladder upgrade or another log.  
+Hope tomorrow I’ll find a way to the plaza, trade for bait, and finally get that map.  
+Sleep tight.

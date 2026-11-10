@@ -1,0 +1,41 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 0. You are Dax, at home before sleep.
+
+What happened today:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, west (site-13)
+- 05:00 tried to visit: there is no home of Resident Services to visit
+- 06:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Jo, Eli)
+- 07:00 tried to visit: there is no home of Nook's Cranny to visit (also nearby: Eli, Kit, Jo)
+- 08:00 bought a simple wooden fence for 100 bells (also nearby: Cal, Jo, Ike)
+- 08:00 ran into Cal at the river: Cal said "Hey Dax, got any info on the island ordinance?"; you said "No ordinance yet, but I’ll keep my eyes open for any changes."
+- 09:00 chopped a tree: wood x2, softwood x1
+- 10:00 dug up a fossil; nobody knows what it is until Blathers assesses it at the museum (also nearby: Ari, Eli)
+- 10:00 ran into Ari at the fields: you said "Hey Ari, heard anything new about the island?"; Ari said "Hey Dax, just got the shovel recipe. Need wood later."
+- 11:00 rested
+- 12:00 tried to visit: there is no home of Tom Nook to visit
+- 13:00 tried to visit: there is no home of Blathers to visit
+- 14:00 bought a fishing bait for 300 bells (also nearby: Cal)
+
+Your notes:
+- (day 0) Remember to ask Tom Nook about any island maps or guidance. Also note the location of the museum for future fossil identification.
+- (day 0) Remember to check island council later if any ordinance appears.
+- (day 0) Get that map asap, maybe ask for a fishing rod later.
+
+What you wrote last night:
+(nothing yet)
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (7 tokens, hidden from everyone) ===
+Need to write private reflection.
+
+=== REPLY ===
+Day 0, the island feels like a blank slate. Tom Nook set up my tent at site‑13, and I offered him a house loan—maybe I’ll build it myself if I can afford the 98k. No Resident Services yet, so I’m still in the dark about ordinances, but Cal’s curiosity keeps me on the lookout. I’m gathering wood, fossils, and a fishing bait—could be useful. I’m not sure where the museum is, so I’ll ask Blathers tomorrow. The bridge to the north bank is expensive, but it could open up a lot of resources. I need to keep my eyes peeled for any council announcements and find a map. Sleep now; tomorrow is another day of exploration.

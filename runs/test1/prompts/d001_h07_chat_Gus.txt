@@ -1,0 +1,64 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0, night.  
+Sun came early, cold wind.  I landed at 5am, Tom Nook set up my tent at site‑9.  No bait, so I tried the river—caught a selit and a selzalne.  The island feels empty; no houses to visit, just water and trees.  I’m learning the rhythm: fishing, resting, watching the sky.  Tomorrow, I’ll get bait—maybe from a trader?  I’ll watch for rain and bring an umbrella.  Energy is tight, so I’ll plan my moves.  The quiet is strange but oddly comforting.  Sleep now, tomorrow is a new day.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- Villagers meet at the plaza at 20:00 and 21:00.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or write until the next morning.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 1 (April 2, spring, cloudy), 07:00. You are Gus.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 1000. Loan owed to Tom Nook: 0. Home: tent lower ground, west (site-9), neighbors: Dax, Jo. Carrying 9/40 items.
+Inventory: shovel x1, axe x1, fishing rod x1, net x1, ladder x1, vaulting pole x1, selit fish x2, selzalne fish x1
+Inside your home (0/6): nothing yet
+Recipes you know: campfire (wood x3); fruit basket (apple x6, softwood x2); golden candlestick (gold nugget x1, iron nugget x3); simple wooden fence (wood x3)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none)
+Bridge: 0/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, cosmos seeds 240, tulip seeds 240, ceiling fan 4600, fishing bait 300, iron fence 280; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, stone fence 2000
+Able Sisters today (09:00-21:00): raincoat 1600, bowler hat 900, tuxedo 3200, kimono 4800
+Your notes, oldest first:
+- (day 0) Keep an eye on the weather, maybe bring umbrella next time.
+- (day 0) Try to buy bait tomorrow if possible. Keep an eye on rain. Keep energy budget tight.
+- (day 0) Remember to check for fishing bait tomorrow.
+- (day 1) Got bait, now can fish larger. Consider buying more supplies tomorrow.
+Getting around: You are at lower ground, west. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 93 steps); 2 (the middle cliff, northwest, about 47 steps); 3 (the top cliff, northeast, about 115 steps); 4 (lower ground, centre, about 38 steps); 5 (lower ground, southeast, about 96 steps); 6 (lower ground, southeast, about 89 steps)
+Buildings: Resident Services (about 52 steps); museum (about 30 steps); Nook's Cranny (about 64 steps); Able Sisters (about 69 steps)
+You spotted today:
+- 07:00 a large fish shadow in the river (lower ground, southwest)
+Mental energy left today: 133 of 150. Typical costs: a plan 12, noticing someone 4, one thing you say in a conversation 10, an evening at the plaza 14, writing at night 6; longer replies cost more.
+
+So far today you:
+- 07:00 fished for a large shadow in the river: caught a selit fish (also nearby: Bo)
+
+You ran into Bo at the river. So far:
+Bo: Hey Gus! How’s the fishing today?
+
+You can reply, or say nothing.
+Keep it to one or two sentences, the way you would actually talk. Only Bo hears it.
+You can also hand Bo something from your pockets right now ("give"), or ask them for something ("ask"); a request stays open until they give it to you.
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {"<item or bells>": <qty>}, "ask": {"<item or bells>": <qty>}, "note": "<optional private note to your future self>"}
+
+=== REASONING (4 tokens, hidden from everyone) ===
+Need reply.
+
+=== REPLY ===
+{"thoughts":"Bo’s greeting is friendly; I’ll keep it short and ask if he saw any good spots for bait. No need to give anything now.","say":"Hey Bo, you spotted any good bait spots?","give":{},"ask":{"fishing bait":1},"note":"Remember to check the river for bait tomorrow"}

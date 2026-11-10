@@ -1,0 +1,57 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0, 22:00.  
+Arrived early, set up tent at site‑10. Tried to help with the bridge, but 2k bells out of reach. Bought bait, caught a selzalne—little but good. Dax unresponsive, maybe he’s busy or hiding.  
+Thoughts: need more bells before the bridge fund. Focus on fishing tomorrow, maybe find a fossil for extra cash. Keep an eye on Dax, he might trade. Also ask Eli tomorrow about the bridge status and if I can chip in later. Sleep now, plan for tomorrow.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 1. You are Jo, at home before sleep.
+
+What happened today:
+- 07:00 threw bait in the river and a large shadow appeared: caught a selit fish
+- 08:00 bought a fishing bait for 300 bells (also nearby: Ike, Kit, Eli, Ari)
+- 08:00 ran into Eli at the Nook's Cranny: Eli said "Hey Jo, any updates on the bridge fund?"; you said "Got a selit today, still fishing for more bells. How's the bridge fund going?"
+- 09:00 threw bait in the river and a very large shadow appeared: caught a loka fish (also nearby: Eli, Kit)
+- 09:00 ran into Eli at the river: Eli said "Hey Jo, still any idea how we can raise more bells for the bridge?"; you said "How much is the bridge fund up to now?"
+- 10:00 walked over to Dax's home
+- 10:00 knocked at Dax's home, but nobody answered
+- 12:00 tried to fish: you have no fishing bait (also nearby: Ari)
+- 13:00 tried to fish: you have no fishing bait (also nearby: Ari)
+- 14:00 walked over to Dax's home
+- 14:00 knocked at Dax's home, but nobody answered
+- 15:00 tried to ask: Eli is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Eli, meet them around the island, visit their home, or write to them at the plaza
+- 16:00 dug up a fossil; nobody knows what it is until Blathers assesses it at the museum
+- 17:00 bought a fishing bait for 300 bells
+
+Your notes:
+- (day 0) Remember to check the river tomorrow for fishing. Also maybe buy a record player later.
+- (day 0) Remember to ask about bridge status tomorrow.
+- (day 0) Maybe collect more bells tomorrow before tackling the bridge fund.
+- (day 0) Get some bells from fish, maybe get a fossil.
+- (day 0) Keep an eye on Dax tomorrow. Maybe he can offer a trade or a small loan. Also consider fishing more for extra bells.
+- (day 1) Try to get some bells from fish. Ask Dax if he can lend or trade.
+- (day 1) Ask later about how much already raised.
+- (day 1) Ask Eli for exact amount at next encounter.
+- (day 1) If Dax offers trade, consider swapping selzalne for bells. Keep an eye on bridge fund at next meeting.
+- (day 1) Plan to bring some selit and fossil tomorrow to show for trade.
+
+What you wrote last night:
+Day 0, 22:00.  
+Arrived early, set up tent at site‑10. Tried to help with the bridge, but 2k bells out of reach. Bought bait, caught a selzalne—little but good. Dax unresponsive, maybe he’s busy or hiding.  
+Thoughts: need more bells before the bridge fund. Focus on fishing tomorrow, maybe find a fossil for extra cash. Keep an eye on Dax, he might trade. Also ask Eli tomorrow about the bridge status and if I can chip in later. Sleep now, plan for tomorrow.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (6 tokens, hidden from everyone) ===
+Need short private note.
+
+=== REPLY ===
+Day 1, 22:30.  
+River’s good—selit, loka, fossil. Still 2k short of bridge. Dax silent, maybe in a trade. Eli’s asking; I’ll ask for exact amount tomorrow. Got 300 bells from bait; can buy more. Might trade selit for bells if Dax offers. Need more fish tomorrow, maybe a bigger catch. Consider asking Eli about a loan or extra help. Sleep. Remember: bridge, Dax, more fish.

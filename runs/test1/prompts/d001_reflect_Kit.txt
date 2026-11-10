@@ -1,0 +1,51 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0 was a whirlwind. Arrived early, set up tent, tried to find services but none. Offered Tom Nook a house for a loan—maybe a good start if I can pay back before upgrades. Bought bait, met Fen, but no map. River gave a shadow, maybe a big fish. No fossils today, but I’ll search tomorrow. Need to figure out how to get a map—ask Isabelle or maybe buy one. Also think about moving home to a free site if it’s cheaper. Resting now, hoping for a calm night and a productive tomorrow.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 1. You are Kit, at home before sleep.
+
+What happened today:
+- 07:00 asked Isabelle: The ordinance now is no ordinance. Anyone can pay me 20000 bells to set one for the whole island from the next morning, or to lift it (none). Options: early bird: everyone keeps earlier hours, and the shops open and close earlier; night owl: everyone keeps later hours, and the shops open and close later; bell boom: Nook's Cranny pays more for everything, and everything in the shops costs more. And here's a map of the island; keep it with you and you'll always know where things are. (You got an island map.) (also nearby: Fen, Dax)
+- 07:00 ran into Fen at the Resident Services: Fen said "Hey Kit, can you tell me about the island ordinance?"; you said "No ordinance, but we can set one for 20,000 bells." [asked for 1 map]
+- 08:00 asked Timmy and Tommy: We buy almost anything at a fixed price, and sell a small stock that changes every day, plus one recipe card. Recipe cards for tools (shovel, axe, fishing rod, net, ladder, vaulting pole) are always in stock. For what you're carrying we'd pay: axe 230, fishing rod 160, ladder 570, net 180, shovel 220, vaulting pole 230. (also nearby: Ike, Eli, Jo, Ari)
+- 09:00 tried to fish: you have no fishing bait (also nearby: Eli, Jo)
+- 10:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none). (also nearby: Dax)
+- 10:00 ran into Dax at the museum: Dax said "Hey Kit, got any good spots for fossils around here?"; you said "I haven’t found any fossils yet, but where should I look?"
+- 11:00 rested
+- 12:00 tried to ask: Fen is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Fen, meet them around the island, visit their home, or write to them at the plaza
+- 13:00 tried to ask: Dax is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Dax, meet them around the island, visit their home, or write to them at the plaza
+- 14:00 tried to fish: you have no fishing bait
+- 15:00 rested
+- 19:00 walked over to Fen's home
+- 19:00 inside Fen's home: not much furniture yet
+- 19:00 visited Fen at home: you said "Hey Fen, could I get another map?" [gave 1 shovel; asked for 1 map]; Fen said "Sure thing, here's a map." [gave 1 island map]
+
+Your notes:
+- (day 0) Try to get some fish tomorrow, maybe use fishing rod.
+- (day 0) Check map tomorrow for rocks and resources.
+- (day 0) If Fen doesn't have a map, I might need to ask Isabelle at Resident Services tomorrow.
+- (day 1) If Isabelle is busy, maybe ask Tom Nook next.
+- (day 1) Ask Fen for a second map today.
+- (day 1) Ask Dax tomorrow for fossil spots. Remember to bring shovel.
+- (day 1) Remember to follow up with Fen tomorrow for the map. If no fossil found, consider visiting Blathers for tips.
+- (day 1) Ask Dax tomorrow for fossil spots and bring shovel.
+- (day 1) Remember to thank Fen later if they give me a map.
+
+What you wrote last night:
+Day 0 was a whirlwind. Arrived early, set up tent, tried to find services but none. Offered Tom Nook a house for a loan—maybe a good start if I can pay back before upgrades. Bought bait, met Fen, but no map. River gave a shadow, maybe a big fish. No fossils today, but I’ll search tomorrow. Need to figure out how to get a map—ask Isabelle or maybe buy one. Also think about moving home to a free site if it’s cheaper. Resting now, hoping for a calm night and a productive tomorrow.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (5 tokens, hidden from everyone) ===
+Need short reflection.
+
+=== REPLY ===
+Day 1: chaos and progress. Got a map from Isabelle and Fen – good start. Still no fishing gear or bait, so I’ll grab some from Timmy/Tommy tomorrow. Fossil hunting: Dax gave me tips, but I need a shovel and a good spot. No ordinance yet, but I’ll consider the 20k bells plan if it helps the village. Still thinking about a permanent spot for my tent – maybe move to a free site. Rested early, but nerves are high. Tomorrow: fish, buy bait, ask Dax again, maybe talk to Tom Nook about the house loan. Need to keep things simple – one map, one shovel, one fishing rod, one set of bait. Sleep now.

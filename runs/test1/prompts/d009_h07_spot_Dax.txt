@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8: Dawn found me chasing wood and bait like a broken loop. Ari traded a selzalne for a fish, but still no bait. Cal offered wood for bait, I slipped it in the back of my mind. Gus, Jo, and Bo all ghosted—maybe they’re busy or away. My tent’s a hole: no room for wood, hardwood, or softwood. I’m stuck with just a single fence piece, a rock, and a handful of fish. The ladder feels useless without a path to the plaza. Still, the map is there, and I keep the ladder as a reminder that tomorrow might bring a new trail. Sleep is thin, but I’ll keep walking.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 9 (April 10, spring, cloudy), 07:00. You are Dax, at Cal's home.
+You just spotted:
+1. a lobas moth on the flowers (lower ground, southeast, near Nook's Cranny)
+2. a large fish shadow in the pond (lower ground, southeast, near rock 1)
+3. a large fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 07:00 walked over to Cal's home
+- 07:00 knocked at Cal's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ari: 1 wood for 1 bait, still pending
+- (day 8) Cal: offered 1 wood for bait, need to confirm
+- (day 8) Tent: no storage, only bells allowed
+Your notes from the last 2 days:
+- (day 7) Need to find a way to get a rock or trade for bait tomorrow.
+- (day 8) Remember to trade my wood for bait at Ari today. If Jo or Cal give anything else, take it.
+- (day 8) Ask for bait from Ari today; keep an eye on other bait requests.
+- (day 8) Trade wood for bait with Cal. Keep track of request.
+- (day 8) Keep an eye on Jo’s request for wood; maybe trade later.
+- (day 8) Got bait, keep wood for future.
+At 08:00 you planned: visit (who: Bo).
+Actions left today: 7 of 10. Mental energy left today: 127.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (68 tokens, hidden from everyone) ===
+We need decide to go after which? We saw lobas moth, fish shadows. Probably want to fish. But need bait. We have wood and can trade. Maybe go to Ari to trade wood for bait. So choose go=1? The list not numbered but actions? We can go to Ari. So go=1.
+
+=== REPLY ===
+{"thoughts":"Need bait to fish, trade wood with Ari. Will head there. Keep eye on fish shadows.", "go":1}

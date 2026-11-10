@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 0. You are Jo, at home before sleep.
+
+What happened today:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, west (site-10)
+- 05:00 tried to visit: there is no home of Resident Services to visit
+- 06:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Eli, Dax)
+- 06:00 ran into Eli at the Resident Services: Eli said "Hey Jo, heard you're busy. Got any thoughts on the bridge or the new house loan?"; you said "Sure, I can chip in for the bridge. Tell me what’s needed next." [tried to give something but Jo doesn't have 2000 bells]
+- 07:00 tried to visit: there is no home of Nook's Cranny to visit (also nearby: Eli, Kit, Dax)
+- 07:00 ran into Eli at the Resident Services: Eli said "Hey Jo, could you help with the bridge? I need 2000 bells to start the fund."; you said "Sorry, I don’t have 2000 bells right now, but I can give something else if that helps."
+- 08:00 bought a fishing bait for 300 bells (also nearby: Cal, Dax, Ike)
+- 09:00 tried to return: 'return' is not something you can do (also nearby: Kit, Eli, Ari, Fen)
+- 10:00 rested
+- 12:00 fished for a very large shadow in the river: it got away
+- 13:00 fished for a medium shadow in the river: caught a selzalne fish
+- 14:00 walked over to Dax's home
+- 14:00 knocked at Dax's home, but nobody answered
+- 15:00 looked around but saw no fossil dig spots there
+
+Your notes:
+- (day 0) Remember to check the river tomorrow for fishing. Also maybe buy a record player later.
+- (day 0) Remember to ask about bridge status tomorrow.
+- (day 0) Maybe collect more bells tomorrow before tackling the bridge fund.
+- (day 0) Get some bells from fish, maybe get a fossil.
+- (day 0) Keep an eye on Dax tomorrow. Maybe he can offer a trade or a small loan. Also consider fishing more for extra bells.
+
+What you wrote last night:
+(nothing yet)
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (11 tokens, hidden from everyone) ===
+We are Jo. Need a short reflective note.
+
+=== REPLY ===
+Day 0, 22:00.  
+Arrived early, set up tent at site‑10. Tried to help with the bridge, but 2k bells out of reach. Bought bait, caught a selzalne—little but good. Dax unresponsive, maybe he’s busy or hiding.  
+Thoughts: need more bells before the bridge fund. Focus on fishing tomorrow, maybe find a fossil for extra cash. Keep an eye on Dax, he might trade. Also ask Eli tomorrow about the bridge status and if I can chip in later. Sleep now, plan for tomorrow.

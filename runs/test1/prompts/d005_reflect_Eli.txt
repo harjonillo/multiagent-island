@@ -1,0 +1,82 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 4. Dawn gray, still cold. Went to plaza, traded 1 softwood to Ari for hardwood, then gave 1 hardwood to Ike for bait. Still no bait, no money to buy. Caught a selzalne today, still only 100 bells. Jo and Ari still MIA. I’ll try to get some wood tomorrow, maybe ask Cal for more selit fish, or post a request on the board. Need that bridge donation info from Jo. Energy low, but I’ll keep trying. Rest tonight.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 5. You are Eli, at home before sleep.
+
+What happened today:
+- 07:00 went to the plaza (also nearby: Ari, Jo)
+- 07:00 ran into Ari at the plaza: Ari said "Hey Eli, got some extra softwood—care to trade for a bit of bait?"; you said "Sure thing, Ari! 1 softwood for a bait, deal?" [gave 1 softwood; asked for 1 fishing bait; then went their way]
+- 08:00 walked over to Jo's home
+- 08:00 knocked at Jo's home, but nobody answered
+- 09:00 walked over to Ari's home
+- 09:00 knocked at Ari's home, but nobody answered
+- 10:00 looked for fish in the river, but there were no fish shadows in sight
+- 11:00 went to the plaza (also nearby: Bo, Gus, Ike, Jo, Kit)
+- 12:00 went to the plaza (also nearby: Ike, Kit)
+- 13:00 walked over to Jo's home; your vaulting pole broke after 30 uses and is gone from your pockets
+- 13:00 inside Jo's home: not much furniture yet
+- 13:00 visited Jo at home: you said "Hey Jo, could you let me know if there's any update on the bridge donation?" [gave 1 selzalne fish]; Jo said "" [just nodded (too tired to talk)]
+- 14:00 fished for a medium shadow in the river: caught a selzalne fish
+- 15:00 tried to rest: couldn't find a way to the home with the tools you carry
+- 16:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 17:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 19:00 too tired to plan, so you planned nothing new
+
+Things that changed hands today:
+- you gave Ari 1 softwood
+- you gave Jo 1 selzalne fish
+
+What you have tonight:
+Bells: 100
+Tools you carry: shovel, axe, fishing rod, net, ladder
+Other things you carry: selzalne fish x1, softwood x4, hardwood x1, selit fish x2
+Recipes you know: clay furnace, fruit basket, ironwood dresser, simple wooden fence
+Since this morning: −1 vaulting pole; −1 softwood
+
+Open requests and recent offers:
+- Ike asked you for 1 fishing bait (day 2)
+- you asked Ike for 1 fishing bait (day 2)
+- you asked Ari for 1 fishing bait (day 3)
+- Ari asked you for 1 fishing bait (day 4)
+- [o26] Cal's offer to you, 1 selit fish for 1 fishing bait: fell through
+- [o30] Ike's offer to you, 1 hardwood for 1 fishing bait: answered with a counter-offer
+- [o31] your offer to Ike, 1 selit fish for 1 fishing bait: waiting for their answer
+- [o32] your offer to Ike, 1 selit fish for 1 fishing bait: waiting for their answer
+
+Your notes:
+- (day 3) Accept trade with Ike, keep eye on Jo's board for more bait.
+- (day 4) If Jo or Ari give bait, skip Cranny. Keep an eye on Jo's board tomorrow.
+- (day 4) Remember to collect the bait from Jo tomorrow.
+- (day 4) Keep an eye on Jo tomorrow for bridge fund.
+- (day 4) Trade hardwood for bait, keep logs for future trade.
+- (day 4) Try to get a spare log or wood if Ari wants it back. If Jo doesn’t reply, post a request on the board tomorrow.
+- (day 4) Got the bait. Keep an eye on the bridge fund tomorrow.
+- (day 4) Tomorrow try to trade a log for bait with Ari or ask Jo for a small donation for the bridge.
+- (day 5) Ask Jo about bridge donation and see if any bait available.
+- (day 5) Got bait from Cal. Keep an eye on Jo for bridge donation tomorrow.
+- (day 5) Trade 1 softwood for bait. Keep track of bait count.
+- (day 5) Ask Jo tomorrow for bridge donation too.
+- (day 5) Keep an eye on Jo’s reply tomorrow, maybe trade a log for bait if no reply.
+- (day 5) Keep an eye on Jo's reply tomorrow; if no bait, consider trading a log for bait with Ari.
+- (day 5) Ask Jo about bridge fund tomorrow if no reply.
+
+What you wrote last night:
+Day 4. Dawn gray, still cold. Went to plaza, traded 1 softwood to Ari for hardwood, then gave 1 hardwood to Ike for bait. Still no bait, no money to buy. Caught a selzalne today, still only 100 bells. Jo and Ari still MIA. I’ll try to get some wood tomorrow, maybe ask Cal for more selit fish, or post a request on the board. Need that bridge donation info from Jo. Energy low, but I’ll keep trying. Rest tonight.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (7 tokens, hidden from everyone) ===
+Need to write diary entry.
+
+=== REPLY ===
+Day 5.  
+Morning light was still weak, but I made it to the plaza before dawn. Ari was there, offering softwood for bait – I traded one and got a fishing bait back. No reply from Jo or Ari after that, so I went to Jo’s house. She was asleep, just a nod when I asked about the bridge donation. I gave her a selzalne fish, hoping for a favor later. The river was a dead zone at 10 AM, but at 2 PM I finally caught a selzalne. My vaulting pole is gone; I’ll have to find a replacement soon. I’m still short on bait and money. No new plans tonight – just rest and hope the next day brings a little more.

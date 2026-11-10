@@ -1,0 +1,38 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, 01:00.  
+Bait crisis continues—no bait, only rocks, no rocks. Bo wants a rock, I have none. Cal gave me a selit, now I have 2. Selzalne up to 3, tugorpi 2, fossil 2. Bells still 100. Bridge still 2k away. Dax silent, maybe sleeping. Plan: post on board for bait tomorrow, trade selzalne for wood if Dax offers. Keep 2 selit for fishing, maybe 1 for trade. Remember to ask Eli about exact bridge fund tomorrow. Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 5 (April 6, spring, sunny), 11:00. You are Jo, at the plaza.
+Nearby: Bo, Eli.
+Earlier today:
+- 09:00 knocked at Dax's home, but nobody answered
+- 09:00 ran into Kit at the Dax's home: Kit said "Hey Jo, got a quick favor?"; you said "Sure thing, Kit! I can trade a selzalne for a rock if you have one." [gave 1 selzalne fish; asked for 1 rock, but there's nothing called rock on this island]; Kit said "Sure, can I get some fishing bait?" [asked for 2 fishing bait]; you said "Sure thing, here’s some bait." [gave 2 selit fish; then went their way]
+- 10:00 walked over to Bo's home
+- 10:00 knocked at Bo's home, but nobody answered
+- 11:00 went to the plaza (also nearby: Bo, Eli, Gus, Ike, Kit)
+Your notes:
+- (day 4) Remember to check if anyone has wood to trade for a rock later.
+- (day 4) Post again tomorrow if no reply.
+- (day 5) Post for 1 bait, offer 1 selzalne for 1 selit with Cal. Keep 2 selit for tomorrow.
+- (day 5) Remember to keep 2 selit for tomorrow's fishing.
+- (day 5) Keep 2 selit for tomorrow fishing. Remember to post bait tomorrow.
+- (day 5) Got bait for Kit, keep 1 selit for tomorrow.
+Mental energy left today: 61 (about 15 for each thing you say). Your plan for today: inward 50 (spent 20), outward 100 (spent 69), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (17 tokens, hidden from everyone) ===
+Need to choose a villager to talk. Likely Eli about bridge fund.
+
+=== REPLY ===
+{"thoughts":"Need bridge info, talk to Eli","approach":"Eli","say":"Hey Eli, can you tell me more about the bridge fund?"}

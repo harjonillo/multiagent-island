@@ -1,0 +1,79 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 2, night.  
+The bridge still feels like a distant dream—500/98k, plus the 100 from Dax. I’ve got a selzalne in my bag now, maybe a good sell later. Tried to give Kit the map, but I only have one. Maybe I should ask Tom for a second copy—no loan yet, but if he says no, I’ll have to consider the 98k. The fence is up; I can store a few tools, but my space is tight. I’m thinking of asking for a small loan to buy a house upgrade instead of the big bridge loan. Tomorrow: check ordinance, ask Tom about a map, maybe bump the bridge contribution a bit. Sleep, rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 4. You are Fen, at home before sleep.
+
+What happened today:
+- 07:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 700 raised so far; anyone can chip in, and it opens more rocks and trees to everyone.
+- 08:00 walked over to Kit's home
+- 08:00 knocked at Kit's home, but nobody answered
+- 09:00 tried to give: 'give' is not something you can do (also nearby: Gus)
+- 09:00 ran into Gus at the around the island: you said "Hey Gus, quick question—do you know where I can get a spare map for Kit? Also, I'm looking for some wood to finish the fence. Any tips?"; Gus said "Hey Fen, here's the map you asked for." [gave 1 island map; asked for 1 hardwood log x1, but there's nothing called hardwood log on this island]; you said "Thanks, Gus!" [gave 1 selzalne fish; asked for 1 hardwood log, but there's nothing called hardwood log on this island]; Gus said "Thanks, Fen! I'll trade you a selzalne fish for that hardwood log." [gave 1 selzalne fish; asked for 1 hardwood log, but there's nothing called hardwood log on this island]; you said "Thanks again, Gus! Could I get another map if you have one?" [asked for 1 island map]; Gus said "" [just nodded (too tired to talk)]
+- 10:00 tried to contribute_bridge: no bells contributed
+- 11:00 tried to buy: shop must be 'cranny' or 'able'
+- 12:00 tried to ask: Kit is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Kit, meet them around the island, visit their home, or write to them at the plaza
+- 13:00 walked over to Kit's home
+- 13:00 knocked at Kit's home, but nobody answered
+- 14:00 tried to ask: Kit is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Kit, meet them around the island, visit their home, or write to them at the plaza
+- 15:00 went to the plaza (also nearby: Cal)
+- 16:00 went to the plaza, but were too tired to do anything there (also nearby: Cal, Ari, Bo, Dax, Ike, Kit)
+- 16:00 ran into Ike at the plaza: you said "Hey Ike, have you heard anything about Kit's spare map?"; Ike said "Got any leads on Kit's map?" [asked for 1 map from kit, but there's nothing called map from kit on this island]; you said "" [just nodded (too tired to talk)]
+- 19:00 too tired to plan, so you planned nothing new
+
+Things that changed hands today:
+- Gus gave you 1 island map
+- you gave Gus 1 selzalne fish
+- Gus gave you 1 selzalne fish
+- Ari traded you 2 softwood for your 1 island map
+
+What you have tonight:
+Bells: 0
+Tools you carry: shovel x2, axe, fishing rod, net, ladder, vaulting pole
+Other things you carry: hardwood x1, wood x4, softwood x7, island map x1, selzalne fish x1
+Recipes you know: campfire, iron fence, simple wooden fence, wooden bookshelf
+Since this morning: +2 softwood
+
+Open requests and recent offers:
+- you asked Gus for 1 island map (day 4)
+- [o23] your offer to Dax, 3 wood for 1 selzalne fish: fell through
+- [o25] Ari's offer to you, 2 softwood for 1 island map: accepted
+
+Your notes:
+- (day 1) Keep an eye on the bridge fund tomorrow.
+- (day 2) Keep an eye on the bridge fund tomorrow, maybe add more if I can.
+- (day 2) Remember to keep track of how many maps I’ve given; I only have one.
+- (day 2) Keep an eye on the bridge fund, maybe add more tomorrow.
+- (day 2) Give map to Kit, trade for shovel recipe, offer bridge contribution. Keep an eye on map requests.
+- (day 3) Remember to check if Tom actually has a spare map before 10. If not, plan to get one from someone else.
+- (day 3) Remember to check if Tom has a spare map after asking. If not, try asking someone else tomorrow.
+- (day 3) Keep track of what villagers respond; maybe get wood for fence soon.
+- (day 3) Ask Tom about map again tomorrow if no spare.
+- (day 3) Keep an eye on the bridge fund tomorrow; maybe chip in 2000 bells later if needed.
+- (day 4) Keep track of Kit’s recipe offer.
+- (day 4) Ask Kit later about map again
+- (day 4) Check if Gus has more maps tomorrow; if not, ask Kit or someone else.
+- (day 4) Remember to check if Kit has a spare map and offer the shovel recipe in exchange.
+- (day 4) Got softwood, still need a log for Kit later.
+
+What you wrote last night:
+Day 2, night.  
+The bridge still feels like a distant dream—500/98k, plus the 100 from Dax. I’ve got a selzalne in my bag now, maybe a good sell later. Tried to give Kit the map, but I only have one. Maybe I should ask Tom for a second copy—no loan yet, but if he says no, I’ll have to consider the 98k. The fence is up; I can store a few tools, but my space is tight. I’m thinking of asking for a small loan to buy a house upgrade instead of the big bridge loan. Tomorrow: check ordinance, ask Tom about a map, maybe bump the bridge contribution a bit. Sleep, rest.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+=== REASONING (13 tokens, hidden from everyone) ===
+Need to write a private note up to 150 words.
+
+=== REPLY ===
+Day 4, night.  
+Bridging still feels out of reach—only 500/98k, and my 0 bells won’t help.  I’m stuck with one map and a selzalne fish that’s not worth much yet.  Gus was nice, but I can’t get more wood or logs.  The fence is half‑done; I’ll finish it tomorrow with the 4 wood I have.  I’m thinking of asking Tom for a second map, but if he says no, maybe I’ll just keep the bridge fund low and focus on upgrading my home.  I’ll also try to get a hardwood log—maybe from someone else or by trading more softwood.  Sleep, plan next steps.

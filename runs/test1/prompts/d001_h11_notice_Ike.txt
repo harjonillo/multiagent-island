@@ -1,0 +1,35 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0 was a whirlwind. Arrived early, set up the tent, and hit the river—got a selzalne, but no big stuff today. Bought bait, a fence, and talked to Ari. Tom Nook offered a huge loan for a house and a cheap move. I’m leaning toward the house; the loan is tempting but I’ll need to pay it back quickly. No fossils yet, but I’ll scour the cliffs tomorrow. Weather’s a factor—rain could kill the fish, so I’ll keep an eye on the sky. Ladder in mind for higher spots. If I can get the bridge funded, that’ll open up more of the island. For now, just rest and plan the next day's hunt.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 1 (April 2, spring, cloudy), 11:00. You are Ike, at the Nook's Cranny.
+Nearby: Eli, Cal.
+Earlier today:
+- 08:00 knocked at Cal's home, but nobody answered
+- 09:00 tried to fish: you have no fishing bait
+- 10:00 walked over to Ari's home
+- 10:00 knocked at Ari's home, but nobody answered
+- 11:00 bought the shovel recipe card for 500 bells; learned the shovel recipe (also nearby: Gus, Eli, Cal)
+Your notes:
+- (day 0) Remember to bring the ladder if I need to reach higher spots tomorrow. Keep an eye on the weather; rain might make fishing harder.
+- (day 0) Check fossil after. Maybe upgrade fence later.
+- (day 0) Remember to scout the cliffs tomorrow. Keep an eye on the weather.
+- (day 1) Buy shovel before next day, maybe ask about fossils later.
+Mental energy left today: 134 (about 10 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (9 tokens, hidden from everyone) ===
+We choose to talk to Eli maybe.
+
+=== REPLY ===
+{"thoughts":"Need info on fossils, maybe get a ladder soon. Eli’s close by and friendly.","approach":"Eli","say":"Hey Eli, got a minute?"}

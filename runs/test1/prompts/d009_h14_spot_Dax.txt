@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8: Dawn found me chasing wood and bait like a broken loop. Ari traded a selzalne for a fish, but still no bait. Cal offered wood for bait, I slipped it in the back of my mind. Gus, Jo, and Bo all ghosted—maybe they’re busy or away. My tent’s a hole: no room for wood, hardwood, or softwood. I’m stuck with just a single fence piece, a rock, and a handful of fish. The ladder feels useless without a path to the plaza. Still, the map is there, and I keep the ladder as a reminder that tomorrow might bring a new trail. Sleep is thin, but I’ll keep walking.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 9 (April 10, spring, cloudy), 14:00. You are Dax, at Cal's home.
+You just spotted:
+1. a kaselzal moth on the flowers (lower ground, southeast, near Nook's Cranny)
+2. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+3. a small fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 12:00 knocked at Jo's home, but nobody answered
+- 13:00 walked over to Bo's home (also nearby: Kit)
+- 13:00 knocked at Bo's home, but nobody answered
+- 14:00 walked over to Cal's home
+- 14:00 knocked at Cal's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ari: 1 wood for 1 bait, still pending
+- (day 8) Cal: offered 1 wood for bait, need to confirm
+- (day 8) Tent: no storage, only bells allowed
+Your notes from the last 2 days:
+- (day 8) Trade wood for bait with Cal. Keep track of request.
+- (day 8) Keep an eye on Jo’s request for wood; maybe trade later.
+- (day 8) Got bait, keep wood for future.
+- (day 9) Got bait, keep wood for later.
+- (day 9) Remember to keep wood stash for future trades.
+- (day 9) If Jo or Bo not there, I'll trade with whoever shows up first. If I get bait, I'll fish for a selzalne next. Remember to store wood at home when possible.
+At 15:00 you planned: fish (where: river, size: medium, bait: True).
+Actions left today: 1 of 10. Mental energy left today: 55.
+
+You can go after one of them at 15:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (63 tokens, hidden from everyone) ===
+We need to choose action. We have seen fish shadow big and small. Likely fish. We want to fish at river? We have plan to fish at river medium. But we saw pond fish. Maybe better fish pond. We have one action left. Choose 1: go after big fish shadow.
+
+=== REPLY ===
+{"thoughts":"I saw a big fish shadow in the pond. It’s a good chance to catch a medium fish with bait. I’ll head there now.","go":1}

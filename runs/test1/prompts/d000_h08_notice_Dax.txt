@@ -1,0 +1,29 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 0 (April 1, spring, rain), 08:00. You are Dax, at the Nook's Cranny.
+Nearby: Cal, Ike.
+Earlier today:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, west (site-13)
+- 05:00 tried to visit: there is no home of Resident Services to visit
+- 06:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Jo, Eli)
+- 07:00 tried to visit: there is no home of Nook's Cranny to visit (also nearby: Eli, Kit, Jo)
+- 08:00 bought a simple wooden fence for 100 bells (also nearby: Cal, Jo, Ike)
+Your notes:
+- (day 0) Remember to ask Tom Nook about any island maps or guidance. Also note the location of the museum for future fossil identification.
+Mental energy left today: 132 (about 11 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (27 tokens, hidden from everyone) ===
+We need to respond with JSON. We choose to talk to someone. Maybe to Cal? He is nearby. Let's do that.
+
+=== REPLY ===
+{"thoughts":"Need to get island map and maybe talk to Tom about loan. Cal is friendly, might ask about island layout or just greet. Keep it short.","approach":"Cal","say":"Hey Cal! New on the island—got any tips for a newbie?"}

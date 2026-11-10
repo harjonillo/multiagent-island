@@ -1,0 +1,32 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0. Arrived at dawn, cold wind, Tom’s tent ready. I offered him a house loan—no interest, 98k, must pay before next upgrade. He seemed relieved. I tried to rally Jo for the bridge, but he only has a few bells. I bought bait, caught a selzalne, got a couple of logs. No fish today, no fossils, no other houses. The island feels quiet, almost empty. I’m low on energy, so I’ll sleep early. Tomorrow: keep energy low, maybe find a free homesite, see if Jo can chip in, and keep an eye on that bridge. I’ll note any new spots, but for now, just rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 1 (April 2, spring, cloudy), 08:00. You are Eli, at the Nook's Cranny.
+Nearby: Ike, Kit, Jo, Ari.
+Earlier today:
+- 07:00 tried to visit: Timmy and Tommy don't live in a house you can visit; they work at Nook's Cranny. To talk to them, use ask (who: Timmy and Tommy). Visiting is for other villagers' homes
+- 08:00 bought a fishing bait for 300 bells (also nearby: Ike, Kit, Jo, Ari)
+Your notes:
+- (day 0) Keep energy low; maybe skip extra actions later.
+- (day 0) If I miss any, I’ll just rest for that hour.
+- (day 0) Remember to keep energy low tomorrow.
+- (day 1) Keep an eye on the bridge fund later, maybe ask Jo again tomorrow.
+Mental energy left today: 132 (about 10 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (18 tokens, hidden from everyone) ===
+Need to decide. I want to ask Jo about bridge fund. So approach Jo.
+
+=== REPLY ===
+{"thoughts":"I should remind Jo about the bridge fund. I’m low on energy but can spare a quick chat.","approach":"Jo","say":"Hey Jo, any updates on the bridge fund?"}

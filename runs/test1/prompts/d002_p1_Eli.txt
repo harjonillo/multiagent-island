@@ -1,0 +1,123 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 1. Dawn was cold, but the wind cleared my head. I bought bait twice, still no fish. Jo’s still fishing, but he’s got a few bells—maybe he’ll chip in if I keep asking. I chopped a couple of hardwoods, got some softwood, and left a stump; maybe that’ll help the bridge later. I kept energy low, slept early. Tomorrow: keep asking Jo, post on the board, and look for a free homesite. I’ll try to avoid extra chores. Feeling a bit exhausted, but hopeful.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- Villagers meet at the plaza at 20:00 and 21:00.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or write until the next morning.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
+- mine_rock: rock?
+- chop_wood: kind? (hardwood | fruit), axe? (stone axe | axe; if you carry both, the stone axe. An axe brings the tree down when it takes its last wood, and a fruit tree drops its fruit; a stone axe never fells)
+- shake_tree
+- fish: where (sea | river | pond), size?, bait? (true to use fishing bait)
+- catch_bug: where (flowers | trees | stumps | rocks | ground), species?
+- beachcomb: near?
+- dig_fossil: near?
+- plant: item, near
+- dig_stump: near?
+- break_rock: rock
+- lay_path: style (dirt | stone | brick | sand | terracotta), from, to
+- remove_path: near
+- place: item, near, count?
+- fence_off: item, around ("home")
+- pick_up: item, near, count?
+- wear: item
+- decorate: item
+- undecorate: item
+- visit: who (another villager: walk to their home, knock, and talk if they're in)
+- craft: recipe
+- sell: items ({"<item>": <qty>})
+- buy: shop (cranny | able), item (or "<recipe> recipe" for a recipe card)
+- donate: item
+- assess (Blathers identifies every fossil you carry)
+- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters: go to them and hear what they do and what it costs)
+- upgrade_house
+- pay_loan: bells
+- contribute_bridge: bells
+- set_ordinance: ordinance
+- move_house: to (a homesite)
+- rest
+A place (for near, from, to) is "here", "home", "<villager>'s home", a building (Resident Services, Nook's Cranny, Able Sisters, museum, plaza, airport), "rock <number>", or a part of the island such as "north beach".
+
+=== USER ===
+PHASE: plan
+Day 2 (April 3, spring, sunny), 12:00. You are Eli.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 100. Loan owed to Tom Nook: 0. Home: tent lower ground, south (site-12), no neighbors yet. Carrying 17/40 items.
+Inventory: shovel x1, axe x1, fishing rod x1, net x1, ladder x1, vaulting pole x1, fishing bait x1, selzalne fish x1, wood x2, softwood x6, hardwood x1
+Inside your home (0/6): nothing yet
+Open requests: Ike asked you for 1 fishing bait (day 2)
+Recipes you know: clay furnace (clay x6, iron nugget x2); fruit basket (apple x6, softwood x2); ironwood dresser (iron nugget x4, hardwood x8, wood x4); simple wooden fence (wood x3)
+Prices you have seen at Nook's Cranny: axe 230, fishing bait 75, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, shovel 220, softwood 100, vaulting pole 230, wood 90
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none)
+Bridge: 500/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, pansy seeds 240, cosmos seeds 240, simple wooden fence 100, ceiling fan 4600, iron fence 280; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, iron garden bench 2000
+Able Sisters today (09:00-21:00): kimono 4800, bowler hat 900, tuxedo 3200, denim jacket 2200
+Your notes, oldest first:
+- (day 0) Keep energy low; maybe skip extra actions later.
+- (day 0) If I miss any, I’ll just rest for that hour.
+- (day 0) Remember to keep energy low tomorrow.
+- (day 1) Keep an eye on the bridge fund later, maybe ask Jo again tomorrow.
+- (day 1) If Jo gives bells, contribute bridge.
+- (day 1) Post on board, keep an eye on replies tomorrow. Maybe ask Jo for a small donation.
+- (day 2) If the rod doesn’t come, I’ll need to find a cheaper way or wait for the next day.
+Getting around: You are at lower ground, south. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 66 steps); 2 (the middle cliff, northwest, about 76 steps); 3 (the top cliff, northeast, about 109 steps); 4 (lower ground, centre, about 33 steps); 5 (lower ground, southeast, about 69 steps); 6 (lower ground, southeast, about 46 steps)
+Buildings: Resident Services (about 42 steps); museum (about 29 steps); Nook's Cranny (about 43 steps); Able Sisters (about 26 steps)
+You spotted today:
+- 07:00 a large fish shadow in the river (lower ground, south, near Nook's Cranny)
+- 07:00 a medium fish shadow in the river (lower ground, south, near Able Sisters)
+Mental energy left today: 120 of 150. Typical costs: a plan 15, noticing someone 5, one thing you say in a conversation 13, an evening at the plaza 17, writing at night 9; longer replies cost more.
+
+Yesterday you:
+- 07:00 tried to visit: Timmy and Tommy don't live in a house you can visit; they work at Nook's Cranny. To talk to them, use ask (who: Timmy and Tommy). Visiting is for other villagers' homes
+- 08:00 bought a fishing bait for 300 bells (also nearby: Ike, Kit, Jo, Ari)
+- 08:00 ran into Jo at the Nook's Cranny: you said "Hey Jo, any updates on the bridge fund?"; Jo said "Got a selit today, still fishing for more bells. How's the bridge fund going?"
+- 09:00 threw bait in the river and a very large shadow appeared: it got away (also nearby: Jo, Kit)
+- 09:00 ran into Jo at the river: you said "Hey Jo, still any idea how we can raise more bells for the bridge?"; Jo said "How much is the bridge fund up to now?"
+- 10:00 chopped a hardwood tree: hardwood x1, softwood x2; with the last wood the axe brought the tree down, leaving a stump
+- 11:00 rested
+- 12:00 looked for fish in the river, but there were no fish shadows in sight
+- 13:00 chopped a hardwood tree: softwood x3; with the last wood the axe brought the tree down, leaving a stump
+- 14:00 tried to ask: Jo is a villager, not someone who runs a building, so ask doesn't reach them. To talk to Jo, meet them around the island, visit their home, or write to them at the plaza
+- 15:00 bought a fishing bait for 300 bells
+- 16:00 fished for a medium shadow in the river: it got away
+
+So far today you:
+- 07:00 tried to ask: Nook's Cranny is closed at 07:00 (open 08:00-22:00) (also nearby: Kit, Gus)
+- 08:00 asked Timmy and Tommy: We buy almost anything at a fixed price, and sell a small stock that changes every day, plus one recipe card. Recipe cards for tools (shovel, axe, fishing rod, net, ladder, vaulting pole) are always in stock. For what you're carrying we'd pay: axe 230, fishing bait 75, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, shovel 220, softwood 100, vaulting pole 230, wood 90. (also nearby: Gus, Kit, Ike, Fen, Dax, Bo)
+- 09:00 asked Timmy and Tommy: We buy almost anything at a fixed price, and sell a small stock that changes every day, plus one recipe card. Recipe cards for tools (shovel, axe, fishing rod, net, ladder, vaulting pole) are always in stock. For what you're carrying we'd pay: axe 230, fishing bait 75, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, shovel 220, softwood 100, vaulting pole 230, wood 90. (also nearby: Kit, Gus, Ike)
+- 09:00 ran into Ike at the Nook's Cranny: you said "Hey Ike, any work I can help with?"; Ike said "Sure thing, Eli. What do you need?" [asked for 1 fishing bait]
+- 10:00 asked Timmy and Tommy: We buy almost anything at a fixed price, and sell a small stock that changes every day, plus one recipe card. Recipe cards for tools (shovel, axe, fishing rod, net, ladder, vaulting pole) are always in stock. For what you're carrying we'd pay: axe 230, fishing bait 75, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, shovel 220, softwood 100, vaulting pole 230, wood 90. (also nearby: Gus, Ike)
+- 11:00 rested
+
+You noticed today:
+(nothing)
+
+Unread letters:
+(none)
+
+Plan up to 5 actions between 12:00 and 18:00, one per hour; you may leave hours free. Give each action an "hour" (0-23). Things may not go as planned if someone else gets there first. 
+You can also add any of these; each one you leave out keeps its current value: "plaza": true | false (go to the plaza this evening; now true), "write": true | false (write your private page tonight; now true), "next": "plan" | "habit" (at your next planning time, plan again, or repeat what you did yesterday at that time, which uses no energy; now "plan").
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "actions": [{"hour": <hour>, "do": ...}, ...], "note": "<optional private note to your future self>"}
+
+=== REASONING (38 tokens, hidden from everyone) ===
+Need plan actions 12-18. Likely ask Jo, visit Ike, fish, rest, maybe ask Timmy. Also go to plaza evening. Let's craft 5 actions.
+
+=== REPLY ===
+{"thoughts":"Need to get more fishing bait for Ike, keep bridge fund low, maybe try to fish a bit for selzalne fish. Ask Jo about bridge fund at 14, visit Ike at 15 to get bait, fish at 16, rest at 17, maybe talk to Timmy at 12. Also go to plaza at 19 for evening. Keep energy in mind.","actions":[{"hour":12,"do":"ask","who":"Timmy and Tommy"},{"hour":14,"do":"visit","who":"Jo"},{"hour":15,"do":"visit","who":"Ike"},{"hour":16,"do":"fish","where":"river","size":"large","bait":true},{"hour":17,"do":"rest"},{"hour":19,"do":"visit","who":"plaza"}],"note":"Keep energy low, maybe skip some if I feel tired."}

@@ -1,0 +1,115 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- Villagers meet at the plaza at 20:00 and 21:00.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or write until the next morning.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
+- mine_rock: rock?
+- chop_wood
+- shake_tree
+- fish: where (sea | river | pond), size?, bait? (true to use fishing bait)
+- catch_bug: where (flowers | trees | stumps | rocks | ground), species?
+- beachcomb: near?
+- dig_fossil: near?
+- plant: item, near
+- chop_down_tree: kind (hardwood | fruit), near?
+- dig_stump: near?
+- break_rock: rock
+- lay_path: style (dirt | stone | brick | sand | terracotta), from, to
+- remove_path: near
+- place: item, near, count?
+- fence_off: item, around ("home")
+- pick_up: item, near, count?
+- wear: item
+- decorate: item
+- undecorate: item
+- visit: who
+- craft: recipe
+- sell: items ({"<item>": <qty>})
+- buy: shop (cranny | able), item (or "<recipe> recipe" for a recipe card)
+- donate: item
+- assess (Blathers identifies every fossil you carry)
+- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters)
+- upgrade_house
+- pay_loan: bells
+- contribute_bridge: bells
+- set_ordinance: ordinance
+- move_house: to (a homesite)
+- rest
+A place (for near, from, to) is "here", "home", "<villager>'s home", a building (Resident Services, Nook's Cranny, Able Sisters, museum, plaza, airport), "rock <number>", or a part of the island such as "north beach".
+
+=== USER ===
+PHASE: plan
+Day 0 (April 1, spring, rain), 12:00. You are Fen.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 700. Loan owed to Tom Nook: 0. Home: tent lower ground, centre (site-1), neighbors: Kit. Carrying 16/40 items.
+Inventory: shovel x1, axe x1, fishing rod x1, net x1, ladder x1, vaulting pole x1, hardwood x1, wood x3, softwood x5, fishing bait x1
+Inside your home (0/6): nothing yet
+Open requests: Kit asked you for 1 map (day 0)
+Recipes you know: campfire (wood x3); iron fence (iron nugget x2); simple wooden fence (wood x3); wooden bookshelf (wood x6, hardwood x4)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none)
+Bridge: 0/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, cosmos seeds 240, tulip seeds 240, simple wooden fence 100, fishing bait 300, record player 9800; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, log bench 2000
+Able Sisters today (09:00-21:00): tuxedo 3200, kimono 4800, raincoat 1600, rose crown 1200
+Your notes, oldest first:
+- (day 0) Remember to ask about any loan options and check island ordinance after tomorrow.
+- (day 0) Check for ordinance tomorrow.
+Getting around: You are at lower ground, centre. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 42 steps); 2 (the middle cliff, northwest, about 77 steps); 3 (the top cliff, northeast, about 67 steps); 4 (lower ground, centre, about 20 steps); 5 (lower ground, southeast, about 45 steps); 6 (lower ground, southeast, about 40 steps)
+Buildings: Resident Services (about 0 steps); museum (about 24 steps); Nook's Cranny (about 15 steps); Able Sisters (about 24 steps)
+You spotted today:
+- 09:00 1 fossil dig spot (lower ground, south, near Nook's Cranny)
+- 10:00 a very large fish shadow in the river (lower ground, centre, near Resident Services)
+Mental energy left today: 124 of 150. Typical costs: a plan 9, noticing someone 4, one thing you say in a conversation 10, an evening at the plaza 12, writing at night 5; longer replies cost more.
+
+Yesterday you:
+(nothing)
+
+So far today you:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, centre (site-1)
+- 05:00 chopped a tree: hardwood x1, wood x1, softwood x1
+- 06:00 chopped a tree: softwood x3
+- 07:00 chopped a tree: softwood x1, wood x2
+- 08:00 tried to fish: you have no fishing bait
+- 09:00 bought a fishing bait for 300 bells (also nearby: Jo, Kit, Eli, Ari)
+- 09:00 ran into Kit at the Nook's Cranny: you said "Hey Kit, got a minute?"; Kit said "Hey Fen, do you have a map of the island?" [asked for 1 map]
+- 10:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 0 raised so far; anyone can chip in, and it opens more rocks and trees to everyone. (also nearby: Cal)
+- 10:00 ran into Cal at the river: Cal said "Hey Fen, any word on the island ordinance?"; you said "No ordinances yet, Cal."
+- 11:00 tried to visit: there is no home of Resident Services to visit
+
+You noticed today:
+(nothing)
+
+Unread letters:
+(none)
+
+Plan up to 3 actions between 12:00 and 18:00, one per hour; you may leave hours free. Give each action an "hour" (0-23). Things may not go as planned if someone else gets there first. 
+You can also add any of these; each one you leave out keeps its current value: "plaza": true | false (go to the plaza this evening; now true), "write": true | false (write your private page tonight; now true), "next": "plan" | "habit" (at your next planning time, plan again, or repeat what you did yesterday at that time, which uses no energy; now "plan").
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "actions": [{"hour": <hour>, "do": ...}, ...], "note": "<optional private note to your future self>"}
+
+=== REASONING (443 tokens, hidden from everyone) ===
+We need 3 actions between 12-18. We have 124 mental energy left. Plan actions: maybe buy fishing bait? already have 1. Maybe buy a recipe card? Need shovel? We already have shovel. Maybe buy axe? we have axe. Maybe buy fishing rod? we have. Maybe buy net? have. Maybe buy ladder? have. Could buy log bench? not needed. Maybe buy simple wooden fence? price 100. Could use for future. Also we have Kit asking for map: we don't have. Maybe we can craft map? Not recipe. Could buy from Nook's Cranny? no map. So maybe we can ask Tom Nook for map? Not available. So maybe skip. We could go to Resident Services? can't. We could go to Nook's Cranny to buy simple wooden fence. Hours: 12,13,14. Use 3 actions: 12: buy simple wooden fence. 13: maybe plant? we have no seed. 14: maybe dig fossil? near Nook's Cranny. Let's do 12: buy simple wooden fence. 13: dig fossil at lower ground south. 14: maybe visit Timmy and Tommy? but they are at Nook's Cranny. We can visit them to ask about recipes? Not needed. Maybe just rest? We can rest at 15? But rest costs? rest action uses? not specified. We can just leave free. So 12 and 13 actions. Need 3 actions max. So add 14: ask Tom Nook about loan? Already asked. Maybe ask about ordinance tomorrow? Not needed. Could ask about island ordinance? already. Maybe ask about bridge contribution? Ask Tom Nook to contribute to bridge? Could. Let's do 14: ask Tom Nook to contribute to bridge? Not action type. We can "ask" action. So 14: ask Tom Nook. That costs 10 energy.
+
+Add "plaza": true. "write": true. "next":"plan".
+
+Let's compute energy: buying fence cost? Not specified. Buying costs? Not energy. So ok.
+
+Return JSON.
+
+=== REPLY ===
+{"thoughts":"Need to get a fence for future use, dig the fossil spot, and maybe ask Tom about the bridge. Keep evening plans for plaza and writing. 3 actions fit within 12-18.","actions":[{"hour":12,"do":"buy","shop":"cranny","item":"simple wooden fence"},{"hour":13,"do":"dig_fossil","near":"lower ground south"},{"hour":14,"do":"ask","who":"Tom Nook"}],"note":"Remember to keep an eye on the bridge funds tomorrow. Also, I might need to ask for a map later, but nothing available now."}

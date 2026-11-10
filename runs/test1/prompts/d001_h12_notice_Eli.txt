@@ -1,0 +1,36 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 0. Arrived at dawn, cold wind, Tom’s tent ready. I offered him a house loan—no interest, 98k, must pay before next upgrade. He seemed relieved. I tried to rally Jo for the bridge, but he only has a few bells. I bought bait, caught a selzalne, got a couple of logs. No fish today, no fossils, no other houses. The island feels quiet, almost empty. I’m low on energy, so I’ll sleep early. Tomorrow: keep energy low, maybe find a free homesite, see if Jo can chip in, and keep an eye on that bridge. I’ll note any new spots, but for now, just rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 1 (April 2, spring, cloudy), 12:00. You are Eli, at the Nook's Cranny.
+Nearby: Bo, Ike.
+Earlier today:
+- 08:00 ran into Dax at the Nook's Cranny: you said "Hey Dax, got a minute?"; Dax said "Hey Eli, got a second?"
+- 09:00 threw bait in the sea and a tiny shadow appeared: caught a kalo fish
+- 10:00 tried to fish: you have no fishing bait
+- 11:00 tried to buy: the stone fence recipe card costs 2000 bells; you have 400 (also nearby: Gus, Ike, Cal)
+- 12:00 bought a fishing bait for 300 bells (also nearby: Bo, Ike, Gus, Cal)
+Your notes:
+- (day 0) Keep energy low; maybe skip extra actions later.
+- (day 0) If I miss any, I’ll just rest for that hour.
+- (day 0) Remember to keep energy low tomorrow.
+- (day 1) Check Jo's funds tomorrow, maybe contribute to bridge.
+- (day 1) Check Jo tomorrow for bridge funds.
+Mental energy left today: 105 (about 10 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (40 tokens, hidden from everyone) ===
+Need to decide. Nearby: Bo, Ike. Maybe talk to Bo about fishing? He has fishing gear? Or talk to Ike about bridge. I will choose Ike to ask about bridge funds.
+
+=== REPLY ===
+{"thoughts":"I should ask Ike about the bridge. He might know if Jo has any bells left or if there's a way to get some for the bridge. Also could get a quick chat to keep energy low. No need to talk to Bo now.","approach":"Ike","say":"Hey Ike, got a sec?"}

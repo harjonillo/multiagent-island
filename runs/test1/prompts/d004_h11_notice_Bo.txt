@@ -1,0 +1,38 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 3, night.  
+Chopped a lot, still only 5 hardwoods.  Got a fossil—hope Blathers likes it.  Jo still silent; maybe she’ll trade rock later.  Kit asked for bait; I’m still low on fish.  I should head to the plaza tomorrow, maybe talk to Gus about fishing spots and ask Jo for a rock.  Need more wood for a ladder to clear the clearing faster.  I’ll try chopping another tree first thing.  No bells yet; that’s okay.  The island feels quieter, but I’m getting my rhythm.  Tomorrow: wood, rock, fish, maybe a new trade.  Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 4 (April 5, spring, sunny), 11:00. You are Bo, at the river.
+Nearby: Kit.
+Earlier today:
+- 08:00 tried to travel: 'travel' is not something you can do
+- 09:00 tried to travel: 'travel' is not something you can do
+- 10:00 went to the plaza (also nearby: Jo)
+- 10:00 ran into Jo at the plaza: you said "Hey Jo, do you have a rock I could use?"; Jo said "Sorry, no rock right now. I have a selzalne if you want to trade." [tried to give 1 selzalne fish but Bo had no room]; you said "Sure, here's a selit fish!" [gave 1 selit fish; asked for 1 rock, but there's nothing called rock on this island]; Jo said "Sure, I can trade another selzalne for a rock if you have one." [gave 1 selzalne fish; asked for 1 rock, but there's nothing called rock on this island]; you said "Sure, here’s a selzalne." [gave 1 selzalne fish; asked for 1 rock, but there's nothing called rock on this island]
+- 11:00 tried to fish: you have no fishing bait (also nearby: Ari, Jo, Kit)
+Your notes:
+- (day 3) Keep an eye on Jo tomorrow; she might reply or pick up the rock.
+- (day 3) Tomorrow: try to get a rock from Jo or someone else, and see if anyone posts a ladder recipe. Also maybe visit Nook's Cranny for wood if needed.
+- (day 4) Remember to ask Jo for a rock tomorrow if I still need one.
+- (day 4) Keep an eye on board replies tomorrow. Maybe someone will give a second bait or trade bait for my selit fish. If none, I might need to fish more tomorrow.
+- (day 4) Remember to trade selit fish for a rock if Jo accepts.
+- (day 4) Keep track of rock count for ladder.
+Mental energy left today: 77 (about 15 for each thing you say). Your plan for today: inward 80 (spent 20), outward 70 (spent 53), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (22 tokens, hidden from everyone) ===
+We need to output JSON. Choose to talk to Kit? Maybe ask for bait. Let's do that.
+
+=== REPLY ===
+{"thoughts":"Need bait, Kit is nearby and likely has fishing rod. Ask him for some bait or if he can help me fish. Keep it short.","approach":"Kit","say":"Hey Kit, got any bait?"}

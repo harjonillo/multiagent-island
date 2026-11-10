@@ -1,0 +1,86 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7, night.  
+Woke up with a knot in my stomach—no bait, no fish, no bridge. Kit was generous but I’m still stuck with a single selit. Dax stays silent, maybe he’s busy or hiding something. I’m running out of energy; the island feels colder without the sun. I’ll grab my umbrella, hope rain’s light. Tomorrow: try Dax again, maybe Bo, or even Jo if he’s around. Need to trade more selit for bait—maybe offer a loka or a gormo. I’m tired, but I’ll keep the campfire lit and hope the next day brings a clue. Sleep.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 9. You are Gus, at home before sleep.
+
+What happened today:
+- 05:00 at home: couldn't put away selzalne fish: your tent has no room for things
+- 07:00 walked over to Dax's home (also nearby: Jo, Bo, Cal)
+- 07:00 knocked at Dax's home, but nobody answered
+- 07:00 ran into Bo at Dax's home: you said "Morning, Bo. Got a selit? Need a single bait to get fishing going."; Bo said "Sure, I can help." [Bo asked you for 1 fishing bait]; you said "" [your offer: you give 1 selit fish, you get 1 fishing bait]; Bo said "Sure, give me some wood for bait." [Bo's offer: you give 1 fishing bait, you get 3 wood]; you said "Hey, Bo, could I get a fishing bait?" [you asked Bo for 1 fishing bait]; Bo said "Sure, give me 3 wood for bait." [Bo's offer: you give 1 fishing bait, you get 3 wood; then you went your ways]
+- 08:00 tried to fish: you have no fishing bait (also nearby: Bo)
+- 08:00 ran into Bo out on a walk: Bo said "Morning, Gus! Can I trade 3 wood for a fishing bait?"; you said "Sorry, no wood right now." [then you went your ways]
+- 09:00 tried to fish: you have no fishing bait (also nearby: Bo, Ari)
+- 10:00 rested
+- 11:00 rested
+- 14:00 spotted a small fish shadow in the sea (lower ground, west) and went after it at 15:00
+- 15:00 fished for a small shadow in the sea: caught a tubas fish
+- 16:00 Dax visited you at home: Dax said "Hey Gus, I got a selit fish—want to swap for a bait?" [Dax's offer: you give 1 fishing bait, you get 1 selit fish; then you went your ways]
+- 20:00 walked over to Dax's home (also nearby: Dax)
+- 20:00 knocked at Dax's home, but nobody answered
+- 21:00 tried to go to the plaza: couldn't find a way to the plaza with the tools you carry
+- 22:00 rested
+- 23:00 rested
+
+Things that changed hands today:
+(nothing)
+
+What you have tonight:
+Bells: 300 in your wallet
+Tools you carry: shovel (30 uses left), axe (29 uses left), fishing rod (24 uses left), net (30 uses left), ladder (19 uses left)
+Other things you carry: selit fish x1, selzalne fish x1, loka fish x2, gormo fish x1, hardwood x2, apple x3, simple wooden fence x1, tubas fish x1
+At home (a tent holds only bells): 0 bells
+Recipes you know: campfire, fruit basket, golden candlestick, simple wooden fence
+Since this morning: +1 tubas fish
+
+Open requests:
+- you want 1 fishing bait from Kit (until day 9)
+- Fen wants 1 fishing bait from you (until day 10)
+- Bo wants 1 fishing bait from you (until day 11)
+- you want 1 fishing bait from Bo (until day 11)
+
+Your notes:
+- (day 8) If Dax or Kit is still silent, maybe I should try Jo or Bo next day. Also consider buying a fishing bait recipe if I can't trade.
+- (day 8) Remember to trade back when I get more bait.
+- (day 8) Keep track of trade balance.
+- (day 8) If Dax refuses, try Kit or Fen next.
+- (day 8) Keep an eye on Kit’s stock, maybe he’ll have more bait tomorrow.
+- (day 8) Ask for a single bait, offer a selit or selzalne. If he’s not there, just rest and try tomorrow.
+- (day 9) If Dax doesn't trade, try Fen tomorrow. Keep an eye on bait balance.
+- (day 9) Trade with Bo for bait
+- (day 9) Remember to bring wood next time so I can trade for bait.
+- (day 9) Remember to gather wood tomorrow.
+- (day 9) Ask Dax for bait, hope he’s home.
+
+Things you remember, numbered:
+(nothing yet)
+
+What you wrote last night:
+Day 7, night.  
+Woke up with a knot in my stomach—no bait, no fish, no bridge. Kit was generous but I’m still stuck with a single selit. Dax stays silent, maybe he’s busy or hiding something. I’m running out of energy; the island feels colder without the sun. I’ll grab my umbrella, hope rain’s light. Tomorrow: try Dax again, maybe Bo, or even Jo if he’s around. Need to trade more selit for bait—maybe offer a loka or a gormo. I’m tired, but I’ll keep the campfire lit and hope the next day brings a clue. Sleep.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something you already remember that is still on your mind. Anything you don't hold on to fades over the next days; what you come back to stays longer.
+
+=== REASONING (5 tokens, hidden from everyone) ===
+Need short diary.
+
+=== REPLY ===
+Day 9, night.  
+Sun’s gone, but I’m still low on bait. I tried Bo again, but he keeps asking for wood and I have none. I did snag a tubas fish, so I’m not starving yet. Dax offered a swap but I still don’t have a bait to give him. I’m holding onto my selit and selzalne; maybe they’ll trade later. The tent is tight—no room for more. I’ll keep the fire going and hope someone brings wood tomorrow.  
+
+Remember:  
+- No bait from Bo or Dax today.  
+- Got a tubas fish.  
+- Still have 1 selit, 1 selzalne, 2 loka, 1 gormo.

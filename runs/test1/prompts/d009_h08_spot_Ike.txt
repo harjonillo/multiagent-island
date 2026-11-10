@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No luck getting the bait—Ari keeps offering fish, I keep offering wood. The trade loop is still stuck. I finally got a wood back from Ari, so I have 3 now, but the bait is still missing. Cal is sleeping, no answer. I’m exhausted; will try to fish for gormo tomorrow, hoping a single fish will fetch some bells. I’ll keep posting the bait request on the board tonight. I need to salvage a stick for a pole, but first I’ll see if anyone has a spare ladder to trade for a ladder. Maybe Bo will help.  
+— Ike
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 9 (April 10, spring, cloudy), 08:00. You are Ike, at Cal's home.
+You just spotted:
+1. a large fish shadow in the pond (lower ground, southeast, near rock 1)
+2. a large fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 07:00 tried to post: 'post' is not something you can do
+- 08:00 walked over to Cal's home (also nearby: Dax, Jo)
+- 08:00 knocked at Cal's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Got 1 wood back from Ari today.
+- (day 8) Still no fishing bait.
+- (day 8) Gormo fish might sell for bells tomorrow.
+Your notes from the last 2 days:
+- (day 7) Remember to post bait request tomorrow after this trade.
+- (day 8) If trade fails, post on board for bait next day.
+- (day 8) Need bait ASAP. Trade wood for bait next.
+- (day 8) If they decline, I'll have to look for another bait source tomorrow. Keep an eye on the board.
+- (day 8) Need bait ASAP, trade with Ari. If fails, post on board tomorrow.
+- (day 8) Confirm trade with Ari, keep track of bait request.
+At 09:00 you planned: visit (who: Ari).
+Actions left today: 6 of 10. Mental energy left today: 123.
+
+You can go after one of them at 09:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (40 tokens, hidden from everyone) ===
+We must choose a number corresponding to one of the two fish? They are both near rock 1. Which one to go after? Probably 1 or 2. We decide 1.
+
+=== REPLY ===
+{"thoughts":"I’ll try to catch one of those fish now, maybe the first one will bite. No trade yet, just fishing for bait. If I catch, I’ll have a chance to use it as bait or sell for bells. I’ll go after the first fish.","go":1}

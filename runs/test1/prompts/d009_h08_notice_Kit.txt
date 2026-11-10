@@ -1,0 +1,35 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 5. I’m still chasing bait and a log. Gus keeps swapping fish for bait, but I’m low on bells and I can’t afford the 300. Jo helped a bit but gave me more selit instead of what I need. I’ve got two selit, one selzalne, a hardwood log and a wood. My shovel recipe is in my head, but I need a small log and the second map. I’ll try Dax again tomorrow, maybe bring a log and ask for the map. If he says no, Fen might. I’ll also swing by Gus at 07:00 tomorrow to trade the selit for bait—maybe he’ll accept a selzalne or something. I’m tired but hopeful. Tonight I’ll rest, save the bells, and plan the next morning. Good night, island.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 9 (April 10, spring, cloudy), 08:00. You are Kit, at the out for a walk.
+Nearby: Fen.
+Earlier today:
+- 07:00 ran into Fen out on a walk: you said "Hey Fen, got a minute?"; Fen said "Hey Kit, mind giving me a map? I can trade you my ladder if you need it." [Fen's offer: you give 1 island map, you get 1 ladder]; you said "Sure thing, Fen! Here’s a map." [you handed Fen 1 island map; you accepted: you gave Fen 1 island map and got 1 ladder]; Fen said "Thanks, Kit! Got it."; you said "Hey Fen, how about trading a selit for some bait?" [your offer: you give 2 selit fish, you get 1 fishing bait]; Fen said "I’m sorry, I don’t have any bait right now."; you said "Thanks, Fen. Catch you later."; Fen said "" [Fen asked you for 1 fishing bait]; you said "Sure, give me bait when you get some."; Fen said "Sure thing, Kit. I'll bring you bait as soon as I have some." [Fen asked you for 1 fishing bait]; you said "Sure, here’s the selit for the bait." [your offer: you give 2 selit fish, you get 1 fishing bait]; Fen said "Thanks, Kit! I'll bring you bait soon." [then you went your ways]
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 8) Remember to keep the selit handy for tomorrow's bait trade.
+- (day 9) Got another ladder. Next, try to get a small log from Fen or someone else. Also keep bait for tomorrow.
+- (day 9) Keep track of bait count
+- (day 9) Remember to keep bait for tomorrow.
+- (day 9) Remember to keep bait count.
+- (day 9) Keep an eye on bait count tomorrow.
+Mental energy left today: 53 (about 17 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (45 tokens, hidden from everyone) ===
+Need to decide whom to talk. Probably Fen for small log? He can trade ladder for map earlier. Need small log for shovel. Maybe talk to Dax? But Fen could give small log. Let's approach Fen.
+
+=== REPLY ===
+{"thoughts":"Need a small log for shovel. Fen offered ladder for map; maybe he can give a log later. Talk now to keep him busy and maybe get a log. Also remind him of bait trade.","approach":"Fen","say":"Hey Fen, got a minute?"}

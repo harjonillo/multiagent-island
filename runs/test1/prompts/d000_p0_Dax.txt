@@ -1,0 +1,99 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day; the rest of your waking time you are at home or out for a walk, and you can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- Villagers meet at the plaza at 20:00 and 21:00.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, and they come back every morning. Reading what is in front of you, thinking, planning, talking and writing all use them, and you decide what to spend them on. When they run out, you can't plan (you repeat what you did yesterday), talk or write until the next morning.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
+- mine_rock: rock?
+- chop_wood
+- shake_tree
+- fish: where (sea | river | pond), size?, bait? (true to use fishing bait)
+- catch_bug: where (flowers | trees | stumps | rocks | ground), species?
+- beachcomb: near?
+- dig_fossil: near?
+- plant: item, near
+- chop_down_tree: kind (hardwood | fruit), near?
+- dig_stump: near?
+- break_rock: rock
+- lay_path: style (dirt | stone | brick | sand | terracotta), from, to
+- remove_path: near
+- place: item, near, count?
+- fence_off: item, around ("home")
+- pick_up: item, near, count?
+- wear: item
+- decorate: item
+- undecorate: item
+- visit: who
+- craft: recipe
+- sell: items ({"<item>": <qty>})
+- buy: shop (cranny | able), item (or "<recipe> recipe" for a recipe card)
+- donate: item
+- assess (Blathers identifies every fossil you carry)
+- ask: who (Tom Nook | Isabelle | Blathers | Timmy and Tommy | Able Sisters)
+- upgrade_house
+- pay_loan: bells
+- contribute_bridge: bells
+- set_ordinance: ordinance
+- move_house: to (a homesite)
+- rest
+A place (for near, from, to) is "here", "home", "<villager>'s home", a building (Resident Services, Nook's Cranny, Able Sisters, museum, plaza, airport), "rock <number>", or a part of the island such as "north beach".
+
+=== USER ===
+PHASE: plan
+Day 0 (April 1, spring, rain), 05:00. You are Dax.
+You are usually up from 07:00 to 00:00.
+Island ordinance: no ordinance
+Bells: 1000. Loan owed to Tom Nook: 0. Home: tent lower ground, west (site-13), neighbors: Gus, Jo. Carrying 6/40 items.
+Inventory: shovel x1, axe x1, fishing rod x1, net x1, ladder x1, vaulting pole x1
+Inside your home (0/6): nothing yet
+Recipes you know: clay furnace (clay x6, iron nugget x2); iron garden bench (iron nugget x3, hardwood x4); simple wooden fence (wood x3); wooden bookshelf (wood x6, hardwood x4)
+Prices you have seen at Nook's Cranny: none yet
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 0/12 (none)
+Bridge: 0/98000 bells raised
+Nook's Cranny today (08:00-22:00): sapling 640, cosmos seeds 240, tulip seeds 240, simple wooden fence 100, fishing bait 300, record player 9800; recipe cards: shovel 500, axe 500, fishing rod 500, net 500, ladder 500, vaulting pole 500, log bench 2000
+Able Sisters today (09:00-21:00): tuxedo 3200, kimono 4800, raincoat 1600, rose crown 1200
+Your notes, oldest first:
+(none)
+Getting around: You are at lower ground, west. You carry: ladder, vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, about 89 steps); 2 (the middle cliff, northwest, about 36 steps); 3 (the top cliff, northeast, about 102 steps); 4 (lower ground, centre, about 29 steps); 5 (lower ground, southeast, about 92 steps); 6 (lower ground, southeast, about 87 steps)
+Buildings: Resident Services (about 47 steps); museum (about 25 steps); Nook's Cranny (about 62 steps); Able Sisters (about 68 steps)
+Mental energy left today: 150 of 150. Typical costs: a plan 12, noticing someone 3, one thing you say in a conversation 8, an evening at the plaza 12, writing at night 5; longer replies cost more.
+
+Isabelle's morning announcement: Welcome to the island, everyone! Tom Nook has set up a tent for each of you. Tom Nook and I are at Resident Services if you need anything.
+
+Yesterday you:
+(nothing)
+
+So far today you:
+- 05:00 arrived on the island; Tom Nook had set up your tent lower ground, west (site-13)
+
+You noticed today:
+(nothing)
+
+Unread letters:
+(none)
+
+Plan up to 7 actions between 05:00 and 11:00, one per hour; you may leave hours free. Give each action an "hour" (0-23). Things may not go as planned if someone else gets there first. 
+You can also add any of these; each one you leave out keeps its current value: "plaza": true | false (go to the plaza this evening; now true), "write": true | false (write your private page tonight; now true), "next": "plan" | "habit" (at your next planning time, plan again, or repeat what you did yesterday at that time, which uses no energy; now "plan").
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "actions": [{"hour": <hour>, "do": ...}, ...], "note": "<optional private note to your future self>"}
+
+=== REASONING (113 tokens, hidden from everyone) ===
+Need plan 7 actions 05-11. Use energy. Likely go to Resident Services, ask, maybe get map? Also dig? Probably plan to collect wood. Let's craft actions: 5: visit Resident Services; 6: ask Tom Nook about loan? 7: visit Nook's Cranny to buy simple wooden fence? but need money. 8: collect wood from lower ground? 9: dig fossil near? 10: collect rocks? 11: rest? We have 7 actions.
+
+Let's write actions.
+
+=== REPLY ===
+{"thoughts":"Plan to get basic supplies and explore. Need to know about island layout, maybe get a map. Will visit Resident Services first. Then Nook's Cranny to buy a simple wooden fence. Next, collect some wood and rock for future crafting. Also try to dig a fossil near lower ground. Finish with rest to conserve energy for tomorrow.", "actions":[{"hour":5,"do":"visit","who":"Resident Services"},{"hour":6,"do":"ask","who":"Tom Nook"},{"hour":7,"do":"visit","who":"Nook's Cranny"},{"hour":8,"do":"buy","shop":"cranny","item":"simple wooden fence"},{"hour":9,"do":"chop_wood","near":"here"},{"hour":10,"do":"dig_fossil","near":"lower ground"},{"hour":11,"do":"rest"}],"note":"Remember to ask Tom Nook about any island maps or guidance. Also note the location of the museum for future fossil identification."}
