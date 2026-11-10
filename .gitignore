@@ -10,4 +10,5 @@ runs/*
 runs/*/*
 !runs/*/manifest.json
 !runs/*/events.jsonl
+!runs/*/prompts/
 _site/

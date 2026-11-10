@@ -41,6 +41,7 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font
 .scroll { overflow-x: auto; }
 .map { position: relative; width: 100%; border: 1px solid var(--border); background: #A9D3E3; overflow: hidden; }
 .map canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0.92; }
+.map .bld.site { transform: translate(-50%, 0); background: #FBEFC9; }
 .map .bld { position: absolute; transform: translate(-50%, -100%); font-size: var(--step--1); font-weight: 600; background: rgba(255,255,255,0.78);
   padding: 1px 6px; border-radius: 4px; white-space: nowrap; pointer-events: none; }
 .map .tip { position: absolute; max-width: 260px; width: max-content; padding: 4px 8px; font-size: var(--step--1);
@@ -114,7 +115,7 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font
 /* A pixel triangle: right when closed, down when open (two sprites, as on the doors page). */
 .held .tri { width: 10px; height: 10px; flex: none; background: no-repeat center / 10px 10px
   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath fill='%236E5D52' d='M1 0h1v5H1zM2 1h1v3H2zM3 2h1v1H3z'/%3E%3C/svg%3E"); }
-.held[open] .tri { background-image:
+.held[open] > summary > .tri { background-image:
   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath fill='%236E5D52' d='M0 1h5v1H0zM1 2h3v1H1zM2 3h1v1H2z'/%3E%3C/svg%3E"); }
 .items { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .items span { font-size: var(--step--1); padding: 2px 6px; background: var(--fill-soft); border: 1px solid var(--border); }
@@ -168,6 +169,33 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font
 .pair .pbar { height: 8px; background: var(--fill-soft); } .pair.on .pbar { background: var(--panel); }
 .pair .pbar span { display: block; height: 8px; background: var(--ink-muted); }
 .talkgrid .said { font-size: var(--step-0); margin-bottom: 4px; line-height: 1.4; }
+/* Prompts: one call per row, opened to read what the model saw and said */
+.convos > summary .label { margin: 6px 0; }
+.convos[open] > summary { margin-bottom: 10px; }
+.pcall { margin-top: 0; border-top: 1px solid var(--fill-soft); }
+.pcall > summary { min-height: 40px; font-size: var(--step-0); color: var(--ink); }
+.pcall > summary .h { color: var(--ink-muted); width: 44px; flex: none; }
+.pbody { padding: 4px 0 12px 18px; display: flex; flex-direction: column; gap: 6px; }
+.plabel { font-size: var(--step--1); font-weight: 600; color: var(--ink-muted); margin-top: 6px; display: flex; gap: 6px; align-items: center; }
+.plabel.private { color: var(--private-ink); }
+.ptext { margin: 0; padding: 10px 12px; max-height: 460px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+  font-family: var(--font-body); font-size: var(--step--1); line-height: 1.45; background: var(--ground); border: 1px solid var(--border); }
+.ptext.private { background: var(--private-fill); border-color: transparent; color: var(--ink); }
+.pbody .held { margin-top: 0; }
+/* How they work */
+.mind { padding: 8px 28px 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 16px; align-items: start; }
+.mind .wide { grid-column: 1 / -1; }
+.mind p { margin: 0 0 10px; line-height: 1.5; } .mind p:last-child { margin-bottom: 0; }
+.kv { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 6px 12px; font-size: var(--step-0); line-height: 1.45; }
+.kv .k { color: var(--ink-muted); }
+.calls { width: 100%; border-collapse: collapse; font-size: var(--step-0); line-height: 1.4; }
+.calls th { font-family: var(--font-display); font-weight: 400; font-size: var(--step--1); text-transform: uppercase; color: var(--ink-muted); text-align: left; padding: 0 10px 6px 0; vertical-align: bottom; }
+.calls td { padding: 8px 10px 8px 0; border-top: 1px solid var(--fill-soft); vertical-align: top; }
+.calls td.num { white-space: nowrap; }
+.calls .ex td { border-top: none; padding-top: 0; }
+.mlist { margin: 0; padding-left: 18px; line-height: 1.5; } .mlist li + li { margin-top: 6px; }
+.quote { border-left: 3px solid var(--tabbar-rule); padding: 2px 0 2px 10px; white-space: pre-wrap; line-height: 1.5; }
+@media (max-width: 700px) { .mind, .head, .dayhead, .cols { padding-left: 16px; padding-right: 16px; } .kv { grid-template-columns: minmax(0, 1fr); gap: 0 12px; } .kv .k { margin-top: 6px; } }
 @media (max-width: 1000px) { .trends { grid-template-columns: minmax(0, 1fr); } }
 </style>
 </head>
@@ -178,7 +206,7 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font
     <div class="runline" id="runline"></div>
   </div>
   <nav class="tabs" aria-label="Views">
-    <button data-tab="home">Home</button><button data-tab="days">Days</button><button data-tab="social">Social</button>
+    <button data-tab="home">Home</button><button data-tab="days">Days</button><button data-tab="social">Social</button><button data-tab="mind">How they work</button>
   </nav>
 </header>
 <div id="view"></div>
@@ -196,7 +224,7 @@ const LOCK = '<svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"
 const TILE_COLOURS = {s: "#A9D3E3", a: "#F1E6C8", r: "#7FBCDB", k: "#A39C8E", b: "#B08A5A", "1": "#CFE3B4", "2": "#B5D49A",
   "3": "#97C27E", B: "#8E8A80", P: "#E6DFCC"};
 const OBJ = {site: "#F7F5EE", home: "#E9C29B", path: "#B98A5E", hardwood: "#3E7A3A", fruit: "#D2553F", stump: "#8A5A2B",
-  sapling: "#6E9E4A", rock: "#5F5B55", placed: "#6250D6", flowers: "#E87BA4", bridge: "#B08A5A"};
+  sapling: "#6E9E4A", rock: "#5F5B55", placed: "#6250D6", flowers: "#E87BA4", bridge: "#B08A5A", bridgeSite: "#E9B949"};
 
 // The map's key, drawn from the same colours the map is painted with.
 const LEGEND = [
@@ -205,7 +233,7 @@ const LEGEND = [
     [TILE_COLOURS.B, "building"], [TILE_COLOURS.P, "plaza"]]],
   ["On it", [[OBJ.site, "free homesite"], [OBJ.home, "home"], [OBJ.path, "path"], [OBJ.hardwood, "tree"], [OBJ.fruit, "fruit tree"],
     [OBJ.sapling, "sapling"], [OBJ.stump, "stump"], [OBJ.rock, "rock"], [OBJ.flowers, "flowers"], [OBJ.placed, "furniture and fences"],
-    [OBJ.bridge, "bridge, once built"]]],
+    [OBJ.bridgeSite, "bridge site, until funded"], [OBJ.bridge, "bridge, once built"]]],
 ];
 const legendHTML = () => `<div class="legend" aria-label="Map key">${LEGEND.map(([g, items]) => `<div class="grp"><b>${g}</b><div class="items">${items.map(([c, l]) => `<span class="sw"><i style="background:${c}"></i>${l}</span>`).join("")}</div></div>`).join("")}</div>`;
 
@@ -214,7 +242,11 @@ function mapHTML(day, opts = {}) {
   const M = D.map;
   const id = "map" + Math.random().toString(36).slice(2, 8);
   const homes = day.homes || {};
-  const labels = M.buildings.map((b) => `<div class="bld" style="left:${((b.x + 0.5) / M.W * 100).toFixed(2)}%;top:${((b.top - 0.6) / M.H * 100).toFixed(2)}%">${esc(b.name)}</div>`).join("");
+  let labels = M.buildings.map((b) => `<div class="bld" style="left:${((b.x + 0.5) / M.W * 100).toFixed(2)}%;top:${((b.top - 0.6) / M.H * 100).toFixed(2)}%">${esc(b.name)}</div>`).join("");
+  if (M.bridge && M.bridge.length && !day.objects.bridge_open) {  // where the bridge will go, labelled under it
+    const bx = M.bridge.reduce((a, c) => a + c[0], 0) / M.bridge.length, by = Math.max(...M.bridge.map((c) => c[1]));
+    labels += `<div class="bld site" style="left:${((bx + 0.5) / M.W * 100).toFixed(2)}%;top:${((by + 1.6) / M.H * 100).toFixed(2)}%">bridge site</div>`;
+  }
   const names = Object.entries(homes).filter(([, s]) => s && M.sites[s]).map(([n, s]) => {
     const [x, y] = M.sites[s].centre;
     return `<a class="who${n === opts.sel ? " on" : ""}" href="${href(n)}" aria-label="${esc(n)} lives ${esc((day.home_areas || {})[n] || "")}" style="left:${((x + 0.5) / M.W * 100).toFixed(2)}%;top:${((y + 0.5) / M.H * 100).toFixed(2)}%">${esc(n)}</a>`;
@@ -243,6 +275,8 @@ function whatIsAt(day, x, y) {
   }
   const b = M.buildings.find((b) => (b.cells || []).some(([cx, cy]) => cx === x && cy === y));
   if (b) return b.name;
+  if (!day.objects.bridge_open && (M.bridge || []).some(([cx, cy]) => Math.abs(cx - x) <= 1 && Math.abs(cy - y) <= 1))
+    return `bridge site: ${fmt(day.bridge_fund || 0)} of ${fmt(D.bridge_cost)} bells raised at Resident Services`;
   const t = (M.tiles[y] || "")[x];
   return GROUND[t] || "";
 }
@@ -272,7 +306,7 @@ function paint(canvas, day) {
   const M = D.map, g = canvas.getContext("2d"), o = day.objects;
   const dot = (x, y, c) => { g.fillStyle = c; g.fillRect(x, y, 1, 1); };
   M.tiles.forEach((row, y) => { for (let x = 0; x < row.length; x++) dot(x, y, TILE_COLOURS[row[x]] || "#CFE3B4"); });
-  if (o.bridge_open) M.bridge.forEach(([x, y]) => dot(x, y, OBJ.bridge));
+  M.bridge.forEach(([x, y]) => dot(x, y, o.bridge_open ? OBJ.bridge : OBJ.bridgeSite));
   const lived = new Set(Object.values(day.homes || {}));
   Object.entries(M.sites).forEach(([sid, s]) => s.cells.forEach(([x, y]) => dot(x, y, lived.has(sid) ? OBJ.home : OBJ.site)));
   o.paths.forEach(([x, y]) => dot(x, y, OBJ.path));
@@ -533,10 +567,8 @@ function days() {
       <div class="card"><div class="label" style="margin-bottom:12px">The commons ${multi ? "across the days picked" : "through the day"}</div>
         <div class="lines4">${commonsChart("Rock hits left", "rocks", sel, multi)}${commonsChart("Wood on trees", "wood", sel, multi)}${commonsChart("Shells", "shells", sel, multi)}${commonsChart("Fruit", "fruit", sel, multi)}</div></div>
       ${isabelleDays(sel)}
-      <div>
-        <div class="label" style="margin:6px 0 10px">All conversations ${multi ? "on these days" : "that day"}</div>
-        ${all.length ? `<div class="talkgrid">${all.join("")}</div>` : '<div class="empty">Nobody talked or wrote.</div>'}
-      </div>
+      ${all.length ? `<details class="held convos"${convosOpen ? " open" : ""}><summary><span class="tri"></span><span class="label">All conversations ${multi ? "on these days" : "that day"}</span><span class="small">${fmt(all.length)}</span></summary>
+        <div class="talkgrid">${all.join("")}</div></details>` : `<div><div class="label" style="margin:6px 0 10px">All conversations ${multi ? "on these days" : "that day"}</div><div class="empty">Nobody talked or wrote.</div></div>`}
     </div>
     <aside class="col" style="flex: 1 1 460px">
       <div class="vtabs" role="tablist" aria-label="Villagers">${D.run.villagers.map((n) => `<button role="tab" aria-selected="${n === name}" data-go="${daysHref(n, picked)}">${esc(n)}</button>`).join("")}</div>
@@ -553,6 +585,7 @@ function days() {
         <div class="sec"><div class="label">Discoveries</div>${seen}</div>
         <div class="sec"><div class="label">Conversations and mail</div>${talks}</div>
         <div class="nightly"><div class="label private" style="margin-bottom:6px">${LOCK} Nightly page${multi ? "s" : ""}</div>${pages}</div>
+        ${promptsSection(name, sel, multi)}
       </div>
     </aside>
   </main>`;
@@ -742,12 +775,152 @@ function onSocialSelect(e) {
   location.hash = socialHref(st);
 }
 
+// --- prompts -----------------------------------------------------------------------
+// D.prompts indexes every call: {day: {name: [[id, kind, hour], ...]}}. The prompts themselves are in
+// prompts/day_NNN.js beside the page, loaded the first time one of that day's calls is opened.
+const KIND_LABEL = {plan: "plan", spot: "spotted something", notice: "someone nearby", chat: "conversation turn",
+  plaza: "at the plaza", evening: "evening at the plaza", night: "nightly page", isabelle: "Isabelle's report", other: "other"};
+const PROMPTS = {}, promptsAsked = {};
+let convosOpen = false;
+window.__islandPrompts = (day, data) => { PROMPTS[day] = data; document.querySelectorAll(`.pcall[data-day="${day}"][open]`).forEach(fillCall); };
+const whenOf = (kind, h) => h == null ? (kind === "night" ? "night" : "") : `${hh(h)}:00`;
+
+function pcallHTML(day, [id, kind, h], who) {
+  return `<details class="held pcall" data-day="${day}" data-id="${esc(id)}"><summary><span class="tri"></span><span class="h">${whenOf(kind, h)}</span>
+    <span>${who ? `<b>${esc(who)}</b> · ` : ""}${esc(KIND_LABEL[kind] || kind)}</span></summary><div class="pbody"><div class="small">loading…</div></div></details>`;
+}
+function fillCall(d) {
+  const P = PROMPTS[d.dataset.day], body = d.querySelector(".pbody");
+  if (!P || body.dataset.done) return;
+  const c = P.calls[d.dataset.id];
+  if (!c) { body.innerHTML = '<div class="empty">This prompt is missing from the logs.</div>'; return; }
+  const [si, user, reasoning, tokens, reply] = c, sys = P.sys[si] || "";
+  const words = (t) => fmt((t.match(/\S+/g) || []).length);
+  body.innerHTML = `<details class="held"><summary><span class="tri"></span>System prompt · ${words(sys)} words</summary><pre class="ptext">${esc(sys)}</pre></details>
+    <div class="plabel">Prompt · ${words(user)} words</div><pre class="ptext">${esc(user)}</pre>
+    <div class="plabel private">${LOCK} Hidden reasoning${tokens != null ? ` · ${fmt(tokens)} tokens` : ""}</div><pre class="ptext private">${esc(reasoning || "(none returned)")}</pre>
+    <div class="plabel">Reply</div><pre class="ptext">${esc(reply ?? "(no reply: the call failed)")}</pre>`;
+  body.dataset.done = "1";
+}
+function openCall(d) {
+  const day = d.dataset.day;
+  if (PROMPTS[day]) return fillCall(d);
+  if (promptsAsked[day]) return;
+  promptsAsked[day] = true;
+  const s = document.createElement("script");
+  s.src = `prompts/day_${String(day).padStart(3, "0")}.js`;
+  s.onerror = () => { promptsAsked[day] = false;
+    document.querySelectorAll(`.pcall[data-day="${day}"] .pbody`).forEach((b) => { b.innerHTML = '<div class="empty">Couldn\'t load this day\'s prompts.</div>'; }); };
+  document.head.appendChild(s);
+}
+function promptsSection(name, sel, multi) {
+  if (!D.prompts) return `<div class="sec"><div class="label">Prompts</div><div class="empty">This run didn't keep its prompts.</div></div>`;
+  const n = sel.reduce((a, L) => a + ((D.prompts[L.day] || {})[name] || []).length, 0);
+  const rows = byDay(sel, multi, (L) => ((D.prompts[L.day] || {})[name] || []).map((c) => pcallHTML(L.day, c)), "No calls kept.");
+  return `<details class="held sec"><summary><span class="tri"></span><span class="label">Prompts</span><span class="small">${plural(n, "call")}: what ${esc(name)} saw and said</span></summary>${rows}</details>`;
+}
+$("#view").addEventListener("toggle", (e) => {
+  const d = e.target;
+  if (d.classList.contains("convos")) convosOpen = d.open;
+  if (d.classList.contains("pcall") && d.open) openCall(d);
+}, true);
+
+// --- how they work -----------------------------------------------------------------
+const CALLS = [
+  ["plan", "on waking, at 12:00 and at 19:00", "rules and action menu",
+    "Which actions to take at which hours until the next plan, with private thoughts and an optional note to self. The morning plan also splits the day's mental energy and says whether to write tonight."],
+  ["spot", "a bug or fish shadow comes into view (at most 3 a day)", "short",
+    "Whether to go after it the next hour, instead of what was planned then."],
+  ["notice", "another villager is nearby", "short", "Whether to go and talk to one of them."],
+  ["chat", "each turn of a conversation", "rules, no menu",
+    "What to say, and whether to give something, ask for something, put a trade on the table, accept one, or leave."],
+  ["plaza", "an hour spent at the plaza", "rules, no menu", "What to read, post or take down on the board, and letters and parcels to send."],
+  ["evening", "the evening plaza round (prompt versions before 6)", "rules, no menu", "The same, once everyone was there at 20:00 and 21:00."],
+  ["night", "after the day ends", "short",
+    "A private page, free-form, which replaces last night's, then up to a few things to hold on to."],
+  ["isabelle", "each night, once", "her own", "Isabelle (not a villager) sums up the day from public events for the next morning's announcement."],
+];
+const SYS_TEXT = {"rules and action menu": "persona, last night's page, the island's rules and the action menu",
+  "rules, no menu": "persona, last night's page and the island's rules, without the action menu",
+  short: "persona, last night's page and two lines about the island", "her own": "her own instructions"};
+
+function mind() {
+  const M = D.mind || {}, P = D.prompts, V = D.run.villagers, nd = D.run.days;
+  const counts = {};
+  if (P) Object.values(P).forEach((by) => Object.values(by).forEach((calls) => calls.forEach((c) => { counts[c[1]] = (counts[c[1]] || 0) + 1; })));
+  const example = (kind) => {
+    if (!P) return null;
+    for (const day of Object.keys(P).map(Number).sort((a, b) => b - a)) {
+      for (const n of [...V, "isabelle"]) { const c = ((P[day] || {})[n] || []).find((x) => x[1] === kind); if (c) return [day, c, n]; }
+    }
+    return null;
+  };
+  const early = (M.versions || [[0, 99]])[0][1] < 6;  // the evening round, before prompt version 6
+  const rows = CALLS.filter(([k]) => k !== "evening" || counts.evening || (!P && early)).map(([k, when, sys, what]) => {
+    const per = counts[k] ? (k === "isabelle" ? counts[k] / nd : counts[k] / (nd * V.length)) : null;
+    const ex = example(k);
+    return `<tr><td><b>${esc(KIND_LABEL[k])}</b></td><td>${esc(when)}</td><td>${esc(what)}<div class="small" style="margin-top:4px">starts with: ${esc(SYS_TEXT[sys])}</div></td>
+      <td class="num">${per == null ? "–" : per.toFixed(1)}</td></tr>
+      ${ex ? `<tr class="ex"><td></td><td colspan="3">${pcallHTML(ex[0], ex[1], `example: ${ex[2] === "isabelle" ? "Isabelle" : ex[2]}, day ${ex[0]}`)}</td></tr>` : ""}`;
+  }).join("");
+
+  const p = M.params || {}, llm = M.llm || {}, en = M.energy || {}, mem = M.memory, refl = M.reflection || {};
+  const settings = [p.reasoning_effort ? `reasoning effort ${p.reasoning_effort}` : null, llm.temperature != null ? `temperature ${llm.temperature}` : null,
+    llm.max_tokens ? `at most ${fmt(llm.max_tokens)} tokens a reply` : null].filter(Boolean).join(", ");
+  let host = "";
+  try { host = M.url ? new URL(M.url).host : ""; } catch (e) { host = ""; }
+
+  const vs = M.versions || [];
+  const ranges = vs.map(([from, v], i) => { const to = i + 1 < vs.length ? vs[i + 1][0] - 1 : nd - 1;
+    return `<li>${from === to ? `day ${from}` : `days ${from}–${to}`}: prompt version ${v}</li>`; }).join("");
+  const inter = (M.interventions || []).map((x) => `<details class="held"><summary><span class="tri"></span>${x.from_day != null ? `from day ${x.from_day}: ` : ""}${esc(x.what)}</summary>
+    <ul class="mlist small">${(x.details || []).map((d) => `<li>${esc(d)}</li>`).join("")}</ul></details>`).join("");
+
+  const memory = mem ? `<li><b>Long-term memories.</b> At night, after the page, a villager can name up to ${mem.picks} things to hold on to, in their own words, or the number of an older memory still on their mind. A memory fades: its strength is e<sup>−days since last recalled ÷ stability</sup>, stability starts at ${mem.stability} days and doubles each time it is picked again, and below ${mem.threshold} it is gone for good. At most ${mem.shown} are in a prompt, strongest first.</li>
+      <li><b>Notes.</b> Each plan can leave a note to self. Notes last ${mem.notes_days} day${mem.notes_days === 1 ? "" : "s"}; what isn't picked at night fades with them.</li>`
+    : `<li><b>Notes.</b> Each plan can leave a note to self; the last ${M.memory_size || 15} are kept.</li>`;
+
+  return `
+  <section class="head"><h1>How the villagers work</h1>
+    <div class="sub">Every villager is the same model, given the same rules. What makes them different is only what has happened to them, and what they wrote down.</div></section>
+  <main class="mind">
+    <div class="card"><div class="label">The model</div>
+      <div class="kv"><div class="k">model</div><div><b>${esc(M.model || D.run.model)}</b></div>
+        <div class="k">served by</div><div>${esc(M.backend || D.run.backend)}${host ? ` (${esc(host)})` : ""}</div>
+        ${settings ? `<div class="k">settings</div><div>${esc(settings)}</div>` : ""}
+        <div class="k">calls</div><div>${fmt(D.run.llm_calls)} over ${plural(nd, "day")}${D.run.errors ? `, ${fmt(D.run.errors)} replies that couldn't be read` : ""}</div></div>
+      <p style="margin-top:12px">Each call is separate: the model keeps nothing between calls. Everything a villager knows at a given moment is in that call's prompt.</p>
+      ${M.persona ? `<div class="small" style="margin-bottom:4px">A villager's whole persona (only the name changes):</div><div class="quote">${esc(M.persona)}</div>` : ""}
+    </div>
+    <div class="card"><div class="label">What carries over from day to day</div>
+      <ul class="mlist">
+        ${refl.enabled !== false ? `<li><b>Last night's page.</b> At night each villager can write a private page, up to ${refl.max_words || 150} words, in any form, with no topics given. It replaces the night before's and sits at the top of every prompt the next day.</li>` : ""}
+        ${memory}
+        <li><b>Yesterday and today.</b> The morning plan lists what they did yesterday, hour by hour; later calls list what they've done so far today and what they noticed.</li>
+        <li><b>What the island keeps for them.</b> Their pockets, home, bells, tools with uses left, recipes known, open requests, the prices they've heard at Nook's Cranny, the island map if they carry it, and in a conversation, the last time they talked with that person.</li>
+        <li><b>Nothing else.</b> What isn't in one of these is forgotten.</li>
+      </ul>
+      ${en.enabled !== false && en.daily ? `<div class="label" style="margin:16px 0 8px">Mental energy</div>
+      <p>${en.daily} points a day, back each morning. Reading a prompt costs points by the length of what changes from call to call (not the fixed rules), and so do writing and talking${en.charge_reasoning ? ", hidden reasoning included" : "; the hidden reasoning doesn't"}. The morning plan splits them between inward (planning, thinking, the page) and outward (talking, the plaza, letters). With none left they can't plan, talk or write until morning.</p>` : ""}
+    </div>
+    <div class="card wide"><div class="label">A day of calls</div>
+      <p class="small">What a villager is asked, when, and what each prompt starts with. ${P ? "Open an example to read the whole prompt, the model's hidden reasoning and its reply. Every call is on the Days tab, under each villager." : "This run didn't keep its prompts, so there are no examples."}</p>
+      <div class="scroll"><table class="calls"><thead><tr><th>call</th><th>when</th><th>what it decides</th><th class="num">a day</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${P ? `<div class="small" style="margin-top:8px">"A day": calls per villager per day in this run (for Isabelle, per day).</div>` : ""}
+    </div>
+    <div class="card"><div class="label">Prompt versions in this run</div>
+      <ul class="mlist">${ranges}</ul>
+      ${inter ? `<div class="label" style="margin:16px 0 4px">Changed mid-run</div>${inter}` : ""}
+    </div>
+  </main>`;
+}
+
 // --- routing -----------------------------------------------------------------------
 let shownTab = null;
 function show() {
   const tab = (location.hash.slice(1).split("/")[0] || "home");
   document.querySelectorAll(".tabs button").forEach((b) => { if (b.dataset.tab === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
-  $("#view").innerHTML = tab === "days" ? days() : tab === "social" ? social() : home();
+  $("#view").innerHTML = tab === "days" ? days() : tab === "social" ? social() : tab === "mind" ? mind() : home();
   if (tab !== shownTab) window.scrollTo(0, 0);
   const pagesScroll = $("#pages-scroll");  // the nightly pages open on the latest night, as the Days page does
   if (pagesScroll && tab !== shownTab) pagesScroll.scrollLeft = pagesScroll.scrollWidth;

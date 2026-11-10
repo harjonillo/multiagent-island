@@ -2,6 +2,32 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-10 22:00
+  what: Prompt version 15, the island says what was missing
+  when: new runs from now on (test1 ends at day 9 on version 14)
+  details:
+    - "places out of reach say which tool would get you there: \"plaza (out of reach without a vaulting pole)\" (was \"out of reach for you right now\"), and so do failed trips, visits and searches (\"you can't get to Able Sisters from here without a vaulting pole\"). In test1 every vaulting pole broke on days 5 and 6, and villagers guessed the ladder or a path would get them across"
+    - "fishing with \"bait\": true and none in your pockets fishes without it and says so (\"no fishing bait in your pockets, so you fished without it: ...\"). In test1 it failed 88 times, still 7 on day 9 after version 13's menu wording, and villagers concluded they couldn't fish"
+    - "rest and wear happen where you are when you can't get home (before, they failed walking home). Crafting stays at home, and the menu says so: \"craft: recipe (at home)\""
+    - "a plan's non-action says where that happens instead: trade, give or talk (when you meet someone), post or letters (the plaza), home or store (the plan's \"home\" field), walk or travel (you walk wherever an action takes you)"
+    - "common ways of writing an action are read as meant: \"Jo's home\" is Jo, \"Nook's Cranny\" is the cranny, \"shovel recipe card\" is the card, \"2 fishing bait\" and \"quantity\" are a count. buy takes a count (up to 10, stopping at the first that doesn't go through)"
+    - "any visit to Nook's Cranny (buying, selling, asking) adds what Timmy and Tommy would pay for what you carry to the prices you've heard, without a word in the result. Nobody in test1 sold anything in 10 days, and 7 of 10 had heard no prices by day 9"
+    - "clearer failures: an axe you don't carry says which one you do; chopping a kind of tree that doesn't exist says trees are hardwood or fruit and either gives all three woods; break_rock says the apple has to be in your pockets and that shaking a fruit tree drops them; a bridge contribution from an empty wallet says so"
+    - "Tom Nook and the fun fact say the bridge crosses the river by Resident Services, so nobody needs a vaulting pole there. The world file calls it the bridge over the river (was the bridge to the north bank; it is on lower ground in the centre)"
+    - "the fun facts start with tools breaking, the ladder and pole, Timmy and Tommy buying almost anything, clams and bait, the map, saplings and planting, and the bridge. Before, facts added in later versions came last, and test1 never heard the ones about clams, the ladder and pole, tools breaking or the map"
+    - "stranded: a villager who is awake and can't get home with the tools they carry stays where they are in free hours (before, any free hour put them back home, whatever they carried); \"Getting around\" says \"Your home is out of reach without a vaulting pole (call_rescue, once a day)\". Falling asleep still brings everyone home"
+    - "call_rescue: the Rescue Service takes a stranded villager home, free, once a day, using that hour, and gives them a talking-to about why they got stuck (which tool they lacked, that ladders and poles wear out on every trip that needs them, that their plans show the uses left, and that Nook's Cranny sells both and their recipe cards). A second call that day is turned down: they're home when they go to sleep. Calling when home is reachable doesn't come and doesn't use up the day's rescue"
+    - "not changed, on purpose: nothing says stumps don't grow back, and nothing points at selling, the loan or planting"
+- time: 2026-11-10 22:00
+  what: Every prompt in the explorer, and a How they work tab
+  when: every run's page; prompts for runs that kept them
+  details:
+    - "runs keep their prompts by default (--no-log-prompts turns it off; --log-prompts is still accepted). A villager's second call with the same tag gets its own file (<tag>_<name>_2.txt): before, each turn in a conversation hour overwrote the last, so test1 kept only a villager's last chat turn of each hour"
+    - "Days: each villager's card has a Prompts section listing every call that day (plan, spotted something, someone nearby, conversation turn, plaza, nightly page), each opening to the system prompt, the prompt, the hidden reasoning and the reply. Prompts load a day at a time from prompts/day_NNN.js beside the page, which also works from disk"
+    - "Days: all conversations that day fold away, closed by default"
+    - "the map shows the bridge site (where the island generator put the crossing) until it's built, labelled, with the fund so far on hover"
+    - "a How they work tab: the model and its settings, what carries over from day to day (the page, memories, notes, what the island keeps for them, energy), each kind of call with when it happens, what it decides, what its prompt starts with, how often it happens and an example, and the prompt versions by day with what changed mid-run"
+    - "to publish a run's prompts, commit runs/<run>/prompts/ next to manifest.json and events.jsonl (the .gitignore lets it through)"
 - time: 2026-11-09 23:00
   what: Prompt version 14, going after what you spot
   when: new runs from now on; running ones keep theirs unless resumed with --prompt-version 14

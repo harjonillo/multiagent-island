@@ -39,7 +39,10 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--config", type=Path, default=Path("config/models.yaml"))
     r.add_argument("--concurrency", type=int, default=1, help="parallel LLM calls within an hour")
     r.add_argument("--no-cache", action="store_true")
-    r.add_argument("--log-prompts", action="store_true", help="save every full prompt under the run dir")
+    r.add_argument("--log-prompts", action="store_true", default=True,
+                   help="save every full prompt, reasoning and reply under <run_dir>/prompts/ (the default; the "
+                        "explorer shows them)")
+    r.add_argument("--no-log-prompts", dest="log_prompts", action="store_false", help="don't save the prompts")
     r.add_argument("--out", type=Path, default=Path("runs"))
     r.add_argument("--run-dir", type=Path, help="exact run directory (default: runs/<timestamp>_<scenario>_s<seed>)")
     r.add_argument("--no-analyze", action="store_true")

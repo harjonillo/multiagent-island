@@ -56,9 +56,20 @@ class Bodies:
                 self.broke.append((name, t, "walking"))
         return notes
 
-    def go_home(self, name: str) -> None:
+    def stuck(self, name: str) -> bool:
+        """Away from home with no way back with the tools they carry (say a vaulting pole broke on the way out)."""
+        home, body = self.home_point(name), self.b[name]
+        return (home is not None and body.pos is not None and tuple(body.pos) != tuple(home)
+                and self.space.path_length(body.pos, home, self.tools_of(name)) is None)
+
+    def go_home(self, name: str, asleep: bool = True) -> None:
+        """Back home in free time, or for the night. From prompt version 15 a villager who is awake and has no
+        way home with the tools they carry stays where they are (the Rescue Service can take them, once a day);
+        falling asleep always brings them home, as the day ends."""
         body = self.b[name]
         home = self.home_point(name)
+        if not asleep and getattr(self.isl, "prompt_version", 1) >= 15 and self.stuck(name):
+            return
         if home is not None and body.pos is not None:
             notes = self._trip_wear(name, body.pos, home)
             body.walked_today += self.space.path_length(body.pos, home, self.tools_of(name)) or 0.0
@@ -84,6 +95,7 @@ class Bodies:
         """Walking distance from where the villager is now to where the action happens."""
         body = self.b[name]
         tools = self.tools_of(name)
+        action = self.isl.tidy(action)
         _, target, _, err = self.space.resolve(self.isl, name, action, body.pos, tools, rng or _NoRng())
         if err or body.pos is None or target is None:
             return 0.0 if not err else None
@@ -101,6 +113,9 @@ class Bodies:
     def perform(self, name: str, action: dict, hour: int, rng=None) -> tuple[bool, str]:
         body = self.b[name]
         vil = self.isl.v[name]
+        action = self.isl.tidy(action)
+        if str(action.get("do", "")).lower() == "call_rescue" and getattr(self.isl, "prompt_version", 1) >= 15:
+            return self.rescue(name)
         need, why = self.isl.tool_for(vil, action)
         if why:
             return False, why
@@ -113,7 +128,8 @@ class Bodies:
         if target is not None and body.pos is not None:
             d = self.space.path_length(body.pos, target, tools)
             if d is None:
-                return False, f"couldn't find a way to the {place} with the tools you carry"
+                return False, self.space._cant_reach(self.isl, f"couldn't find a way to the {place} with the tools you carry",
+                                                     body.pos, [target], tools)
             notes = self._trip_wear(name, body.pos, target)
             body.walked_today += d
             body.pos = tuple(target)
@@ -127,6 +143,37 @@ class Bodies:
                 self.broke.append((name, need, act.get("do")))
         return ok, res + "".join(f"; {n}" for n in notes)
 
+    def rescue(self, name: str) -> tuple[bool, str]:
+        """Prompt version 15: the Rescue Service takes a stranded villager home, once a day, free; the action's hour
+        is spent on it. It comes only when there is no way home with the tools they carry, and says why they got
+        stuck. A second call that day is turned down: they get home when they fall asleep."""
+        body, vil = self.b[name], self.isl.v[name]
+        home = self.home_point(name)
+        if home is None or body.pos is None:
+            return False, "you have no home to be taken back to yet"
+        if not self.stuck(name):
+            here = tuple(body.pos) == tuple(home)
+            return False, ("you're at home already" if here else
+                           "you can get home from here with the tools you carry, so the Rescue Service didn't come")
+        rescued = self.isl.__dict__.setdefault("rescued", {})
+        if rescued.get(name) == self.isl.day:
+            return False, ("the Rescue Service already took you home once today and only comes once a day; you'll be "
+                           "back home when you go to sleep tonight")
+        rescued[name] = self.isl.day
+        where = self.space.region(tuple(body.pos)) if hasattr(self.space, "region") else "where you were"
+        gap = self.space.reach_gap(body.pos, [home], self.tools_of(name)) if hasattr(self.space, "reach_gap") else ""
+        why = {"a vaulting pole": "the way home crosses the river, and you carry no vaulting pole",
+               "a ladder": "the way home climbs a cliff, and you carry no ladder",
+               "a ladder and a vaulting pole": "the way home crosses the river and climbs a cliff, and you carry "
+                                               "neither a vaulting pole nor a ladder"}.get(gap, "there was no way home "
+                                                                                              "with the tools you carry")
+        body.pos, body.place = tuple(home), "home"
+        return True, (f"the Rescue Service took you home from {where}, and gave you a talking-to: you were stuck "
+                      f"because {why}. Ladders and vaulting poles wear out a little on every trip that needs them, "
+                      "and your plans show how many uses each has left; Nook's Cranny always sells them, and their "
+                      "recipe cards. The Rescue Service comes once a day: get stuck again today and you wait until "
+                      "you go to sleep to be home")
+
     def go_to(self, name: str, landmark: str, label: str) -> tuple[bool, str]:
         """Walk to a building (the plaza, from prompt version 7) in free time. Not an action: nothing
         happens there but being there. Returns whether they got there, and why not."""
@@ -137,7 +184,8 @@ class Bodies:
         door = self.space.landmark(self.isl, name, landmark, body.pos)
         best = self.space.nearest(tuple(body.pos), tools, [door]) if door is not None else None
         if best is None:
-            return False, f"couldn't find a way to the {label} with the tools you carry"
+            return False, self.space._cant_reach(self.isl, f"couldn't find a way to the {label} with the tools you carry",
+                                                 body.pos, [door] if door is not None else [], tools)
         _, stand, d = best
         notes = self._trip_wear(name, body.pos, stand)
         body.walked_today += d

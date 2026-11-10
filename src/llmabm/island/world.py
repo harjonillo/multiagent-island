@@ -138,11 +138,30 @@ ORDINANCE_TEXT = {
 TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_clam": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 14  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+LATEST_PROMPT_VERSION = 15  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
 AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
 CLAM, BAIT = "manila clam", "fishing bait"  # dug on the beach (dig_clam); one clam crafts one bait
 MAP = "island map"  # from Tom Nook or Isabelle; carried, it shows the island's layout in plans (prompt version 3 on)
+
+
+_NOT_ACTIONS = [  # prompt version 15: what a plan tried as an action, and where it happens instead
+    (("trade", "give", "gift", "talk", "chat", "offer", "greet", "meet", "say", "request"),
+     "talking, giving and trading happen when you meet someone (visit them to meet on purpose)"),
+    (("post", "board", "letter", "write", "send", "mail", "parcel", "read", "check_board", "bulletin"),
+     "the board, letters and parcels are at the plaza: spend a free hour there with {\"do\": \"plaza\"}"),
+    (("home", "store", "take", "put_away", "deposit", "withdraw"),
+     "putting things away at home or taking them out is the plan's \"home\" field, when you plan at home"),
+    (("walk", "travel", "go", "move", "explore", "return", "go_home", "wander", "head"),
+     "you walk wherever an action takes you; rest at home, or spend a free hour at the plaza"),
+]
+
+
+def not_an_action(do: str) -> str:
+    for words, where in _NOT_ACTIONS:
+        if do in words or do.split("_")[0] in words:
+            return f"'{do}' isn't an action: {where}"
+    return f"'{do}' is not something you can do"
 
 
 def recipe_of_card(item: str) -> str | None:
@@ -469,7 +488,12 @@ class Island:
         if do == "chop_wood" and getattr(self, "prompt_version", 1) >= 4:
             want = str(action.get("axe", "")).strip().lower()
             if want in AXES:
-                return (want, None) if vil.inventory[want] > 0 else (None, f"you have no {want}")
+                if vil.inventory[want] > 0:
+                    return want, None
+                other = [t for t in AXES if vil.inventory[t] > 0]
+                if other and getattr(self, "prompt_version", 1) >= 15:
+                    return None, f"you have no {want}; you carry the {other[0]}"
+                return None, f"you have no {want}"
             have = [t for t in AXES if vil.inventory[t] > 0]
             return (have[0], None) if have else (None, "you have no axe")
         need = TOOL_FOR.get(do)
@@ -716,6 +740,8 @@ class Island:
         do = str(action.get("do", "")).strip().lower()
         fn = getattr(self, f"_do_{do}", None)
         if fn is None:
+            if getattr(self, "prompt_version", 1) >= 15:
+                return False, not_an_action(do)
             return False, f"'{do}' is not something you can do"
         place = self._NEEDS_OPEN.get(do)
         if do == "buy":
@@ -732,10 +758,51 @@ class Island:
         if place and not self.is_open(place, hour):
             names = {"cranny": "Nook's Cranny", "able": "the Able Sisters", "resident_services": "Resident Services", "museum": "the museum"}
             return False, f"{names[place]} is closed at {clock(hour)} (open {fmt_window(self.shop_hours(place))})"
+        if place == "cranny" and getattr(self, "prompt_version", 1) >= 15:
+            self.hear_prices(vil)  # at the counter, Timmy and Tommy's prices for what you carry are in plain view
         try:
-            return fn(vil, action, hour)
+            ok, res = fn(vil, action, hour)
         except (TypeError, ValueError) as e:
             return False, f"{do} failed: {e}"
+        if action.get("_no_bait"):  # set by the body: "bait": true with none in the pockets (version 15)
+            res = f"no fishing bait in your pockets, so you fished without it: {res}"
+        return ok, res
+
+    def hear_prices(self, vil) -> None:
+        """What Nook's Cranny would pay for each thing the villager carries, added to the prices they've heard."""
+        vil.prices_seen.update({k: self.sell_price(k) for k in vil.inventory if vil.inventory[k] > 0 and k in self.prices})
+
+    def tidy(self, action: dict) -> dict:
+        """Prompt version 15: common ways of writing an action, read as meant. "Jo's home" is Jo, a shop named
+        in full is that shop, "shovel recipe card" is the card, and "2 fishing bait" or "quantity" is a count.
+        Earlier versions take the action as written."""
+        if getattr(self, "prompt_version", 1) < 15 or not isinstance(action, dict):
+            return action
+        a = dict(action)
+        do = str(a.get("do", "")).strip().lower()
+        if do in ("rescue", "rescue_service", "call_rescue_service", "call_for_rescue", "call rescue"):
+            a["do"] = do = "call_rescue"
+        if do == "visit" and isinstance(a.get("who"), str):
+            who = re.sub(r"(?i)^(the )?(home|house) of\s+|['’]s?\s+(home|house|place)$", "", a["who"].strip()).strip()
+            a["who"] = next((n for n in self.v if n.lower() == who.lower()), a["who"])
+        if do in ("buy", "sell") and isinstance(a.get("shop"), str):
+            shop = a["shop"].strip().lower()
+            if "able" in shop:
+                a["shop"] = "able"
+            elif any(w in shop for w in ("cranny", "nook", "timmy", "tommy")):
+                a["shop"] = "cranny"
+        if do == "buy":
+            for k in ("quantity", "qty", "amount", "n"):
+                if k in a and "count" not in a:
+                    a["count"] = a.pop(k)
+            if isinstance(a.get("item"), str):
+                item = a["item"].strip().lower()
+                m = re.match(r"^(\d+)\s*x?\s+(.+)$", item)
+                if m:
+                    a.setdefault("count", int(m.group(1)))
+                    item = m.group(2)
+                a["item"] = item[: -len(" card")] if item.endswith(" recipe card") else item
+        return a
 
     def _do_wear(self, vil, a, hour):
         item = str(a.get("item", "")).lower()
@@ -1146,6 +1213,9 @@ class Island:
     def _do_break_rock(self, vil, a, hour):
         fruit = self.w["island"]["native_fruit"]
         if vil.inventory[fruit] < 1:
+            if getattr(self, "prompt_version", 1) >= 15:
+                return False, (f"you need {_a(fruit)} in your pockets: breaking a rock eats one first, to be strong "
+                               f"enough (shaking a fruit tree drops them)")
             return False, f"you need to eat {_a(fruit)} first to be strong enough to break a rock"
         try:
             idx = int(a.get("rock")) - 1
@@ -1305,6 +1375,26 @@ class Island:
         return out
 
     def _do_buy(self, vil, a, hour):
+        """One of something, or from prompt version 15 up to `count` (at most 10), stopping at the first that
+        doesn't go through."""
+        try:
+            count = max(1, min(10, int(a.get("count", 1)))) if getattr(self, "prompt_version", 1) >= 15 else 1
+        except (TypeError, ValueError):
+            count = 1
+        if count == 1:
+            return self._buy_one(vil, a, hour)
+        done, why = [], None
+        for _ in range(count):
+            ok, res = self._buy_one(vil, a, hour)
+            if not ok:
+                why = res
+                break
+            done.append(res)
+        if not done:
+            return False, why
+        return True, "; ".join(done) + (f"; no more: {why}" if why else "")
+
+    def _buy_one(self, vil, a, hour):
         shop = str(a.get("shop", "cranny")).lower()
         item = str(a.get("item", "")).lower()
         cards = self.recipe_cards_for_sale() if shop == "cranny" else {}
@@ -1383,6 +1473,9 @@ class Island:
         cost = self.w["bridge"]["cost"]
         amt = min(int(a.get("bells", 0)), vil.bells, cost - self.bridge_fund)
         if amt <= 0:
+            if getattr(self, "prompt_version", 1) >= 15 and vil.bells <= 0:
+                return False, "no bells contributed: your wallet is empty" + (
+                    f" (your {vil.home_bells} bells at home stay there)" if vil.home_bells else "")
             return False, "no bells contributed"
         vil.bells -= amt
         self.bridge_fund += amt
@@ -1447,7 +1540,9 @@ class Island:
             br = w["bridge"]
             bridge = ("The bridge is built." if self.bridge_built else
                       f"The {br['name']} costs {br['cost']} bells, {self.bridge_fund} raised so far; anyone can chip in, "
-                      "and it opens more rocks and trees to everyone.")
+                      + ("and it opens more rocks and trees to everyone." if getattr(self, "prompt_version", 1) < 15 else
+                         "and once built it crosses the river by Resident Services, so nobody needs a vaulting pole "
+                         "there, and it opens more rocks and trees to everyone."))
             text = (f"Tom Nook: {up}. I can also move your home to a free homesite overnight for "
                     f"{w.get('move_house_cost', 10000)} bells. Free homesites: {sites}. {bridge}")
         elif who == "isabelle":

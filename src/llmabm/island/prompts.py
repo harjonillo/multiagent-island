@@ -69,6 +69,16 @@ PROMPT_CHANGES = {
     14: "going after what you spot: when a bug or fish shadow first comes into view and you carry the net or "
         "fishing rod for it, you can decide right then to go after it the next hour (an action), instead of what "
         "you had planned for that hour if anything",
+    15: "the island says what was missing: a place out of reach says which tool would get you there (\"out of "
+        "reach without a vaulting pole\"), and so does a walk or visit that fails; fishing with bait you don't have "
+        "fishes without it and says so; resting or changing clothes happens where you are when you can't get "
+        "home; a non-action says where that happens instead; common ways of writing an action are read as meant "
+        "(\"Jo's home\", \"Nook's Cranny\", \"shovel recipe card\", \"2 fishing bait\"), and buy takes a count. "
+        "Any visit to Nook's Cranny adds what they'd pay for what you carry to the prices you've heard. Crafting "
+        "is marked as at home, and the fun facts start with the ones about getting around and tools. A villager who "
+        "is awake and can't get home with the tools they carry stays out (before, any free hour took them home); "
+        "call_rescue has the Rescue Service take them home, once a day, for that hour, with a talking-to about why "
+        "they got stuck. A second time that day, they get home when they go to sleep",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -121,6 +131,11 @@ _MENU_CHANGES = {
     12: [("- buy: shop (cranny | able), item (or \"<recipe> recipe\" for a recipe card)\n",
           "- buy: shop (cranny | able), item (as the shop lists it: a thing, a tool, or \"<thing> recipe\" for a "
           "recipe card)\n")],
+    15: [("- craft: recipe\n", "- craft: recipe (at home)\n"),
+         ("- rest\n- plaza", "- rest\n- call_rescue (only when you can't get home with the tools you carry: the Rescue "
+                             "Service takes you home, once a day)\n- plaza"),
+         ("- buy: shop (cranny | able), item (as the shop lists it",
+          "- buy: shop (cranny | able), count?, item (as the shop lists it")],
     13: [("bait? (true to use fishing bait)", "bait? (true uses 1 fishing bait from your pockets; if you have none, leave it out)"),
          ("- visit: who (another villager: walk to their home, knock, and talk if they're in)\n",
           "- visit: who (a villager: walk to their home, knock, and talk if they're in. Shops and services are "
@@ -476,7 +491,8 @@ def fun_facts(isl: Island) -> list[str]:
         "Did you know Timmy and Tommy buy almost anything at a fixed price?",
         "Did you know letters and parcels sent at the plaza arrive the next morning?",
         "Did you know digging up a stump with your shovel clears the spot again?",
-        "Did you know funding the bridge north opens more rocks and trees to everyone?",
+        ("Did you know the bridge, once funded, crosses the river by Resident Services and opens more rocks and trees?"
+         if v >= 15 else "Did you know funding the bridge north opens more rocks and trees to everyone?"),
         f"Did you know anyone can pay Isabelle {w['ordinances']['cost']:,} bells to set an island ordinance?",
     ]
     if tools.get("uses"):
@@ -498,6 +514,11 @@ def fun_facts(isl: Island) -> list[str]:
         facts.append("Did you know digging up a manila clam teaches you to make fishing bait?")
     if getattr(getattr(isl, "energy", None), "enabled", False):
         facts.append("Did you know your mental energy comes back in full every morning?")
+    if v >= 15:  # what getting around and tools depend on comes up in the first days, not the last
+        first = ["tools break", "ladder climbs", "buy almost anything", "manila clam", "island map", "saplings",
+                 "plant ", "the bridge", "letters and parcels", "fishing bait", "axe", "stump"]
+        rank = lambda f: next((i for i, k in enumerate(first) if k in f), len(first))
+        facts = sorted(facts, key=rank)  # stable: the rest keep their order
     return facts
 
 

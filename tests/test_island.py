@@ -408,7 +408,7 @@ def test_stumps_and_breaking_rocks():
     ok, msg = bodies.perform("A", {"do": "chop_wood"}, 9, rng)
     assert ok and "brought the tree down" not in msg and not any(t.kind == "stump" for t in isl.trees), msg
     ok, msg = bodies.perform("A", {"do": "chop_wood", "axe": "axe"}, 10, rng)
-    assert not ok and msg == "you have no axe"
+    assert not ok and msg.startswith("you have no axe"), msg
     isl.v["A"].inventory["axe"] = 1
     ok, msg = bodies.perform("A", {"do": "chop_wood", "axe": "axe"}, 10, rng)
     assert ok and "brought the tree down" in msg and isl.collected["A"]["trees_removed"] == 1, msg
@@ -964,7 +964,9 @@ def test_site_data_and_page_for_a_mock_run():
         page = build_site(run_dir).read_text()
         assert "__DATA__" not in page and "__TITLE__" not in page
         blob = page.split('<script id="site-data" type="application/json">', 1)[1].split("</script>", 1)[0]
-        assert json.loads(blob) == data  # nothing in the data closes the script tag early
+        page_data = json.loads(blob)
+        assert page_data.pop("prompts") is None  # this run kept no prompts
+        assert page_data == data  # nothing in the data closes the script tag early
         assert 'href="../../site/index.html"' in page and "/ exp " not in page  # a mock run isn't numbered
 
         # The Experiments page over the folder: one door per run, numbered from 00, mock runs left out, each
@@ -1235,7 +1237,9 @@ def test_fishing_bait_makes_a_fish_appear():
     isl.w["island"]["catch_fail_rate"] = 0.0
     g.critters = []  # no shadows anywhere: without bait there is nothing to catch
     ok, msg = bodies.perform("A", {"do": "fish", "where": "sea", "bait": True}, 10, rng)
-    assert not ok and "no fishing bait" in msg
+    # From prompt version 15, bait you don't have means fishing without it, said so (before, the action failed).
+    assert ok and msg.startswith("no fishing bait in your pockets, so you fished without it: "), msg
+    assert isl.v["A"].inventory["fishing bait"] == 0
     isl.v["A"].inventory["fishing bait"] = 2
     ok, msg = bodies.perform("A", {"do": "fish", "where": "sea", "bait": True}, 10, rng)
     assert ok and "threw bait in the sea" in msg and "caught" in msg, msg
@@ -2011,3 +2015,90 @@ def test_prompt_version_14_going_after_what_you_spot():
         sim._spot_decisions(isl.day, h)
         assert len(prompts) == n
         assert "at home." in spot_prompt(isl, va, "home", h, ["x"], None, 3, 10)
+
+
+def test_prompts_are_kept_and_on_the_site():
+    """Every call's prompt is logged without overwriting another (a villager's several turns in one hour each
+    get a file), and the site gets one script per day with an index of who made which call."""
+    import json
+
+    from llmabm.island.site_build import build_site
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
+    with tempfile.TemporaryDirectory() as d:
+        run_dir = Path(d) / "run"
+        sim = IslandSimulation(sc, load_backends(None), run_dir, seed=3, backend_override="mock", verbose=False,
+                               log_prompts=True)
+        sim.run(1)
+        files = sorted((run_dir / "prompts").glob("*.txt"))
+        assert len(files) == sim.calls  # one file per call, none overwritten
+        out = build_site(run_dir)
+        page = out.read_text()
+        blob = page.split('<script id="site-data" type="application/json">', 1)[1].split("</script>", 1)[0]
+        index = json.loads(blob)["prompts"]
+        script = (out.parent / "prompts" / "day_000.js").read_text()
+        assert script.startswith("window.__islandPrompts(0,")
+        day = json.loads(script[len("window.__islandPrompts(0,"):-3])
+        listed = [c for calls in index["0"].values() for c in calls]
+        assert len(listed) == len(files) and {c[0] for c in listed} == set(day["calls"])
+        assert all(c[1] in ("plan", "spot", "notice", "chat", "plaza", "evening", "night", "isabelle") for c in listed)
+        for name in sc.villagers:  # each villager's calls start with the morning plan
+            assert index["0"][name][0][1] == "plan"
+        sys_i, user, reasoning, tokens, reply = next(iter(day["calls"].values()))
+        assert day["sys"][sys_i] and user and reply is not None
+
+
+def test_version_15_says_what_was_missing():
+    """Prompt version 15: plans written in common ways are read as meant, and failures say what would work."""
+    isl, g, bodies = _grid_island()
+    isl.prompt_version = 15
+    rng = random.Random(0)
+    a = isl.tidy({"do": "visit", "who": "B's home"})
+    assert a["who"] == "B"
+    a = isl.tidy({"do": "buy", "shop": "Nook's Cranny", "item": "2 fishing bait"})
+    assert a["shop"] == "cranny" and a["item"] == "fishing bait" and a["count"] == 2
+    assert isl.tidy({"do": "buy", "shop": "cranny", "item": "shovel recipe card"})["item"] == "shovel recipe"
+    ok, msg = isl.act("A", {"do": "trade", "with": "B"}, 10)
+    assert not ok and msg.startswith("'trade' isn't an action: talking, giving and trading"), msg
+    ok, msg = isl.act("A", {"do": "home", "store": {"wood": 1}}, 10)
+    assert not ok and "\"home\" field" in msg, msg
+    # Somewhere across the river, without a vaulting pole: the failure names the pole.
+    vil = isl.v["A"]
+    vil.inventory["vaulting pole"] = 0
+    ok, msg = bodies.perform("A", {"do": "buy", "shop": "Able Sisters", "item": "kimono"}, 10, rng)
+    assert not ok and msg == "you can't get to Able Sisters from here without a vaulting pole", msg
+    assert "Able Sisters (out of reach without a vaulting pole)" in bodies.where_note("A")
+    # Bells: none in the wallet says so.
+    vil.bells = 0
+    assert "wallet is empty" in isl._do_contribute_bridge(vil, {"bells": 100}, 10)[1]
+
+
+def test_rescue_service_once_a_day():
+    """Prompt version 15: a villager who can't get home stays out in free time, and the Rescue Service takes them
+    home once a day, saying why they got stuck; a second call that day is turned down."""
+    isl, g, bodies = _grid_island()
+    isl.prompt_version = 15
+    rng = random.Random(0)
+    b, vil = bodies.b["A"], isl.v["A"]
+    home = bodies.home_point("A")
+    assert bodies.rescue("A") == (False, "you're at home already")
+    vil.inventory["vaulting pole"] = 1
+    bodies.perform("A", {"do": "buy", "shop": "able", "item": "kimono"}, 10, rng)  # across the river
+    out = b.pos
+    assert out != home and not bodies.stuck("A")
+    ok, msg = bodies.perform("A", {"do": "rescue"}, 11, rng)
+    assert not ok and "didn't come" in msg  # not stuck: the pole still gets them home
+    vil.inventory["vaulting pole"] = 0
+    assert bodies.stuck("A")
+    bodies.go_home("A", asleep=False)
+    assert b.pos == out  # awake and stranded: a free hour doesn't take them home
+    assert "Your home is out of reach without a vaulting pole" in bodies.where_note("A")
+    ok, msg = bodies.perform("A", {"do": "call_rescue"}, 12, rng)
+    assert ok and b.pos == home and "crosses the river, and you carry no vaulting pole" in msg, msg
+    vil.inventory["vaulting pole"] = 1
+    bodies.perform("A", {"do": "buy", "shop": "able", "item": "kimono"}, 13, rng)
+    vil.inventory["vaulting pole"] = 0
+    ok, msg = bodies.perform("A", {"do": "call_rescue"}, 14, rng)
+    assert not ok and "once a day" in msg and b.pos != home
+    bodies.go_home("A", asleep=True)  # going to sleep ends the day at home
+    assert b.pos == home

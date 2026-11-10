@@ -30,7 +30,7 @@ reasoning kept low), which has a free tier.
    ```
 3. Run two days:
    ```bash
-   llmabm run scenarios/island_blank.yaml --seed 0 --days 2 --run-dir runs/test1 --log-prompts
+   llmabm run scenarios/island_blank.yaml --seed 0 --days 2 --run-dir runs/test1
    ```
 4. Keep going later with `llmabm resume runs/test1 --days 1`.
 
@@ -46,8 +46,8 @@ calls and tokens so far. If a run stops on a rate or daily limit, rerun the same
 same seed (or `llmabm resume` it the next day): cached replies replay the finished part for free.
 A resume that switched the prompt version (`--prompt-version`) needs the flag again until its
 first day finishes, because the checkpoint it replays from still has the old version. Small models sometimes return broken
-JSON; check the error count in `summary.txt` before reading much into a run. `--log-prompts` saves exactly what
-each villager saw, which is worth having on a first run.
+JSON; check the error count in `summary.txt` before reading much into a run. A run saves exactly what
+each villager saw in `prompts/` (turn it off with `--no-log-prompts`); the explorer shows it.
 
 Other providers (Gemini, Cerebras, Mistral, NVIDIA, OpenRouter, or a local model through Ollama
 with no key) are in `config/models.yaml`: put their key in `.env` and pass `--backend <name>`.
@@ -62,14 +62,14 @@ See [Models, free tiers and caching](#models-free-tiers-and-caching).
 | Isabelle's report | `days/day_NNN_isabelle.md` |
 | plans | the reasoning is in the day logs; the full scheduled and dropped lists are `plan` events in `events.jsonl` |
 | everything, raw | `events.jsonl`, including each model's raw reply |
-| prompts | `prompts/`, with `--log-prompts`: what each villager was shown, then the model's hidden reasoning and its reply |
+| prompts | `prompts/` (unless `--no-log-prompts`): one file per call, what the villager was shown, then the model's hidden reasoning and its reply. A villager's second call with the same tag (say, another turn in the same conversation hour) is `<tag>_<name>_2.txt` |
 
 `llmabm analyze <run_dir>` rebuilds the logs, summary and plots from `events.jsonl` without any
 LLM calls. More under [Outputs](#outputs).
 
 | command | what it does |
 |---|---|
-| `llmabm run <scenario>` | run a scenario. `--seed`, `--days` (or `--steps`), `--backend`, `--concurrency N`, `--no-cache`, `--log-prompts`, `--run-dir`, `--no-analyze` |
+| `llmabm run <scenario>` | run a scenario. `--seed`, `--days` (or `--steps`), `--backend`, `--concurrency N`, `--no-cache`, `--no-log-prompts`, `--run-dir`, `--no-analyze` |
 | `llmabm resume <run_dir>` | continue an island run from its last checkpoint. `--days`, `--backend`, `--prompt-version`, `--no-analyze` |
 | `llmabm analyze <run_dir>` | rebuild the summary, plots and logs, for example after you edit the analysis code |
 | `llmabm site <run_dir>` | build the run's explorer page, `<run_dir>/site/index.html`, from `site_data.json`. That file is written again first if it's missing or older than `events.jsonl`, so you don't need `analyze` before it |
@@ -85,14 +85,18 @@ package, runs `llmabm site runs --out _site` and deploys `_site/`: the Experimen
 root and each run at `<run>/`. The build makes no LLM calls.
 
 A run is published when its `manifest.json` and `events.jsonl` are committed; everything else in a
-run directory stays ignored, and the site is built from those two files alone. To publish a run:
+run directory stays ignored, and the site is built from those two files, plus `prompts/` if that is
+committed too. The prompts are what the "How they work" tab's examples and each villager's Prompts
+section on the Days tab show (loaded a day at a time, so the page stays small); without them the
+site says the run didn't keep its prompts. They are large (test1: about 7.6 MB of text for 10 days,
+1.3 MB compressed in git). To publish a run:
 
 ```bash
-git add runs/<run>/manifest.json runs/<run>/events.jsonl
+git add runs/<run>/manifest.json runs/<run>/events.jsonl runs/<run>/prompts
 git commit -m "Publish <run>" && git push
 ```
 
-To take one down, `git rm --cached` the two files and push. Once (in the repository's settings):
+To take one down, `git rm -r --cached` those files and push. Once (in the repository's settings):
 Pages > Build and deployment > Source: GitHub Actions. On a free GitHub plan the repository has to
 be public for Pages, and then its whole history is public too.
 
@@ -110,11 +114,12 @@ half day that the next resume will set aside and replay. A resume that finished 
 ```bash
 llmabm resume runs/<run> --days 1        # until it finishes the day
 llmabm site runs                         # optional: preview at runs/site/index.html
-git add runs/<run>/manifest.json runs/<run>/events.jsonl
+git add runs/<run>/manifest.json runs/<run>/events.jsonl runs/<run>/prompts
 git commit -m "Publish <run> through day N" && git push
 ```
 
-The site shows the villagers' private thoughts, notes and nightly pages, and anyone with the link
+The site shows the villagers' private thoughts, notes and nightly pages (and, with `prompts/`, every
+prompt and the model's hidden reasoning), and anyone with the link
 can read it. The villagers themselves can't: they are model calls with no web access, and their
 prompts only ever hold their own thoughts, notes and pages (conversations pass on only what was said
 and done). Every page also asks search engines and AI crawlers not to index or train on it
@@ -222,7 +227,13 @@ the tools the villager carries,
 and each villager's prompt says which rocks and buildings are within reach and how many steps
 away. From prompt version 10 it also lists the trees in the part of the island they're in (one
 of nine areas): standing hardwood and fruit trees, stumps and saplings, so a thinning wood can
-be seen rather than only pieced together from chop results. Placed furniture and fences block walking, so villagers can wall off space. Trees,
+be seen rather than only pieced together from chop results. From prompt version 15, a place out of
+reach says which tool would get you there ("plaza (out of reach without a vaulting pole)"). A tool
+can break on the way out, leaving a villager with no way home: from version 15 they stay out in
+their free hours instead of being put back home, their prompt says so ("Your home is out of reach
+without a vaulting pole (call_rescue, once a day)"), and falling asleep still brings them home.
+The bridge's site is fixed by the island generator: the shortest straight crossing of the river on
+the lower ground, at most 4 tiles, nearest Resident Services. Placed furniture and fences block walking, so villagers can wall off space. Trees,
 rocks, buildings (the plaza too) and homes always keep at least one free tile between them.
 
 **Two axes.** The stone axe, which everyone starts with, only gathers wood: the tree stays. The
@@ -465,7 +476,8 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 | `ask` | `who`: Tom Nook, Isabelle, Blathers, Timmy and Tommy, Able Sisters | their building | hear what they do and what it costs (open hours apply). Only for NPCs: to ask another villager something, talk to them |
 | `decorate` / `undecorate` | `item` | home | put furniture in or take it out; visitors see it |
 | `visit` | `who`: another villager | their home | knock, and talk if they're in; see the next section. Not for NPCs or buildings: villagers often try "visit Tom Nook" or "visit Nook's Cranny", and from prompt version 2 the failure says what to do instead |
-| `rest` | | home | |
+| `rest` | | home | from prompt version 15, where you are if you can't get home |
+| `call_rescue` | | where you are | prompt version 15: only when you can't get home with the tools you carry. The Rescue Service takes you home, free, once a day, and says why you got stuck; the hour goes on it. A second call that day is turned down |
 
 **Changing the island** (grid only, except planting trees)
 
@@ -693,7 +705,7 @@ write. Their old page stays.
 **Hidden reasoning.** Reasoning models (gpt-oss on Groq, for example) think before they answer,
 in text the villager never writes down. That reasoning is always recorded: the provider's
 reasoning token count per villager and call type goes into each day's `energy` event and the
-summary, and with `--log-prompts` the reasoning text itself is saved after each prompt. By
+summary, and the reasoning text itself is saved after each prompt in `prompts/`. By
 default it isn't charged, so a villager could deliberate at length and pay only for what it
 writes. Set `charge_reasoning: true` under `mental_energy` to charge it as thinking, like the
 `thoughts` field; villagers are then told that thinking things over costs energy too. How much
@@ -814,6 +826,8 @@ Each island run directory has:
 | `events.jsonl` | every event with its day and hour. Each action has a `delta` (bells, loan, items, recipes, house) and a `pools_delta` (public resources it changed). An `hour_state` snapshot every hour |
 | `manifest.json` | the scenario, world and villagers used |
 | `checkpoint.pkl` | the whole simulation, saved after every day |
+| `prompts/` | every call, one file each (unless `--no-log-prompts`): the system prompt, the prompt, the model's hidden reasoning and its reply |
+| `site/` | the explorer page, `llmabm site <run_dir>`: Home, Days (with each villager's prompts), Social, and How they work (the model, what carries over from day to day, each kind of call with an example, the prompt versions) |
 
 `summary.txt` covers:
 - who took each resource, with a concentration index (HHI), and net worth with its Gini
@@ -931,8 +945,8 @@ and `qwen/qwen3.8-27b`, which didn't reason at all on Groq in our tests. Groq sa
 tokens don't count toward its limits, but repeating the same system prompt showed no caching in
 a test, so plan on paying for every token. `--concurrency N` runs calls within an hour in parallel. Responses are cached
 in `.cache/llm/`, keyed on the prompt and the run seed. Re-running the same seed replays for
-free; a new seed resamples. Use `--no-cache` to force fresh calls. `--log-prompts` saves
-every full prompt, which is the fastest way to see what an agent actually saw.
+free; a new seed resamples. Use `--no-cache` to force fresh calls. Every full prompt is saved in
+`prompts/` (unless `--no-log-prompts`), which is the fastest way to see what an agent actually saw.
 
 Small free models often return malformed JSON. Those turns are logged as errors with the raw
 reply, and the agent does nothing that turn. Check the error count in `summary.txt` before

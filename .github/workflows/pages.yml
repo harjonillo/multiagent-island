@@ -1,7 +1,7 @@
 # Build the island explorer from the committed runs and publish it on GitHub Pages.
 #
-# A run is published when its manifest.json and events.jsonl are committed under runs/ (everything
-# else in a run directory stays ignored). The build makes no LLM calls. Mock-backend runs are left out.
+# A run is published when its manifest.json and events.jsonl are committed under runs/, with its
+# prompts/ folder if that is committed too (everything else in a run directory stays ignored). The build makes no LLM calls. Mock-backend runs are left out.
 # Repository settings: Pages > Build and deployment > Source: "GitHub Actions".
 
 name: Explorer site

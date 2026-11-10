@@ -14,6 +14,7 @@ from pathlib import Path
 from .site_data import VERSION as SITE_DATA_VERSION
 from .site_data import write as write_site_data
 from .site_experiments import TOKENS, build_experiments, experiment_order, is_run
+from .site_prompts import write as write_prompts
 
 TEMPLATE = Path(__file__).with_name("site_template.html")
 
@@ -45,11 +46,13 @@ def fresh_site_data(run_dir: Path) -> Path:
 
 def build_site(run_dir: Path, out_dir: Path | None = None, home: str = "../../site/index.html") -> Path:
     """Write <out_dir>/index.html (default <run_dir>/site/) from <run_dir>/site_data.json, brought up to
-    date first (fresh_site_data). `home` is the link to the Experiments page, relative to the page."""
+    date first (fresh_site_data), and <out_dir>/prompts/ from the run's prompt logs if it kept them. `home` is the link to the Experiments page, relative to the page."""
     run_dir = Path(run_dir)
     data = json.loads(fresh_site_data(run_dir).read_text())
     out_dir = Path(out_dir) if out_dir else run_dir / "site"
     out_dir.mkdir(parents=True, exist_ok=True)
+    # Every prompt, one script per day beside the page, loaded when one is opened (site_prompts.py).
+    data["prompts"] = write_prompts(run_dir, out_dir, data["run"]["days"], data["run"]["villagers"])
     # Inside <script>, "</" could end the element early; JSON allows escaping it.
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     title = html.escape(f"{data['run']['scenario']}, seed {data['run']['seed']}")

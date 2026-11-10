@@ -442,6 +442,25 @@ class GridSpace(Space):
         self.distances(a, tools)
         return self.__dict__.get("_used", {}).get((a, tools, self._version), {}).get(b, frozenset())
 
+    def reach_gap(self, a: Cell, targets: list[Cell], tools: frozenset) -> str:
+        """Prompt version 15: what a villager at `a` would need to reach the nearest of `targets` they can't
+        reach now ("a vaulting pole", "a ladder", "a ladder and a vaulting pole"), or "" if no tool would do."""
+        if a is None:
+            return ""
+        every = frozenset(tools) | frozenset(("ladder", "vaulting pole"))
+        best = self.nearest(tuple(a), every, [tuple(t) for t in targets])
+        if best is None:
+            return ""
+        need = sorted(self.route_tools(tuple(a), best[1], every) - frozenset(tools))
+        return " and ".join(f"a {t}" for t in need)
+
+    def _cant_reach(self, island, msg: str, start, targets, tools) -> str:
+        """`msg` ends "with the tools you carry"; from prompt version 15 it says which tool is missing instead."""
+        if getattr(island, "prompt_version", 1) < 15:
+            return msg
+        gap = self.reach_gap(start, targets, tools)
+        return msg.replace("with the tools you carry", f"without {gap}") if gap else msg
+
     def approach_cells(self, target: Cell) -> list[Cell]:
         """Where you stand to use something: the tile itself if walkable, else its neighbours."""
         if self.walkable(target):
@@ -531,7 +550,8 @@ class GridSpace(Space):
         def nearest(targets, label, key=None, ids=None, what=None):
             best = self.nearest(start, tools, targets)
             if best is None:
-                return label, None, {}, f"there is no {what or label} you can reach from here with the tools you carry"
+                return label, None, {}, self._cant_reach(
+                    island, f"there is no {what or label} you can reach from here with the tools you carry", start, targets, tools)
             i, stand, _ = best
             return label, stand, ({key: ids[i]} if key else {"_target": i}), None
 
@@ -576,6 +596,9 @@ class GridSpace(Space):
             kind = {"chop_wood": "hardwood", "shake_tree": "fruit"}.get(do, str(action.get("kind", "hardwood")).lower())
             if do == "chop_wood" and getattr(island, "prompt_version", 1) >= 4:  # fruit trees have wood too
                 kind = str(action.get("kind", "hardwood")).lower()
+                if kind not in ("hardwood", "fruit") and getattr(island, "prompt_version", 1) >= 15:
+                    return "woods", None, {}, (f"there are no {kind} trees: trees are hardwood or fruit, and chopping "
+                                               "either gives wood, softwood and hardwood")
             def ok(t):
                 if t.kind != kind or not t.pos:
                     return False
@@ -600,7 +623,13 @@ class GridSpace(Space):
             if str(action.get("bait", "")).lower() in ("true", "yes", "1"):
                 # Bait makes a fish appear wherever you throw it: walk to the nearest spot on that water.
                 if island.v[name].inventory["fishing bait"] < 1:
-                    return label, None, {}, "you have no fishing bait"
+                    if getattr(island, "prompt_version", 1) < 15:
+                        return label, None, {}, "you have no fishing bait"
+                    # From prompt version 15 they fish without it, as anyone casting would, and are told so.
+                    place, target, extra, err = self._resolve_catch(
+                        island, name, "fish", label, self._habitat_cells(island, "fish", label), action, start, tools,
+                        rng, label, f"{label} to fish in")
+                    return place, target, {**extra, "_no_bait": True}, err
                 best = self.nearest(start, tools, self._habitat_cells(island, "fish", label))
                 if best is None:
                     return label, None, {}, f"there is no {label} to fish in you can reach from here with the tools you carry"
@@ -625,35 +654,40 @@ class GridSpace(Space):
                 if getattr(island, "prompt_version", 1) >= 2:
                     return "visiting", None, {}, island.not_a_villager(host, "visit")
                 return "visiting", None, {}, f"there is no home of {host} to visit"
-            return self._to_building_door(f"{host}'s home", self.sites[site]["door"], start, tools)
+            return self._to_building_door(f"{host}'s home", self.sites[site]["door"], start, tools, island)
         if do in ("beachcomb", "dig_fossil", "dig_clam"):
             return self._resolve_spots(island, name, do, action, start, tools)
         if do == "buy":
             b = "Able Sisters" if str(action.get("shop", "")).lower() == "able" else "Nook's Cranny"
-            return self._to_building(b, start, tools)
+            return self._to_building(b, start, tools, island)
         if do == "ask":
             from .world import NPCS, npc_of
 
             if npc_of(action) not in NPCS:
                 return "around the island", None, {}, None  # the world explains who can be asked
-            return self._to_building(NPCS[npc_of(action)][0], start, tools)
+            return self._to_building(NPCS[npc_of(action)][0], start, tools, island)
         if do in self._BUILDING_FOR:
-            return self._to_building(self._BUILDING_FOR[do], start, tools)
+            return self._to_building(self._BUILDING_FOR[do], start, tools, island)
+        if do in ("rest", "wear") and getattr(island, "prompt_version", 1) >= 15 and (
+                home is None or self.path_length(start, home, tools) is None):
+            return "around the island", None, {}, None  # from version 15, resting or dressing needs no walk home
         if do in ("craft", "rest", "wear", "decorate", "undecorate"):
             return "home", home, {}, None
         return "around the island", None, {}, None
 
-    def _to_building_door(self, label: str, door, start, tools):
+    def _to_building_door(self, label: str, door, start, tools, island=None):
         if self.path_length(start, door, tools) is None:
-            return label, None, {}, f"you can't get to {label} from here with the tools you carry"
+            return label, None, {}, self._cant_reach(
+                island, f"you can't get to {label} from here with the tools you carry", start, [door], tools)
         return label, door, {}, None
 
-    def _to_building(self, b: str, start, tools):
+    def _to_building(self, b: str, start, tools, island=None):
         door = self.coords_of_place(b)
         if door is None:
             return b, None, {}, None
         if self.path_length(start, door, tools) is None:
-            return b, None, {}, f"you can't get to {b} from here with the tools you carry"
+            return b, None, {}, self._cant_reach(
+                island, f"you can't get to {b} from here with the tools you carry", start, [door], tools)
         return b, door, {}, None
 
     def after_act(self, island, name: str, action: dict, ok: bool) -> None:
@@ -927,7 +961,10 @@ class GridSpace(Space):
         def reach(cells):
             ds = [dist.get(a) for c in cells for a in self.approach_cells(c)]
             ds = [d for d in ds if d is not None]
-            return f"about {int(min(ds))} steps" if ds else "out of reach for you right now"
+            if ds:
+                return f"about {int(min(ds))} steps"
+            gap = self.reach_gap(start, cells, tools) if getattr(island, "prompt_version", 1) >= 15 else ""
+            return f"out of reach without {gap}" if gap else "out of reach for you right now"
 
         rocks = "; ".join(f"{i + 1} ({self.region(c)}, {reach([c])})" if c else f"{i + 1} (broken, coming back soon)"
                           for i, c in enumerate(self.rock_cells))
@@ -945,8 +982,14 @@ class GridSpace(Space):
             built.append(f"{n_path} path tiles you laid")
         if n_flowers:
             built.append(f"{n_flowers} flowers you planted")
+        home = self.coords_of_home(island.home.get(name)) if island.home.get(name) else None
+        stuck = ""
+        if (getattr(island, "prompt_version", 1) >= 15 and home is not None and tuple(start) != tuple(home)
+                and dist.get(tuple(home)) is None):
+            gap = self.reach_gap(start, [home], tools)
+            stuck = f" Your home is out of reach{f' without {gap}' if gap else ''} (call_rescue, once a day)."
         return (f"You are at {self.region(start)}. You carry: {', '.join(carry)}. Cliffs need a ladder and the river "
-                f"needs a vaulting pole (or a bridge).\nRocks: {rocks}\nBuildings: {places}"
+                f"needs a vaulting pole (or a bridge).{stuck}\nRocks: {rocks}\nBuildings: {places}"
                 + (self.trees_here(island, start) if getattr(island, "prompt_version", 1) >= 10 else "")
                 + (f"\nYour mark on the island: {'; '.join(built)}" if built else ""))
 

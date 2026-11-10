@@ -122,7 +122,7 @@ house_levels:                      # upgrading takes a Tom Nook loan for `cost`;
 move_house_cost: 10000             # Tom Nook moves your home to a free homesite overnight
 
 bridge:
-  name: bridge to the north bank
+  name: bridge over the river
   cost: 98000                      # anyone can chip in; built once funded
   unlocks: {rocks: 3, hardwood_trees: 10}
 

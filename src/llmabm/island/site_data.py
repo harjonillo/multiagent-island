@@ -19,10 +19,11 @@ from .analysis import (RESOURCES, _side, action_mix, assets, extraction_shares, 
                        reply_errors, run_out, snapshots)
 from .world import CATEGORIES, CLAM, FOSSIL, clock, sell_prices
 
-VERSION = 9  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
+VERSION = 10  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
 # 7: what each thing on the map is, for hovering (objects.info), buildings' tiles, and each day's house names
 # 8: what each villager gathered and sold each day, and where their bells came from and went (econ)
 # 9: a nightly page's opening on the home page takes in the line after a heading-only first line (pages.rest)
+# 10: the bridge fund each day, for the bridge site on the map; how the villagers work (mind): the model and its settings, energy, memory, and the prompt versions by day
 
 # Why actions failed, matched on the result text; the first match wins.
 FAIL_BUCKETS = [
@@ -209,7 +210,8 @@ def days_data(run: Run) -> list[dict]:
         out.append({"day": d, "date": _short_date(st.get("date", "")), "season": st.get("season", ""),
                     "weather": st.get("weather", ""), "homes": snap.get("homes", {}),
                     "home_areas": snap.get("home_areas", {}), "objects": objects,
-                    "houses": {n: levels[v["house"]]["name"] for n, v in snap["villagers"].items()}})
+                    "houses": {n: levels[v["house"]]["name"] for n, v in snap["villagers"].items()},
+                    "bridge_fund": snap.get("bridge_fund", 0)})
     return out
 
 
@@ -569,6 +571,44 @@ def build(run_dir: Path) -> dict:
         "daylog": day_detail(run),
         "social": social_data(run),
         "bridge_cost": m["world"]["bridge"]["cost"],
+        "mind": mind_data(run),
+    }
+
+
+def mind_data(run: Run) -> dict:
+    """What every villager is made of, for the How they work tab: the model and request settings, the
+    daily mental energy, the nightly page, memory, and which prompt version each day used (with what
+    changed mid-run)."""
+    m = run.manifest
+    cfg = m.get("scenario_config") or {}
+    backend = m.get("backend_override") or sorted({v["model"] for v in m["villagers"].values()})[0]
+    spec = (m.get("backends") or {}).get(backend, backend).split("|")
+    try:
+        params = json.loads(spec[2]) if len(spec) > 2 else {}
+    except ValueError:
+        params = {}
+    # Prompt versions: what the run started with, then each resume that switched it.
+    start = m.get("prompt_version")
+    if start is None:
+        first = next((i["what"] for i in m.get("interventions", []) if i["what"].startswith("prompt version ")), None)
+        start = int(first.split()[2]) if first else 1
+    versions = [[0, start]]
+    for e in run.of("resume"):
+        v = e.get("prompt_version")
+        if v is not None and int(v) != versions[-1][1]:
+            versions.append([e["from_day"], int(v)])
+    memory = cfg.get("memory")
+    if not memory and any(i["what"] == "long-term memory" for i in m.get("interventions", [])):
+        from .memory import DEFAULTS
+        memory = {"mode": "consolidate", **DEFAULTS}
+    return {
+        "backend": backend, "url": spec[0] if len(spec) > 1 else "", "model": spec[1] if len(spec) > 1 else spec[0],
+        "params": params, "llm": cfg.get("llm", {}), "energy": cfg.get("mental_energy", {}),
+        "reflection": cfg.get("reflection", {}), "memory": memory, "memory_size": cfg.get("memory_size"),
+        "versions": versions,
+        "interventions": [{"from_day": i.get("from_day"), "what": i["what"], "details": i.get("details", [])}
+                          for i in m.get("interventions", [])],
+        "persona": next(iter(m["villagers"].values())).get("persona", ""),
     }
 
 

@@ -46,6 +46,8 @@ from .grid import GridSpace
 from .body import Bodies
 from .world import Island, clock, load_world, to_game_hour
 
+_PROMPT_LOCK = threading.Lock()
+
 
 class EventLog:
     def __init__(self, path: Path, mode: str = "w"):
@@ -226,9 +228,22 @@ class IslandSimulation:
     # --- persistence -------------------------------------------------------
     def __getstate__(self):
         state = dict(self.__dict__)
-        for k in ("backends", "log", "_raw_log"):
+        for k in ("backends", "log", "_raw_log", "_prompt_seq"):
             state.pop(k, None)
         return state
+
+    def _prompt_file(self, tag: str, name: str) -> Path:
+        """Where this call's prompt is logged: <tag>_<name>.txt for the first call with that tag (a day,
+        an hour and a kind of call), then <tag>_<name>_2.txt and so on, so a villager's several turns in one
+        conversation are all kept. The count starts again in each process, so a resume that replays a day
+        writes the same files again."""
+        with _PROMPT_LOCK:
+            seq = self.__dict__.setdefault("_prompt_seq", Counter())
+            seq[(tag, name)] += 1
+            n = seq[(tag, name)]
+        d = self.run_dir / "prompts"
+        d.mkdir(exist_ok=True)
+        return d / (f"{tag}_{name}.txt" if n == 1 else f"{tag}_{name}_{n}.txt")
 
     def _intervene(self, from_day: int, what: str, details: list[str]) -> None:
         """Record a deliberate mid-run change, in the events and in the manifest."""
@@ -427,9 +442,7 @@ class IslandSimulation:
         backend = self.backends[backend_name]
         msgs = [{"role": "system", "content": system or self.systems[name]}, {"role": "user", "content": user}]
         if self.log_prompts:
-            d = self.run_dir / "prompts"
-            d.mkdir(exist_ok=True)
-            prompt_file = d / f"{tag}_{name}.txt"
+            prompt_file = self._prompt_file(tag, name)
             prompt_file.write_text(f"=== SYSTEM ===\n{msgs[0]['content']}\n\n=== USER ===\n{user}\n")
         try:
             reply = backend.complete(msgs, self.sc.temperature, max_tokens or self.sc.max_tokens)
@@ -1238,7 +1251,7 @@ class IslandSimulation:
                 if self.bodies.wander(n, int(self.sc.world.get("grid", {}).get("wander_steps", 12)), self.rng):
                     wandering.add(n)
                     continue
-            self.bodies.go_home(n)
+            self.bodies.go_home(n, asleep=not isl.is_awake(n, h))
         # What each awake villager sees around them (bugs, fish shadows, shells, dig spots).
         for n in isl.v:
             if isl.arrived[n] is not None and isl.is_awake(n, h):
