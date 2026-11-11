@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+Walked around, nobody answered. Kit offered selit for bait but I’m still short. Jo offered selzalne, but I’m not willing to trade yet. Dax still wants bait, I’ve nothing to give. No progress on fishing. Still 0 bells. Ladder still half‑built; need more wood. Maybe tomorrow I’ll bring a wood to Dax to trade for bait. Still no rock from Jo. I’ll keep asking Gus later, maybe he’s somewhere else.
+
+Sleep is hard, but I’m determined. Tomorrow: bring wood, ask Dax, keep looking for Jo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 10 (May 1, spring, sunny), 08:00. You are Bo, at the Dax's home.
+Nearby: Jo.
+Earlier today:
+- 07:00 walked over to Gus's home
+- 07:00 knocked at Gus's home, but nobody answered
+- 08:00 walked over to Dax's home (also nearby: Jo)
+- 08:00 knocked at Dax's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still no bait, need wood trade
+- (day 8) Dax wants bait, I have none
+- (day 8) Ladder 22 uses left, need more wood
+Your notes from the last 2 days:
+- (day 9) Remember to bring wood tomorrow to trade for bait.
+- (day 9) Try to get bait from Dax. If they accept, good. If not, keep trying elsewhere.
+- (day 9) Remember to gather wood tomorrow to try trading for bait.
+- (day 9) Got bait. Keep 4 wood left.
+- (day 9) Keep wood reserve for next trade.
+- (day 10) Keep at least 3 wood in reserve for future bait trades.
+Mental energy left today: 127 (about 17 for each thing you say). Your plan for today: inward 20 (spent 23: 3 more than planned, from your spare), outward 130 (spent 0), spare 0 (used 3).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (41 tokens, hidden from everyone) ===
+Need to decide. Dax wants bait, I have none but had bait day9? Wait day9 notes: got bait. So I have bait. Use to trade. So approach Dax.
+
+=== REPLY ===
+{"thoughts":"I have bait from yesterday and still have a few wood left. Dax needs bait, so I should trade and get more wood to finish ladder. No need to talk to Jo now.", "approach":"Dax", "say":"Hey Dax, got some bait if you need it."}

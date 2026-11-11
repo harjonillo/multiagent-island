@@ -1,0 +1,41 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, night.  
+I’m still stuck on the bait.  Ari keeps swapping wood for fish, and Cal is still out of the woods.  The pond gave me a miruru and an ashrumo moth, but I’m still 0 bells.  I’ll try the fishing rod again tomorrow; maybe a gormo will fetch something.  No trades today, so I keep my 3 woods and 1 fish.  I’ll post a request on the board tonight – “Need 1 fishing bait, will trade 1 wood.”  I’m tired but hopeful.  Maybe Bo will have a ladder, or someone will bring a spare.  The island feels quiet, but the water’s still alive.  I’ll keep an eye on the rocks for more bugs and the pond for more fish.  
+
+I’ll sleep early, maybe get some rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 10 (May 1, spring, sunny), 07:00. You are Ike, at the out for a walk.
+Nearby: Ari.
+Earlier today:
+- 05:00 at home: couldn't put away wood: your tent has no room for things
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Got 1 wood back from Ari today.
+- (day 9) Got miruru fish, ashrumo moth
+- (day 9) Still 0 bells
+- (day 9) Still 3 woods, 1 fish, 1 bait needed
+Your notes from the last 2 days:
+- (day 8) If they decline, I'll have to look for another bait source tomorrow. Keep an eye on the board.
+- (day 8) Need bait ASAP, trade with Ari. If fails, post on board tomorrow.
+- (day 8) Confirm trade with Ari, keep track of bait request.
+- (day 9) Tomorrow I’ll head to Nook’s Cranny to buy fishing bait. Keep an eye on Cal for wood trade.
+- (day 9) Tomorrow head to Nook's Cranny for fishing bait. Keep an eye on Cal's wood supply.
+- (day 10) Remember to ask Ari for another bait if needed tomorrow.
+Mental energy left today: 131 (about 17 for each thing you say). Your plan for today: inward 70 (spent 19), outward 80 (spent 0), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (4 tokens, hidden from everyone) ===
+Need JSON.
+
+=== REPLY ===
+{"thoughts":"I still need bait. Ari has wood, maybe he’ll trade. I’ll ask him tomorrow. No need to talk now.","approach":"","say":""}

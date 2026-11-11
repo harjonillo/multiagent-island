@@ -1,0 +1,85 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8.  
+I kept circling the plaza like a broken record—no one, no trade. I posted twice, each time hoping for bait or a log, but the board stayed quiet. The fishing rod felt pointless; no fish, no bait, no energy. I’m still stuck with 3 softwood, 1 hardwood, 2 selit fish. I’ll ask Jo in person tomorrow, maybe trade a log for bait. The bridge donation still a mystery; I’ll keep an eye out. I’m tired but will keep my tools ready; a small fence might still be useful. Tomorrow I’ll try to move a bit more, maybe find a rock or ladder.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 10. You are Eli, at home before sleep.
+
+What happened today:
+- 07:00 went to the plaza
+- 07:00 posted on the board [b84]: "Eli: Need 1 fishing bait. Offer 1 selit fish. Also need a log or rock if anyone "
+- 08:00 fished for a small shadow in the sea: caught a tubas fish
+- 09:00 went to the plaza
+- 10:00 looked for fish in the sea, but there were no fish shadows in sight
+- 11:00 went to the plaza
+- 11:00 posted on the board [b85]: "Eli: Need 1 fishing bait. Offer 1 selit fish and 1 softwood. Also need a log or "
+- 12:00 went to the plaza
+- 12:00 sent Jo a parcel: 1 selit fish
+- 12:00 took down your board post [b85]
+- 13:00 tried to post: 'post' isn't an action: the board, letters and parcels are at the plaza: spend a free hour there with {"do": "plaza"}
+- 14:00 went to the plaza, but were too tired to do anything there
+- 15:00 tried to visit: you can't get to Jo's home from here without a vaulting pole
+- 16:00 went to the plaza, but were too tired to do anything there
+- 17:00 went to the plaza, but were too tired to do anything there
+- 19:00 too tired to plan, so you planned nothing new
+
+Things that changed hands today:
+(nothing)
+
+What you have tonight:
+Bells: 100 in your wallet
+Tools you carry: shovel (30 uses left), axe (27 uses left), fishing rod (22 uses left), net (30 uses left), ladder (30 uses left)
+Other things you carry: selzalne fish x1, softwood x3, hardwood x1, selit fish x1, tubas fish x1
+At home (a tent holds only bells): 0 bells
+Recipes you know: clay furnace, fruit basket, ironwood dresser, simple wooden fence
+Since this morning: +1 tubas fish; −1 selit fish
+
+Open requests:
+(none)
+
+Your notes:
+- (day 9) Check Jo's home tomorrow for log or rock. Keep an eye on the plaza for anyone wanting bait.
+- (day 9) Keep eye on Jo tomorrow for log/rock. Maybe ask her in person.
+- (day 9) Keep eye on Jo tomorrow for log/rock.
+- (day 9) Tomorrow try to visit Jo’s house for a log or rock.
+- (day 9) Ask Jo for a log or rock. If she says no, try to trade a selit fish for bait.
+- (day 9) Check Jo’s reply tomorrow, keep track of any bridge donation. Also try to fish later if I get bait.
+- (day 10) Try to get a vaulting pole tomorrow; maybe ask Jo if she has one.
+- (day 10) Keep an eye on Jo tomorrow; maybe she has a rock.
+- (day 10) Stay patient, keep posting.
+- (day 10) Check Jo's house tomorrow, maybe she has a log.
+- (day 10) Keep an eye on Jo, maybe she’ll drop a log. If she has a vaulting pole, ask for it.
+- (day 10) Keep an eye on Jo tomorrow, maybe she'll drop a log or rock. Also, consider visiting the beach for more fish.
+
+Things you remember, numbered:
+1. (day 8) Still 3 softwood, 1 hardwood, 2 selit fish
+2. (day 8) No trades today
+3. (day 8) Need Jo’s log or rock for bait tomorrow
+
+What you wrote last night:
+Day 8.  
+I kept circling the plaza like a broken record—no one, no trade. I posted twice, each time hoping for bait or a log, but the board stayed quiet. The fishing rod felt pointless; no fish, no bait, no energy. I’m still stuck with 3 softwood, 1 hardwood, 2 selit fish. I’ll ask Jo in person tomorrow, maybe trade a log for bait. The bridge donation still a mystery; I’ll keep an eye out. I’m tired but will keep my tools ready; a small fence might still be useful. Tomorrow I’ll try to move a bit more, maybe find a rock or ladder.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something you already remember that is still on your mind. Anything you don't hold on to fades over the next days; what you come back to stays longer.
+
+=== REASONING (10 tokens, hidden from everyone) ===
+Need to write diary entry 150 words.
+
+=== REPLY ===
+Day 10.  
+The sun was still high when I went to the plaza, but the board stayed empty. I posted a new request, swapped a selit fish for a log if anyone had one, and tried to be patient. I caught a tubas fish early, but the sea went silent by mid‑morning—no shadows, no bite. I sent Jo a parcel of selit fish, hoping she’d return the favor with a log or at least a vaulting pole. I’ve been running out of energy; the shovel, axe, and rod are still good, but I feel the weight of the day. No new trades, no new items. I’m still missing that log, that rock, that pole. I’ll keep watching Jo’s house, keep posting, and hope a fish or a log comes my way.
+
+Remember:
+- Got a tubas fish.
+- Still need Jo’s log or vaulting pole.
+- No trades today.

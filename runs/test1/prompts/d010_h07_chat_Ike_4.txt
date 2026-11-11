@@ -1,0 +1,98 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, night.  
+I’m still stuck on the bait.  Ari keeps swapping wood for fish, and Cal is still out of the woods.  The pond gave me a miruru and an ashrumo moth, but I’m still 0 bells.  I’ll try the fishing rod again tomorrow; maybe a gormo will fetch something.  No trades today, so I keep my 3 woods and 1 fish.  I’ll post a request on the board tonight – “Need 1 fishing bait, will trade 1 wood.”  I’m tired but hopeful.  Maybe Bo will have a ladder, or someone will bring a spare.  The island feels quiet, but the water’s still alive.  I’ll keep an eye on the rocks for more bugs and the pond for more fish.  
+
+I’ll sleep early, maybe get some rest.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 10 (May 1, spring, sunny), 07:00. You are Ike.
+You are usually up from 07:00 to 00:00.
+Bells: 0 in your wallet. Home: tent lower ground, east (site-3), neighbors: Cal. Carrying 15/40 items.
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Open requests: Ari wants 1 fishing bait from you (until day 10)
+Recipes you know: clay furnace (clay x6, iron nugget x2; you have none); golden candlestick (gold nugget x1, iron nugget x3; you have none); iron worktable (iron nugget x5, wood x4; in pockets: wood 5); simple wooden fence (wood x3; 5 in pockets)
+Nook's Cranny buys at (prices you've heard): none yet
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640, cosmos seeds 240, hyacinth seeds 240, fishing bait 300, record player 9800, ceiling fan 4600
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards: shovel recipe 200, axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, stone fence recipe 800
+Able Sisters today (09:00-21:00), clothes: kimono 4800, rose crown 1200, bowler hat 900, straw hat 800
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Got 1 wood back from Ari today.
+- (day 8) Still no fishing bait.
+- (day 8) Gormo fish might sell for bells tomorrow.
+- (day 9) Got miruru fish, ashrumo moth
+- (day 9) Still 0 bells
+- (day 9) Still 3 woods, 1 fish, 1 bait needed
+Your notes from the last 2 days:
+- (day 8) If trade fails, post on board for bait next day.
+- (day 8) Need bait ASAP. Trade wood for bait next.
+- (day 8) If they decline, I'll have to look for another bait source tomorrow. Keep an eye on the board.
+- (day 8) Need bait ASAP, trade with Ari. If fails, post on board tomorrow.
+- (day 8) Confirm trade with Ari, keep track of bait request.
+- (day 9) Tomorrow I’ll head to Nook’s Cranny to buy fishing bait. Keep an eye on Cal for wood trade.
+- (day 9) Tomorrow head to Nook's Cranny for fishing bait. Keep an eye on Cal's wood supply.
+- (day 10) Remember to ask Ari for another bait if needed tomorrow.
+- (day 10) Got a bait, keep an eye on Cal for more wood.
+- (day 10) Remember to check the board tomorrow if this fails.
+- (day 10) Make sure I have a fishing rod tomorrow.
+Getting around: You are at lower ground, east. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+
+So far today you:
+- 05:00 at home: couldn't put away wood: your tent has no room for things
+
+Between you and Ari so far (the latest 6; 5 earlier):
+- day 6: Ari gave you 1 selzalne fish
+- day 7: Ari gave you 1 wood, which you had asked for
+- day 7: you gave Ari 1 selzalne fish
+- day 8: Ari gave you 1 wood
+- day 10: Ari gave you 1 wood
+- day 10: Ari gave you 1 wood
+
+The last time you talked with Ari before today (day 9, 13:00, at your home):
+Ari: Hey Ike, can I trade a wood for a bait? [Ari's offer: you give 1 fishing bait, you get 1 wood; then you went your ways]
+
+You ran into Ari at Ike's home. So far:
+Ari: Hey Ike, can I trade you some wood for a fishing bait?
+You: Sure, here's a wood. [your offer: you give 1 wood, you get 1 fishing bait]
+Ari: Sure, here's a wood. [Ari handed you 1 wood]
+You: Sure, here's a wood. [your offer: you give 1 wood, you get 1 fishing bait]
+Ari: Sure, here's a wood. [Ari handed you 1 wood]
+You: Sure, give me that bait. [your offer: you give 1 wood, you get 1 fishing bait]
+Ari: Sorry, I don’t have any bait right now.
+
+Reply, or say nothing to end it. "leave": true ends it after this line.
+One or two sentences, the way you'd really talk. Only Ari hears it.
+Each line costs about 17 mental energy; you have 86 left today.
+You can also give Ari something from your pockets now ("give"), ask for something ("ask"; open until they give or trade it, up to 3 days). Leave any empty ({}).
+Trade offers left in this conversation (from either of you): 0 of 3.
+On the table from you: you give 1 wood, you get 1 fishing bait, if Ari accepts.
+In your pockets right now: 0 bells, shovel x1, axe x1, fishing rod x1, net x1, ladder x1, selzalne fish x1, fossil x1, wood x5, gormo fish x1, miruru fish x1, ashrumo moth x1
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {} or {"<item or bells>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (162 tokens, hidden from everyone) ===
+We need to respond to Ari. We have 5 woods. Ari wants 1 fishing bait, but doesn't have. We can give wood? He wants bait. We could ask for wood? He has wood. We can trade? He has none. We could offer wood for bait but he has none. Maybe ask for wood? He has wood. He wants bait. We could ask for wood? No. Maybe propose trade: give wood for bait if he gets one. But he doesn't have. We can ask him to get bait from Nook's. Probably best to say "Sure, I'll bring you a bait tomorrow." No action. Let's give no item. We can ask for wood? No. Just say something. "I'll try to get a bait tomorrow." We'll set leave false.
+
+=== REPLY ===
+{"thoughts":"Ari still doesn't have bait. I have 5 woods and no bait. I could offer a wood for bait if he gets one, but he can't give me one now. Best to promise to get bait tomorrow and keep trading. No immediate trade. I’ll just say something friendly and keep my woods.", "say":"Sure, I'll try to get a bait tomorrow and bring it over.", "give": {}, "ask": {}, "leave": false, "note":"Keep an eye on Ari tomorrow; maybe he'll have bait after I buy one."}

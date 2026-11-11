@@ -1,0 +1,53 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 13:00. You are Fen, at the river.
+You just spotted:
+1. a medium fish shadow in the river (lower ground, centre, near Resident Services)
+2. an ashrumo moth on a rock (lower ground, centre, near rock 4)
+Earlier today:
+- 07:00 ran into Kit at Kit's home: you said "Hey Kit, any chance you have a map or can point me toward the plaza?"; Kit said "Hey Fen, how about I trade you one selit for a bait?" [Kit's offer: you give 1 fishing bait, you get 1 selit fish]; you said "Sure, here's a map for a bait." [your offer: you give 1 island map, you get 1 fishing bait]; Kit said "" [Kit's offer: you give 1 island map, you get 1 selit fish]; you said "Nah, I don’t have that, maybe later." [then you went your ways]
+- 08:00 tried to visit: you can't get to Kit's home from here without a vaulting pole
+- 09:00 tried to visit: you can't get to Kit's home from here without a vaulting pole
+- 12:00 tried to dig_rock: 'dig_rock' is not something you can do
+- 13:00 looked for fish in the river, but there were no fish shadows in sight
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Need apple before rock break
+- (day 8) Gus traded selzalne for bait, but gave me none
+- (day 8) Still only 1 map in hand, still no path to plaza
+Your notes from the last 2 days:
+- (day 9) Remember to catch selzalne first, then trade for bait.
+- (day 9) Got bait tomorrow.
+- (day 10) Keep trying to get bait. If nothing happens, maybe wait for next day.
+- (day 10) Keep the other two maps for future trades or requests.
+- (day 10) Remember to find selit or get a map soon.
+- (day 10) Try to get a ladder tomorrow, maybe from Gus if I can reach him with a vaulting pole.
+At 14:00 you have nothing planned.
+Actions left today: 3 of 10. Mental energy left today: 61.
+
+You can go after one of them at 14:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (19 tokens, hidden from everyone) ===
+We need pick one to go after. Options: fish shadow, moth. Probably fish.
+
+=== REPLY ===
+{"thoughts":"I’ll try the medium fish shadow. It’s in the river, close to Resident Services, and I still need bait. I’ll give it a shot now and hope the fish is there.", "go":1}

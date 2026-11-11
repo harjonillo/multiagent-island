@@ -1,0 +1,102 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+Walked around, nobody answered. Kit offered selit for bait but I’m still short. Jo offered selzalne, but I’m not willing to trade yet. Dax still wants bait, I’ve nothing to give. No progress on fishing. Still 0 bells. Ladder still half‑built; need more wood. Maybe tomorrow I’ll bring a wood to Dax to trade for bait. Still no rock from Jo. I’ll keep asking Gus later, maybe he’s somewhere else.
+
+Sleep is hard, but I’m determined. Tomorrow: bring wood, ask Dax, keep looking for Jo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 10. You are Bo, at home before sleep.
+
+What happened today:
+- 07:00 walked over to Gus's home
+- 07:00 knocked at Gus's home, but nobody answered
+- 08:00 walked over to Dax's home (also nearby: Jo)
+- 08:00 knocked at Dax's home, but nobody answered
+- 09:00 tried to break_rock: you need an apple in your pockets: breaking a rock eats one first, to be strong enough (shaking a fruit tree drops them) (also nearby: Cal, Jo)
+- 09:00 spotted an ashrumo moth on a rock (lower ground, southeast, near rock 5) and went after it at 10:00
+- 10:00 tried to catch_bug: pockets full
+- 11:00 tried to fish: no fishing bait in your pockets, so you fished without it: pockets full
+- 12:00 walked over to Dax's home (also nearby: Ari)
+- 12:00 knocked at Dax's home, but nobody answered
+- 12:00 ran into Ari at Dax's home: Ari said "Hey Bo, got any idea where the path to Cranny is?"; you said "Hey Ari, any clue where the path to Cranny is?"; Ari said "Sure, I can help. I have a wood if you want." [Ari tried to hand you 1 wood but you had no room]; you said "Thanks Ari, could I have a wood? Maybe I can give you a shovel if you like." [you asked Ari for 1 wood]; Ari said "" [just nodded (too tired to talk)]
+- 13:00 tried to fish: no fishing bait in your pockets, so you fished without it: pockets full
+- 14:00 tried to fish: no fishing bait in your pockets, so you fished without it: pockets full
+- 15:00 no fishing bait in your pockets, so you fished without it: looked for fish in the river, but there were no fish shadows in sight
+- 16:00 tried to go to the plaza: couldn't find a way to the plaza without a vaulting pole
+- 19:00 walked over to Ari's home
+- 19:00 inside Ari's home: not much furniture yet
+- 19:00 visited Ari at home: you said "" [just nodded (too tired to talk)]
+
+Things that changed hands today:
+(nothing)
+
+What you have tonight:
+Bells: 0 in your wallet
+Tools you carry: shovel x2 (uses left: 29, 30), axe (19 uses left), fishing rod (24 uses left), net (30 uses left), ladder (16 uses left)
+Other things you carry: hardwood x7, wood x7, softwood x10, miphosel shell x2, ashbastu shell x2, loka fish x2, gormo fish x2, shovel recipe x1, fossil x1
+At home (a tent holds only bells): 0 bells
+Recipes you know: campfire, clay furnace, iron worktable, shovel, simple wooden fence
+Since this morning: nothing changed
+
+Open requests:
+- you want 1 fishing bait from Kit (until day 10)
+- you want 1 fishing bait from Gus (until day 11)
+- Gus wants 1 fishing bait from you (until day 11)
+- you want 1 wood from Ari (until day 12)
+
+Your notes:
+- (day 9) Remember to bring a few wood pieces each time, maybe 2-3, to offer as trade for bait.
+- (day 9) Remember to bring 2-3 wood next time for bait trade.
+- (day 9) Track wood usage, keep 3-5 wood in reserve for future trades.
+- (day 9) Remember to bring wood tomorrow to trade for bait.
+- (day 9) Try to get bait from Dax. If they accept, good. If not, keep trying elsewhere.
+- (day 9) Remember to gather wood tomorrow to try trading for bait.
+- (day 9) Got bait. Keep 4 wood left.
+- (day 9) Keep wood reserve for next trade.
+- (day 10) Keep at least 3 wood in reserve for future bait trades.
+- (day 10) Try to keep 3 wood reserve for next bait trade.
+- (day 10) Ask Ari for path next time to save time
+- (day 10) Need wood for bait. Keep shovels as backup.
+- (day 10) If Ari has wood, trade for shovel later. If Dax gives bait, fish tomorrow. Stay tuned.
+
+Things you remember, numbered:
+1. (day 8) Still no bait, need wood trade
+2. (day 8) Dax wants bait, I have none
+3. (day 8) Ladder 22 uses left, need more wood
+
+What you wrote last night:
+Day 8, night.  
+Walked around, nobody answered. Kit offered selit for bait but I’m still short. Jo offered selzalne, but I’m not willing to trade yet. Dax still wants bait, I’ve nothing to give. No progress on fishing. Still 0 bells. Ladder still half‑built; need more wood. Maybe tomorrow I’ll bring a wood to Dax to trade for bait. Still no rock from Jo. I’ll keep asking Gus later, maybe he’s somewhere else.
+
+Sleep is hard, but I’m determined. Tomorrow: bring wood, ask Dax, keep looking for Jo.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something you already remember that is still on your mind. Anything you don't hold on to fades over the next days; what you come back to stays longer.
+
+=== REASONING (6 tokens, hidden from everyone) ===
+Need to write diary.
+
+=== REPLY ===
+Day 10, night.  
+Still no bait, no fish, no bells.  
+Ari offered wood but I’m out of space.  
+Got 7 hardwood, 7 wood, 10 softwood—keep 3‑5 wood for next trade.  
+Shovels 29/30 uses, ladder 16 uses.  
+Nothing changed in inventory, nothing exchanged.  
+Plan: tomorrow bring 3‑4 wood to Dax or Kit, maybe try Gus.  
+Keep an eye on the rocks for breaking later.  
+Sleep is thin, but I’ll keep pushing.
+
+Remember:  
+- 3 wood reserve for bait trade.  
+- Shovel uses 29 left.  
+- No bait yet.

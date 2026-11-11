@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 5. I’m still chasing bait and a log. Gus keeps swapping fish for bait, but I’m low on bells and I can’t afford the 300. Jo helped a bit but gave me more selit instead of what I need. I’ve got two selit, one selzalne, a hardwood log and a wood. My shovel recipe is in my head, but I need a small log and the second map. I’ll try Dax again tomorrow, maybe bring a log and ask for the map. If he says no, Fen might. I’ll also swing by Gus at 07:00 tomorrow to trade the selit for bait—maybe he’ll accept a selzalne or something. I’m tired but hopeful. Tonight I’ll rest, save the bells, and plan the next morning. Good night, island.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 10:00. You are Kit, at the river.
+You just spotted:
+1. a very large fish shadow in the river (lower ground, centre)
+2. a selashren moth on a stump (lower ground, centre, near rock 4)
+Earlier today:
+- 08:00 walked over to Bo's home
+- 08:00 knocked at Bo's home, but nobody answered
+- 09:00 tried to go to the plaza: couldn't find a way to the plaza without a vaulting pole
+- 09:00 spotted a large fish shadow in the river (lower ground, centre, near rock 4) and went after it at 10:00 instead of plaza
+- 10:00 fished for a large shadow in the river: caught a tugorpi fish
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 9) Remember to keep bait count.
+- (day 9) Keep an eye on bait count tomorrow.
+- (day 9) If he says no, I'll wait for his bait or trade selzalne next time.
+- (day 10) Remember to keep the selit handy for bait trades tomorrow. Also try to get a small log from someone if possible.
+- (day 10) If Fen says no, plan to ask Dax or Fen for a small log tomorrow. Keep bait count low.
+- (day 10) Ask Fen for a second map. Keep bait low.
+At 11:00 you planned: plaza.
+Actions left today: 7 of 10. Mental energy left today: 88.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (54 tokens, hidden from everyone) ===
+We choose to go after fish? Already caught. Maybe go after selashren moth? but it's at stump. We can go after it at 11:00. Go=2? Actually list: 1 fish, 2 moth. We choose moth.
+
+=== REPLY ===
+{"thoughts":"Moth’s rare, could trade for bait or wood. Fish already caught. Go after moth to try get something useful.","go":2}

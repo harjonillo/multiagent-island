@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9: Dawn was gray, but I got a selit fish and a selit moth. I traded my lone softwood to Jo for a selit fish—now I have a selit fish and a selit moth, but no softwood. Bo kept asking for wood, I kept walking. I caught a lobas moth, a kaselzal moth, and a nevin moth. The ladder is still useless; the plaza feels far. I have wood, hardwood, and a fence piece, but my tent holds no wood. I’m stuck, but the map is still there. I’ll keep the ladder; maybe it leads somewhere tomorrow. Sleep is thin, but I’ll keep walking.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 16:00. You are Dax, at home.
+You just spotted:
+1. a nevin moth on a tree (lower ground, west)
+Earlier today:
+- 13:00 knocked at Ari's home, but nobody answered
+- 14:00 no fishing bait in your pockets, so you fished without it: fished for a very large shadow in the river: caught a loka fish
+- 15:00 rested
+- 16:00 rested
+- 16:00 Ari visited you at home: Ari said "" [just nodded (too tired to talk)]
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ari: 1 wood for 1 bait, still pending
+- (day 9) I traded 1 softwood for 1 selit fish with Jo.
+- (day 9) I have 3 moths: lobas, kaselzal, nevin.
+- (day 9) I still need fishing bait from Bo and Jo.
+Your notes from the last 2 days:
+- (day 9) If Jo or Bo not there, I'll trade with whoever shows up first. If I get bait, I'll fish for a selzalne next. Remember to store wood at home when possible.
+- (day 9) If Gus accepts, trade immediately. If not, maybe offer wood later.
+- (day 10) Make sure to keep an eye on Jo tomorrow for extra bait trade. Keep wood stash at home.
+- (day 10) Remember to get bait tomorrow to trade back.
+- (day 10) Remember to follow up at the plaza tomorrow for bait.
+- (day 10) Keep an eye on Jo tomorrow, maybe trade selit for bait there.
+At 17:00 you planned: plaza.
+Actions left today: 1 of 10. Mental energy left today: 51.
+
+You can go after one of them at 17:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (71 tokens, hidden from everyone) ===
+We need to choose action. We have 1 action left today. We can go to plaza at 17:00 to get bait. That's likely. So go=1? But need number of target. We have options: Ari, Jo, Bo? Probably plaza is option 1? We don't know numbering. I'll choose go=1.
+
+=== REPLY ===
+{"thoughts":"Need bait. Plaza likely has it. Leave for 17:00.", "go":1}

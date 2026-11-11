@@ -1,0 +1,47 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, night.  
+I’m still stuck on the bait.  Ari keeps swapping wood for fish, and Cal is still out of the woods.  The pond gave me a miruru and an ashrumo moth, but I’m still 0 bells.  I’ll try the fishing rod again tomorrow; maybe a gormo will fetch something.  No trades today, so I keep my 3 woods and 1 fish.  I’ll post a request on the board tonight – “Need 1 fishing bait, will trade 1 wood.”  I’m tired but hopeful.  Maybe Bo will have a ladder, or someone will bring a spare.  The island feels quiet, but the water’s still alive.  I’ll keep an eye on the rocks for more bugs and the pond for more fish.  
+
+I’ll sleep early, maybe get some rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 09:00. You are Ike, at the river.
+You just spotted:
+1. a very large fish shadow in the river (lower ground, south, near Able Sisters)
+Earlier today:
+- 05:00 at home: couldn't put away wood: your tent has no room for things
+- 07:00 ran into Ari at Ike's home: Ari said "Hey Ike, can I trade you some wood for a fishing bait?"; you said "Sure, here's a wood." [your offer: you give 1 wood, you get 1 fishing bait]; Ari said "Sure, here's a wood." [Ari handed you 1 wood]; you said "Sure, here's a wood." [your offer: you give 1 wood, you get 1 fishing bait]; Ari said "Sure, here's a wood." [Ari handed you 1 wood]; you said "Sure, give me that bait." [your offer: you give 1 wood, you get 1 fishing bait]; Ari said "Sorry, I don’t have any bait right now."; you said "Sure, I'll try to get a bait tomorrow and bring it over."; Ari said "I’ll try again tomorrow, thanks." [then you went your ways]
+- 08:00 tried to visit: Nook's Cranny isn't anyone's home. You go somewhere by doing something there: buy or sell at Nook's Cranny, ask Tom Nook or Isabelle at Resident Services, donate or assess fossils at the museum. Visiting is for other villagers' homes (also nearby: Ari)
+- 09:00 no fishing bait in your pockets, so you fished without it: fished for a very large shadow in the river: caught a loka fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Got 1 wood back from Ari today.
+- (day 9) Got miruru fish, ashrumo moth
+- (day 9) Still 0 bells
+- (day 9) Still 3 woods, 1 fish, 1 bait needed
+Your notes from the last 2 days:
+- (day 9) Tomorrow head to Nook's Cranny for fishing bait. Keep an eye on Cal's wood supply.
+- (day 10) Remember to ask Ari for another bait if needed tomorrow.
+- (day 10) Got a bait, keep an eye on Cal for more wood.
+- (day 10) Remember to check the board tomorrow if this fails.
+- (day 10) Make sure I have a fishing rod tomorrow.
+- (day 10) Keep an eye on Ari tomorrow; maybe he'll have bait after I buy one.
+At 10:00 you planned: fish (where: river, bait: True).
+Actions left today: 7 of 10. Mental energy left today: 64.
+
+You can go after one of them at 10:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (44 tokens, hidden from everyone) ===
+We need choose action. Probably go to Nook's Cranny to buy bait. So go=2? But list actions: 1 fish, 2 Nook's, etc. We'll pick 2.
+
+=== REPLY ===
+{"thoughts":"Need bait for tomorrow, buy at Nook's Cranny. No urgent other tasks.","go":2}

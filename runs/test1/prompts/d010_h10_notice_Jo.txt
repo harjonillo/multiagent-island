@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, 23:45.  
+Sun’s out, fish are good, but the bridge still feels miles away. Got 2 softwood from Cal and Dax, plus 2 miruru tonight—good for tomorrow’s fishing run. Bait is still a problem; I gave a selit to Dax and got a piece of softwood back, but he’s still silent. Cal’s offering more fish for softwood, so I’ll keep an eye on him. Dax keeps disappearing at the flowers—maybe he’s out fishing or hiding the rocks. I need to ask Eli tomorrow about the bridge fund, but first I’ll post a bait request. Sleep early, wake with the pond’s echo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 10 (May 1, spring, sunny), 10:00. You are Jo, at the pond.
+Nearby: Cal.
+Earlier today:
+- 08:00 went bug catching around the trees: caught a nevin moth (also nearby: Bo)
+- 09:00 no fishing bait in your pockets, so you fished without it: fished for a very large shadow in the pond: it got away (also nearby: Cal, Bo)
+- 09:00 ran into Cal at the pond: you said "Morning, Cal! Got a bit of selzalne if you need it for the fish."; Cal said "Hey Jo, I’ve got a selit fish—can I trade it for a selzalne?" [Cal's offer: you give 1 selzalne fish, you get 1 selit fish]; you said "Sure thing, Cal! Here’s my selzalne." [you accepted: you gave Cal 1 selzalne fish and got 1 selit fish]; Cal said "Hey Jo, could I grab a softwood?" [Cal asked you for 1 softwood]; you said "Sure thing, Cal! Here’s a selit fish for a softwood." [your offer: you give 1 selit fish, you get 1 softwood]; Cal said "Thanks, Jo!"; you said "Thanks, Cal! Catch you later."; Cal said "Sure, thanks Jo!" [Cal asked you for 1 softwood]; you said "Sure thing, Cal! Here’s a softwood for you." [you handed Cal 1 softwood]; Cal said "Sure." [Cal accepted: you gave Cal 1 selit fish and got 1 softwood; Cal's offer: you give 1 selit fish, you get 1 softwood, but Cal had no softwood, so trade failed]; you said "Sure thing, Cal. Here’s one softwood." [you handed Cal 1 softwood]; Cal said "Thanks, Jo!" [then you went your ways]
+- 09:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 10:00 instead of visit (who: Dax)
+- 10:00 fished for a small shadow in the pond: caught a moitbas fish (also nearby: Cal)
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Cal gave 2 softwood, I traded 1 selzalne.
+- (day 9) Dax still wants bait, I owe him one.
+- (day 9) Bridge still 2k.
+Your notes from the last 2 days:
+- (day 9) Keep track of selit usage for future fishing trips.
+- (day 10) Got a selit fish. Good for tomorrow’s fishing. Remember to ask Eli about bridge donation tomorrow.
+- (day 10) Keep track of softwood left after trade: 1. Save selit fish for future bait.
+- (day 10) Keep softwood for bridge, remember to ask Eli tomorrow.
+- (day 10) Remember to keep the second softwood for the bridge tomorrow.
+- (day 10) Keep the second softwood for tomorrow’s bridge plan. Ask Eli tomorrow about bridge donation.
+Mental energy left today: 10 (about 17 for each thing you say). Your plan for today: inward 80 (spent 46), outward 70 (spent 94: 24 more than planned, from your spare), spare 0 (used 24).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (11 tokens, hidden from everyone) ===
+We need JSON. Choose Cal. Say opening.
+
+=== REPLY ===
+{"thoughts":"Need more bait, trade with Cal again, keep softwood for bridge","approach":"Cal","say":"Morning, Cal! Got some selzalne if you still need it."}

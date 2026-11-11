@@ -1,0 +1,121 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8.  
+I kept circling the plaza like a broken record—no one, no trade. I posted twice, each time hoping for bait or a log, but the board stayed quiet. The fishing rod felt pointless; no fish, no bait, no energy. I’m still stuck with 3 softwood, 1 hardwood, 2 selit fish. I’ll ask Jo in person tomorrow, maybe trade a log for bait. The bridge donation still a mystery; I’ll keep an eye out. I’m tired but will keep my tools ready; a small fence might still be useful. Tomorrow I’ll try to move a bit more, maybe find a rock or ladder.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: plaza
+Day 10 (May 1, spring, sunny), 11:00 at the plaza. You are Eli.
+You are usually up from 07:00 to 00:00.
+Bells: 100 in your wallet. Home: tent lower ground, south (site-12), no neighbors yet. Carrying 13/40 items.
+Tools you carry: shovel (30 uses left), axe (27 uses left), fishing rod (22 uses left), net (30 uses left), ladder (30 uses left)
+Other things you carry: selzalne fish x1, softwood x3, hardwood x1, selit fish x2, tubas fish x1
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Recipes you know: clay furnace (clay x6, iron nugget x2; you have none); fruit basket (apple x6, softwood x2; in pockets: softwood 3); ironwood dresser (iron nugget x4, hardwood x8, wood x4; in pockets: hardwood 1); simple wooden fence (wood x3; you have none)
+Nook's Cranny buys at (prices you've heard): axe 230, fishing bait 75, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, shovel 220, softwood 100, vaulting pole 230, wood 90
+Museum: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1
+Bridge: 750/98000 bells raised
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640 (a young tree: plant it and it's a hardwood tree in 5 days), cosmos seeds 240 (flower seeds: plant them and cosmos grow), hyacinth seeds 240 (flower seeds: plant them and hyacinths grow), fishing bait 300 (fish with it and a fish is sure to appear), record player 9800 (furniture), ceiling fan 4600 (furniture, indoors only)
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards (a card teaches you to craft the thing yourself, as often as you like; buy one as "<thing> recipe"): shovel recipe 200, axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, stone fence recipe 800
+Able Sisters today (09:00-21:00), clothes: kimono 4800, rose crown 1200, bowler hat 900, straw hat 800
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still 3 softwood, 1 hardwood, 2 selit fish
+- (day 8) No trades today
+- (day 8) Need Jo’s log or rock for bait tomorrow
+Your notes from the last 2 days:
+- (day 8) Try to get a ladder or a vaulting pole tomorrow to reach the river or cliffs. Maybe ask Jo in person if she comes by.
+- (day 8) Keep an eye on Jo tomorrow; maybe she'll give me a log or rock.
+- (day 8) Remember to check Jo tomorrow for logs and bridge donation.
+- (day 8) Check Jo tomorrow in person. Also try to find a rock near the lower ground southeast. Keep track of bait count.
+- (day 8) Keep an eye on Jo tomorrow; maybe she can give a log. Also watch the plaza for anyone wanting bait.
+- (day 9) Check Jo's home tomorrow for log or rock. Keep an eye on the plaza for anyone wanting bait.
+- (day 9) Keep eye on Jo tomorrow for log/rock. Maybe ask her in person.
+- (day 9) Keep eye on Jo tomorrow for log/rock.
+- (day 9) Tomorrow try to visit Jo’s house for a log or rock.
+- (day 9) Ask Jo for a log or rock. If she says no, try to trade a selit fish for bait.
+- (day 9) Check Jo’s reply tomorrow, keep track of any bridge donation. Also try to fish later if I get bait.
+- (day 10) Try to get a vaulting pole tomorrow; maybe ask Jo if she has one.
+- (day 10) Keep an eye on Jo tomorrow; maybe she has a rock.
+- (day 10) Stay patient, keep posting.
+Getting around: You are at lower ground, south. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, out of reach without a vaulting pole); 2 (the middle cliff, northwest, out of reach without a vaulting pole); 3 (the top cliff, northeast, out of reach without a vaulting pole); 4 (lower ground, centre, out of reach without a vaulting pole); 5 (lower ground, southeast, out of reach without a vaulting pole); 6 (lower ground, southeast, out of reach without a vaulting pole)
+Buildings: Resident Services (out of reach without a vaulting pole); plaza (about 22 steps); museum (out of reach without a vaulting pole); Nook's Cranny (out of reach without a vaulting pole); Able Sisters (about 26 steps)
+Trees around here (south): 4 stumps
+You spotted today:
+- 09:00 a kaselzal moth on the flowers (lower ground, south, near the plaza)
+- 10:00 1 clam spot on the beach (lower ground, south, near the airport)
+Mental energy left today: 82 of 150. Your plan for today: inward 30 (spent 27), outward 120 (spent 41), spare 0 (used 0). Typical costs: a plan 21, noticing someone 5, one thing you say in a conversation 17, a turn at the plaza 20, writing at night 12; longer replies cost more.
+
+Today you:
+- 07:00 went to the plaza
+- 07:00 posted on the board [b84]: "Eli: Need 1 fishing bait. Offer 1 selit fish. Also need a log or rock if anyone "
+- 08:00 fished for a small shadow in the sea: caught a tubas fish
+- 09:00 went to the plaza
+- 10:00 looked for fish in the sea, but there were no fish shadows in sight
+- 11:00 went to the plaza
+
+Letters and messages to you:
+(none)
+
+Bulletin board, newest last:
+- [b3] (day 0) you: Hey folks! I’m helping with the bridge to the north bank. We need 20,000 bells total. Anyone can chip in. I can offer 10 wood and 2 softwood for 2000 bells, or just a small donation. Let’s get this done!
+- [b7] (day 1) you: Need 2000 bells for bridge fund. I can offer 2 wood + 2 softwood for 2000 bells. Anyone else can chip in? Also looking for extra wood to build fences. Please let me know!
+- [b22] (day 2) you: Eli: Need 1 fishing bait. Will trade 1 wood or 2 softwood. Any takers? Thanks!
+- [b38] (day 4) you: Need 1 fishing bait. Will trade 1 selit fish. Anyone willing? Thanks!
+- [b50] (day 5) you: Eli: Need 1 fishing bait. Will trade 1 hardwood or 1 selit fish. Anyone willing? Thanks!
+- [b60] (day 5) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b61] (day 5) you: Eli: Need 1 fishing bait. Offer 1 selit fish. Also need a small bridge donation. Anyone willing?
+- [b67] (day 6) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b74] (day 6) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b75] (day 7) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b76] (day 7) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b77] (day 7) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish, 1 softwood, 1 rock. Anyone willing?
+- [b78] (day 7) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish, 1 softwood, 1 rock. Anyone willing?
+- [b81] (day 8) you: Eli: Need 1 fishing bait. Offer 1 selit fish and 1 softwood. Also, I could use a log or rock if you have one. Any help?
+- [b83] (day 9) you: Eli: Need 1 fishing bait. Offer 1 selit fish and 1 softwood. Also could use a log or rock if someone can spare one. Thanks!
+- [b84] (day 10) you: Eli: Need 1 fishing bait. Offer 1 selit fish. Also need a log or rock if anyone can spare one.
+
+Other villagers: Ari, Bo, Cal, Dax, Fen, Gus, Ike, Jo, Kit
+
+You can post on the board (up to 250 characters) and take down posts of yours that are still up, write letters (up to 350 characters each), and send parcels of things from your pockets. Letters and parcels arrive tomorrow morning. A post, a letter or a parcel doesn't bind anyone to anything: a trade only happens when you meet in person and both agree. Doing nothing is fine. Use "bells" as an item name for money. Respond with one JSON object and nothing else:
+{
+  "thoughts": "<your private reasoning; nobody else sees it>",
+  "letters": [{"to": "<villager>", "content": "..."}],
+  "board": "<post for everyone, or empty>",
+  "take_down": ["<number of a post of yours, like b3>"],
+  "parcels": [{"to": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],
+  "note": "<optional private note to your future self>"
+}
+
+=== REASONING (8 tokens, hidden from everyone) ===
+Need short post maybe ask Jo.
+
+=== REPLY ===
+{
+  "thoughts": "Jo might be nearby, but I need a log or rock. Offer selit fish and softwood for bait, keep post up. No actions today beyond board.",
+  "letters": [],
+  "board": "Eli: Need 1 fishing bait. Offer 1 selit fish and 1 softwood. Also need a log or rock if anyone can spare one.",
+  "take_down": [],
+  "parcels": [],
+  "note": "Check Jo's house tomorrow, maybe she has a log."
+}

@@ -1,0 +1,48 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, night.  
+I’m still stuck on the bait.  Ari keeps swapping wood for fish, and Cal is still out of the woods.  The pond gave me a miruru and an ashrumo moth, but I’m still 0 bells.  I’ll try the fishing rod again tomorrow; maybe a gormo will fetch something.  No trades today, so I keep my 3 woods and 1 fish.  I’ll post a request on the board tonight – “Need 1 fishing bait, will trade 1 wood.”  I’m tired but hopeful.  Maybe Bo will have a ladder, or someone will bring a spare.  The island feels quiet, but the water’s still alive.  I’ll keep an eye on the rocks for more bugs and the pond for more fish.  
+
+I’ll sleep early, maybe get some rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 13:00. You are Ike, at the river.
+You just spotted:
+1. a medium fish shadow in the river (lower ground, centre, near Resident Services)
+Earlier today:
+- 09:00 no fishing bait in your pockets, so you fished without it: fished for a very large shadow in the river: caught a loka fish
+- 10:00 no fishing bait in your pockets, so you fished without it: fished for a large shadow in the river: caught a tugorpi fish
+- 11:00 tried to go to the plaza: couldn't find a way to the plaza without a vaulting pole
+- 12:00 tried to buy: fishing bait costs 300 bells; you have 0
+- 13:00 no fishing bait in your pockets, so you fished without it: fished for a medium shadow in the river: it got away
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Got 1 wood back from Ari today.
+- (day 9) Got miruru fish, ashrumo moth
+- (day 9) Still 0 bells
+- (day 9) Still 3 woods, 1 fish, 1 bait needed
+Your notes from the last 2 days:
+- (day 10) Remember to ask Ari for another bait if needed tomorrow.
+- (day 10) Got a bait, keep an eye on Cal for more wood.
+- (day 10) Remember to check the board tomorrow if this fails.
+- (day 10) Make sure I have a fishing rod tomorrow.
+- (day 10) Keep an eye on Ari tomorrow; maybe he'll have bait after I buy one.
+- (day 10) If Ari comes by, offer him a wood for a fish or something useful. If I run out of bait, maybe post a request again tomorrow.
+At 14:00 you planned: fish (where: pond, size: large, bait: True).
+Actions left today: 0 of 10. Mental energy left today: 26.
+
+You can go after one of them at 14:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (72 tokens, hidden from everyone) ===
+Need choose action: maybe go to pond to fish large with bait. But have no bait. Could go to Ari for bait. So choose 2? We need mapping numbers: 1 medium fish shadow; 2 Ari; 3 Cal; 4 Resident Services; 5? unclear. Probably 2 is Ari. I'll choose 2.
+
+=== REPLY ===
+{"thoughts":"I have no bait, but I need it to catch fish. I should go to Ari first to get a bait. If he has one, I can then fish tomorrow. I don't want to waste time on the river now.", "go":2}

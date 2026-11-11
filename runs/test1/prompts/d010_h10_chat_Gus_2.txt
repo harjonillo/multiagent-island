@@ -1,0 +1,90 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, night.  
+Sun’s gone, but I’m still low on bait. I tried Bo again, but he keeps asking for wood and I have none. I did snag a tubas fish, so I’m not starving yet. Dax offered a swap but I still don’t have a bait to give him. I’m holding onto my selit and selzalne; maybe they’ll trade later. The tent is tight—no room for more. I’ll keep the fire going and hope someone brings wood tomorrow.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 10 (May 1, spring, sunny), 10:00. You are Gus.
+You are usually up from 07:00 to 00:00.
+Bells: 300 in your wallet. Home: tent lower ground, west (site-9), neighbors: Dax, Jo. Carrying 20/40 items.
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Open requests: Fen wants 1 fishing bait from you (until day 10); Bo wants 1 fishing bait from you (until day 11); you want 1 fishing bait from Bo (until day 11)
+Recipes you know: campfire (wood x3; 1 in pockets); fruit basket (apple x6, softwood x2; in pockets: apple 3, softwood 2); golden candlestick (gold nugget x1, iron nugget x3; you have none); simple wooden fence (wood x3; 1 in pockets; you carry 1 simple wooden fence)
+Nook's Cranny buys at (prices you've heard): none yet
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640, cosmos seeds 240, hyacinth seeds 240, fishing bait 300, record player 9800, ceiling fan 4600
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards: shovel recipe 200, axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, stone fence recipe 800
+Able Sisters today (09:00-21:00), clothes: kimono 4800, rose crown 1200, bowler hat 900, straw hat 800
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) No bait from Bo or Dax today.
+- (day 9) Got a tubas fish.
+- (day 9) Still have 1 selit, 1 selzalne, 2 loka, 1 gormo.
+Your notes from the last 2 days:
+- (day 8) If Dax or Kit is still silent, maybe I should try Jo or Bo next day. Also consider buying a fishing bait recipe if I can't trade.
+- (day 8) Remember to trade back when I get more bait.
+- (day 8) Keep track of trade balance.
+- (day 8) If Dax refuses, try Kit or Fen next.
+- (day 8) Keep an eye on Kit’s stock, maybe he’ll have more bait tomorrow.
+- (day 8) Ask for a single bait, offer a selit or selzalne. If he’s not there, just rest and try tomorrow.
+- (day 9) If Dax doesn't trade, try Fen tomorrow. Keep an eye on bait balance.
+- (day 9) Trade with Bo for bait
+- (day 9) Remember to bring wood next time so I can trade for bait.
+- (day 9) Remember to gather wood tomorrow.
+- (day 9) Ask Dax for bait, hope he’s home.
+- (day 10) If Dax refuses, try Bo or buy bait tomorrow.
+Getting around: You are at lower ground, west. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+
+So far today you:
+- 07:00 chopped a hardwood tree: softwood x2, wood x1; with the last wood the axe brought the tree down, leaving a stump
+- 07:00 spotted a nevin moth on a tree (the middle cliff, west) and went after it at 08:00 instead of visit (who: Bo)
+- 08:00 looked for bugs around the trees, but didn't see any
+- 09:00 no fishing bait in your pockets, so you fished without it: looked for fish in the sea, but there were no fish shadows in sight
+- 10:00 walked over to Dax's home (also nearby: Ari)
+- 10:00 inside Dax's home: not much furniture yet
+
+Between you and Dax so far:
+- day 2: Dax gave you 1 fishing bait
+- day 3: you gave Dax 1 selzalne fish
+
+The last time you talked with Dax before today (day 9, 16:00, at your home):
+Dax: Hey Gus, I got a selit fish—want to swap for a bait? [Dax's offer: you give 1 fishing bait, you get 1 selit fish; then you went your ways]
+
+You are visiting Dax at their home. Inside you can see: nothing much yet. So far:
+You: Hey Dax, I got a selit fish—let’s swap for your bait. [your offer: you give 1 selit fish, you get 1 fishing bait]
+Dax: Sure thing, I'll trade my selit fish for your fishing bait. [Dax's offer: you give 1 fishing bait, you get 1 selit fish]
+
+Reply, or say nothing to end it. "leave": true ends it after this line.
+One or two sentences, the way you'd really talk. Only Dax hears it.
+Each line costs about 17 mental energy; you have 112 left today.
+You can also give Dax something from your pockets now ("give"), ask for something ("ask"; open until they give or trade it, up to 3 days), or offer a trade ("trade"; it happens only if Dax accepts, both sides at once). Leave any empty ({}).
+Trade offers left in this conversation (from either of you): 1 of 3.
+On the table from Dax: you give 1 fishing bait (you have none), you get 1 selit fish. You can't accept it; or offer another.
+In your pockets right now: 300 bells, shovel x1, axe x1, fishing rod x1, net x1, ladder x1, selit fish x1, selzalne fish x1, loka fish x2, gormo fish x1, hardwood x2, wood x1, apple x3, simple wooden fence x1, tubas fish x1, softwood x2
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {} or {"<item or bells>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, "trade": {} or {"give": {"<item or bells>": <qty>}, "want": {"<item or bells>": <qty>}}, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (62 tokens, hidden from everyone) ===
+We need to reply. We don't have bait, but have selit fish. Dax wants bait, gives selit. We could trade selit for bait? Dax already offers that. We have selit. So we can accept trade: give selit, want fishing bait. So trade.
+
+=== REPLY ===
+{"thoughts":"I have a selit fish and need bait. Dax wants bait, offers selit in return. I can accept the trade.", "say":"Sure, give me your bait.", "give":{},"ask":{},"trade":{"give":{"selit fish":1},"want":{"fishing bait":1}}, "leave":false, "note":"Need to get bait soon."}

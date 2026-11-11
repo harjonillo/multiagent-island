@@ -1,0 +1,41 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, night.  
+Sun’s gone, but I’m still low on bait. I tried Bo again, but he keeps asking for wood and I have none. I did snag a tubas fish, so I’m not starving yet. Dax offered a swap but I still don’t have a bait to give him. I’m holding onto my selit and selzalne; maybe they’ll trade later. The tent is tight—no room for more. I’ll keep the fire going and hope someone brings wood tomorrow.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 07:00. You are Gus, at the woods.
+You just spotted:
+1. a nevin moth on a tree (the middle cliff, west)
+Earlier today:
+- 07:00 chopped a hardwood tree: softwood x2, wood x1; with the last wood the axe brought the tree down, leaving a stump
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) No bait from Bo or Dax today.
+- (day 9) Got a tubas fish.
+- (day 9) Still have 1 selit, 1 selzalne, 2 loka, 1 gormo.
+Your notes from the last 2 days:
+- (day 8) Ask for a single bait, offer a selit or selzalne. If he’s not there, just rest and try tomorrow.
+- (day 9) If Dax doesn't trade, try Fen tomorrow. Keep an eye on bait balance.
+- (day 9) Trade with Bo for bait
+- (day 9) Remember to bring wood next time so I can trade for bait.
+- (day 9) Remember to gather wood tomorrow.
+- (day 9) Ask Dax for bait, hope he’s home.
+At 08:00 you planned: visit (who: Bo).
+Actions left today: 5 of 10. Mental energy left today: 130.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (24 tokens, hidden from everyone) ===
+We need decide whether to go after Bo or not. No plan to go to other. Probably go to Bo.
+
+=== REPLY ===
+{"thoughts":"Need bait. Bo might have some. No better option now. Go after him.", "go":1}

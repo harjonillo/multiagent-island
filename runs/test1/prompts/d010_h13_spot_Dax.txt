@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9: Dawn was gray, but I got a selit fish and a selit moth. I traded my lone softwood to Jo for a selit fish—now I have a selit fish and a selit moth, but no softwood. Bo kept asking for wood, I kept walking. I caught a lobas moth, a kaselzal moth, and a nevin moth. The ladder is still useless; the plaza feels far. I have wood, hardwood, and a fence piece, but my tent holds no wood. I’m stuck, but the map is still there. I’ll keep the ladder; maybe it leads somewhere tomorrow. Sleep is thin, but I’ll keep walking.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 13:00. You are Dax, at Ari's home.
+You just spotted:
+1. a small fish shadow in the river (lower ground, southeast)
+Earlier today:
+- 12:00 at home: couldn't put away wood: your tent has no room for things; couldn't put away simple wooden fence: your tent has no room for things
+- 12:00 walked over to Gus's home
+- 12:00 knocked at Gus's home, but nobody answered
+- 13:00 walked over to Ari's home
+- 13:00 knocked at Ari's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ari: 1 wood for 1 bait, still pending
+- (day 9) I traded 1 softwood for 1 selit fish with Jo.
+- (day 9) I have 3 moths: lobas, kaselzal, nevin.
+- (day 9) I still need fishing bait from Bo and Jo.
+Your notes from the last 2 days:
+- (day 9) If Jo or Bo not there, I'll trade with whoever shows up first. If I get bait, I'll fish for a selzalne next. Remember to store wood at home when possible.
+- (day 9) If Gus accepts, trade immediately. If not, maybe offer wood later.
+- (day 10) Make sure to keep an eye on Jo tomorrow for extra bait trade. Keep wood stash at home.
+- (day 10) Remember to get bait tomorrow to trade back.
+- (day 10) Remember to follow up at the plaza tomorrow for bait.
+- (day 10) Keep an eye on Jo tomorrow, maybe trade selit for bait there.
+At 14:00 you planned: fish (where: river, bait: True).
+Actions left today: 1 of 10. Mental energy left today: 57.
+
+You can go after one of them at 14:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (339 tokens, hidden from everyone) ===
+We need to decide. We have actions left 1. We can go fishing at 14:00. We have bait? We need bait. We have pending trade with Ari? He had 1 wood for 1 bait pending. We have no bait yet. We have 3 moths. We need bait to fish. We could go to Ari to get bait? But he hasn't answered. Maybe go to Jo? We didn't see Jo. We could go to Bo? We need bait. Best to go to Jo? But we don't know. Maybe go to the plaza? No. We have only one action left. We could go fishing hoping bait from previous trade? We don't have. So maybe go to Jo to get bait. But we don't have bait. We need to trade wood for bait. We have wood? We have wood, hardwood, fence piece. We have wood at home? We didn't store. We have wood at home? We have wood, hardwood, fence piece but tent holds no wood. We can store at home? We didn't. So we have wood. We can go to Jo to trade wood for bait. So go to Jo. But we don't have Jo's location. But likely near. So choose go=1? But list numbers? We need to choose the number of the one to go after. Which options: 1= fish? 2= go to Jo? We need mapping. Not defined. We can choose 0 to do nothing. But we want bait. I think go to Jo. I'll say 1? But ambiguous. I'll choose 1 as fishing? No. I'll pick 2 for Jo.
+
+=== REPLY ===
+{"thoughts":"Need bait before fishing. I have wood and moths, but no bait yet. The only way to get bait is to trade with Jo or Bo. I have wood to offer and Jo is likely nearby. I'll head to Jo’s place to

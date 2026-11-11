@@ -1,0 +1,48 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+Walked around, nobody answered. Kit offered selit for bait but I’m still short. Jo offered selzalne, but I’m not willing to trade yet. Dax still wants bait, I’ve nothing to give. No progress on fishing. Still 0 bells. Ladder still half‑built; need more wood. Maybe tomorrow I’ll bring a wood to Dax to trade for bait. Still no rock from Jo. I’ll keep asking Gus later, maybe he’s somewhere else.
+
+Sleep is hard, but I’m determined. Tomorrow: bring wood, ask Dax, keep looking for Jo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 14:00. You are Bo, at the river.
+You just spotted:
+1. a selashren moth on a stump (lower ground, southwest)
+2. a very large fish shadow in the river (lower ground, southwest)
+Earlier today:
+- 12:00 walked over to Dax's home (also nearby: Ari)
+- 12:00 knocked at Dax's home, but nobody answered
+- 12:00 ran into Ari at Dax's home: Ari said "Hey Bo, got any idea where the path to Cranny is?"; you said "Hey Ari, any clue where the path to Cranny is?"; Ari said "Sure, I can help. I have a wood if you want." [Ari tried to hand you 1 wood but you had no room]; you said "Thanks Ari, could I have a wood? Maybe I can give you a shovel if you like." [you asked Ari for 1 wood]; Ari said "" [just nodded (too tired to talk)]
+- 13:00 tried to fish: no fishing bait in your pockets, so you fished without it: pockets full
+- 14:00 tried to fish: no fishing bait in your pockets, so you fished without it: pockets full
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still no bait, need wood trade
+- (day 8) Dax wants bait, I have none
+- (day 8) Ladder 22 uses left, need more wood
+Your notes from the last 2 days:
+- (day 9) Got bait. Keep 4 wood left.
+- (day 9) Keep wood reserve for next trade.
+- (day 10) Keep at least 3 wood in reserve for future bait trades.
+- (day 10) Try to keep 3 wood reserve for next bait trade.
+- (day 10) Ask Ari for path next time to save time
+- (day 10) Need wood for bait. Keep shovels as backup.
+At 15:00 you planned: fish (where: river, bait: True).
+Actions left today: 1 of 10. Mental energy left today: 48.
+
+You can go after one of them at 15:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (199 tokens, hidden from everyone) ===
+We need choose action. We have 1 action left. We need bait? We have 4 wood left, need to trade for bait. Ari offered wood if we give shovel. We have shovels? Not mentioned. Could trade. But we have 1 action left. We could go to Dax? But he wants bait. We can give bait? No. We could go to Ari to get wood? But we already had offer. But we can still go to get wood. So go to Ari to get wood. That is action 1. Then later we can trade. So go 0? Actually we have to choose number of target: 1 for selashren moth? 2 for fish shadow? The description: "you can go after one of them at 15:00: it takes that hour and is one of your actions". So choose 1 or 2. But we want wood. So better not. So choose 0.
+
+=== REPLY ===
+{"thoughts":"I need a wood to trade for bait, but I only have one action left. I’ll skip the hunt and try to get the wood from Ari instead later. No hunting now.", "go":0}

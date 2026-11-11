@@ -1,0 +1,41 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9: Dawn came, but the river still feels like a wall. I chased a big shadow, got a selit, but the bait is still out of reach. Ike’s house was the only place with a door, but he was gone, leaving a selzalne fish in a corner. I offered a wood, got nothing. The plaza feels farther than ever; the ladder I have is useless without a path. I spent most of the day fishing and walking, but no trades. I’m still holding 200 bells, 7 woods, 12 hardwoods, 8 softwoods, and a few fish and a fossil. My heart aches for that first fishing bait. I’ll keep asking Ike and Dax, and maybe try Cranny tomorrow if I can find a way. Tomorrow, I’ll keep the hope alive and keep trading wood for bait.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 10 (May 1, spring, sunny), 12:00. You are Ari, at the Dax's home.
+Nearby: Bo.
+Earlier today:
+- 09:00 walked over to Dax's home
+- 09:00 knocked at Dax's home, but nobody answered
+- 10:00 tried to visit: Timmy and Tommy don't live in a house you can visit; they work at Nook's Cranny. To talk to them, use ask (who: Timmy and Tommy). Visiting is for other villagers' homes (also nearby: Gus)
+- 12:00 walked over to Dax's home (also nearby: Bo)
+- 12:00 knocked at Dax's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Got selit fish at 08:00
+- (day 9) Ike dropped a selzalne fish after wood offer
+- (day 9) Still no fishing bait, 200 bells, 7 wood, 12 hardwood, 8 softwood.
+Your notes from the last 2 days:
+- (day 10) If bait still missing, try to trade with Gus or Jo next day.
+- (day 10) Got wood from Ike. Need bait next.
+- (day 10) Keep offering wood for bait, hope he finally gives it.
+- (day 10) Keep trying to get bait from Ike tomorrow or buy from Cranny.
+- (day 10) Remember to bring a wood to Ike tomorrow and keep asking for bait. Also check Cranny if I can reach it.
+- (day 10) If I still don’t get bait, I’ll buy from Cranny tomorrow with a vaulting pole.
+Mental energy left today: 25 (about 17 for each thing you say). Your plan for today: inward 30 (spent 51: 21 more than planned, from your spare), outward 20 (spent 74: 54 more than planned, from your spare), spare 100 (used 75).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (23 tokens, hidden from everyone) ===
+Need to respond with JSON. Choose to talk to Bo? He is nearby. Approach Bo. Say greeting.
+
+=== REPLY ===
+{"thoughts":"Need bait, try Bo for info on path or trade. Maybe he knows where Cranny is. Keep it short.","approach":"Bo","say":"Hey Bo, got any idea where the path to Cranny is?"}

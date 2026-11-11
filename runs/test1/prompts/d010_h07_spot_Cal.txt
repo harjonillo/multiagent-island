@@ -1,0 +1,41 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7, 23 h.  
+Got bait, still only 100 bells. Ike helped with a selzalne, but wood’s scarce. Tried Jo, no luck. I’ll keep asking Dax for wood and bait—maybe swap more selzalne. Plan: trade 2 selzalne for 1 wood tomorrow, then buy more bait. Need to finish the bridge to open new spots; maybe chip in 10k. Also consider moving Tom’s house if I can afford the loan—could get extra storage. Sleep now, hope tomorrow brings more fish shadows and a reply from Jo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 07:00. You are Cal, at the visiting.
+You just spotted:
+1. a lobas moth on the flowers (lower ground, southeast)
+2. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+3. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 07:00 tried to visit: there is no villager called shop to visit
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 9) Remember to trade the bait back to Dax tomorrow.
+- (day 9) Keep an eye on Jo for future trades. I still need wood for bridge.
+- (day 9) Accept trade later if Jo says yes.
+- (day 9) Keep track of bait, maybe trade with Ike tomorrow.
+- (day 9) After trade, keep wood in home. Maybe ask Jo tomorrow for more bait.
+- (day 10) Remember to ask Dax for more wood tomorrow if he has any left.
+At 08:00 you planned: buy (shop: cranny, item: fishing bait, count: 1).
+Actions left today: 5 of 10. Mental energy left today: 127.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (44 tokens, hidden from everyone) ===
+We need decide go after which? We spotted large fish shadows twice. Maybe go to pond to fish. Also lobas moth maybe not useful. So choose 2? They are same location. Go 2.
+
+=== REPLY ===
+{"thoughts":"I’ll head to the pond to try the fish shadow. It’s a good chance for bait and maybe a big catch. I’ll skip the moth for now.","go":2}

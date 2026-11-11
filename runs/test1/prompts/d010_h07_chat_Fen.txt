@@ -1,0 +1,109 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 10 (May 1, spring, sunny), 07:00. You are Fen.
+You are usually up from 07:00 to 00:00.
+Bells: 0 in your wallet. Home: tent lower ground, centre (site-1), neighbors: Kit. Carrying 23/40 items.
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Open requests: you want 1 fishing bait from Gus (until day 10); you want 1 fishing bait from Kit (until day 11)
+Recipes you know: campfire (wood x3; 2 in pockets); iron fence (iron nugget x2; you have none); simple wooden fence (wood x3; 2 in pockets; you carry 4 simple wooden fence); wooden bookshelf (wood x6, hardwood x4; in pockets: wood 2, hardwood 1)
+Nook's Cranny buys at (prices you've heard): axe 230, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, shovel 220, simple wooden fence 90, softwood 100, vaulting pole 230, wood 90
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640, cosmos seeds 240, hyacinth seeds 240, fishing bait 300, record player 9800, ceiling fan 4600
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards: shovel recipe 200, axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, stone fence recipe 800
+Able Sisters today (09:00-21:00), clothes: kimono 4800, rose crown 1200, bowler hat 900, straw hat 800
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Need apple before rock break
+- (day 8) Gus traded selzalne for bait, but gave me none
+- (day 8) Still only 1 map in hand, still no path to plaza
+Your notes from the last 2 days:
+- (day 8) Post map request tomorrow after seeing if Kit has one.
+- (day 8) Remember to check if Gus gives bait tomorrow. If not, maybe trade again or ask someone else.
+- (day 8) Keep fishing bait handy for future trades.
+- (day 8) If Tom still silent, maybe trade a log later. Keep an eye on bridge.
+- (day 8) Tomorrow, focus on getting a map and ladder. Maybe ask Kit or Gus again. Also see if anyone can help with bridge. Write page tonight.
+- (day 9) Keep selzalne handy for bait trades.
+- (day 9) Ask for map, offer ladder. If he refuses, try Gus tomorrow.
+- (day 9) Map received, ladder gone. Next step: find a way to the plaza. Maybe ask Gus tomorrow for bait.
+- (day 9) Keep the selzalne fish handy for tomorrow's bait trade.
+- (day 9) Keep selzalne handy; maybe trade again tomorrow
+- (day 9) Remember to catch selzalne first, then trade for bait.
+- (day 9) Got bait tomorrow.
+- (day 10) Keep trying to get bait. If nothing happens, maybe wait for next day.
+Getting around: You are at lower ground, centre. You carry: no ladder or vaulting pole. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Your island map:
+- northwest: the middle cliff and the top cliff; beach; rocks 2; 1 fruit tree, 2 hardwood trees
+- north: the middle cliff and the top cliff; beach; river; rocky shore; 2 fruit trees, 4 hardwood trees
+- northeast: the middle cliff and the top cliff; beach; rocks 3
+- west: lower ground and the middle cliff; beach; homes: Dax, Gus, Jo; 4 fruit trees, 1 hardwood tree
+- centre: lower ground and the middle cliff; river; buildings: Resident Services, museum; homes: Fen, Kit; rocks 4; 2 hardwood trees
+- east: lower ground and the middle cliff; beach; homes: Cal, Ike; 2 fruit trees
+- southwest: lower ground; beach; river; homes: Bo
+- south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli
+- southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+
+So far today you:
+- 07:00 tried to visit: you can't get to Kit's home from here without a vaulting pole (also nearby: Kit)
+
+Between you and Kit so far:
+- day 1: Kit gave you 1 shovel
+- day 1: you gave Kit 1 island map, which they had asked for
+- day 9: you traded Kit 1 ladder for 1 island map
+- day 9: Kit gave you 1 island map
+- day 9: you gave Kit 1 selzalne fish
+
+The last time you talked with Kit before today (day 9, 08:00, out on a walk):
+Kit: Hey Fen, got a minute?
+You: Sure, give me bait when I get it, and here’s a selzalne for you. [you handed Kit 1 selzalne fish; your offer: you give 1 selzalne fish, you get 1 fishing bait, but you had no selzalne fish, so trade failed]
+Kit: Hey Fen, how about I trade you a selit for a bait? [Kit's offer: you give 1 fishing bait, you get 1 selit fish]
+You:  [just nodded (too tired to talk)]
+
+You ran into Kit at Kit's home. So far:
+You: Hey Kit, any chance you have a map or can point me toward the plaza?
+Kit: Hey Fen, how about I trade you one selit for a bait? [Kit's offer: you give 1 fishing bait, you get 1 selit fish]
+
+Reply, or say nothing to end it. "leave": true ends it after this line.
+One or two sentences, the way you'd really talk. Only Kit hears it.
+Each line costs about 17 mental energy; you have 120 left today.
+You can also give Kit something from your pockets now ("give"), ask for something ("ask"; open until they give or trade it, up to 3 days), or offer a trade ("trade"; it happens only if Kit accepts, both sides at once). Leave any empty ({}).
+Trade offers left in this conversation (from either of you): 2 of 3.
+On the table from Kit: you give 1 fishing bait (you have none), you get 1 selit fish. You can't accept it; or offer another.
+In your pockets right now: 0 bells, shovel x2, axe x1, fishing rod x1, net x1, hardwood x1, wood x2, softwood x7, simple wooden fence x4, island map x3, tubas fish x1
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {} or {"<item or bells>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, "trade": {} or {"give": {"<item or bells>": <qty>}, "want": {"<item or bells>": <qty>}}, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (200 tokens, hidden from everyone) ===
+Need to reply to Kit. We have no bait, but we have selzalne fish? We have tubas fish, not selzalne. We have selit? No. We could offer a selzalne? We don't have. We can offer a map? We have 3 maps. Kit might accept map for bait? He offered selit for bait. We could ask for bait or ask for something else. Maybe ask for a map? We can trade map for bait? But he didn't offer. We can ask for bait. So ask for bait. Also maybe give a map? He might accept map? We can propose trade: give 1 island map for bait. Let's do that. So say: "Sure, here's a map for a bait." We need to give 1 island map. So trade: give: island map 1, want: fishing bait 1. That is a trade. So we can do trade. No ask. Leave false.
+
+=== REPLY ===
+{"thoughts":"I have no bait, but I have three maps. Kit offered a selit for bait, which I can't do. Better trade a map for bait. I'll give him one island map and ask for a fishing bait.", "say":"Sure, here's a map for a bait.", "give":{},"ask":{},"trade":{"give":{"island map":1},"want":{"fishing bait":1}},"leave":false,"note":"Keep the other two maps for future trades or requests."}

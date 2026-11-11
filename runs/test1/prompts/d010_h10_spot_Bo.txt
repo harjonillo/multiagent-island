@@ -1,0 +1,47 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+Walked around, nobody answered. Kit offered selit for bait but I’m still short. Jo offered selzalne, but I’m not willing to trade yet. Dax still wants bait, I’ve nothing to give. No progress on fishing. Still 0 bells. Ladder still half‑built; need more wood. Maybe tomorrow I’ll bring a wood to Dax to trade for bait. Still no rock from Jo. I’ll keep asking Gus later, maybe he’s somewhere else.
+
+Sleep is hard, but I’m determined. Tomorrow: bring wood, ask Dax, keep looking for Jo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 10 (May 1, spring, sunny), 10:00. You are Bo, at the rocks.
+You just spotted:
+1. a small fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 08:00 walked over to Dax's home (also nearby: Jo)
+- 08:00 knocked at Dax's home, but nobody answered
+- 09:00 tried to break_rock: you need an apple in your pockets: breaking a rock eats one first, to be strong enough (shaking a fruit tree drops them) (also nearby: Cal, Jo)
+- 09:00 spotted an ashrumo moth on a rock (lower ground, southeast, near rock 5) and went after it at 10:00
+- 10:00 tried to catch_bug: pockets full
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still no bait, need wood trade
+- (day 8) Dax wants bait, I have none
+- (day 8) Ladder 22 uses left, need more wood
+Your notes from the last 2 days:
+- (day 9) Remember to bring wood tomorrow to trade for bait.
+- (day 9) Try to get bait from Dax. If they accept, good. If not, keep trying elsewhere.
+- (day 9) Remember to gather wood tomorrow to try trading for bait.
+- (day 9) Got bait. Keep 4 wood left.
+- (day 9) Keep wood reserve for next trade.
+- (day 10) Keep at least 3 wood in reserve for future bait trades.
+At 11:00 you planned: fish (where: sea, bait: True).
+Actions left today: 5 of 10. Mental energy left today: 111.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (103 tokens, hidden from everyone) ===
+We need decide whether to go after fish or moth. Fish shadow at 10:00, but we can go after it at 11. Might get fish? We have no bait. Sea fishing requires bait true. We have no bait. So fishing not possible. Moth? Could catch? Maybe just ignore. I'll go after fish anyway to try? Probably no. I'll go after moth? We already saw moth at 10. Might try catch bug? But pockets full. I'll choose 0.
+
+=== REPLY ===
+{"thoughts":"I still have no bait for sea fishing, and my pockets are full. The moth was seen earlier, but catching it would waste time. Better to skip a chase today and focus on gathering wood tomorrow for bait trade.","go":0}
