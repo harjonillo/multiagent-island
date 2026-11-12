@@ -79,6 +79,24 @@ PROMPT_CHANGES = {
         "is awake and can't get home with the tools they carry stays out (before, any free hour took them home); "
         "call_rescue has the Rescue Service take them home, once a day, for that hour, with a talking-to about why "
         "they got stuck. A second time that day, they get home when they go to sleep",
+    16: "actions by number: each plan lists the actions the villager can do right then, numbered and spelled out "
+        "(worked out from what they carry, their bells, what they keep at home for crafting, where they can walk "
+        "with the tools they carry, and opening hours within the plan's hours), and the plan picks them by number "
+        "(\"pick\"), adding a count, bells or a place where an option takes one. Nothing else can be planned. The "
+        "action menu in the island rules becomes a list of every kind of action and what each needs, without "
+        "how to write it. A pick that can't be read is dropped, and the villager's day says so. An option with "
+        "opening hours is moved to an hour it's open, within the plan",
+    17: "more bridges, and stairs: anyone can propose a bridge across the river or stairs up a cliff (which anyone can "
+        "climb without a ladder) where they stand, free, and each is built once its own fund at Resident Services "
+        "reaches the bridge's cost. Ten in all on the island, the first bridge included, built or proposed; one "
+        "proposal of each villager's still being funded at a time. Each fund is its own line on the list, and plans, "
+        "Tom Nook and the action list say what is proposed, built and raised. A bridge is 3 tiles wide, crossing at "
+        "most 4 river tiles with a landing on each bank; stairs are 2 wide and 4 long, two rows below a cliff edge "
+        "and two above; the first bridge gets the same 3-wide footprint. From the moment one is proposed its "
+        "footprint is a construction site: walkable, but nothing can be planted or put on it. Bridges and stairs "
+        "only give access: "
+        "the first bridge no longer adds 3 rocks and 10 hardwood trees somewhere on the island when built, and Tom "
+        "Nook and the fun fact no longer say it opens more rocks and trees (a fun fact about stairs is added)",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -150,6 +168,37 @@ _MENU_CHANGES = {
           "fishing rod (fish); net (catch_bug); ladder (climbs one cliff up or down); vaulting pole (jumps across "
           "the river). You use a ladder or vaulting pole you carry whenever your way needs it.")],
 }
+
+
+def action_catalogue(world: dict, version: int = PROMPT_VERSION) -> str:
+    """Prompt version 16: every kind of action and what it needs, so a villager knows what exists before it is
+    on their list. How to write one isn't here: plans pick from a numbered list. Says what each needs, not what
+    it gives (that is learned on the island)."""
+    fruit = world["island"]["native_fruit"]
+    structures = ""
+    if version >= 17:
+        from .world import structures_cfg
+
+        cfg = structures_cfg(world)
+        structures = (f"- propose a bridge across the river or stairs up a cliff, where you stand: nothing in your pockets. "
+                      f"A bridge is 3 tiles wide; stairs, 2 wide and 4 long, let anyone climb that cliff without a "
+                      f"ladder. From the moment one is proposed nothing can be planted or put where it goes. Each is "
+                      f"built once {cfg['cost']} bells are "
+                      f"donated at Resident Services; the island can have {cfg['max']} in all, the {world['bridge']['name']} "
+                      "included, and you one proposal still being funded at a time\n")
+    return f"""Actions. Each takes one hour. When you plan, you get a numbered list of the actions you can do then, worked out from what you carry, your bells, where you can get to with the tools you carry, and opening hours; you plan by picking numbers. An action shows up on your list once you have what it needs. Every kind there is, and what it needs:
+- mine a rock, dig for fossils, dig for manila clams on the beach, dig up a stump: a shovel
+- break a rock: a shovel, and {_a_word(fruit)} in your pockets, which you eat first
+- chop wood: an axe or a stone axe (the axe brings a tree down when it takes its last wood); shake a fruit tree: one with fruit on it
+- fish: a fishing rod (fishing bait makes a fish appear); catch bugs: a net
+- beachcomb
+- plant: a sapling, {_a_word(fruit)} or flower seeds; put furniture or fencing outside, fence off your home, pick up what you put out; lay or take up a path
+- craft (at home): a recipe you know and what it needs; put furniture inside your home or take it out; put on clothes you carry
+- visit another villager at their home
+- Nook's Cranny (Timmy and Tommy): sell, buy things, tools and recipe cards; the Able Sisters: buy clothes; the museum (Blathers): donate, assess fossils; Resident Services (Tom Nook, Isabelle): upgrade your home, pay your loan, put bells toward the bridge, set an island ordinance, move your home; ask any of them what they do and what it costs
+- rest; call the Rescue Service (only when you can't get home with the tools you carry; once a day)
+{structures}Gathering anything needs room in your pockets. Not actions: talking, giving and trading happen when you meet someone (visit them to meet on purpose), and you walk wherever an action takes you. You can also spend a free hour at the plaza, which isn't one of your actions: the bulletin board, letters and parcels are there.
+Tools: a ladder climbs one cliff up or down and a vaulting pole jumps across the river; you use one you carry whenever your way needs it."""
 
 
 def action_menu(version: int = PROMPT_VERSION) -> str:
@@ -269,7 +318,8 @@ def system_prompt(spec: AgentSpec, world: dict, n_villagers: int, brief: str, se
         parts.append("## About you\n" + "\n".join(f"- {k}: {v}" for k, v in about.items()))
     for fname, text in spec.docs:
         parts.append(f"## Something you know: {fname}\n{text}")
-    parts.append("## Your island\n" + island_rules(world, n_villagers, version) + (f"\n\n{action_menu(version)}" if menu else ""))
+    actions = action_catalogue(world, version) if version >= 16 else action_menu(version)
+    parts.append("## Your island\n" + island_rules(world, n_villagers, version) + (f"\n\n{actions}" if menu else ""))
     if brief:
         parts.append(brief.strip())
     return "\n\n".join(parts)
@@ -428,6 +478,8 @@ def status_block(isl: Island, vil: Villager, when: str, talk: bool = False) -> s
              + f"\nAble Sisters today ({fmt_window(isl.shop_hours('able'))}): "
              + ", ".join(f"{k} {round(p * f)}" for k, p in isl.able_stock.items()))
     bridge = "built" if isl.bridge_built else f"{isl.bridge_fund}/{w['bridge']['cost']} bells raised"
+    if _v(isl) >= 17:
+        bridge = structures_text(isl)
     requests = request_lines(isl, vil.name) if v12 else isl.favor_lines(vil.name)
     wallet = " in your wallet" if v12 else ""
     ordinance = (f"Island ordinance: {ORDINANCE_TEXT.get(isl.ordinance, isl.ordinance)}"
@@ -454,7 +506,8 @@ def status_block(isl: Island, vil: Villager, when: str, talk: bool = False) -> s
         + (f"Nook's Cranny buys at (prices you've heard): {prices}\n" if v13 else
            f"What Nook's Cranny pays when you sell it there (prices you've heard): {prices}\n" if v12 else
            f"Prices you have seen at Nook's Cranny: {prices}\n")
-        + ("" if talk else f"Museum: {isl.museum_line()}\nBridge: {bridge}\n")
+        + ("" if talk else f"Museum: {isl.museum_line()}\n"
+           + (f"Bridges and stairs: {bridge}\n" if _v(isl) >= 17 else f"Bridge: {bridge}\n"))
         + f"{shops}\n"
         + memory_block(isl, vil)
         + (f"\nGetting around: {getting}" if getting else "")
@@ -462,6 +515,17 @@ def status_block(isl: Island, vil: Villager, when: str, talk: bool = False) -> s
            and getattr(isl, "map_text", "") else "")
         + ("" if talk else spotted_lines(isl, vil) + energy_lines(isl, vil))
     )
+
+
+def structures_text(isl: Island) -> str:
+    """Prompt version 17: every bridge and stairs, built or being funded, and how many more the island can have."""
+    from .world import structures_cfg
+
+    cfg = structures_cfg(isl.w)
+    all_ = isl.structures()
+    parts = [st["name"] + (f" (proposed by {st['by']})" if st["by"] else "")
+             + (": built" if st["built"] else f": {st['fund']}/{cfg['cost']} bells raised") for st in all_]
+    return "; ".join(parts) + f". {len(all_)} of {cfg['max']} so far"
 
 
 ANNOUNCE_WORDS = 70  # from prompt version 5: the announcement itself...
@@ -491,7 +555,8 @@ def fun_facts(isl: Island) -> list[str]:
         "Did you know Timmy and Tommy buy almost anything at a fixed price?",
         "Did you know letters and parcels sent at the plaza arrive the next morning?",
         "Did you know digging up a stump with your shovel clears the spot again?",
-        ("Did you know the bridge, once funded, crosses the river by Resident Services and opens more rocks and trees?"
+        ("Did you know a funded bridge lets anyone cross the river without a vaulting pole?" if v >= 17 else
+         "Did you know the bridge, once funded, crosses the river by Resident Services and opens more rocks and trees?"
          if v >= 15 else "Did you know funding the bridge north opens more rocks and trees to everyone?"),
         f"Did you know anyone can pay Isabelle {w['ordinances']['cost']:,} bells to set an island ordinance?",
     ]
@@ -510,13 +575,16 @@ def fun_facts(isl: Island) -> list[str]:
         facts.append("Did you know a stone axe only gathers wood, but an iron axe fells trees?"
                      if "stone axe" in (w.get("items") or {}) else
                      "Did you know taking a tree's last wood with an axe brings it down?")
+    if v >= 17:
+        facts.append("Did you know funded stairs let anyone climb a cliff without a ladder?")
     if v >= 11 and int(isl_cfg.get("clams_per_day", 0)) > 0:
         facts.append("Did you know digging up a manila clam teaches you to make fishing bait?")
     if getattr(getattr(isl, "energy", None), "enabled", False):
         facts.append("Did you know your mental energy comes back in full every morning?")
     if v >= 15:  # what getting around and tools depend on comes up in the first days, not the last
         first = ["tools break", "ladder climbs", "buy almost anything", "manila clam", "island map", "saplings",
-                 "plant ", "the bridge", "letters and parcels", "fishing bait", "axe", "stump"]
+                 "plant ", "the bridge", "funded bridge", "funded stairs", "letters and parcels", "fishing bait", "axe",
+                 "stump"]
         rank = lambda f: next((i for i, k in enumerate(first) if k in f), len(first))
         facts = sorted(facts, key=rank)  # stable: the rest keep their order
     return facts
@@ -645,23 +713,29 @@ def inbox_text(vil: Villager) -> str:
 
 
 def plan_prompt(isl: Island, vil: Villager, a: int, b: int, n_actions: int, yesterday: list[str],
-                announcement: bool = False, noticed: list[str] | None = None, choices: dict | None = None) -> str:
+                announcement: bool = False, noticed: list[str] | None = None, choices: dict | None = None,
+                options: str | None = None) -> str:
+    """From prompt version 16, `options` is the villager's numbered list (options.options_text), and the
+    plan picks from it by number."""
     done = "\n".join(f"- {r}" for r in vil.today) or "(nothing yet)"
     prev = "\n".join(f"- {r}" for r in yesterday) or "(nothing)"
     inbox = inbox_text(vil)
     isabelle = f"Isabelle's morning announcement: {announcement_text(isl)}\n\n" if announcement else ""
     seen = "\n".join(f"- {x}" for x in (noticed or [])) or "(nothing)"
     v7 = getattr(isl, "prompt_version", 1) >= 7
+    v16 = _v(isl) >= 16 and options is not None
     en = getattr(isl, "energy", None)
     energy = v7 and en is not None and en.enabled
     extra = ""
-    if v7:
+    if v7 and not v16:  # from version 16 the plaza is on the list
         extra += ('\nYou can also spend any free hour at the plaza: add {"hour": <hour>, "do": "plaza"}. '
                   "It isn't one of your actions.")
     home_now = _v(isl) >= 12 and (getattr(isl, "at_home", None) or {}).get(vil.name)
     if home_now:
         extra += ("\nYou're at home, so you can put things from your pockets away or take things out before you go, "
-                  'which takes no time: "home": {"store": {"<item or bells>": <qty>}, "take": {"<item or bells>": <qty>}}.')
+                  'which takes no time: "home": {"store": {"<item or bells>": <qty>}, "take": {"<item or bells>": <qty>}}.'
+                  + (" Your list counts what is in your pockets now; what you take out counts from your next plan."
+                     if v16 else ""))
     if energy:
         if en.plans.get(vil.name) is None:
             extra += (f"\nFirst, decide how you'll spend today's {round(en.daily)} points of mental energy: "
@@ -671,16 +745,28 @@ def plan_prompt(isl: Island, vil: Villager, a: int, b: int, n_actions: int, yest
         else:
             extra += ("\nYou can change today's energy plan if you want: "
                       '"energy": {"inward": <points>, "outward": <points>}.')
+    if v16:
+        listed = (f"What you can do between {clock(a)} and {clock(b - 1)}, with what you carry and where you can get "
+                  f"to (each takes one hour):\n{options}\n\n")
+        ask = (f"Plan up to {n_actions} actions between {clock(a)} and {clock(b - 1)}, one per hour, by picking "
+               "numbers from the list; you may leave hours free and pick a number more than once. Give each an "
+               "\"hour\" (0-23); something at a shop or service goes in the nearest hour it's open. Things may "
+               "not go as planned if someone else gets there first. ")
+        shape = '"actions": [{"hour": <hour>, "pick": <number>}, ...], '
+    else:
+        listed = ""
+        ask = (f"Plan up to {n_actions} actions between {clock(a)} and {clock(b - 1)}, one per hour; you may leave hours free. "
+               "Give each action an \"hour\" (0-23). Things may not go as planned if someone else gets there first. ")
+        shape = '"actions": [{"hour": <hour>, "do": ...}, ...], '
     return (
         "PHASE: plan\n" + status_block(isl, vil, clock(a))
         + f"\n\n{isabelle}Yesterday you:\n{prev}\n\nSo far today you:\n{done}\n\nYou noticed today:\n{seen}\n\nUnread letters:\n{inbox}\n\n"
-        f"Plan up to {n_actions} actions between {clock(a)} and {clock(b - 1)}, one per hour; you may leave hours free. "
-        "Give each action an \"hour\" (0-23). Things may not go as planned if someone else gets there first. "
+        + listed + ask
         + extra + (choices_text(isl, choices) if choices else "") + "\n"
         "Respond with one JSON object and nothing else:\n"
         '{"thoughts": "<your private reasoning; nobody else sees it>", '
         + ('"energy": {"inward": <points>, "outward": <points>}, ' if energy else "")
-        + '"actions": [{"hour": <hour>, "do": ...}, ...], '
+        + shape
         + ('"home": {"store": {}, "take": {}}, ' if home_now else "")
         + '"note": "<optional private note to your future self>"}'
     )

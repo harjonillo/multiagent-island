@@ -124,7 +124,15 @@ move_house_cost: 10000             # Tom Nook moves your home to a free homesite
 bridge:
   name: bridge over the river
   cost: 98000                      # anyone can chip in; built once funded
-  unlocks: {rocks: 3, hardwood_trees: 10}
+  unlocks: {rocks: 3, hardwood_trees: 10}  # added somewhere on the island when built; before prompt version 17 only
+
+structures:                        # from prompt version 17: villagers propose more bridges and stairs
+  max: 10                          # on the island in all, the bridge above included
+  cost: 98000                      # each, raised in donations at Resident Services; built once funded
+  near: 8                          # proposed where they stand: the nearest workable spot within this many tiles
+  bridge_span: 4                   # a bridge crosses at most this many river tiles, in a straight line
+  spacing: 6                       # tiles between any two bridges or stairs
+  per_villager: 1                  # proposals of theirs still being funded, at most
 
 materials:                         # sell price at Nook's Cranny
   wood: 60

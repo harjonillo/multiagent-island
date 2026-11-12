@@ -317,8 +317,12 @@ def summary(run: Run) -> str:
 
     bridge_by = {n: c.get("bridge_bells", 0) for n, c in last["collected"].items()}
     L += ["", f"Bridge: {'built' if last['bridge_built'] else 'not built'}, {last['bridge_fund']}/{m['world']['bridge']['cost']} raised",
-          "  contributors: " + (", ".join(f"{n} {b}" for n, b in sorted(bridge_by.items(), key=lambda kv: -kv[1]) if b) or "nobody"),
-          f"Trees: {dict(last['trees'])}; planted "
+          "  contributors (to every bridge and stairs): "
+          + (", ".join(f"{n} {b}" for n, b in sorted(bridge_by.items(), key=lambda kv: -kv[1]) if b) or "nobody")]
+    for st in last.get("structures") or []:  # prompt version 17: proposed by villagers
+        L.append(f"  {st['name']}: proposed by {st['by']} on day {st['day']}, "
+                 + ("built" if st["built"] else f"{st['fund']} raised"))
+    L += [f"Trees: {dict(last['trees'])}; planted "
           f"{sum(c.get('planted', 0) for c in last['collected'].values())}, chopped down "
           f"{sum(c.get('trees_removed', 0) for c in last['collected'].values())}"]
 

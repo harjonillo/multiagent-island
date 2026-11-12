@@ -289,6 +289,41 @@ it uses one of the day's actions only if the hour was free. At most 3 such calls
 (`sightings.max_decisions_per_day`). Logged as `spot_decision`. Shells and dig spots, which stay
 all day, don't ask.
 
+**Actions by number, from prompt version 16.** Before, a plan wrote its actions as free-form JSON,
+and many failed on form (visiting Nook's Cranny or Tom Nook, `walk`, `post`, `trade`, asking a
+villager) or on something the villager didn't have yet (bait, an apple, bells, a way across the
+river). Now each plan prompt has a numbered list of what that villager can do then, each option
+spelled out ("fish in the river with fishing bait (uses 1; you carry 2)", "visit Jo at their
+home", "buy fishing bait at Nook's Cranny, 300 bells each"). The list is built in code
+(`options.py`) from what they carry, their bells, what they keep at home (for crafting), where they
+can walk with the tools they carry, and opening hours within the plan's hours. The reply picks by
+number (`{"hour": 9, "pick": 14}`), adding a count, bells or a place where an option takes one; the
+plaza is on the list too. The list is as of planning time: something an earlier pick would bring
+(buy bait at 9, fish with it at 10) shows up on the next plan's list. Failures that remain come
+from what changes during the day (someone mined the rock first, pockets filled up, a tool broke).
+A pick that can't be read is dropped and the villager's day says so; a pick at a shop or service
+is moved to the nearest hour it's open. The island rules now list every kind of action and what
+it needs, so villagers know what exists before it's on their list. Every action and the checks that put it on the list are
+charted in [docs/actions.md](docs/actions.md).
+
+**More bridges, and stairs, from prompt version 17.** Anyone can propose a bridge across the river
+or stairs up a cliff, right where they stand (`propose_bridge`, `propose_stairs`): free, taking the
+hour. The island picks the nearest workable spot within 8 tiles, at least 6 tiles from any other
+bridge or stairs, and the proposal fails if there's none, saying where the nearest one is. A bridge
+is 3 tiles wide and crosses at most 4 tiles of lower river (the river averages 3 tiles across), with
+a landing on each bank; stairs are 2 wide and 4 long, two rows below a cliff edge and two above; the
+first bridge gets the same 3-wide footprint. Every land tile under one has to be clear, and from the
+moment it's proposed it is a construction site: walkable, but nothing can be planted or put on it.
+On test1's island that leaves 28 bridge spots and 130 stairs spots before any are taken. Each is built
+once its own fund at Resident Services reaches 98,000 bells, the first bridge's cost; several funds
+can be open at once, and each is its own line on the list. A built bridge crosses the river like the
+first one; built stairs let anyone climb that cliff edge without a ladder. The island can have 10
+in all, built or proposed, the first bridge included, and each villager one proposal still being
+funded at a time (`structures` in the world file). Bridges and stairs only give access. Before version
+17, the first bridge also added 3 rocks and 10 hardwood trees at random places on the island when
+built, and Tom Nook and a fun fact said it "opens more rocks and trees to everyone"; in test1
+villagers made plans around a "bridge rock".
+
 **Shared resources.** Everything refills at 05:00 unless noted.
 
 | resource | supply | notes |

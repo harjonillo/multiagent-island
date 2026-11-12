@@ -96,7 +96,9 @@ def _objects(snap: dict) -> dict:
     o = snap.get("objects") or {}
     return {"trees": o.get("trees", []), "rocks": o.get("rocks", []), "paths": [p[:2] for p in o.get("paths", [])],
             "placed": [p[:2] for p in o.get("placed", [])], "flowers": [f[:2] for f in o.get("flowers", [])],
-            "bridge_open": bool(o.get("bridge_open"))}
+            "bridge_open": bool(o.get("bridge_open")),
+            "bridge_cells": o.get("bridge_cells"),  # prompt version 17: the first bridge's 3-wide footprint
+            "structures": o.get("structures", [])}  # prompt version 17: [kind, cells, built, fund, name]
 
 
 FELLED = ("brought the tree down", "chopped down")  # chop results that left a stump

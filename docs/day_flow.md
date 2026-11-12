@@ -1,7 +1,8 @@
 # How a run works, day by day
 
 Three levels: the whole run, one island day, and one hour inside it. Then two tables: every
-LLM call, and every file a run writes.
+LLM call, and every file a run writes. Every action, and when it's on a villager's list (prompt
+version 16), is in [actions.md](actions.md).
 
 Legend, in all three charts:
 - **purple, rounded:** an LLM call
@@ -68,7 +69,7 @@ flowchart TD
         who["Villagers awake in the window with actions left"]
         habitq{"Chose 'next: habit'<br/>last time?"}
         afford{"Enough energy<br/>to read the prompt?"}
-        plan(["LLM: plan<br/>full rules + action menu<br/>status, memories and recent notes, the 8 oldest unread letters<br/>Isabelle's announcement on the first plan"])
+        plan(["LLM: plan<br/>full rules + action menu<br/>from version 16: a numbered list, see actions.md<br/>status, memories and recent notes, the 8 oldest unread letters<br/>Isabelle's announcement on the first plan"])
         apply["Actions placed at their hours, one per hour, 10 a day<br/>dropped if asleep or no hour free<br/>note kept, choices for plaza, write, next updated"]
         habit["Repeat yesterday's actions for this window<br/>free, 'next' resets to plan"]
         tired["Repeat yesterday's actions<br/>counted as ran out"]
@@ -206,7 +207,7 @@ can't be afforded isn't made.
 
 | call | who | when | system prompt | reply | if it can't be afforded | logged as |
 |---|---|---|---|---|---|---|
-| plan | each awake villager with actions left | on waking and halfway through their waking hours, unless they chose habit | full rules + action menu | JSON: thoughts, actions, note, plaza / write / next | repeats yesterday | `plan` |
+| plan | each awake villager with actions left | on waking and halfway through their waking hours, unless they chose habit | full rules + action menu (version 16: every kind of action and what it needs) | JSON: thoughts, actions (version 16: hour and the number picked from their list), note, plaza / write / next | repeats yesterday | `plan` |
 | plaza | villagers whose plan set an hour aside for it (before version 7: who chose to go) | that hour (before version 7: 20:00; 21:00 only with new offers waiting) | rules, no menu | JSON: thoughts, letters, board, take_down (version 12), parcels, note; offers and responses before version 12 | skips the plaza | `evening_turn` and more |
 | notice | a villager with someone nearby, out of the house | any hour, up to 4 a day | short: persona, nightly page | JSON: thoughts, approach, opening line | too tired to talk | `encounter_decision` |
 | spot (version 14) | a villager who just saw a bug or fish shadow, carries the net or rod for it, is awake next hour and has an action for it | any hour, up to 3 a day (`sightings.max_decisions_per_day`) | short: persona, nightly page | JSON: thoughts, go (which one, or 0) | lets it be | `spot_decision` |

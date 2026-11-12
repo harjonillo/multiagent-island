@@ -327,7 +327,8 @@ def test_blank_villagers_reflect_privately():
         for e in [x for x in refl if x["day"] == 1]:
             tagged[e["agent"]] = e["self_doc"]
         for f in prompts.glob("d002_*.txt"):
-            owner = f.stem.split("_")[-1]
+            parts = f.stem.split("_")
+            owner = parts[-2] if parts[-1].isdigit() else parts[-1]  # a second call that hour is <tag>_<name>_2
             # the mock writes from a small pool of sentences, so only check full self docs that are unique
             for who, doc in tagged.items():
                 if (who != owner and list(tagged.values()).count(doc) == 1 and doc in _seen(f)
@@ -2102,3 +2103,188 @@ def test_rescue_service_once_a_day():
     assert not ok and "once a day" in msg and b.pos != home
     bodies.go_home("A", asleep=True)  # going to sleep ends the day at home
     assert b.pos == home
+
+
+def _stocked(isl, name="A"):
+    """A villager with a bit of everything, so most kinds of option come up."""
+    vil = isl.v[name]
+    fruit = isl.w["island"]["native_fruit"]
+    for k, n in {"shovel": 1, "fishing rod": 1, "net": 1, "axe": 1, "stone axe": 1, "fishing bait": 2, fruit: 2,
+                 "sapling": 1, "tulip seeds": 1, "log stool": 1, "simple wooden fence": 3, "straw hat": 1,
+                 "fossil": 1, "sea bass": 1, "wood": 4}.items():
+        vil.inventory[k] = n
+    vil.bells = 30000
+    vil.recipes |= {"log stool"}
+    return vil
+
+
+def test_version_16_lists_only_what_a_villager_can_do():
+    """Prompt version 16: the plan's numbered list has no option that would fail if done right away, and leaves
+    out what needs something the villager doesn't have: bait, bells, a way across the river."""
+    import copy
+
+    from llmabm.island.options import Choice, Count, Items, plan_options
+
+    isl, g, bodies = _grid_island()
+    assert isl.prompt_version >= 16
+    vil = _stocked(isl)
+    hours = list(range(8, 20))
+    opts = plan_options(isl, bodies, g, "A", hours)
+    kinds = {o.action["do"] for o in opts}
+    assert {"mine_rock", "break_rock", "chop_wood", "fish", "catch_bug", "dig_fossil", "plant", "place", "fence_off",
+            "craft", "wear", "visit", "ask", "sell", "buy", "donate", "assess", "rest", "plaza"} <= kinds, kinds
+    assert not any(o.action["do"] == "visit" and o.action["who"] in ("A", "Nook's Cranny", "Tom Nook") for o in opts)
+    for i, o in enumerate(opts):
+        if o.action["do"] == "plaza":
+            continue
+        act = dict(o.action)
+        for k, spec in o.fields.items():
+            if isinstance(spec, Count):
+                act[k] = spec.default if spec.default is not None else spec.lo
+            elif isinstance(spec, Choice):
+                act[k] = spec.default if spec.default is not None else spec.values[-1]
+            elif isinstance(spec, Items):
+                k0 = next(iter(spec.have))
+                act[k] = {k0: 1}
+        b2 = copy.deepcopy(bodies)  # the island, grid and bodies together, so each option starts from the same state
+        hour = min(o.hours) if o.hours else hours[0]
+        ok, msg = b2.perform("A", act, hour, random.Random(i))
+        if act["do"].startswith("propose_"):  # version 17: it depends on where they are at that hour, not on the plan
+            assert ok or "within 8 steps of here" in msg and "the nearest you can walk to" in msg, (o.text, msg)
+            continue
+        assert ok, (o.text, act, msg)
+
+    # What it needs, it doesn't list without.
+    vil.inventory["fishing bait"] = 0
+    vil.bells = 0
+    opts = plan_options(isl, bodies, g, "A", hours)
+    assert not any(o.action.get("bait") for o in opts)
+    assert not any(o.action["do"] in ("buy", "contribute_bridge", "set_ordinance", "move_house") for o in opts)
+    vil.inventory["vaulting pole"] = 0  # the Able Sisters are across the river from A's home (version 15's test)
+    assert not any("Able Sisters" in o.text for o in plan_options(isl, bodies, g, "A", hours))
+    vil.inventory["vaulting pole"] = 1
+    assert any("Able Sisters" in o.text for o in plan_options(isl, bodies, g, "A", hours))
+    # Shops and services only in the hours they're open; outside them, not at all.
+    assert not isl.is_open("cranny", 23)
+    late = plan_options(isl, bodies, g, "A", [23])
+    assert not any(o.action["do"] == "sell" or o.action.get("shop") == "cranny" for o in late)
+    day = plan_options(isl, bodies, g, "A", [7, 8, 9])
+    assert all(o.hours == frozenset({8, 9}) for o in day if o.action.get("shop") == "cranny")
+
+
+def test_version_16_reads_picks_by_number():
+    from llmabm.island.options import Count, Option, read_picks, unread_line
+
+    opts = [Option("rest", {"do": "rest"}),
+            Option("put bells toward the bridge", {"do": "contribute_bridge"}, frozenset({9, 10}),
+                   {"bells": Count(1, 500)}),
+            Option("spend the hour at the plaza", {"do": "plaza"})]
+    acts, bad = read_picks(opts, [{"hour": 8, "pick": 1}, {"hour": 9, "pick": "2", "bells": 9999},
+                                  {"hour": 10, "pick": 2}, {"hour": 11, "pick": 7}, {"hour": 12, "do": "plaza"},
+                                  {"hour": 13, "do": "fish"}])
+    assert acts == [{"hour": 8, "do": "rest"}, {"hour": 9, "do": "contribute_bridge", "bells": 500, "_open": frozenset({9, 10})},
+                    {"hour": 12, "do": "plaza"}]
+    assert [b["why"] for b in bad] == ['2 (put bells toward the bridge): it needs "bells": 1 to 500',
+                                       "there is no 7 on your list", "it didn't say which number"]
+    assert unread_line(7, bad[1]) == "07:00 in your plan, there is no 7 on your list, so it wasn't planned"
+
+
+def test_version_16_mock_run_has_no_malformed_actions():
+    """End to end on the latest wording: every action comes from a list, so nothing fails on form, and shop and
+    service picks land in hours they're open."""
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=5, backend_override="mock",
+                               log_prompts=True, verbose=False)
+        assert sim.prompt_version >= 16
+        sim.run(2)
+        run = load_run(Path(d) / "run")
+        acts = run.of("action")
+        assert acts and all(a["ok"] for a in acts if a["action"]["do"] in ("visit", "ask", "rest", "wear"))
+        for a in acts:
+            assert "not something you can do" not in a["result"] and "isn't an action" not in a["result"]
+            assert " is closed at " not in a["result"], a
+        plans = run.of("plan")
+        assert any(p["scheduled"] for p in plans)
+        prompt = _seen(next((Path(d) / "run" / "prompts").glob("d001_p0_*.txt")))
+        assert "by picking numbers from the list" in prompt and '"pick": <number>' in prompt
+        assert "Write each as JSON" not in prompt  # the old menu's instructions are gone
+
+
+def test_version_17_bridges_and_stairs():
+    """Prompt version 17: anyone proposes a bridge or stairs where they stand; each is built once its own fund
+    reaches the cost, at most 10 on the island (the first bridge included), one open proposal per villager."""
+    from llmabm.island.options import plan_options
+    from llmabm.island.grid import BRIDGE
+
+    isl, g, bodies = _grid_island(("A", "B", "C"))
+    assert isl.prompt_version >= 17
+    rng = random.Random(0)
+    a, b = isl.v["A"], isl.v["B"]
+    a.inventory["ladder"] = a.inventory["vaulting pole"] = 0
+    home = bodies.home_point("A")
+    walk = g.distances(home, frozenset())
+    spot = next(sp for sp in g.structure_spots(isl, "stairs") if sp["steps"][0][0] in walk and sp["steps"][0][1] not in walk)
+    (lo, hi), (lo2, hi2) = spot["steps"]
+    assert any(o.action["do"] == "propose_stairs" for o in plan_options(isl, bodies, g, "A", list(range(8, 20))))
+    bodies.b["A"].pos = lo
+    ok, msg = bodies.perform("A", {"do": "propose_stairs"}, 10, rng)
+    assert ok and msg.startswith("proposed stairs up to") and "2 of 10" in msg, msg
+    st = isl.projects[0]
+    assert st["by"] == "A" and {tuple(c) for c in st["cells"]} == set(spot["cells"]) and not st["built"]
+    assert len(st["cells"]) == 8 and {lo, hi, lo2, hi2} <= set(spot["cells"])  # 2 wide, 4 long
+    assert set(spot["cells"]) <= g._occupied(isl)  # a construction site: nothing goes on it
+    assert not any(set(spot["cells"]) & set(sp["cells"]) for sp in g.structure_spots(isl, "stairs"))
+    # One open proposal each: A's list has no more proposals, and a second try is turned down.
+    assert not any(o.action["do"].startswith("propose") for o in plan_options(isl, bodies, g, "A", list(range(8, 20))))
+    ok, msg = bodies.perform("A", {"do": "propose_bridge"}, 11, rng)
+    assert not ok and "one proposal of yours at a time" in msg, msg
+    # Each fund is its own line; B funds the stairs, which are built, and anyone climbs there without a ladder.
+    b.bells = 200000
+    funds = [o.action for o in plan_options(isl, bodies, g, "B", list(range(8, 20))) if o.action["do"] == "contribute_bridge"]
+    assert funds == [{"do": "contribute_bridge"}, {"do": "contribute_bridge", "project": "s1"}]
+    ok, msg = bodies.perform("B", {"do": "contribute_bridge", "project": "s1", "bells": 200000}, 10, rng)
+    assert ok and "fully funded and built" in msg and b.bells == 200000 - 98000, msg
+    assert st["built"] and {hi, hi2} <= set(g.distances(lo, frozenset())) and isl.collected["B"]["bridge_bells"] == 98000
+    assert "stairs up to" in g.objects_snapshot(isl)["structures"][0][4]
+    # A bridge, proposed by B where they stand at a narrow stretch of river.
+    bspot = next(sp for sp in g.structure_spots(isl, "bridge") if sp["ends"][0] in walk or sp["ends"][1] in walk)
+    bodies.b["B"].pos = next(e for e in bspot["ends"] if e in walk)
+    ok, msg = bodies.perform("B", {"do": "propose_bridge"}, 12, rng)
+    assert ok and msg.startswith("proposed a bridge across the river"), msg
+    ok, _ = bodies.perform("B", {"do": "contribute_bridge", "project": "s2", "bells": 98000}, 13, rng)
+    br = isl.projects[1]
+    assert len(br["cells"]) == 3 * (len(br["water"]) // 3 + 2)  # 3 wide: the water and a landing on each bank
+    assert ok and all(g.terrain[y][x] == BRIDGE for x, y in br["water"])
+    far_side = [tuple(c) for c in br["cells"] if tuple(c) not in walk and tuple(c) not in map(tuple, br["water"])]
+    assert far_side and all(c in g.distances(bodies.b["B"].pos, frozenset()) for c in far_side)
+    # The first bridge is 3 wide too from version 17; before, the generator's strip of river.
+    assert len(g.first_bridge_cells(isl)) == 3 * (len(g.bridge_cells) + 2)
+    # Ten in all, the first bridge included.
+    while len(isl.structures()) < 10:
+        isl.projects.append({"id": f"s{len(isl.projects) + 1}", "kind": "stairs", "name": "stairs", "cells": [],
+                             "by": "x", "day": 1, "fund": 0, "built": False})
+    bodies.b["C"].pos = lo
+    ok, msg = bodies.perform("C", {"do": "propose_stairs"}, 10, rng)
+    assert not ok and "already has 10" in msg, msg
+    assert not any(o.action["do"].startswith("propose") for o in plan_options(isl, bodies, g, "C", list(range(8, 20))))
+    # Earlier prompt versions have none of it.
+    isl.prompt_version = 16
+    assert g.first_bridge_cells(isl) == g.bridge_cells and not g.structure_tiles(isl)
+    assert not any(o.action["do"].startswith("propose") for o in plan_options(isl, bodies, g, "B", list(range(8, 20))))
+    assert not isl.act("B", {"do": "propose_stairs", "_cells": [list(lo), list(hi)]}, 10)[0]
+
+
+def test_version_17_bridges_only_give_access():
+    """From prompt version 17 the first bridge adds no rocks or trees when built, and nobody says it does."""
+    from llmabm.island.prompts import fun_facts
+
+    for version, extra in ((16, True), (17, False)):
+        isl = _island(("A",))
+        isl.prompt_version = version
+        rocks, trees = isl.n_rocks, len(isl.trees)
+        isl.v["A"].bells = isl.w["bridge"]["cost"]
+        assert isl.act("A", {"do": "contribute_bridge", "bells": isl.w["bridge"]["cost"]}, 10)[0] and isl.bridge_built
+        assert (isl.n_rocks > rocks and len(isl.trees) > trees) == extra
+        said = isl.act("A", {"do": "ask", "who": "Tom Nook"}, 10)[1] + " ".join(fun_facts(isl))
+        assert ("rocks and trees" in said) == extra

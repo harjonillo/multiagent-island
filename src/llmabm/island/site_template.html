@@ -224,7 +224,7 @@ const LOCK = '<svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"
 const TILE_COLOURS = {s: "#A9D3E3", a: "#F1E6C8", r: "#7FBCDB", k: "#A39C8E", b: "#B08A5A", "1": "#CFE3B4", "2": "#B5D49A",
   "3": "#97C27E", B: "#8E8A80", P: "#E6DFCC"};
 const OBJ = {site: "#F7F5EE", home: "#E9C29B", path: "#B98A5E", hardwood: "#3E7A3A", fruit: "#D2553F", stump: "#8A5A2B",
-  sapling: "#6E9E4A", rock: "#5F5B55", placed: "#6250D6", flowers: "#E87BA4", bridge: "#B08A5A", bridgeSite: "#E9B949"};
+  sapling: "#6E9E4A", rock: "#5F5B55", placed: "#6250D6", flowers: "#E87BA4", bridge: "#B08A5A", bridgeSite: "#E9B949", stairs: "#7A5C3E"};
 
 // The map's key, drawn from the same colours the map is painted with.
 const LEGEND = [
@@ -233,7 +233,7 @@ const LEGEND = [
     [TILE_COLOURS.B, "building"], [TILE_COLOURS.P, "plaza"]]],
   ["On it", [[OBJ.site, "free homesite"], [OBJ.home, "home"], [OBJ.path, "path"], [OBJ.hardwood, "tree"], [OBJ.fruit, "fruit tree"],
     [OBJ.sapling, "sapling"], [OBJ.stump, "stump"], [OBJ.rock, "rock"], [OBJ.flowers, "flowers"], [OBJ.placed, "furniture and fences"],
-    [OBJ.bridgeSite, "bridge site, until funded"], [OBJ.bridge, "bridge, once built"]]],
+    [OBJ.bridgeSite, "bridge or stairs site, until funded"], [OBJ.bridge, "bridge, once built"], [OBJ.stairs, "stairs, once built"]]],
 ];
 const legendHTML = () => `<div class="legend" aria-label="Map key">${LEGEND.map(([g, items]) => `<div class="grp"><b>${g}</b><div class="items">${items.map(([c, l]) => `<span class="sw"><i style="background:${c}"></i>${l}</span>`).join("")}</div></div>`).join("")}</div>`;
 
@@ -243,8 +243,9 @@ function mapHTML(day, opts = {}) {
   const id = "map" + Math.random().toString(36).slice(2, 8);
   const homes = day.homes || {};
   let labels = M.buildings.map((b) => `<div class="bld" style="left:${((b.x + 0.5) / M.W * 100).toFixed(2)}%;top:${((b.top - 0.6) / M.H * 100).toFixed(2)}%">${esc(b.name)}</div>`).join("");
-  if (M.bridge && M.bridge.length && !day.objects.bridge_open) {  // where the bridge will go, labelled under it
-    const bx = M.bridge.reduce((a, c) => a + c[0], 0) / M.bridge.length, by = Math.max(...M.bridge.map((c) => c[1]));
+  const BR = day.objects.bridge_cells || M.bridge;  // from prompt version 17 the first bridge's footprint
+  if (BR && BR.length && !day.objects.bridge_open) {  // where the bridge will go, labelled under it
+    const bx = BR.reduce((a, c) => a + c[0], 0) / BR.length, by = Math.max(...BR.map((c) => c[1]));
     labels += `<div class="bld site" style="left:${((bx + 0.5) / M.W * 100).toFixed(2)}%;top:${((by + 1.6) / M.H * 100).toFixed(2)}%">bridge site</div>`;
   }
   const names = Object.entries(homes).filter(([, s]) => s && M.sites[s]).map(([n, s]) => {
@@ -275,8 +276,10 @@ function whatIsAt(day, x, y) {
   }
   const b = M.buildings.find((b) => (b.cells || []).some(([cx, cy]) => cx === x && cy === y));
   if (b) return b.name;
-  if (!day.objects.bridge_open && (M.bridge || []).some(([cx, cy]) => Math.abs(cx - x) <= 1 && Math.abs(cy - y) <= 1))
+  if (!day.objects.bridge_open && (day.objects.bridge_cells || M.bridge || []).some(([cx, cy]) => Math.abs(cx - x) <= 1 && Math.abs(cy - y) <= 1))
     return `bridge site: ${fmt(day.bridge_fund || 0)} of ${fmt(D.bridge_cost)} bells raised at Resident Services`;
+  const st = (day.objects.structures || []).find(([, cells]) => cells.some(([cx, cy]) => Math.abs(cx - x) <= 1 && Math.abs(cy - y) <= 1));
+  if (st) return st[2] ? `${st[4]}, built` : `${st[4]}, proposed: ${fmt(st[3])} of ${fmt(D.bridge_cost)} bells raised at Resident Services`;
   const t = (M.tiles[y] || "")[x];
   return GROUND[t] || "";
 }
@@ -306,7 +309,8 @@ function paint(canvas, day) {
   const M = D.map, g = canvas.getContext("2d"), o = day.objects;
   const dot = (x, y, c) => { g.fillStyle = c; g.fillRect(x, y, 1, 1); };
   M.tiles.forEach((row, y) => { for (let x = 0; x < row.length; x++) dot(x, y, TILE_COLOURS[row[x]] || "#CFE3B4"); });
-  M.bridge.forEach(([x, y]) => dot(x, y, o.bridge_open ? OBJ.bridge : OBJ.bridgeSite));
+  (o.bridge_cells || M.bridge).forEach(([x, y]) => dot(x, y, o.bridge_open ? OBJ.bridge : OBJ.bridgeSite));
+  (o.structures || []).forEach(([k, cells, built]) => cells.forEach(([x, y]) => dot(x, y, built ? OBJ[k] : OBJ.bridgeSite)));
   const lived = new Set(Object.values(day.homes || {}));
   Object.entries(M.sites).forEach(([sid, s]) => s.cells.forEach(([x, y]) => dot(x, y, lived.has(sid) ? OBJ.home : OBJ.site)));
   o.paths.forEach(([x, y]) => dot(x, y, OBJ.path));
