@@ -256,7 +256,9 @@ def encounter_reply(prompt: str, rng: random.Random) -> str:
         out["say"] = "Could you spare me some of those, if you get any?"
     elif '"trade": {} or' in prompt and inv and rng.random() < 0.15:  # prompt version 12: trades in person
         want = rng.choice([{"bells": rng.choice([100, 300, 600])}, {rng.choice(["wood", "stone", "apple"]): 2}])
-        out["trade"] = {"give": {rng.choice(list(inv)): 1}, "want": want}
+        give = {rng.choice(list(inv)): 1}
+        m = re.search(r'"trade": \{\} or \{"(you give [^"]+)": .*?"([^"]+ gives you)"', prompt)  # prompt version 18
+        out["trade"] = {m.group(1): give, m.group(2): want} if m else {"give": give, "want": want}
         out["say"] = "Want to swap?"
     return json.dumps(out)
 

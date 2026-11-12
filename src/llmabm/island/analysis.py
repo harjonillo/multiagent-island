@@ -8,6 +8,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from ..analysis import Run, load_run
+from .prompts import act_record
 from .world import CATEGORIES, FOSSIL, ORDINANCE_TEXT, category_of, clock
 
 RESOURCES = ["rocks", "wood", "fruit", "fish", "bugs", "shells", "fossils"]
@@ -638,7 +639,9 @@ def _social_lines(hev: list[dict]) -> list[str]:
             who = " and ".join(e["villagers"])
             head = (f"{e['villagers'][0]} visited {e['villagers'][1]} at home" if e.get("visit")
                     else f"{who} met at the {e['location']}")
-            out.append(f"{head}: " + (" / ".join(f'{x["speaker"]}: "{x["text"]}"' + (f" [{x['act']}]" if x.get("act") else "")
+            other = lambda s: next((v for v in e["villagers"] if v != s), "")  # noqa: E731
+            out.append(f"{head}: " + (" / ".join(f'{x["speaker"]}: "{x["text"]}"'
+                                                  + (f" [{act_record(x, other(x['speaker']))}]" if x.get("act") else "")
                                                   for x in spoken) if spoken else "they just waved"))
         elif t == "visit":
             out.append(f"{e['guest']} knocked at {e['host']}'s home: "

@@ -97,6 +97,11 @@ PROMPT_CHANGES = {
         "only give access: "
         "the first bridge no longer adds 3 rocks and 10 hardwood trees somewhere on the island when built, and Tom "
         "Nook and the fun fact no longer say it opens more rocks and trees (a fun fact about stairs is added)",
+    18: "trades name both people, never \"X for Y\": a conversation's reply writes a trade as \"you give <them>\" and "
+        "\"<them> gives you\" (was \"give\" and \"want\"); the offer on the table, each turn's tag and what has "
+        "changed hands between you say who gives what to whom (\"Ari's offer: Ari gives you 1 wood, you give Ari 1 "
+        "fishing bait\"; \"you gave Jo 1 selit fish and Jo gave you 1 softwood, in a trade\"). A request to you "
+        "says how many of it you have",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -928,8 +933,10 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
                      opener: bool, visit: str | None = None, last: str | None = None) -> str:
     v12 = _v(isl) >= 12
     v13 = _v(isl) >= 13
+    v18 = _v(isl) >= 18
+    have = (lambda k: vil.bells if k == "bells" else vil.inventory.get(k, 0)) if v18 else None  # noqa: E731
     said = "\n".join(f'{"You" if t["speaker"] == vil.name else t["speaker"]}: {t["text"]}'
-                     + (f" [{turn_act_text(t, vil.name, other, v13) if v12 else t['act']}]" if t.get("act") else "")
+                     + (f" [{turn_act_text(t, vil.name, other, v13, v18, have) if v12 else t['act']}]" if t.get("act") else "")
                      for t in turns if t["text"] or t.get("act"))
     if visit == "guest":
         host = isl.v[other]
@@ -952,7 +959,14 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
         table = open_trade(turns)
         tries = TRADE_TRIES - trade_tries(turns) if v13 else None
         pick = "<item or bells>" if v13 else "<item or bells from your pockets>"
-        if v13:
+        if v18:  # every trade names who gives what to whom
+            options = (f"You can also give {other} something from your pockets now (\"give\"), ask {other} for "
+                       f"something (\"ask\"; open until they give or trade it, up to {REQUEST_DAYS} days)"
+                       + (f", or offer a trade (\"trade\": what you give {other} and what {other} gives you; it "
+                          f"happens only if {other} accepts, both at once)" if tries > 0 else "")
+                       + ". Leave any empty ({}).\n" + trade_tries_text(tries, other)
+                       + trade_table_text_v18(isl, table, vil, other, tries))
+        elif v13:
             options = (f"You can also give {other} something from your pockets now (\"give\"), ask for something "
                        f"(\"ask\"; open until they give or trade it, up to {REQUEST_DAYS} days)"
                        + (f", or offer a trade (\"trade\"; it happens only if {other} accepts, both sides at once)"
@@ -967,9 +981,10 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
                        "hands at once, or nothing does. Leave any of them empty ({}) if you don't want to.\n"
                        + trade_table_text(table, vil.name, other))
         options += f"In your pockets right now: {pocket_summary(isl, vil)}\n"
+        trade_shape = (f'{{"you give {other}": {{"{pick}": <qty>}}, "{other} gives you": {{"<item or bells>": <qty>}}}}'
+                       if v18 else f'{{"give": {{"{pick}": <qty>}}, "want": {{"<item or bells>": <qty>}}}}')
         fields = (f'"give": {{}} or {{"{pick}": <qty>}}, "ask": {{}} or {{"<item or bells>": <qty>}}, '
-                  + (f'"trade": {{}} or {{"give": {{"{pick}": <qty>}}, '
-                     '"want": {"<item or bells>": <qty>}}, ' if tries is None or tries > 0 else "")
+                  + (f'"trade": {{}} or {trade_shape}, ' if tries is None or tries > 0 else "")
                   + ('"accept": true | false, ' if table and table["proposer"] == other
                      and (tries is None or not isl.accept_problem(vil.name, table)) else ""))
     else:
@@ -979,7 +994,7 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
     return (
         "PHASE: encounter\n" + status_block(isl, vil, clock(hour), talk=True)
         + f"\n\nSo far today you:\n" + ("\n".join(f"- {r}" for r in vil.today) or "(nothing yet)")
-        + "\n\n" + (exchanges_with(isl, vil.name, other) if _v(isl) >= 8 else "")
+        + "\n\n" + (exchanges_with(isl, vil.name, other) if _v(isl) >= 8 else "")  # noqa: ISC003
         + (last_chat_with(isl, vil.name, other) if v12 else "")
         + f"{situation}\n"
         + (f"One or two sentences, the way you'd really talk. Only {other} hears it.\n" if v13 else
@@ -1044,9 +1059,10 @@ def pocket_summary(isl: Island, vil: Villager) -> str:
     return f"{vil.bells} bells" + (f", {things}" if things else ", nothing else")
 
 
-def turn_act_text(t: dict, me: str, other: str, v13: bool = False) -> str:
+def turn_act_text(t: dict, me: str, other: str, v13: bool = False, v18: bool = False, have=None) -> str:
     """Prompt version 12: what a conversation turn did, told from `me`'s side ("Ike handed you 1 wood"). From
-    version 13 (`v13`) a trade offer reads as what you'd give and get, like the offer on the table."""
+    version 13 (`v13`) a trade offer reads as what you'd give and get, like the offer on the table. From 18 (`v18`)
+    trades name both people, and `have` (item -> how many `me` carries) adds how many of a request you have."""
     acts = t.get("acts")
     if not acts:
         text = t.get("act") or ""
@@ -1066,11 +1082,14 @@ def turn_act_text(t: dict, me: str, other: str, v13: bool = False) -> str:
                          else f"{speaker} tried to hand you {what} but {why}")
         elif a["kind"] == "asked":
             line = f"you asked {other} for {what}" if mine else f"{speaker} asked you for {what}"
+            if not mine and have is not None and not a.get("unknown"):  # version 18: how many of it you have
+                line += " (" + ", ".join(f"you have {have(k) or 'none'}" + (f" {k}" if len(a['items']) > 1 else "")
+                                         for k in a["items"]) + ")"
             if a.get("unknown"):
                 line += f", but there's nothing called {' or '.join(a['unknown'])} on this island"
             parts.append(line)
     for a in acts:
-        if trade := _trade_act_text(a, speaker, me, other, v13):
+        if trade := (_trade_act_text_v18(a, speaker, me, other) if v18 else _trade_act_text(a, speaker, me, other, v13)):
             parts.append(trade)
     if t.get("leave"):
         parts.append("then you went your ways")
@@ -1123,6 +1142,116 @@ def _trade_act_text(a: dict, speaker: str, me: str, other: str, v13: bool = Fals
     return ""
 
 
+def _sides(giver: str, gives: dict, taker: str, takes: dict, me: str) -> str:
+    """Prompt version 18: both sides of a trade, each naming who gives what to whom, from `me`'s side:
+    "Ari gives you 1 wood, you give Ari 1 fishing bait"."""
+    name = lambda n: "you" if n == me else n  # noqa: E731
+    verb = lambda n: "give" if n == me else "gives"  # noqa: E731
+    return (f"{name(giver)} {verb(giver)} {name(taker) if taker != me else 'you'} {_count(gives)}, "
+            f"{name(taker)} {verb(taker)} {name(giver) if giver != me else 'you'} {_count(takes)}")
+
+
+def _trade_act_text_v18(a: dict, speaker: str, me: str, other: str) -> str:
+    """Prompt version 18: a trade proposed, made or fallen through in a conversation, naming both people."""
+    mine = speaker == me
+    k, who = a["kind"], ("you" if mine else speaker)
+    if k == "proposed":
+        if a.get("over"):
+            return f"{who} tried to offer another trade, but none were left"
+        if a.get("unknown"):
+            return f"{who} proposed a trade, but there's nothing called {' or '.join(a['unknown'])} on this island"
+        if a.get("one_sided"):
+            return f"{who} proposed a trade with nothing on one side, so there was none"
+        offer = ("your offer: " if mine else f"{speaker}'s offer: ") + _sides(speaker, a["give"], other if mine else me,
+                                                                             a["want"], me)
+        return f"{offer}, but {problem_text(a['problem'], me)}, so there was no offer" if a.get("problem") else offer
+    if k in ("traded", "trade_failed"):
+        p = a["proposer"]
+        q = other if p == me else me
+        accepted = "you accepted" if mine else f"{speaker} accepted"
+        if k == "traded":
+            done = _sides(p, a["give"], q, a["want"], me).replace(" gives ", " gave ").replace(" give ", " gave ")
+            return f"{accepted}: {done}"
+        return f"{accepted}, but the trade fell through, nothing changed hands: {problem_text(a['problem'], me)}"
+    if k == "no_trade":
+        return (f"you accepted, but {other} had no trade on the table" if mine
+                else f"{speaker} accepted, but you had no trade on the table")
+    return ""
+
+
+def trade_table_text_v18(isl: Island, t: dict | None, vil: Villager, other: str, tries: int) -> str:
+    """Prompt version 18: the trade on the table, naming both people, with how many of your side you have."""
+    if not t:
+        return ""
+    me = vil.name
+    if t["proposer"] == me:
+        return f"On the table from you: {_sides(me, t['give'], other, t['want'], me)}, if {other} accepts.\n"
+    have = ", ".join(f"you have {(vil.bells if k == 'bells' else vil.inventory.get(k, 0)) or 'none'}"
+                     + (f" {k}" if len(t["want"]) > 1 else "") for k in t["want"])
+    line = f"On the table from {other}: {_sides(other, t['give'], me, t['want'], me)} ({have}). "
+    problem = isl.accept_problem(me, t)
+    line += ("You can't accept it (no room)" if problem.get("room") else "You can't accept it") if problem \
+        else "\"accept\": true makes the trade"
+    return line + ("; or offer another.\n" if tries > 0 else ".\n")
+
+
+def trade_sides(trade: dict, other: str) -> tuple:
+    """A reply's trade as (what the speaker gives, what they'd get). Prompt version 18 writes "you give <other>" and
+    "<other> gives you"; earlier versions "give" and "want". Either is read, whatever the version."""
+    give = want = None
+    for k, v in trade.items():
+        key = str(k).strip().lower()
+        if key == "give" or key.startswith("you give"):
+            give = v
+        elif key in ("want", "get") or key.endswith("gives you") or key.startswith("you get"):
+            want = v
+    return give, want
+
+
+def act_record(t: dict, other: str) -> str:
+    """For the record (day logs, the explorer; villagers never see it from prompt version 12): what a conversation
+    turn did, naming who gives what to whom. Built from the turn's structured acts, so it reads the same for any
+    run that kept them (from version 12); turns without them keep what was written then."""
+    acts = t.get("acts")
+    if not acts:
+        return t.get("act") or ""
+    s = t["speaker"]
+    out = []
+    for a in acts:
+        k = a["kind"]
+        if k == "gave":
+            out.append(f"gave {other} {_count(a['items'])}")
+        elif k == "failed":
+            out.append(f"tried to give {other} {_count(a['items'])}, but {problem_text(a['problem'])}")
+        elif k == "asked":
+            out.append(f"asked {other} for {_count(a['items'])}"
+                       + (f", but there's nothing called {' or '.join(a['unknown'])}" if a.get("unknown") else ""))
+        elif k == "proposed":
+            deal = f"{s} gives {_count(a['give'])}, {other} gives {_count(a['want'])}"
+            if a.get("over"):
+                out.append(f"tried to offer {other} another trade ({deal}), but none were left")
+            elif a.get("unknown"):
+                out.append(f"offered {other} a trade, but there's nothing called {' or '.join(a['unknown'])}")
+            elif a.get("one_sided"):
+                out.append(f"offered {other} a trade with nothing on one side")
+            elif a.get("problem"):
+                out.append(f"tried to offer {other} a trade ({deal}), but {problem_text(a['problem'])}")
+            else:
+                out.append(f"offered {other} a trade: {deal}")
+        elif k in ("traded", "trade_failed"):
+            p = a["proposer"]
+            q = s if p != s else other
+            deal = f"{p} gave {_count(a['give'])}, {q} gave {_count(a['want'])}"
+            out.append(f"accepted {p}'s trade: {deal}" if k == "traded" else
+                       f"accepted {p}'s trade ({p} gives {_count(a['give'])}, {q} gives {_count(a['want'])}), but it "
+                       f"fell through: {problem_text(a['problem'])}")
+        elif k == "no_trade":
+            out.append(f"accepted, but {other} had no trade on the table")
+    if t.get("leave") or (t.get("act") or "").endswith("then went their way"):
+        out.append("then went their way")
+    return "; ".join(out)
+
+
 def open_trade(turns: list[dict]) -> dict | None:
     """Prompt version 12: the trade on the table in a conversation: the latest one proposed, unless it has
     since been accepted (made or fallen through). A new proposal from either side replaces it."""
@@ -1171,16 +1300,23 @@ def last_chat_with(isl: Island, me: str, other: str) -> str:
              else at_place(c["place"]))
     turns = c["turns"][-LAST_CHAT_LINES:]
     lines = [f'{"You" if t["speaker"] == me else t["speaker"]}: {t["text"][:200]}'
-             + (f" [{turn_act_text(t, me, other, _v(isl) >= 13)}]" if t.get("act") or t.get("acts") else "")
+             + (f" [{turn_act_text(t, me, other, _v(isl) >= 13, _v(isl) >= 18)}]" if t.get("act") or t.get("acts") else "")
              for t in turns]
     return (f"The last time you talked with {other} before today (day {c['day']}, {clock(c['hour'])}, {where}):\n"
             + "\n".join(lines) + "\n\n")
 
 
-def exchange_line(e: dict, me: str) -> str:
-    """One thing that changed hands, as `me` saw it (prompt version 8)."""
+def exchange_line(e: dict, me: str, v18: bool = False) -> str:
+    """One thing that changed hands, as `me` saw it (prompt version 8). From 18 (`v18`) a trade names both sides."""
     mine = e["from"] == me
     other = e["to"] if mine else e["from"]
+    if e["how"] == "trade" and v18:  # e["from"] gave e["items"]; e["to"] gave e["got"]
+        mine_items, theirs = (e["items"], e["got"]) if mine else (e["got"], e["items"])
+        asked_mine = e.get("asked") if mine else e.get("asked_back")
+        asked_theirs = e.get("asked_back") if mine else e.get("asked")
+        return (f"you gave {other} {_count(mine_items)}" + (f" (which {other} had asked for)" if asked_mine else "")
+                + f" and {other} gave you {_count(theirs)}" + (" (which you had asked for)" if asked_theirs else "")
+                + ", in a trade")
     if e["how"] == "trade":
         if mine:  # asked: the taker had asked for e["items"]; asked_back: the giver had asked for e["got"]
             gave = _count(e["items"]) + (f" (which {other} had asked for)" if e.get("asked") else "")
@@ -1204,7 +1340,7 @@ def exchanges_with(isl: Island, me: str, other: str) -> str:
     if not ex:
         return ""
     shown = ex[-EXCHANGES_SHOWN:]
-    lines = [f"- day {e['day']}: {exchange_line(e, me)}" for e in shown]
+    lines = [f"- day {e['day']}: {exchange_line(e, me, _v(isl) >= 18)}" for e in shown]
     more = len(ex) - len(shown)
     return (f"Between you and {other} so far" + (f" (the latest {len(shown)}; {more} earlier)" if more else "")
             + ":\n" + "\n".join(lines) + "\n\n")
@@ -1252,7 +1388,7 @@ def night_facts(isl: Island, vil: Villager, offers: list | None) -> str:
     v12 = _v(isl) >= 12
     requests = request_lines(isl, me) if v12 else isl.favor_lines(me)
     return ("Things that changed hands today:\n"
-            + ("\n".join(f"- {exchange_line(e, me)}" for e in today) or "(nothing)") + "\n\n"
+            + ("\n".join(f"- {exchange_line(e, me, _v(isl) >= 18)}" for e in today) or "(nothing)") + "\n\n"
             + f"What you have tonight:\nBells: {vil.bells}{' in your wallet' if v12 else ''}\n{pockets_text(isl, vil)}\n"
             + f"Recipes you know: {', '.join(sorted(vil.recipes)) or 'none'}\n"
             + since_morning(isl, vil) + "\n"

@@ -2,6 +2,14 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-13 12:00
+  what: Prompt version 18, trades name both people
+  when: new runs from now on, or a run resumed with --prompt-version 18; the record, for every run
+  details:
+    - "a conversation's reply writes a trade as \"you give <them>\" and \"<them> gives you\" (was \"give\" and \"want\"; both are still read). In test1, 12 of 18 replies to an offer on the table asked for the same thing back (Ike offers wood for Ari's bait; Ari answers with fish for Ike's bait), 7 of them on days 9 to 11, after version 13's \"you give, you get\" table. Bo, asked by Ari for bait he didn't have, offered his own wood for Ari's bait, thinking \"Ari wants bait, gives wood\""
+    - "the offer on the table, each turn's tag and what has changed hands between two villagers name who gives what to whom, never \"X for Y\": \"On the table from Ike: Ike gives you 1 wood, you give Ike 1 fishing bait (you have none)\"; \"you gave Jo 1 selit fish and Jo gave you 1 softwood, in a trade\". A request to you says how many of it you have"
+    - "the record (day logs, the explorer) names both people too, rebuilt from what each turn did, so it reads that way for every run that kept it (from prompt version 12), test1 included once re-analysed: \"offered Kit a trade: Gus gives 1 selit fish, Kit gives 1 fishing bait\" (was \"offered a trade: 1 selit fish for 1 fishing bait\")"
+    - "not changed, on purpose: who has what. In test1 at most one villager held any fishing bait at the end of each day from day 6 on, and nobody knew its recipe, so most bait trades couldn't have happened however they were worded"
 - time: 2026-11-12 18:00
   what: Prompt version 17, more bridges, and stairs
   when: new runs from now on, or a run resumed with --prompt-version 17

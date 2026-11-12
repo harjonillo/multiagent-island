@@ -35,7 +35,7 @@ from ..agent import AgentSpec, load_agent_file
 from ..llm import DailyLimit, LLMError
 from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, TRADE_TRIES, _count, keep_chat, open_trade,
                       problem_text, trade_tries, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, OFFER_DAYS,
-                      REQUEST_DAYS, at_place, turn_act_text,
+                      REQUEST_DAYS, act_record, at_place, trade_sides, turn_act_text,
                       encounter_prompt, evening_prompt, plaza_prompt, spot_prompt, action_text,
                       announcement_text, inbox_text, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
@@ -872,7 +872,7 @@ class IslandSimulation:
                 else (f"ran into {other} {at_place(place)}" if v12 else f"ran into {other} at the {place}")
             if spoken:
                 lines = "; ".join(f'{"you" if t["speaker"] == me else other} said "{t["text"][:220]}"'
-                                  + (f" [{turn_act_text(t, me, other, self.prompt_version >= 13) if v12 else t['act']}]"
+                                  + (f" [{turn_act_text(t, me, other, self.prompt_version >= 13, self.prompt_version >= 18) if v12 else t['act']}]"
                                      if t.get("act") else "") for t in spoken)
                 isl.v[me].today.append(f"{clock(h)} {where}: {lines}")
             else:
@@ -917,11 +917,14 @@ class IslandSimulation:
                 acts.append("asked for " + ", ".join(f"{n} {k}" for k, n in f["items"].items()))
                 said.append({"kind": "asked", "items": dict(f["items"])})
         trade = obj.get("trade")
-        if self.v12 and isinstance(trade, dict) and \
-                (_clean_side(trade.get("give")) or _clean_side(trade.get("want"))):
-            self._propose_trade(d, speaker, other, trade, acts, said, turns or [])
+        if self.v12 and isinstance(trade, dict):  # version 18 writes "you give <other>" and "<other> gives you"
+            give_side, want_side = trade_sides(trade, other)
+            if _clean_side(give_side) or _clean_side(want_side):
+                self._propose_trade(d, speaker, other, {"give": give_side, "want": want_side}, acts, said, turns or [])
         self._log_favors_done(d)
-        if acts:
+        if said:  # the record names who gives what to whom (villagers see their own version, from `acts`)
+            turn["act"] = act_record({"speaker": speaker, "acts": said}, other)
+        elif acts:
             turn["act"] = "; ".join(acts)
         if said:
             turn["acts"] = said

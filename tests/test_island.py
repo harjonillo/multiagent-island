@@ -1473,6 +1473,7 @@ def test_prompt_version_8_shows_what_you_have_and_what_changed_hands():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=2)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=2, backend_override="mock", verbose=False)
+        sim.prompt_version = sim.isl.prompt_version = 17  # the trade wording before version 18
         sim.run(3)
         isl = sim.isl
         assert isl.prompt_version >= 8 and hasattr(isl, "morning_state")
@@ -1787,6 +1788,7 @@ def test_prompt_version_13_a_conversation_holds_at_most_three_trade_offers():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
+        sim.prompt_version = sim.isl.prompt_version = 17  # the trade wording before version 18
         sim.run(1)
         events = []
         sim.log = lambda type_, **data: events.append({"type": type_, **data})
@@ -1853,6 +1855,7 @@ def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied():
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
+        sim.prompt_version = sim.isl.prompt_version = 17  # the trade wording before version 18
         sim.run(1)
         events = []
         sim.log = lambda type_, **data: events.append({"type": type_, **data})  # the run's log is closed
@@ -2200,7 +2203,9 @@ def test_version_16_mock_run_has_no_malformed_actions():
         sim.run(2)
         run = load_run(Path(d) / "run")
         acts = run.of("action")
-        assert acts and all(a["ok"] for a in acts if a["action"]["do"] in ("visit", "ask", "rest", "wear"))
+        # these only fail if a ladder or pole broke or changed hands after the plan, putting the place out of reach
+        assert acts and all(a["ok"] or "can't get to" in a["result"]
+                            for a in acts if a["action"]["do"] in ("visit", "ask", "rest", "wear"))
         for a in acts:
             assert "not something you can do" not in a["result"] and "isn't an action" not in a["result"]
             assert " is closed at " not in a["result"], a
@@ -2288,3 +2293,43 @@ def test_version_17_bridges_only_give_access():
         assert (isl.n_rocks > rocks and len(isl.trees) > trees) == extra
         said = isl.act("A", {"do": "ask", "who": "Tom Nook"}, 10)[1] + " ".join(fun_facts(isl))
         assert ("rocks and trees" in said) == extra
+
+
+def test_version_18_trades_name_both_people():
+    """Prompt version 18: a trade says who gives what to whom, never "X for Y", in the reply, the offer on the
+    table, each turn's tag, what has changed hands, and the record; a request to you says how many you have."""
+    from llmabm.island.prompts import (act_record, encounter_prompt, exchange_line, trade_sides, turn_act_text)
+
+    isl = _island(("Ari", "Ike"))
+    assert isl.prompt_version >= 18
+    isl.v["Ari"].inventory["wood"] = 3
+    offer = {"speaker": "Ike", "text": "Wood for bait?", "act": "x",
+             "acts": [{"kind": "asked", "items": {"fishing bait": 1}},
+                      {"kind": "proposed", "give": {"wood": 1}, "want": {"fishing bait": 1}}]}
+    tag = turn_act_text(offer, "Ari", "Ike", True, True, lambda k: isl.v["Ari"].inventory.get(k, 0))
+    assert tag == ("Ike asked you for 1 fishing bait (you have none); "
+                   "Ike's offer: Ike gives you 1 wood, you give Ike 1 fishing bait"), tag
+    assert turn_act_text(offer, "Ike", "Ari", True, True) == (
+        "you asked Ari for 1 fishing bait; your offer: you give Ari 1 wood, Ari gives you 1 fishing bait")
+    done = {"speaker": "Ari", "text": "", "act": "x",
+            "acts": [{"kind": "traded", "proposer": "Ike", "give": {"wood": 1}, "want": {"fishing bait": 1}}]}
+    assert turn_act_text(done, "Ike", "Ari", True, True) == "Ari accepted: you gave Ari 1 wood, Ari gave you 1 fishing bait"
+    assert act_record(offer, "Ari") == "asked Ari for 1 fishing bait; offered Ari a trade: Ike gives 1 wood, Ari gives 1 fishing bait"
+    assert act_record(done, "Ike") == "accepted Ike's trade: Ike gave 1 wood, Ari gave 1 fishing bait"
+    # The offer on the table and the reply's keys name the other villager.
+    p = encounter_prompt(isl, isl.v["Ari"], "Ike", "river", 10, [offer], opener=False)
+    assert "On the table from Ike: Ike gives you 1 wood, you give Ike 1 fishing bait (you have none). You can't accept it" in p
+    assert '"trade": {} or {"you give Ike": {' in p and '"Ike gives you": {' in p and '"want"' not in p
+    import re
+
+    tags = re.findall(r"\[([^\]]*)\]", p.split("So far:")[1].split("Respond with")[0])
+    table = next(ln for ln in p.splitlines() if ln.startswith("On the table"))
+    assert tags and not any(" for " in x.replace("asked you for", "") for x in tags + [table]), (tags, table)
+    # Both ways of writing a trade are read.
+    assert trade_sides({"you give Ike": {"wood": 1}, "Ike gives you": {"apple": 2}}, "Ike") == ({"wood": 1}, {"apple": 2})
+    assert trade_sides({"give": {"wood": 1}, "want": {"apple": 2}}, "Ike") == ({"wood": 1}, {"apple": 2})
+    # What has changed hands between them.
+    e = {"day": 3, "from": "Ike", "to": "Ari", "how": "trade", "items": {"wood": 1}, "got": {"fishing bait": 1}}
+    assert exchange_line(e, "Ari", True) == "you gave Ike 1 fishing bait and Ike gave you 1 wood, in a trade"
+    assert exchange_line(e, "Ike", True) == "you gave Ari 1 wood and Ari gave you 1 fishing bait, in a trade"
+    assert exchange_line(e, "Ari") == "Ike traded you 1 wood for your 1 fishing bait"  # earlier versions as they were
