@@ -36,11 +36,24 @@ water and cliff edges.
 **Getting around.** Beach and grass are walkable. Trees, rocks, buildings, homes, placed furniture
 and fences block their tiles; the plaza doesn't. Going up or down one cliff tier needs a **ladder**.
 Crossing the river needs a **vaulting pole**, which clears up to 3 tiles of water,
-until the bridge is built. The pond and the sea can never be crossed. Everyone starts with both,
-and they wear out (see Tools). Trees, rocks, buildings (the plaza too) and homes always keep at
-least one free tile between them. The bridge goes across 2 tiles of river on lower ground, centre, near Resident Services; it costs
-98,000 bells and, once funded, opens 3 more rocks and
-10 more hardwood trees.
+except over a built bridge. The river is 3.1 tiles across on average
+(measured straight across at each river tile; 2 to 8). The pond and the sea can
+never be crossed. Everyone starts with both, and they wear out (see Tools). Trees, rocks, buildings
+(the plaza too) and homes always keep at least one free tile between them.
+
+**Bridges and stairs.** The first bridge goes across 2 tiles of river on lower ground, centre, near Resident Services; it costs
+98,000 bells, raised by anyone at Resident Services, and once built it is a way across the
+river without a pole. Villagers can propose more bridges, and stairs, where they stand, each built
+once its own fund reaches 98,000 bells; 10 in all, built or proposed, the first bridge
+included, and one proposal of each villager's still being funded at a time. A bridge is 3 tiles wide
+and crosses at most 4 tiles of lower river, with a landing on each bank (the first
+bridge too); stairs are 2 tiles wide and 4 long, two rows below a cliff edge and two above, and let
+anyone climb there without a ladder. Every land tile under one has to be clear, it has to be at least
+6 tiles from any other, and from the moment it's proposed nothing can be planted or put
+on it. This island has 28 spots for a bridge and 130 for stairs before any
+are taken. They only give access. (In runs on prompt versions before 17, the first bridge also adds
+3 rocks and 10 hardwood trees at
+random places when built, and villagers can't propose more.)
 
 What you can reach from Resident Services:
 
@@ -307,7 +320,7 @@ between 1,000 and 10,000.
 
 | who | where | open | what they do |
 |---|---|---|---|
-| Tom Nook | Resident Services | all day | house upgrades on a loan with no interest and no deadline (pay it off before the next one); moves your home for 10,000 bells overnight; bridge fund (98,000 bells) |
+| Tom Nook | Resident Services | all day | house upgrades on a loan with no interest and no deadline (pay it off before the next one); moves your home for 10,000 bells overnight; bridge and stairs funds (98,000 bells each) |
 | Isabelle | Resident Services | all day | sets an ordinance for 20,000 bells, from the next morning |
 | Timmy and Tommy | Nook's Cranny | 08:00-22:00 | buy almost anything at a fixed price; sell a small daily stock |
 | the Able Sisters | Able Sisters | 09:00-21:00 | sell clothes |

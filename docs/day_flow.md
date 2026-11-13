@@ -168,7 +168,7 @@ flowchart TD
 
     subgraph chat["One-on-one chat, 2 lines by default"]
         cafford{"Enough energy?"}
-        talk(["LLM: chat turn<br/>rules without the action menu<br/>say something, give or ask for items"])
+        talk(["LLM: chat turn<br/>rules without the action menu<br/>say something, give or ask for items,<br/>offer or accept a trade (version 12)"])
         nod["Just nods"]
         cev[("events.jsonl: encounter, gift<br/>favor_asked, favor_done")]
     end
@@ -211,7 +211,7 @@ can't be afforded isn't made.
 | plaza | villagers whose plan set an hour aside for it (before version 7: who chose to go) | that hour (before version 7: 20:00; 21:00 only with new offers waiting) | rules, no menu | JSON: thoughts, letters, board, take_down (version 12), parcels, note; offers and responses before version 12 | skips the plaza | `evening_turn` and more |
 | notice | a villager with someone nearby, out of the house | any hour, up to 4 a day | short: persona, nightly page | JSON: thoughts, approach, opening line | too tired to talk | `encounter_decision` |
 | spot (version 14) | a villager who just saw a bug or fish shadow, carries the net or rod for it, is awake next hour and has an action for it | any hour, up to 3 a day (`sightings.max_decisions_per_day`) | short: persona, nightly page | JSON: thoughts, go (which one, or 0) | lets it be | `spot_decision` |
-| chat turn | the one who was approached, then back and forth | right after a notice or a visit | rules, no menu | JSON: thoughts, say, give, ask, trade and accept (version 12), leave (version 9), note | just nods | `encounter`, and `trade_proposed`, `trade`, `trade_failed`, `trade_over`, `trade_cant_offer` (version 13) |
+| chat turn | the one who was approached, then back and forth | right after a notice or a visit | rules, no menu | JSON: thoughts, say, give, ask, trade and accept (version 12; from version 18 a trade is "you give <them>" and "<them> gives you"), leave (version 9), note | just nods | `encounter`, and `trade_proposed`, `trade`, `trade_failed`, `trade_over`, `trade_cant_offer` (version 13) |
 | nightly page | villagers who chose to write | end of day | short: persona, nightly page | free text, up to 150 words, then optionally `Remember:` and up to 3 things to hold on to | doesn't write; old page stays, nothing new is remembered | `reflection` |
 | Isabelle's report | Isabelle (not charged) | end of day, if `isabelle.summary` (on) | Isabelle | free text, at most 120 words | always made | `isabelle_summary` |
 | Isabelle's announcement | Isabelle (not charged) | end of day, if `isabelle.announce` | Isabelle | free text, read in the next morning's plan | always made | `isabelle_announcement` |
