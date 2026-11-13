@@ -298,7 +298,7 @@ class IslandSimulation:
                 vil.memories = []
         if not hasattr(sim, "choices"):
             sim.choices = {n: {"plaza": True, "write": True, "next": "plan"} for n in sim.isl.v}
-        for attr, default in (("pending_moves", {}), ("moved_today", []), ("mail", [])):
+        for attr, default in (("pending_moves", {}), ("moved_today", []), ("mail", []), ("projects", [])):
             if not hasattr(sim.isl, attr):
                 setattr(sim.isl, attr, default)
         for vil in sim.isl.v.values():
