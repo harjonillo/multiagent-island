@@ -10,7 +10,8 @@ Movement:
   Walk on beach and grass. Trees, rocks and buildings block their tile.
   Changing cliff tier needs a ladder (one tier at a time).
   Crossing the river needs a vaulting pole (jumping up to `pole_max_width` water tiles)
-  or a bridge. Pond and sea are never crossable.
+  or a bridge. Pond and sea are never crossable. From prompt version 17 villagers can
+  propose more bridges, and stairs, which climb one cliff edge without a ladder.
 
 Rules marked ASSUMPTION in docs/grid_spec.md are from memory of the game and meant
 to be checked.
@@ -21,6 +22,7 @@ from __future__ import annotations
 import heapq
 import math
 import random
+import re
 from collections import Counter, deque
 
 from .space import Space
@@ -246,6 +248,122 @@ class GridSpace(Space):
                             best = (d, run)
         self.bridge_cells = best[1] if best else []
 
+    # --- bridges and stairs from villagers (prompt version 17) ------------------
+    # Footprints: a bridge is 3 tiles wide and as long as the water it crosses plus a landing tile on each bank;
+    # stairs are 2 tiles wide and 4 long, two rows below a cliff edge and two above. From the moment one is
+    # proposed its footprint is a construction site: walkable, but nothing can be planted or put on it.
+    BRIDGE_WIDE, STAIRS_WIDE, STAIRS_LONG = 3, 2, 4
+
+    def stair_steps(self) -> set:
+        """Built stairs, as the steps they make walkable in both directions: {(lower tile, upper tile), ...}."""
+        return self.__dict__.setdefault("stairs", set())
+
+    def first_bridge_cells(self, island) -> list[Cell]:
+        """The first bridge's footprint. From prompt version 17 it is 3 wide with a landing on each bank, like
+        any bridge; before, the strip of river tiles the generator picked."""
+        if getattr(island, "prompt_version", 1) < 17 or not self.bridge_cells:
+            return list(self.bridge_cells)
+        xs, y = [c[0] for c in self.bridge_cells], self.bridge_cells[0][1]
+        return [(x, y + dy) for dy in (-1, 0, 1) for x in range(min(xs) - 1, max(xs) + 2)
+                if 0 <= x < self.W and 0 <= y + dy < self.H]
+
+    def structure_tiles(self, island) -> set[Cell]:
+        """Every tile under a bridge or stairs, built or proposed (version 17; none before)."""
+        if getattr(island, "prompt_version", 1) < 17:
+            return set()
+        out = set(self.first_bridge_cells(island))
+        for st in getattr(island, "projects", None) or []:
+            out |= {tuple(c) for c in st["cells"]}
+        return out
+
+    def _clear(self, c: Cell, taken: set) -> bool:
+        """A tile a footprint can cover: `taken` (structure_spots) holds what is on tiles, homes, buildings and doors."""
+        return c not in self.blocked and c not in taken
+
+    def structure_spots(self, island, kind: str, around: Cell | None = None, radius: float | None = None) -> list[dict]:
+        """Where a bridge or stairs could go, nearest to `around` first (centre within `radius` tiles, if given).
+        Each spot is {"cells": its footprint, "water": tiles that become bridge, "steps": the stair steps,
+        "ends": the tiles you can stand on to propose it, "at": its centre}. A bridge's middle lane crosses at
+        most `bridge_span` lower-river tiles, with land at both ends; the side lanes need land at both ends too, and
+        in between, river (which becomes bridge) or land where the bank bends. Every land tile has to be clear, and
+        the footprint at least `spacing` tiles from any other bridge or stairs."""
+        from .world import structures_cfg
+
+        # Everyone plans at about the same time with the island unchanged: the full list is kept until it changes.
+        key = (kind, island.day, self._version, len(self.flowers), len(self.placed), len(self.paths),
+               len(getattr(island, "projects", None) or []), getattr(island, "prompt_version", 1))
+        cache = self.__dict__.setdefault("_spot_cache", {})
+        if key not in cache:
+            cache.clear() if len(cache) > 8 else None
+            cache[key] = self._structure_spots(island, kind, structures_cfg(island.w))
+        out = cache[key]
+        if around is not None:
+            out = sorted((sp for sp in out if radius is None or math.dist(sp["at"], around) <= radius),
+                         key=lambda sp: math.dist(sp["at"], around))
+        return list(out)
+
+    def _structure_spots(self, island, kind: str, cfg: dict) -> list[dict]:
+        others = self.structure_tiles(island)
+        taken = ((self._occupied(island) - set(self.paths)) | getattr(self, "fixtures", set())  # paths are fine
+                 | {s["door"] for s in self.sites.values()} | {b["door"] for b in self.buildings.values()})
+        apart = lambda cells: all(math.dist(c, t) > cfg["spacing"] for c in cells for t in others)  # noqa: E731
+        inside = lambda c: 0 <= c[0] < self.W and 0 <= c[1] < self.H  # noqa: E731
+        land = lambda c: inside(c) and self.terrain[c[1]][c[0]] in (GRASS, SAND) and self._level(c) == 1  # noqa: E731
+        water = lambda c: inside(c) and self.terrain[c[1]][c[0]] == RIVER and self.tier[c[1]][c[0]] == 1  # noqa: E731
+        out = []
+        if kind == "bridge":
+            half = self.BRIDGE_WIDE // 2
+            for y in range(self.H):
+                for x in range(self.W):
+                    for (dx, dy), (px, py) in (((1, 0), (0, 1)), ((0, 1), (1, 0))):
+                        start = (x - dx, y - dy)  # the landing on the near bank, centre lane
+                        if not (water((x, y)) and land(start)):
+                            continue
+                        k = 0
+                        while water((x + k * dx, y + k * dy)) and k <= cfg["bridge_span"]:
+                            k += 1
+                        if k > cfg["bridge_span"]:
+                            continue
+                        lanes = [[(start[0] + i * dx + j * px, start[1] + i * dy + j * py) for i in range(k + 2)]
+                                 for j in range(-half, half + 1)]
+                        if not all(land(ln[0]) and land(ln[-1]) and all(water(c) or land(c) for c in ln[1:-1])
+                                   for ln in lanes):
+                            continue
+                        cells = [c for ln in lanes for c in ln]
+                        dry = [c for c in cells if land(c)]
+                        centre = lanes[half][len(lanes[half]) // 2]
+                        if all(self._clear(c, taken) for c in dry) and apart(cells):
+                            out.append({"cells": cells, "water": [c for c in cells if water(c)], "steps": [],
+                                        "ends": [c for ln in lanes for c in (ln[0], ln[-1])], "at": centre})
+        else:
+            for y in range(self.H):
+                for x in range(self.W):
+                    for (dx, dy), (px, py) in (((1, 0), (0, 1)), ((-1, 0), (0, 1)), ((0, 1), (1, 0)), ((0, -1), (1, 0))):
+                        # (x, y) is the lower tile at the edge in the first lane; (dx, dy) points up the cliff.
+                        if not (inside((x, y)) and self.terrain[y][x] == GRASS):
+                            continue
+                        t = self.tier[y][x]
+                        lanes = [[(x + i * dx + j * px, y + i * dy + j * py) for i in (-1, 0, 1, 2)]
+                                 for j in range(self.STAIRS_WIDE)]
+                        ok = all(inside(c) and self.terrain[c[1]][c[0]] == GRASS for ln in lanes for c in ln)
+                        ok = ok and all(self.tier[ln[0][1]][ln[0][0]] == t and self.tier[ln[1][1]][ln[1][0]] == t
+                                        and self.tier[ln[2][1]][ln[2][0]] == t + 1 and self.tier[ln[3][1]][ln[3][0]] == t + 1
+                                        for ln in lanes)
+                        cells = [c for ln in lanes for c in ln]
+                        if (ok and all(self._clear(c, taken) for c in cells)
+                                and apart(cells)):
+                            out.append({"cells": cells, "water": [], "steps": [[ln[1], ln[2]] for ln in lanes],
+                                        "ends": cells, "at": lanes[0][1]})
+        return out
+
+    def structure_name(self, kind: str, cells) -> str:
+        """"bridge across the river (lower ground, east)", "stairs up to the middle cliff (north)"."""
+        cells = [tuple(c) for c in cells]
+        if kind == "bridge":
+            return f"bridge across the river ({self.region(cells[len(cells) // 2])})"
+        top = max(cells, key=self._level)
+        return f"stairs up to {TIER_NAME.get(self._level(top), 'the cliff')} ({self._area(top)})"
+
     # --- objects ------------------------------------------------------------
     def spot_ok_for_object(self, cell: Cell, others: set[Cell]) -> bool:
         """ASSUMPTION: trees and rocks need their 8 neighbours free of other trees, rocks, buildings
@@ -311,8 +429,10 @@ class GridSpace(Space):
                     self.flowers[c] = {"kind": kind, "owner": None, "bloom_day": 0}
 
     def _occupied(self, island) -> set:
+        """Tiles with something on them. From prompt version 17 that includes every bridge and stairs footprint,
+        built or proposed, so nothing is planted or put there (and no tree or rock turns up there)."""
         return ({c for c in self.rock_cells if c} | {t.pos for t in island.trees if getattr(t, "pos", None)}
-                | set(self.placed) | set(self.paths) | set(self.flowers))
+                | set(self.placed) | set(self.paths) | set(self.flowers) | self.structure_tiles(island))
 
     def _free_spot(self, cells: list, taken: set, tries: int = 2000):
         for _ in range(tries):
@@ -335,10 +455,23 @@ class GridSpace(Space):
         if any(getattr(t, "pos", None) is None for t in island.trees) or len(self.rock_cells) < island.n_rocks:
             self.attach(island)
         if island.bridge_built and not self.bridge_built:
-            for x, y in self.bridge_cells:
-                self.terrain[y][x] = BRIDGE
+            for x, y in self.first_bridge_cells(island):  # from version 17, the river tiles of its 3-wide footprint
+                if self.terrain[y][x] in (RIVER, BRIDGE):
+                    self.terrain[y][x] = BRIDGE
             self.bridge_built = True
             self._version += 1
+        done = self.__dict__.setdefault("structures_built", set())
+        for st in getattr(island, "projects", None) or []:
+            if st["built"] and st["id"] not in done:
+                if st["kind"] == "bridge":
+                    for x, y in st.get("water") or st["cells"]:
+                        if self.terrain[y][x] == RIVER:
+                            self.terrain[y][x] = BRIDGE
+                else:
+                    for lo, hi in st.get("steps") or [st["cells"][:2]]:
+                        self.stair_steps().update({(tuple(lo), tuple(hi)), (tuple(hi), tuple(lo))})
+                done.add(st["id"])
+                self._version += 1
 
     def new_day(self, island, rng: random.Random) -> None:
         self.day = island.day
@@ -394,6 +527,7 @@ class GridSpace(Space):
             self._cache.clear()
             used_cache.clear()
         ladder, pole = "ladder" in tools, "vaulting pole" in tools
+        stairs = self.stair_steps()
         pole_w = int(self.cfg["pole_max_width"])
         W, H, terrain, paths, path_cost = self.W, self.H, self.terrain, self.paths, self.path_cost
         walk, lvl = self._lookups()
@@ -417,6 +551,8 @@ class GridSpace(Space):
                     ln = lvl[ny][nx]
                     if ln == lc:
                         cost = path_cost if n in paths else 1.0
+                    elif (c, n) in stairs:  # version 17: built stairs, for anyone
+                        cost = 2.0
                     elif ladder and abs(ln - lc) == 1:
                         cost, via = 3.0, by_ladder
                 elif pole and terrain[ny][nx] == RIVER:
@@ -535,6 +671,7 @@ class GridSpace(Space):
         state = dict(self.__dict__)
         state["_cache"], state["_used"] = {}, {}
         state.pop("_lk", None)
+        state.pop("_spot_cache", None)
         return state
 
     def resolve(self, island, name: str, action: dict, pos, tools, rng):
@@ -668,6 +805,37 @@ class GridSpace(Space):
             return self._to_building(NPCS[npc_of(action)][0], start, tools, island)
         if do in self._BUILDING_FOR:
             return self._to_building(self._BUILDING_FOR[do], start, tools, island)
+        if do in ("propose_bridge", "propose_stairs") and getattr(island, "prompt_version", 1) >= 17:
+            # Proposed where they stand: the nearest workable spot within `near` tiles that they can walk to.
+            from .world import structures_cfg
+
+            kind = do.split("_")[1]
+            if (why := island.proposal_problem(name)):  # the island's limits come before where they stand
+                return "around the island", None, {}, why
+            r = structures_cfg(island.w)["near"]
+            label = "river" if kind == "bridge" else "cliffs"
+            spots = self.structure_spots(island, kind, tuple(start), r)
+            dist = self.distances(start, tools)
+            for sp in spots:
+                ends = [e for e in sp["ends"] if e in dist]
+                if ends:
+                    stand = min(ends, key=lambda e: dist[e])
+                    return label, stand, {"_cells": [list(c) for c in sp["cells"]],
+                                          "_water": [list(c) for c in sp["water"]],
+                                          "_steps": [[list(a), list(b)] for a, b in sp["steps"]],
+                                          "_name": self.structure_name(kind, sp["cells"])}, None
+            what = "stretch of river narrow enough for a bridge" if kind == "bridge" else "cliff edge for stairs"
+            if spots:
+                return label, None, {}, self._cant_reach(
+                    island, f"you can't get to the {what} near here with the tools you carry", start,
+                    [e for sp in spots for e in sp["ends"]], tools)
+            # Say where the nearest one they could walk to is, as the island does for other places out of reach.
+            best = min(((dist[e], e) for sp in self.structure_spots(island, kind) for e in sp["ends"] if e in dist),
+                       default=None)
+            where = (f"; the nearest you can walk to is about {int(best[0])} steps away ({self.region(best[1])})"
+                     if best else "; there's none you can walk to with the tools you carry")
+            return label, None, {}, (f"there's no {what} within {r} steps of here ({self.region(tuple(start))}), "
+                                     f"away from other bridges and stairs{where}")
         if do in ("rest", "wear") and getattr(island, "prompt_version", 1) >= 15 and (
                 home is None or self.path_length(start, home, tools) is None):
             return "around the island", None, {}, None  # from version 15, resting or dressing needs no walk home
@@ -710,8 +878,13 @@ class GridSpace(Space):
 
     # --- building --------------------------------------------------------------
     def landmark(self, island, name: str, ref, start) -> Cell | None:
-        """A place the mind can name: here, home, <villager>'s home, a building, the plaza, rock N."""
+        """A place the mind can name: here, home, <villager>'s home, a building, the plaza, rock N. A tile
+        ([x, y]) is itself: from prompt version 16 an option can point at where something already is."""
+        if isinstance(ref, (list, tuple)) and len(ref) == 2 and all(isinstance(v, int) for v in ref):
+            return tuple(ref)
         r = str(ref or "here").strip().lower()
+        if getattr(island, "prompt_version", 1) >= 16:  # "southwest", as region() says it, is south and west
+            r = re.sub(r"\b(north|south)(east|west)\b", r"\1 \2", r)
         if r in ("here", ""):
             return start
         if r in ("home", "my home", "my house"):
@@ -768,7 +941,8 @@ class GridSpace(Space):
                 if not self.walkable(n):
                     continue
                 lc, ln = self._level(c), self._level(n)
-                cost = 1.0 if ln == lc else (3.0 if ladder and abs(ln - lc) == 1 else None)
+                cost = (1.0 if ln == lc else 2.0 if (c, n) in self.stair_steps()
+                        else 3.0 if ladder and abs(ln - lc) == 1 else None)
                 if cost is None:
                     continue
                 if d + cost < dist.get(n, 1e18):
@@ -943,6 +1117,9 @@ class GridSpace(Space):
             "trees": [[*t.pos, t.kind] for t in island.trees if t.pos],
             "rocks": [list(c) if c else None for c in self.rock_cells],
             "bridge_open": self.bridge_built,
+            "bridge_cells": [list(c) for c in self.first_bridge_cells(island)],
+            "structures": [[st["kind"], [list(c) for c in st["cells"]], bool(st["built"]), st["fund"], st["name"]]
+                           for st in getattr(island, "projects", None) or []],
             "paths": [[*c, p["style"], p["owner"]] for c, p in self.paths.items()],
             "placed": [[*c, o["item"], o["kind"], o["owner"]] for c, o in self.placed.items()],
             "flowers": [[*c, f["kind"], f["owner"], int(island.day >= f["bloom_day"])] for c, f in self.flowers.items()],

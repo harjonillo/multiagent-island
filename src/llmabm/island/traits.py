@@ -47,7 +47,7 @@ METRICS = {
     "talk_energy": "share of mental energy spent talking (mental energy runs only)",
     "habit_plans": "plans replaced by habit because mental energy ran out",
     "donations": "museum donations",
-    "bridge_bells": "bells put toward the bridge",
+    "bridge_bells": "bells put toward the bridge (and, from prompt version 17, other bridges and stairs)",
     "trades": "completed trades",
 }
 

@@ -57,12 +57,41 @@ _TOOLS = ("shovel", "stone axe", "fishing rod", "net", "ladder", "vaulting pole"
 _FURNITURE = ("log stool", "campfire", "stone stool", "wooden chair", "log bench", "wooden table", "small lamp")
 
 
+def _picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
+    """Prompt version 16: one number from the villager's list for each hour, with what the option needs added."""
+    block = prompt.split("(each takes one hour):\n", 1)[1].split("\n\n", 1)[0]
+    lines = dict((int(k), t) for k, t in re.findall(r"^(\d+)\. (.*)$", block, re.M))
+    places = re.findall(r"^Places: (.*)$", block, re.M)
+    places = places[0].split(", ") if places else ["home"]
+    out = []
+    for h in hours:
+        n = rng.choice(sorted(lines))
+        pick, text = {"hour": h, "pick": n}, lines[n]
+        if (m := re.search(r'"bells": 1 to (\d+)(?! \(or)', text)) or (m := re.search(r'"bells": (1)(?! \(or)', text)):
+            pick["bells"] = rng.randint(1, int(m.group(1)))
+        if (m := re.search(r'"items": \{"<thing>": <how many>\} from (.*)$', text)):
+            k, _, c = rng.choice(m.group(1).split(", ")).rpartition(" x")
+            pick["items"] = {k: int(c)}
+        if '"to": a place' in text:
+            pick["to"] = rng.choice(places)
+        out.append(pick)
+    return out
+
+
 def plan_reply(prompt: str, rng: random.Random) -> str:
     m = re.search(r"Plan up to (\d+) actions between (\d+):00 and (\d+):00", prompt)
     n, a, b = int(m.group(1)), int(m.group(2)), int(m.group(3))
     window = list(range(a, b + 1)) if a <= b else list(range(a, 24)) + list(range(0, b + 1))  # wraps past midnight
     hours = rng.sample(window, min(n, len(window)))
     hours.sort(key=window.index)
+    if "by picking numbers from the list" in prompt:  # prompt version 16
+        out = {"thoughts": "picking from the list", "actions": _picks(prompt, hours, rng),
+               "note": "" if rng.random() < 0.8 else "the rocks went fast today"}
+        if '"write": true | false' in prompt and rng.random() < 0.2:
+            out["write"] = rng.random() < 0.6
+        if '"energy": {"inward"' in prompt and rng.random() < 0.8:
+            out["energy"] = {"inward": rng.randint(20, 80), "outward": rng.randint(20, 80)}
+        return json.dumps(out)
     inv, recipes, bells = _inventory(prompt), _recipes(prompt), _bells(prompt)
     acts = []
     missing = [t for t in _TOOLS if t not in inv]
@@ -227,7 +256,9 @@ def encounter_reply(prompt: str, rng: random.Random) -> str:
         out["say"] = "Could you spare me some of those, if you get any?"
     elif '"trade": {} or' in prompt and inv and rng.random() < 0.15:  # prompt version 12: trades in person
         want = rng.choice([{"bells": rng.choice([100, 300, 600])}, {rng.choice(["wood", "stone", "apple"]): 2}])
-        out["trade"] = {"give": {rng.choice(list(inv)): 1}, "want": want}
+        give = {rng.choice(list(inv)): 1}
+        m = re.search(r'"trade": \{\} or \{"(you give [^"]+)": .*?"([^"]+ gives you)"', prompt)  # prompt version 18
+        out["trade"] = {m.group(1): give, m.group(2): want} if m else {"give": give, "want": want}
         out["say"] = "Want to swap?"
     return json.dumps(out)
 

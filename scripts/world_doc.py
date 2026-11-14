@@ -14,7 +14,7 @@ from pathlib import Path
 
 from llmabm.island.grid import POND, RIVER, ROCKY, SAND, SEA, TIER_NAME, WATER, GridSpace
 from llmabm.island.grid_render import render_grid_map
-from llmabm.island.world import ORDINANCE_TEXT, Island, clock, fmt_window, load_world
+from llmabm.island.world import ORDINANCE_TEXT, Island, clock, fmt_window, load_world, structures_cfg
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS = [("no tools", frozenset()), ("vaulting pole", frozenset({"vaulting pole"})),
@@ -43,6 +43,18 @@ def build(seed: int):
     g.attach(isl)
     isl.day = 0  # day 0 morning: the wild flowers are in bloom
     return w, g, isl
+
+
+def river_widths(g: GridSpace) -> list[int]:
+    """How many river tiles across the river is at each river tile: the shorter of its run across and down."""
+    def run(x, y, dx, dy):
+        k = 1
+        for s in (1, -1):
+            cx, cy = x + s * dx, y + s * dy
+            while 0 <= cx < g.W and 0 <= cy < g.H and g.terrain[cy][cx] == RIVER:
+                k, cx, cy = k + 1, cx + s * dx, cy + s * dy
+        return k
+    return [min(run(x, y, 1, 0), run(x, y, 0, 1)) for y in range(g.H) for x in range(g.W) if g.terrain[y][x] == RIVER]
 
 
 def mouths(g: GridSpace) -> int:
@@ -110,8 +122,11 @@ def map_section(w: dict, g: GridSpace, isl: Island, seed: int) -> str:
                       f"{sum(1 for b in g.buildings.values() if b['door'] in dist)} of {len(g.buildings)}",
                       f"{sum(1 for s in g.sites.values() if s['door'] in dist)} of {len(g.sites)}"])
     gc, br = g.cfg, w["bridge"]
+    st = structures_cfg(w)
     bridge = (f"across {len(g.bridge_cells)} tiles of river on {g.region(g.bridge_cells[0])}" if g.bridge_cells
               else "nowhere on this island (no short crossing was found)")
+    widths = river_widths(g)
+    spots = {k: len(g.structure_spots(isl, k)) for k in ("bridge", "stairs")}
     fo, bo = gc["fish_out"], gc["bugs_out"]
     out_fish = (f"{fo['sea']} in the sea, {fo['river']} in the river, {fo['pond']} in the pond and "
                 f"{fo['clifftop']} in the river up on the cliffs")
@@ -136,11 +151,24 @@ water and cliff edges.
 **Getting around.** Beach and grass are walkable. Trees, rocks, buildings, homes, placed furniture
 and fences block their tiles; the plaza doesn't. Going up or down one cliff tier needs a **ladder**.
 Crossing the river needs a **vaulting pole**, which clears up to {gc['pole_max_width']} tiles of water,
-until the bridge is built. The pond and the sea can never be crossed. Everyone starts with both,
-and they wear out (see Tools). Trees, rocks, buildings (the plaza too) and homes always keep at
-least one free tile between them. The bridge goes {bridge}, near Resident Services; it costs
-{n(br['cost'])} bells and, once funded, opens {br['unlocks'].get('rocks', 0)} more rocks and
-{br['unlocks'].get('hardwood_trees', 0)} more hardwood trees.
+except over a built bridge. The river is {sum(widths) / len(widths):.1f} tiles across on average
+(measured straight across at each river tile; {min(widths)} to {max(widths)}). The pond and the sea can
+never be crossed. Everyone starts with both, and they wear out (see Tools). Trees, rocks, buildings
+(the plaza too) and homes always keep at least one free tile between them.
+
+**Bridges and stairs.** The first bridge goes {bridge}, near Resident Services; it costs
+{n(br['cost'])} bells, raised by anyone at Resident Services, and once built it is a way across the
+river without a pole. Villagers can propose more bridges, and stairs, where they stand, each built
+once its own fund reaches {n(st['cost'])} bells; {st['max']} in all, built or proposed, the first bridge
+included, and one proposal of each villager's still being funded at a time. A bridge is 3 tiles wide
+and crosses at most {st['bridge_span']} tiles of lower river, with a landing on each bank (the first
+bridge too); stairs are 2 tiles wide and 4 long, two rows below a cliff edge and two above, and let
+anyone climb there without a ladder. Every land tile under one has to be clear, it has to be at least
+{st['spacing']} tiles from any other, and from the moment it's proposed nothing can be planted or put
+on it. This island has {spots['bridge']} spots for a bridge and {spots['stairs']} for stairs before any
+are taken. They only give access. (In runs on prompt versions before 17, the first bridge also adds
+{br['unlocks'].get('rocks', 0)} rocks and {br['unlocks'].get('hardwood_trees', 0)} hardwood trees at
+random places when built, and villagers can't propose more.)
 
 What you can reach from Resident Services:
 
@@ -339,7 +367,7 @@ def services_section(w: dict) -> str:
 
 | who | where | open | what they do |
 |---|---|---|---|
-| Tom Nook | Resident Services | {fmt_window(hrs['resident_services'])} | house upgrades on a loan with no interest and no deadline (pay it off before the next one); moves your home for {n(w['move_house_cost'])} bells overnight; bridge fund ({n(w['bridge']['cost'])} bells) |
+| Tom Nook | Resident Services | {fmt_window(hrs['resident_services'])} | house upgrades on a loan with no interest and no deadline (pay it off before the next one); moves your home for {n(w['move_house_cost'])} bells overnight; bridge and stairs funds ({n(w['bridge']['cost'])} bells each) |
 | Isabelle | Resident Services | {fmt_window(hrs['resident_services'])} | sets an ordinance for {n(ords['cost'])} bells, from the next morning |
 | Timmy and Tommy | Nook's Cranny | {fmt_window(hrs['cranny'])} | buy almost anything at a fixed price; sell a small daily stock |
 | the Able Sisters | Able Sisters | {fmt_window(hrs['able'])} | sell clothes |

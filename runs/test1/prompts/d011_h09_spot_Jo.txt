@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, 23:45.  
+Sun’s out, fish are good, but the bridge still feels miles away. Got 2 softwood from Cal and Dax, plus 2 miruru tonight—good for tomorrow’s fishing run. Bait is still a problem; I gave a selit to Dax and got a piece of softwood back, but he’s still silent. Cal’s offering more fish for softwood, so I’ll keep an eye on him. Dax keeps disappearing at the flowers—maybe he’s out fishing or hiding the rocks. I need to ask Eli tomorrow about the bridge fund, but first I’ll post a bait request. Sleep early, wake with the pond’s echo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 09:00. You are Jo, at Cal's home.
+You just spotted:
+1. a phobasne moth on the flowers (lower ground, east)
+Earlier today:
+- 08:00 walked over to Dax's home (also nearby: Ari)
+- 08:00 knocked at Dax's home, but nobody answered
+- 08:00 ran into Ari at Dax's home: you said "Hey Ari, got any rocks I could use for the bridge?"; Ari said "Thanks, Jo! I’ll bring rocks if I find any."; you said "Thanks, Ari! Here’s a selzalne fish. Can you bring me a rock if you find one?" [you handed Ari 1 selzalne fish; you asked Ari for 1 rock, but there's nothing called rock on this island]; Ari said "Thanks, Jo! Do you have any fishing bait I could trade for a wood?" [Ari asked you for 1 fishing bait]; you said "Hey Ari, I’ve got this selzalne fish for you, can you swing by with a rock sometime?" [you handed Ari 1 selzalne fish; you asked Ari for 1 rock, but there's nothing called rock on this island]; Ari said "Sure, Ari! I’ll bring a rock if I find one. Do you have any fishing bait to trade for a wood?" [Ari asked you for 1 fishing bait]; you said "Hey Ari, I’ll trade you a selit fish for a rock, if you can swing one over." [you proposed a trade, but there's nothing called rock on this island]; Ari said "Thanks! Here’s a selit fish, can you trade me a fishing bait?" [Ari handed you 1 selit fish; Ari asked you for 1 fishing bait]; you said "" [your offer: you give Ari 1 selit fish, Ari gives you 1 fishing bait]; Ari said "Hey Jo, I still need that fishing bait. Can you give me one?" [Ari asked you for 1 fishing bait]; you said "" [just nodded (too tired to talk)]
+- 09:00 walked over to Cal's home
+- 09:00 knocked at Cal's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Cal gave 2 softwood, I traded 1 selzalne.
+- (day 9) Dax still wants bait, I owe him one.
+- (day 9) Bridge still 2k.
+Your notes from the last 2 days:
+- (day 11) Keep the selit for next fishing run. Maybe ask for a rock later.
+- (day 11) Remember to keep the selit fish for next fishing run. Ask Eli about bridge donation tomorrow.
+- (day 11) Remember to keep the selzalne handy for future trades.
+- (day 11) Remember to trade selzalne for rock if he can find one.
+- (day 11) Keep track of rocks for bridge.
+- (day 11) Remember to keep bait for tomorrow.
+At 10:00 you planned: propose_bridge.
+Actions left today: 5 of 10. Mental energy left today: 11.
+
+You can go after one of them at 10:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (148 tokens, hidden from everyone) ===
+We need to decide which action to go after at 10:00. We have actions left: 5 of 10. We can go after one of them at 10:00. Options: maybe Dax, Ari, Cal, or others? We want to get bait? Ari asked for bait. Dax wants bait. Cal could give more softwood. Let's go to Cal to get more softwood and ask about bridge. So go after Cal. That's action 3? The list not numbered but we choose Cal. So go 3? We need number. The actions list likely: 1) Dax, 2) Ari, 3) Cal, 4) ... Let's output 3.
+
+=== REPLY ===
+{"thoughts":"I’ll go to Cal’s house at 10 AM to snag another softwood and ask about the bridge fund. It’s the most useful right now and I still have enough energy for the rest of the day.", "go":3}

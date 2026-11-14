@@ -1,0 +1,47 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 10, night.  
+Sun set early again. I chopped a hardwood, got some softwood and wood, but the axe left a stump. Spotted a nevin moth and chased it instead of visiting Bo—missed a trade again. I tried fishing without bait; sea was empty. Went to Dax; he still wants bait first—nothing moves. Rested, dug up a fossil (Blathers will decide). Chopped more hardwoods, got a tubas fish. Still no space in the tent for the selit or selzalne, so they’re just hanging on my belt. My tools are wearing down—axe 26 uses left. Bells are fine, but I’ve got a bunch of requests for fishing bait from Fen, Bo, and Dax. I need to get wood tomorrow to trade for bait. Maybe Nook’s will have some.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 08:00. You are Gus, at the trees.
+You just spotted:
+1. a phobasne moth on the flowers (the middle cliff, centre)
+2. a medium fish shadow in the clifftop (the middle cliff, north)
+3. a small fish shadow in the clifftop (the middle cliff, centre)
+4. a small fish shadow in the clifftop (the middle cliff, centre)
+Earlier today:
+- 07:00 chopped a hardwood tree: hardwood x2, wood x1; with the last wood the axe brought the tree down, leaving a stump
+- 07:00 spotted a nevin moth on a tree (the middle cliff, centre) and went after it at 08:00 instead of mine_rock (rock: 1)
+- 08:00 went bug catching around the trees: caught a nevin moth
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) No bait from Bo or Dax today.
+- (day 9) Still have 1 selit, 1 selzalne, 2 loka, 1 gormo.
+- (day 10) No bait yet; still need wood to trade
+- (day 10) Dax says he wants bait first, so I’ll bring wood tomorrow.
+Your notes from the last 2 days:
+- (day 10) If Dax refuses, try Bo or buy bait tomorrow.
+- (day 10) Need to get bait soon.
+- (day 10) Need to get bait tomorrow, maybe buy from Nook's.
+- (day 10) Keep track of wood count for next day trade.
+- (day 10) Remember to leave enough wood for future trades.
+- (day 11) Keep an eye on the wood count, maybe chop more tomorrow.
+At 09:00 you planned: visit (who: Bo).
+Actions left today: 5 of 10. Mental energy left today: 112.
+
+You can go after one of them at 09:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (68 tokens, hidden from everyone) ===
+We need decide. He wants to trade with Bo for bait. He had planned to visit Bo at 09. He can go after one of the spotted? He spotted phobasne moth, medium fish shadow, two small fish shadows. Might chase one. He wants bait, so better visit Bo. So go 0.
+
+=== REPLY ===
+{"thoughts":"I’ll stick to my plan and head to Bo's place at 09:00. Chasing the fish shadows feels less useful right now, and I really need bait for Dax. The phobasne moth is a nice catch but not urgent. I'll conserve my actions and energy for the trade.", "go":0}

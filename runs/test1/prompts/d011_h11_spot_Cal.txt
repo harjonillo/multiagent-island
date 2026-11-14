@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7, 23 h.  
+Got bait, still only 100 bells. Ike helped with a selzalne, but wood’s scarce. Tried Jo, no luck. I’ll keep asking Dax for wood and bait—maybe swap more selzalne. Plan: trade 2 selzalne for 1 wood tomorrow, then buy more bait. Need to finish the bridge to open new spots; maybe chip in 10k. Also consider moving Tom’s house if I can afford the loan—could get extra storage. Sleep now, hope tomorrow brings more fish shadows and a reply from Jo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 11:00. You are Cal, at home.
+You just spotted:
+1. a large fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 08:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 6) and went after it at 09:00 instead of fish (where: river)
+- 09:00 fished for a small shadow in the pond: caught a moitbas fish
+- 09:00 spotted an ashrumo moth on a rock (lower ground, southeast, near rock 6) and went after it at 10:00 instead of fish (where: sea)
+- 10:00 went bug catching by the rocks: caught an ashrumo moth (also nearby: Bo)
+- 11:00 rested
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 10) Ask for softwood tomorrow if not ready now.
+- (day 10) Need to stock up on softwood soon.
+- (day 10) Remember to keep the trade active; keep an eye on Jo’s offers.
+- (day 10) Remember to track softwood count for future trades.
+- (day 10) No more energy for talks today.
+- (day 11) Try to ask Dax for some wood tomorrow. Maybe trade a selit for a softwood if he has any.
+At 12:00 you have nothing planned.
+Actions left today: 5 of 10. Mental energy left today: 108.
+
+You can go after one of them at 12:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (34 tokens, hidden from everyone) ===
+We need to decide. We have large fish shadow. Good for bait. Probably go 12:00 after large fish. So go=1? Let's output.
+
+=== REPLY ===
+{"thoughts":"Need bait for next day. Large fish looks promising. Go after it now.", "go":1}

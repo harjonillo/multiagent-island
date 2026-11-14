@@ -8,6 +8,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from ..analysis import Run, load_run
+from .prompts import act_record
 from .world import CATEGORIES, FOSSIL, ORDINANCE_TEXT, category_of, clock
 
 RESOURCES = ["rocks", "wood", "fruit", "fish", "bugs", "shells", "fossils"]
@@ -317,8 +318,12 @@ def summary(run: Run) -> str:
 
     bridge_by = {n: c.get("bridge_bells", 0) for n, c in last["collected"].items()}
     L += ["", f"Bridge: {'built' if last['bridge_built'] else 'not built'}, {last['bridge_fund']}/{m['world']['bridge']['cost']} raised",
-          "  contributors: " + (", ".join(f"{n} {b}" for n, b in sorted(bridge_by.items(), key=lambda kv: -kv[1]) if b) or "nobody"),
-          f"Trees: {dict(last['trees'])}; planted "
+          "  contributors (to every bridge and stairs): "
+          + (", ".join(f"{n} {b}" for n, b in sorted(bridge_by.items(), key=lambda kv: -kv[1]) if b) or "nobody")]
+    for st in last.get("structures") or []:  # prompt version 17: proposed by villagers
+        L.append(f"  {st['name']}: proposed by {st['by']} on day {st['day']}, "
+                 + ("built" if st["built"] else f"{st['fund']} raised"))
+    L += [f"Trees: {dict(last['trees'])}; planted "
           f"{sum(c.get('planted', 0) for c in last['collected'].values())}, chopped down "
           f"{sum(c.get('trees_removed', 0) for c in last['collected'].values())}"]
 
@@ -634,7 +639,9 @@ def _social_lines(hev: list[dict]) -> list[str]:
             who = " and ".join(e["villagers"])
             head = (f"{e['villagers'][0]} visited {e['villagers'][1]} at home" if e.get("visit")
                     else f"{who} met at the {e['location']}")
-            out.append(f"{head}: " + (" / ".join(f'{x["speaker"]}: "{x["text"]}"' + (f" [{x['act']}]" if x.get("act") else "")
+            other = lambda s: next((v for v in e["villagers"] if v != s), "")  # noqa: E731
+            out.append(f"{head}: " + (" / ".join(f'{x["speaker"]}: "{x["text"]}"'
+                                                  + (f" [{act_record(x, other(x['speaker']))}]" if x.get("act") else "")
                                                   for x in spoken) if spoken else "they just waved"))
         elif t == "visit":
             out.append(f"{e['guest']} knocked at {e['host']}'s home: "

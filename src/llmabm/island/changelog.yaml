@@ -2,6 +2,32 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-13 12:00
+  what: Prompt version 18, trades name both people
+  when: new runs from now on, or a run resumed with --prompt-version 18; the record, for every run
+  details:
+    - "a conversation's reply writes a trade as \"you give <them>\" and \"<them> gives you\" (was \"give\" and \"want\"; both are still read). In test1, 12 of 18 replies to an offer on the table asked for the same thing back (Ike offers wood for Ari's bait; Ari answers with fish for Ike's bait), 7 of them on days 9 to 11, after version 13's \"you give, you get\" table. Bo, asked by Ari for bait he didn't have, offered his own wood for Ari's bait, thinking \"Ari wants bait, gives wood\""
+    - "the offer on the table, each turn's tag and what has changed hands between two villagers name who gives what to whom, never \"X for Y\": \"On the table from Ike: Ike gives you 1 wood, you give Ike 1 fishing bait (you have none)\"; \"you gave Jo 1 selit fish and Jo gave you 1 softwood, in a trade\". A request to you says how many of it you have"
+    - "the record (day logs, the explorer) names both people too, rebuilt from what each turn did, so it reads that way for every run that kept it (from prompt version 12), test1 included once re-analysed: \"offered Kit a trade: Gus gives 1 selit fish, Kit gives 1 fishing bait\" (was \"offered a trade: 1 selit fish for 1 fishing bait\")"
+    - "not changed, on purpose: who has what. In test1 at most one villager held any fishing bait at the end of each day from day 6 on, and nobody knew its recipe, so most bait trades couldn't have happened however they were worded"
+- time: 2026-11-12 18:00
+  what: Prompt version 17, more bridges, and stairs
+  when: new runs from now on, or a run resumed with --prompt-version 17
+  details:
+    - "anyone can propose a bridge across the river, or stairs up a cliff, right where they stand (propose_bridge, propose_stairs). It's free and takes the hour. The island picks the nearest workable spot within 8 tiles, at least 6 tiles from any other bridge or stairs; with none there, it fails and says where the nearest one is"
+    - "bridges and stairs take up room: a bridge is 3 tiles wide, crossing at most 4 tiles of lower river (test1's river averages 3.1 across, 3.2 on lower ground) with a landing on each bank; stairs are 2 wide and 4 long, two rows below a cliff edge and two above. The first bridge gets the same 3-wide footprint (it was a 2-tile strip). Every land tile under one has to be clear, and from the moment it's proposed it's a construction site: walkable, but nothing can be planted or put on it, and no tree or rock turns up there. Test1's island has 28 bridge spots and 130 stairs spots"
+    - "each is built once its own fund at Resident Services reaches 98,000 bells, the first bridge's cost. Several funds can be open at once, and each is its own line on a villager's list (\"put bells toward the stairs up to the middle cliff (north) (0/98000 raised, Ari's proposal)\"). A built bridge crosses the river like the first; built stairs let anyone climb that cliff edge without a ladder."
+    - "at most 10 bridges and stairs on the island, built or proposed, the first bridge included; each villager has at most one proposal still being funded"
+    - "plans list every bridge and stairs with who proposed it and what's raised, Tom Nook says anyone can propose more and how many there are, and the action list says what proposing needs. The map shows proposed sites and built bridges and stairs, and the summary lists them"
+    - "bridges and stairs only give access. Before, the first bridge also added 3 rocks and 10 hardwood trees at random places on the island when built, and Tom Nook (28 times in test1) and a fun fact said it \"opens more rocks and trees to everyone\"; villagers planned around a \"bridge rock\". Now Tom Nook says only that it crosses the river so nobody needs a vaulting pole there, the fun fact says a funded bridge lets anyone cross without a pole, and a new one says funded stairs let anyone climb a cliff without a ladder"
+- time: 2026-11-12 12:00
+  what: Prompt version 16, actions by number
+  when: new runs from now on, or a run resumed with --prompt-version 16
+  details:
+    - "each plan lists the actions the villager can do then, numbered and spelled out, worked out from what they carry, their bells, what they keep at home (for crafting), where they can walk with the tools they carry, and opening hours within the plan's hours. The plan picks by number, adding a count, bells or a place where an option takes one. Nothing else can be planned. In test1, days 7 to 11, actions failed on form (visiting Nook's Cranny or Tom Nook, walk, post, trade, asking a villager) or on what the villager didn't have yet (fishing with bait they didn't carry, bells, a way across the river)"
+    - "the action menu in the island rules becomes a list of every kind of action and what each needs, without how to write it, so villagers know what exists before it is on their list"
+    - "a pick that can't be read is dropped and the villager's day says so; a pick at a shop or service goes in the nearest hour it's open"
+    - "the list is as of planning time: something an earlier pick in the same plan would bring (buying bait, then fishing with it) is on the next plan's list. The optional fish size and bug species are gone; going after a particular shadow or bug is the spot decision"
 - time: 2026-11-10 22:00
   what: Prompt version 15, the island says what was missing
   when: new runs from now on (test1 ends at day 9 on version 14)

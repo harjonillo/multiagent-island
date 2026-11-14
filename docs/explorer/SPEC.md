@@ -212,7 +212,9 @@ Failure buckets, matched on the action's `result` text (first match wins):
 - **Click an edge (or a row in "Pairs, most contact first")** → side panel lists everything between the
   two, oldest first: kind (colour dot), direction (`A → B`, or `A approached B at <place>` for
   encounters), `day N · HH:00`, and the content (dialogue lines; letter text; parcel items and note;
-  offer `give for want`, marking counteroffers; trade terms).
+  offer `give for want`, marking counteroffers; trade terms). A conversation's tags name who gives
+  what to whom (`prompts.act_record`: "offered Kit a trade: Gus gives 1 selit fish, Kit gives 1
+  fishing bait"), never "X for Y".
 - **Click a node** → only that villager's edges stay at full strength, and the panel lists all of their
   interactions. A "Clear" button returns to pair view.
 - Default selection: the pair with the most interactions.
@@ -238,7 +240,7 @@ All from the run directory. Event fields as written by `sim.py` (check names aga
 | nightly pages | `reflection`: `agent, self_doc, skipped`; also `selves/<name>.md` |
 | commons by hour | `hour_state.pools`: `rocks[]` (hits left per rock), `wood_left, fruit_on_trees, trees{}, shells_left, fossils_left, museum, bridge_fund` |
 | villagers by hour | `hour_state.villagers[name]`: `activity, location, place, pos, bells, loan, items, house, walked_today` |
-| end of day | `snapshot`: `villagers{bells, loan, house, items, inventory_value, recipes, interior, wearing}`, `homes`, `objects{trees, rocks, paths, placed, flowers, bridge_open}` |
+| end of day | `snapshot`: `villagers{bells, loan, house, items, inventory_value, recipes, interior, wearing}`, `homes`, `objects{trees, rocks, paths, placed, flowers, bridge_open}`; from prompt version 17 also `objects.bridge_cells` (the first bridge's footprint) and `objects.structures` (`[kind, cells, built, fund, name]` for each bridge or stairs villagers proposed), and `structures` with who proposed each and when |
 | energy | `energy`: per villager `spent{planning,thinking,talking}, left, skipped, tokens` |
 | Isabelle | `isabelle_summary.text` |
 | run-level stats (HHI, Gini, run-out hours, top actions, spotted) | reuse the functions behind `summary.txt` in `island/analysis.py` |

@@ -138,7 +138,7 @@ ORDINANCE_TEXT = {
 TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_clam": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 15  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+LATEST_PROMPT_VERSION = 18  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
 AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
 CLAM, BAIT = "manila clam", "fishing bait"  # dug on the beach (dig_clam); one clam crafts one bait
@@ -155,6 +155,16 @@ _NOT_ACTIONS = [  # prompt version 15: what a plan tried as an action, and where
     (("walk", "travel", "go", "move", "explore", "return", "go_home", "wander", "head"),
      "you walk wherever an action takes you; rest at home, or spend a free hour at the plaza"),
 ]
+
+
+STRUCTURES = {"max": 10, "cost": 98000, "near": 8, "bridge_span": 4, "spacing": 6, "per_villager": 1}
+
+
+def structures_cfg(w: dict) -> dict:
+    """Prompt version 17: bridges and stairs villagers propose (the world file's `structures`; runs started before
+    it existed get these defaults, the cost being the first bridge's)."""
+    return {**STRUCTURES, "cost": int((w.get("bridge") or {}).get("cost", STRUCTURES["cost"])),
+            **(w.get("structures") or {})}
 
 
 def not_an_action(do: str) -> str:
@@ -287,6 +297,7 @@ class Island:
         self.museum: dict[str, dict[str, str]] = {c: {} for c in CATEGORIES}  # species -> donor
         self.bridge_fund = 0
         self.bridge_built = False
+        self.projects: list[dict] = []  # from prompt version 17: bridges and stairs villagers proposed
         self.board: list[tuple[int, str, str, str]] = []  # (day, author, text, number like "b3")
         self.cranny_stock: dict[str, int] = {}
         self.cranny_recipe: str | None = None
@@ -1467,7 +1478,54 @@ class Island:
         vil.loan -= amt
         return True, f"paid Tom Nook {amt} bells; {vil.loan} left on the loan"
 
+    def structures(self) -> list[dict]:
+        """Prompt version 17: every bridge and stairs, the first bridge included, each with its fund:
+        {"id", "kind", "name", "fund", "built", "by"}. The first bridge's id is "bridge"."""
+        first = {"id": "bridge", "kind": "bridge", "name": self.w["bridge"]["name"], "fund": self.bridge_fund,
+                 "built": self.bridge_built, "by": None}
+        return [first] + list(getattr(self, "projects", None) or [])
+
+    def proposal_problem(self, name: str) -> str | None:
+        """Prompt version 17: why `name` can't propose a bridge or stairs anywhere right now, or None."""
+        cfg = structures_cfg(self.w)
+        if len(self.structures()) >= cfg["max"]:
+            return f"the island already has {cfg['max']} bridges and stairs, built or proposed; Tom Nook won't take more"
+        mine = [p for p in self.projects if p["by"] == name and not p["built"]]
+        if len(mine) >= cfg["per_villager"]:
+            return f"your {mine[0]['name']} is still being funded; Tom Nook takes one proposal of yours at a time"
+        return None
+
+    def _do_propose_bridge(self, vil, a, hour):
+        return self._propose(vil, a, "bridge")
+
+    def _do_propose_stairs(self, vil, a, hour):
+        return self._propose(vil, a, "stairs")
+
+    def _propose(self, vil, a, kind):
+        """Prompt version 17: a bridge or stairs where the villager stands (the grid picks the spot, in `_cells`).
+        Free to propose; built once its fund reaches the cost, from anyone's donations at Resident Services."""
+        if getattr(self, "prompt_version", 1) < 17:
+            return False, not_an_action(f"propose_{kind}")
+        cfg = structures_cfg(self.w)
+        why = self.proposal_problem(vil.name)
+        if why:
+            return False, why
+        if not a.get("_cells"):
+            return self._needs_grid({})
+        n = 1 + len(self.projects)
+        name = a.get("_name") or f"{kind} {n}"
+        self.projects.append({"id": f"s{n}", "kind": kind, "name": name, "cells": [list(c) for c in a["_cells"]],
+                              "water": a.get("_water") or [], "steps": a.get("_steps") or [],
+                              "by": vil.name, "day": self.day, "fund": 0, "built": False})
+        what = ("a " if kind == "bridge" else "") + name  # "a bridge across ...", "stairs up to ..."
+        self.news.append(f"{vil.name} proposed {what}")
+        return True, (f"proposed {what}; Tom Nook builds it once {cfg['cost']} bells have been donated at Resident "
+                      f"Services, and anyone can chip in ({len(self.structures())} of {cfg['max']} bridges and stairs "
+                      "on the island, built or proposed)")
+
     def _do_contribute_bridge(self, vil, a, hour):
+        if a.get("project") not in (None, "", "bridge") and getattr(self, "prompt_version", 1) >= 17:
+            return self._contribute_project(vil, a)
         if self.bridge_built:
             return False, "the bridge is already built"
         cost = self.w["bridge"]["cost"]
@@ -1484,6 +1542,27 @@ class Island:
         if self.bridge_fund >= cost:
             self._build_bridge()
             self.news.append(f"the {self.w['bridge']['name']} was fully funded and built")
+            msg += "; it is fully funded and built!"
+        return True, msg
+
+    def _contribute_project(self, vil, a):
+        """Prompt version 17: bells toward a bridge or stairs a villager proposed."""
+        p = next((p for p in self.projects if p["id"] == a.get("project")), None)
+        if p is None:
+            return False, f"there is no proposal called {a.get('project')}"
+        if p["built"]:
+            return False, f"the {p['name']} is already built"
+        cost = structures_cfg(self.w)["cost"]
+        amt = min(int(a.get("bells", 0)), vil.bells, cost - p["fund"])
+        if amt <= 0:
+            return False, "no bells contributed: your wallet is empty" if vil.bells <= 0 else "no bells contributed"
+        vil.bells -= amt
+        p["fund"] += amt
+        self.collected[vil.name]["bridge_bells"] += amt
+        msg = f"put {amt} bells toward the {p['name']} ({p['fund']}/{cost})"
+        if p["fund"] >= cost:
+            p["built"] = True
+            self.news.append(f"the {p['name']} was fully funded and built")
             msg += "; it is fully funded and built!"
         return True, msg
 
@@ -1542,7 +1621,17 @@ class Island:
                       f"The {br['name']} costs {br['cost']} bells, {self.bridge_fund} raised so far; anyone can chip in, "
                       + ("and it opens more rocks and trees to everyone." if getattr(self, "prompt_version", 1) < 15 else
                          "and once built it crosses the river by Resident Services, so nobody needs a vaulting pole "
-                         "there, and it opens more rocks and trees to everyone."))
+                         "there, and it opens more rocks and trees to everyone." if getattr(self, "prompt_version", 1) < 17
+                         else "and once built it crosses the river by Resident Services, so nobody needs a vaulting "
+                              "pole there."))
+            if getattr(self, "prompt_version", 1) >= 17:
+                cfg = structures_cfg(w)
+                proposed = "; ".join(p["name"] + (", built" if p["built"] else f", {p['fund']} raised")
+                                     for p in self.projects)
+                bridge += (f" Anyone can also propose another bridge, or stairs up a cliff that anyone can climb without "
+                           f"a ladder, right where they stand; each is built once {cfg['cost']} bells are donated here. "
+                           f"The island can have {cfg['max']} in all, built or proposed, and has {len(self.structures())}"
+                           + (f": the {w['bridge']['name']}; {proposed}" if proposed else "") + ".")
             text = (f"Tom Nook: {up}. I can also move your home to a free homesite overnight for "
                     f"{w.get('move_house_cost', 10000)} bells. Free homesites: {sites}. {bridge}")
         elif who == "isabelle":
@@ -1579,7 +1668,11 @@ class Island:
         return True, f"asked {text}"
 
     def _build_bridge(self):
+        """Before prompt version 17 the first bridge also added rocks and trees somewhere on the island (`unlocks`).
+        From 17, a bridge only crosses the river, like any bridge or stairs: it gives access, nothing else."""
         self.bridge_built = True
+        if getattr(self, "prompt_version", 1) >= 17:
+            return
         u = self.w["bridge"]["unlocks"]
         self.n_rocks += u.get("rocks", 0)
         self.rocks += [self.w["island"]["rock_hits"]] * u.get("rocks", 0)
@@ -1628,6 +1721,7 @@ class Island:
             "trees": Counter(t.kind for t in self.trees),
             "bridge_fund": self.bridge_fund,
             "bridge_built": self.bridge_built,
+            "structures": [dict(p) for p in getattr(self, "projects", None) or []],
             "collected": {n: dict(c) for n, c in self.collected.items()},
             "homes": dict(self.home),
             "home_areas": {n: self.sites[s]["area"] for n, s in self.home.items() if s in self.sites},

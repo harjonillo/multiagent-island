@@ -1,0 +1,52 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 13:00. You are Fen, at the river.
+You just spotted:
+1. a tiny fish shadow in the sea (lower ground, southwest)
+Earlier today:
+- 09:00 fished for a very large shadow in the river: caught a loka fish
+- 10:00 walked over to Gus's home
+- 10:00 knocked at Gus's home, but nobody answered
+- 12:00 fished for a small shadow in the river: caught a gormo fish
+- 13:00 fished for a small shadow in the river: caught an ashpimi fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Need apple before rock break
+- (day 8) Gus traded selzalne for bait, but gave me none
+- (day 8) Still only 1 map in hand, still no path to plaza
+Your notes from the last 2 days:
+- (day 10) Try to get a ladder tomorrow, maybe from Gus if I can reach him with a vaulting pole.
+- (day 10) Ask Gus tomorrow with a vaulting pole if I can get it.
+- (day 11) Remember to trade selit fish for bait at Kit tomorrow.
+- (day 11) Hope Jo will give me bait. If not, maybe trade later.
+- (day 11) Remember to stock up on rocks before next trade.
+- (day 11) Tomorrow, try to get a vaulting pole or ladder. Also ask Kit again for bait, maybe bring a rock to trade.
+At 14:00 you planned: rest.
+Actions left today: 0 of 10. Mental energy left today: 43.
+
+You can go after one of them at 14:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (126 tokens, hidden from everyone) ===
+We need to choose one action to take after 14:00. Options? The list of actions? Not provided. Probably we choose to go after something: maybe go after the tiny fish shadow? But we already saw it. Maybe go after the fish? We have 0 actions left today. We can go after one of them: fish? The fish are caught already. Maybe go after Gus? He didn't answer. We could try to get ladder. So choose to go after Gus with vaulting pole. So go: 1? We need number. Probably 1 refers to Gus? I'll pick 1.
+
+=== REPLY ===
+{"thoughts":"Need ladder or vaulting pole for bridge. Gus may have it. I’ll head to his place after 14:00.","go":1}

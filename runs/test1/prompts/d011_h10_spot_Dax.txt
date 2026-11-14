@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9: Dawn was gray, but I got a selit fish and a selit moth. I traded my lone softwood to Jo for a selit fish—now I have a selit fish and a selit moth, but no softwood. Bo kept asking for wood, I kept walking. I caught a lobas moth, a kaselzal moth, and a nevin moth. The ladder is still useless; the plaza feels far. I have wood, hardwood, and a fence piece, but my tent holds no wood. I’m stuck, but the map is still there. I’ll keep the ladder; maybe it leads somewhere tomorrow. Sleep is thin, but I’ll keep walking.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 10:00. You are Dax, at the river.
+You just spotted:
+1. a medium fish shadow in the clifftop (the middle cliff, north)
+2. a small fish shadow in the clifftop (the middle cliff, north)
+Earlier today:
+- 07:00 knocked at Gus's home, but nobody answered
+- 08:00 fished for a medium shadow in the river: caught a selzalne fish
+- 09:00 fished for a small shadow in the clifftop: caught an ashpimi fish
+- 09:00 spotted a small fish shadow in the river (the middle cliff, north) and went after it at 10:00 instead of propose_bridge
+- 10:00 fished for a small shadow in the river: caught a gormo fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ari: 1 wood for 1 bait, still pending
+- (day 9) I traded 1 softwood for 1 selit fish with Jo.
+- (day 9) I have 3 moths: lobas, kaselzal, nevin.
+- (day 9) I still need fishing bait from Bo and Jo.
+Your notes from the last 2 days:
+- (day 10) Make sure to keep an eye on Jo tomorrow for extra bait trade. Keep wood stash at home.
+- (day 10) Remember to get bait tomorrow to trade back.
+- (day 10) Remember to follow up at the plaza tomorrow for bait.
+- (day 10) Keep an eye on Jo tomorrow, maybe trade selit for bait there.
+- (day 10) If Jo doesn’t have bait, Gus might. If neither, I’ll head to the plaza tomorrow with a vaulting pole.
+- (day 11) Keep wood stash at home for future trades.
+At 11:00 you planned: rest.
+Actions left today: 5 of 10. Mental energy left today: 105.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (15 tokens, hidden from everyone) ===
+We choose to go after medium fish shadow at 11:00.
+
+=== REPLY ===
+{"thoughts":"Going after medium fish shadow at 11:00. It's likely still there, and I need bait soon. No other urgent tasks. 0","go":1}

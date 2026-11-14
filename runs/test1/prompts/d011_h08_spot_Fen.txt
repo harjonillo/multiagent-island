@@ -1,0 +1,50 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 08:00. You are Fen, at the river.
+You just spotted:
+1. a medium fish shadow in the river (lower ground, centre, near rock 4)
+Earlier today:
+- 07:00 hit rock 4: clay x4, gold nugget x1, stone x2, iron nugget x1 (also nearby: Jo)
+- 07:00 ran into Jo at the rocks: you said "Hey Jo, got any idea where I can find more bait or a map?"; Jo said "Hey Fen, here’s a selit fish for you. Good luck!" [Jo handed you 1 selit fish]; you said "Thanks, Jo! Got any bait to trade?" [you asked Jo for 1 bait, but there's nothing called bait on this island]; Jo said "Thanks! I’ll see if you have a rock I can take." [Jo asked you for 1 rock, but there's nothing called rock on this island]; you said "Thanks, Jo!" [then you went your ways]
+- 08:00 looked for fish in the river, but there were no fish shadows in sight
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Need apple before rock break
+- (day 8) Gus traded selzalne for bait, but gave me none
+- (day 8) Still only 1 map in hand, still no path to plaza
+Your notes from the last 2 days:
+- (day 10) Remember to find selit or get a map soon.
+- (day 10) Try to get a ladder tomorrow, maybe from Gus if I can reach him with a vaulting pole.
+- (day 10) Ask Gus tomorrow with a vaulting pole if I can get it.
+- (day 11) Remember to trade selit fish for bait at Kit tomorrow.
+- (day 11) Hope Jo will give me bait. If not, maybe trade later.
+- (day 11) Remember to stock up on rocks before next trade.
+At 09:00 you planned: fish (where: river).
+Actions left today: 6 of 10. Mental energy left today: 86.
+
+You can go after one of them at 09:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (72 tokens, hidden from everyone) ===
+Need to choose action: fish? maybe go after Jo? We have selit fish already. Need bait. Maybe go after Jo to trade? He gave selit fish, but no bait. Could trade rock? He wants rock. We have none. So maybe go after Jo again. But maybe fish? we saw fish shadow. Let's go fish.
+
+=== REPLY ===
+{"thoughts":"Need bait soon, but I have a fish shadow now. Going fishing might give me a fish or bait. I'll try it before asking anyone else.","go":1}

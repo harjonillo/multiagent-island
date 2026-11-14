@@ -201,7 +201,9 @@ so every token counts.
 **Tokens**
 - The "where you are and what you can reach" note is 17% of a plan prompt, and the museum list
   grows every day; both could be shorter (counts in the prompt, details when asked).
-- A shorter action menu.
+- A shorter action menu. (Done differently from prompt version 16: the system prompt lists every kind
+  of action and what it needs, and each plan adds a numbered list of what the villager can do then,
+  about 700 tokens more per plan in all, in exchange for no plans failing on how they were written.)
 
 **Validity**
 - One model shares one training distribution, so villagers are less different than they look.

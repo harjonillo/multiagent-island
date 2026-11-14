@@ -1,0 +1,53 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 10, night.  
+Still no bait, no fish, no bells.  
+Ari offered wood but I’m out of space.  
+Got 7 hardwood, 7 wood, 10 softwood—keep 3‑5 wood for next trade.  
+Shovels 29/30 uses, ladder 16 uses.  
+Nothing changed in inventory, nothing exchanged.  
+Plan: tomorrow bring 3‑4 wood to Dax or Kit, maybe try Gus.  
+Keep an eye on the rocks for breaking later.  
+Sleep is thin, but I’ll keep pushing.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 15:00. You are Bo, at the woods.
+You just spotted:
+1. a small fish shadow in the river (lower ground, southwest)
+Earlier today:
+- 12:00 knocked at Ari's home, but nobody answered
+- 13:00 walked over to Fen's home
+- 13:00 knocked at Fen's home, but nobody answered
+- 14:00 rested
+- 15:00 dug up a stump; the spot is clear now
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still no bait, need wood trade
+- (day 8) Ladder 22 uses left, need more wood
+- (day 10) Shovel uses 29 left.
+- (day 10) No bait yet.
+Your notes from the last 2 days:
+- (day 10) Ask Ari for path next time to save time
+- (day 10) Need wood for bait. Keep shovels as backup.
+- (day 10) If Ari has wood, trade for shovel later. If Dax gives bait, fish tomorrow. Stay tuned.
+- (day 11) Keep 3‑5 wood in reserve for tomorrow's bait trade. If Dax or Gus don’t answer, maybe try Ari for a second wood later.
+- (day 11) Keep 4 wood for future trades. Ask Ari for path next time.
+- (day 11) Remember to keep 3‑5 wood for next bait trade. Keep an eye on Ari for any new offers.
+At 16:00 you planned: rest.
+Actions left today: 0 of 10. Mental energy left today: 82.
+
+You can go after one of them at 16:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (25 tokens, hidden from everyone) ===
+Need private thoughts, and go number. Likely go after Ari? He had wood. I think 1 Ari.
+
+=== REPLY ===
+{"thoughts":"Ari’s house had wood earlier. Still no bait, need wood. Trade for shovel if possible. I’ll head to Ari at 16:00.", "go":1}

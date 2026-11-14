@@ -35,13 +35,14 @@ from ..agent import AgentSpec, load_agent_file
 from ..llm import DailyLimit, LLMError
 from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, TRADE_TRIES, _count, keep_chat, open_trade,
                       problem_text, trade_tries, INBOX_SHOWN, LETTER_CHARS, ISABELLE_SYSTEM, OFFER_DAYS,
-                      REQUEST_DAYS, at_place, turn_act_text,
+                      REQUEST_DAYS, act_record, at_place, trade_sides, turn_act_text,
                       encounter_prompt, evening_prompt, plaza_prompt, spot_prompt, action_text,
                       announcement_text, inbox_text, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
                       isabelle_summary_prompt, plan_prompt, system_prompt)
 from .energy import MentalEnergy
 from .memory import consolidate, forget, settings as memory_settings, split_picks
+from .options import options_text, plan_options, read_picks, unread_line
 from .grid import GridSpace
 from .body import Bodies
 from .world import Island, clock, load_world, to_game_hour
@@ -297,7 +298,7 @@ class IslandSimulation:
                 vil.memories = []
         if not hasattr(sim, "choices"):
             sim.choices = {n: {"plaza": True, "write": True, "next": "plan"} for n in sim.isl.v}
-        for attr, default in (("pending_moves", {}), ("moved_today", []), ("mail", [])):
+        for attr, default in (("pending_moves", {}), ("moved_today", []), ("mail", []), ("projects", [])):
             if not hasattr(sim.isl, attr):
                 setattr(sim.isl, attr, default)
         for vil in sim.isl.v.values():
@@ -871,7 +872,7 @@ class IslandSimulation:
                 else (f"ran into {other} {at_place(place)}" if v12 else f"ran into {other} at the {place}")
             if spoken:
                 lines = "; ".join(f'{"you" if t["speaker"] == me else other} said "{t["text"][:220]}"'
-                                  + (f" [{turn_act_text(t, me, other, self.prompt_version >= 13) if v12 else t['act']}]"
+                                  + (f" [{turn_act_text(t, me, other, self.prompt_version >= 13, self.prompt_version >= 18) if v12 else t['act']}]"
                                      if t.get("act") else "") for t in spoken)
                 isl.v[me].today.append(f"{clock(h)} {where}: {lines}")
             else:
@@ -916,11 +917,14 @@ class IslandSimulation:
                 acts.append("asked for " + ", ".join(f"{n} {k}" for k, n in f["items"].items()))
                 said.append({"kind": "asked", "items": dict(f["items"])})
         trade = obj.get("trade")
-        if self.v12 and isinstance(trade, dict) and \
-                (_clean_side(trade.get("give")) or _clean_side(trade.get("want"))):
-            self._propose_trade(d, speaker, other, trade, acts, said, turns or [])
+        if self.v12 and isinstance(trade, dict):  # version 18 writes "you give <other>" and "<other> gives you"
+            give_side, want_side = trade_sides(trade, other)
+            if _clean_side(give_side) or _clean_side(want_side):
+                self._propose_trade(d, speaker, other, {"give": give_side, "want": want_side}, acts, said, turns or [])
         self._log_favors_done(d)
-        if acts:
+        if said:  # the record names who gives what to whom (villagers see their own version, from `acts`)
+            turn["act"] = act_record({"speaker": speaker, "acts": said}, other)
+        elif acts:
             turn["act"] = "; ".join(acts)
         if said:
             turn["acts"] = said
@@ -1070,6 +1074,9 @@ class IslandSimulation:
         isl.at_home = {n: self.bodies.at_home(n) for n in isl.v}
         if getattr(isl, "prompt_version", 1) >= 3:
             isl.map_text = self.space.map_text(isl)
+        # From version 16 each villager picks from a list of what they can do, made here, before anyone acts.
+        v16 = getattr(self, "prompt_version", 1) >= 16
+        options = {n: plan_options(isl, self.bodies, self.space, n, slot[n][1]) for n in who} if v16 else {}
 
         # An even share of the actions left, rounded up; fixed windows had no shares.
         shares = {n: None if fixed else -(-(budget - self.used[n]) // (slot[n][3] - slot[n][0])) for n in who}
@@ -1082,7 +1089,8 @@ class IslandSimulation:
                 return HABIT
             user = plan_prompt(isl, vil, awake[0], awake[-1] + 1, min(shares[name] or left, len(awake)), self.yesterday[name],
                                announcement=self.first_plan[name], noticed=self.noticed[name][-8:],
-                               choices=self.choices[name])
+                               choices=self.choices[name],
+                               options=options_text(options[name], isl, name, self.space) if v16 else None)
             if not self.energy.can(name, self._need(name, user)):
                 return TIRED
             self.first_plan[name] = False
@@ -1120,7 +1128,12 @@ class IslandSimulation:
                 continue
             reply, obj, err = results[name]
             acts = [x for x in (obj or {}).get("actions", []) if isinstance(x, dict)] if obj else []
+            unread = []
+            if v16:  # picks by number, as the actions they stand for
+                acts, unread = read_picks(options[name], acts)
+                isl.v[name].today.extend(unread_line(a, u) for u in unread)
             scheduled, dropped = self._assign_hours(name, acts, awake[0], awake[-1] + 1, cap=shares[name])
+            dropped = unread + dropped
             for h, act in scheduled:
                 self.schedule.setdefault(h, []).append((name, act))
             self.habits[(name, phase)] = [{"hour": h % 24, **act} for h, act in scheduled]
@@ -1177,6 +1190,7 @@ class IslandSimulation:
         taken = {h for h, lst in self.schedule.items() for n, _ in lst if n == name}
         out, dropped, cursor, n_acts = [], [], a, 0
         for act in acts:
+            open_ = act.get("_open")  # version 16: the hours an option's place is open, set from the list
             # Keys the body fills in (targets, what was seen) can't come from the mind.
             act = {k: v for k, v in act.items() if not str(k).startswith("_") and k not in ("none_seen", "none_out", "habitat")}
             plaza = v7 and str(act.get("do") or "").strip().lower() == "plaza"
@@ -1198,10 +1212,14 @@ class IslandSimulation:
                 dropped.append({**act, "hour": want, "why": f"asleep at {clock(h)}"})
                 continue
             h = max(h, a)
+            if open_ is not None:  # the first free hour it's open from the one asked for, else the earliest
+                free = [x for x in range(a, b) if x in open_ and x not in taken]
+                h = next((x for x in free if x >= h), free[0] if free else b)
             while h < b and h in taken:
                 h += 1
             if h >= b:
-                dropped.append({**act, "why": f"no free hour left before {clock(b)}"})
+                dropped.append({**act, "why": f"no free hour left before {clock(b)}"
+                                + (" while it's open" if open_ is not None else "")})
                 continue
             taken.add(h)
             if not plaza:

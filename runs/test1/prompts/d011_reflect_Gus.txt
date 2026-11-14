@@ -1,0 +1,84 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 10, night.  
+Sun set early again. I chopped a hardwood, got some softwood and wood, but the axe left a stump. Spotted a nevin moth and chased it instead of visiting Bo—missed a trade again. I tried fishing without bait; sea was empty. Went to Dax; he still wants bait first—nothing moves. Rested, dug up a fossil (Blathers will decide). Chopped more hardwoods, got a tubas fish. Still no space in the tent for the selit or selzalne, so they’re just hanging on my belt. My tools are wearing down—axe 26 uses left. Bells are fine, but I’ve got a bunch of requests for fishing bait from Fen, Bo, and Dax. I need to get wood tomorrow to trade for bait. Maybe Nook’s will have some.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 11. You are Gus, at home before sleep.
+
+What happened today:
+- 07:00 chopped a hardwood tree: hardwood x2, wood x1; with the last wood the axe brought the tree down, leaving a stump
+- 07:00 spotted a nevin moth on a tree (the middle cliff, centre) and went after it at 08:00 instead of mine_rock (rock: 1)
+- 08:00 went bug catching around the trees: caught a nevin moth
+- 09:00 walked over to Bo's home
+- 09:00 knocked at Bo's home, but nobody answered
+- 10:00 bought a cosmos seeds for 240 bells
+- 10:00 spotted a medium fish shadow in the river (lower ground, south, near Able Sisters) and went after it at 11:00 instead of rest
+- 11:00 fished for a very large shadow in the river: caught a loka fish
+- 12:00 walked over to Dax's home
+- 12:00 knocked at Dax's home, but nobody answered
+- 13:00 walked over to Bo's home
+- 13:00 knocked at Bo's home, but nobody answered
+- 15:00 rested
+- 16:00 rested
+- 17:00 rested
+
+Things that changed hands today:
+(nothing)
+
+What you have tonight:
+Bells: 60 in your wallet
+Tools you carry: shovel (29 uses left), axe (25 uses left), fishing rod (22 uses left), net (29 uses left), ladder (9 uses left)
+Other things you carry: selit fish x1, selzalne fish x1, loka fish x3, gormo fish x1, hardwood x5, wood x3, apple x3, simple wooden fence x1, tubas fish x2, softwood x6, fossil x1, nevin moth x1, cosmos seeds x1
+At home (a tent holds only bells): 0 bells
+Recipes you know: campfire, fruit basket, golden candlestick, simple wooden fence
+Since this morning: +1 loka fish; +2 hardwood; +1 wood; +1 nevin moth; +1 cosmos seeds; bells 300 → 60 in your wallet
+
+Open requests:
+- Bo wants 1 fishing bait from you (until day 11)
+- you want 1 fishing bait from Bo (until day 11)
+- Dax wants 1 fishing bait from you (until day 12)
+
+Your notes:
+- (day 10) If Dax refuses, try Bo or buy bait tomorrow.
+- (day 10) Need to get bait soon.
+- (day 10) Need to get bait tomorrow, maybe buy from Nook's.
+- (day 10) Keep track of wood count for next day trade.
+- (day 10) Remember to leave enough wood for future trades.
+- (day 11) Keep an eye on the wood count, maybe chop more tomorrow.
+- (day 11) Remember to bring wood tomorrow for Dax if he still wants bait. Also maybe ask Bo for a quick trade. Keep an eye on my apple supply for breaking rocks next time.
+- (day 11) Remember to bring more wood tomorrow for Dax.
+
+Things you remember, numbered:
+1. (day 9) No bait from Bo or Dax today.
+2. (day 9) Got a tubas fish.
+3. (day 9) Still have 1 selit, 1 selzalne, 2 loka, 1 gormo.
+4. (day 10) No bait yet; still need wood to trade
+5. (day 10) Dax says he wants bait first, so I’ll bring wood tomorrow.
+
+What you wrote last night:
+Day 10, night.  
+Sun set early again. I chopped a hardwood, got some softwood and wood, but the axe left a stump. Spotted a nevin moth and chased it instead of visiting Bo—missed a trade again. I tried fishing without bait; sea was empty. Went to Dax; he still wants bait first—nothing moves. Rested, dug up a fossil (Blathers will decide). Chopped more hardwoods, got a tubas fish. Still no space in the tent for the selit or selzalne, so they’re just hanging on my belt. My tools are wearing down—axe 26 uses left. Bells are fine, but I’ve got a bunch of requests for fishing bait from Fen, Bo, and Dax. I need to get wood tomorrow to trade for bait. Maybe Nook’s will have some.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something you already remember that is still on your mind. Anything you don't hold on to fades over the next days; what you come back to stays longer.
+
+=== REASONING (12 tokens, hidden from everyone) ===
+Need to write diary entry up to 150 words.
+
+=== REPLY ===
+Day 11, night.  
+Sunset came early, but I still got a couple of hardwoods and a chunk of softwood. The axe left a stump, so I’ll need to swing a bit more tomorrow. I chased a nevin moth instead of visiting Bo, so the bait request is still hanging. The river was a bit better—caught a loka fish and a couple of tubas, plus a fossil for Blathers. Still no bait to trade for Dax, but I bought some cosmos seeds to keep the garden going. My tools are wearing down fast—axe 25, shovel 29, rod 22. Bells are low; I’ll need to buy bait from Nook’s tomorrow. Still no space for selit and selzalne, but I’ll hold them on my belt.
+
+Remember:
+- 5 hardwoods, 6 softwood, 3 wood
+- 1 nevin moth, 1 cosmos seed
+- Bo and Dax still want bait, I need wood tomorrow.

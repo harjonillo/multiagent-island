@@ -221,8 +221,9 @@ snow. Nothing else changes in the rain, so whether villagers care is an open que
   6 patches of wild flowers
 
 Getting around is gated. Changing cliff tier needs a **ladder** (one tier at a time), and
-crossing the river needs a **vaulting pole** (up to 3 water tiles) until the bridge is
-built. The pond and the sea can't be crossed. Everyone starts with both. Bodies pathfind with
+crossing the river needs a **vaulting pole** (up to 3 water tiles) except over a built bridge;
+from prompt version 17, built stairs climb one cliff without a ladder too. The river averages 3
+tiles across (test1: 3.2 on lower ground, 2.3 up on the cliffs). The pond and the sea can't be crossed. Everyone starts with both. Bodies pathfind with
 the tools the villager carries,
 and each villager's prompt says which rocks and buildings are within reach and how many steps
 away. From prompt version 10 it also lists the trees in the part of the island they're in (one
@@ -232,8 +233,10 @@ reach says which tool would get you there ("plaza (out of reach without a vaulti
 can break on the way out, leaving a villager with no way home: from version 15 they stay out in
 their free hours instead of being put back home, their prompt says so ("Your home is out of reach
 without a vaulting pole (call_rescue, once a day)"), and falling asleep still brings them home.
-The bridge's site is fixed by the island generator: the shortest straight crossing of the river on
-the lower ground, at most 4 tiles, nearest Resident Services. Placed furniture and fences block walking, so villagers can wall off space. Trees,
+The first bridge's site is fixed by the island generator: the shortest straight crossing of the river on
+the lower ground, at most 4 tiles, nearest Resident Services; from prompt version 17 it is 3 tiles
+wide with a landing on each bank, like any bridge, and villagers can propose more bridges and stairs
+(see below). Placed furniture and fences block walking, so villagers can wall off space. Trees,
 rocks, buildings (the plaza too) and homes always keep at least one free tile between them.
 
 **Two axes.** The stone axe, which everyone starts with, only gathers wood: the tree stays. The
@@ -289,6 +292,47 @@ it uses one of the day's actions only if the hour was free. At most 3 such calls
 (`sightings.max_decisions_per_day`). Logged as `spot_decision`. Shells and dig spots, which stay
 all day, don't ask.
 
+**Actions by number, from prompt version 16.** Before, a plan wrote its actions as free-form JSON,
+and many failed on form (visiting Nook's Cranny or Tom Nook, `walk`, `post`, `trade`, asking a
+villager) or on something the villager didn't have yet (bait, an apple, bells, a way across the
+river). Now each plan prompt has a numbered list of what that villager can do then, each option
+spelled out ("fish in the river with fishing bait (uses 1; you carry 2)", "visit Jo at their
+home", "buy fishing bait at Nook's Cranny, 300 bells each"). The list is built in code
+(`options.py`) from what they carry, their bells, what they keep at home (for crafting), where they
+can walk with the tools they carry, and opening hours within the plan's hours. The reply picks by
+number (`{"hour": 9, "pick": 14}`), adding a count, bells or a place where an option takes one; the
+plaza is on the list too. The list is as of planning time: something an earlier pick would bring
+(buy bait at 9, fish with it at 10) shows up on the next plan's list. Failures that remain come
+from what changes during the day (someone mined the rock first, pockets filled up, a tool broke).
+A pick that can't be read is dropped and the villager's day says so; a pick at a shop or service
+is moved to the nearest hour it's open. The island rules now list every kind of action and what
+it needs, so villagers know what exists before it's on their list. Every action, the checks that put it on the list and what comes of it
+are charted in [docs/actions.md](docs/actions.md).
+
+**More bridges, and stairs, from prompt version 17.** Anyone can propose a bridge across the river
+or stairs up a cliff, right where they stand (`propose_bridge`, `propose_stairs`): free, taking the
+hour. The island picks the nearest workable spot within 8 tiles, at least 6 tiles from any other
+bridge or stairs, and the proposal fails if there's none, saying where the nearest one is. A bridge
+is 3 tiles wide and crosses at most 4 tiles of lower river (the river averages 3 tiles across), with
+a landing on each bank; stairs are 2 wide and 4 long, two rows below a cliff edge and two above; the
+first bridge gets the same 3-wide footprint. Every land tile under one has to be clear, and from the
+moment it's proposed it is a construction site: walkable, but nothing can be planted or put on it.
+On test1's island that leaves 28 bridge spots and 130 stairs spots before any are taken. Each is built
+once its own fund at Resident Services reaches 98,000 bells, the first bridge's cost; several funds
+can be open at once, and each is its own line on the list. A built bridge crosses the river like the
+first one; built stairs let anyone climb that cliff edge without a ladder. The island can have 10
+in all, built or proposed, the first bridge included, and each villager one proposal still being
+funded at a time (`structures` in the world file). Bridges and stairs only give access. Before version
+17, the first bridge also added 3 rocks and 10 hardwood trees at random places on the island when
+built, and Tom Nook and a fun fact said it "opens more rocks and trees to everyone"; in test1
+villagers made plans around a "bridge rock".
+
+**Trades name both people, from prompt version 18.** A conversation's reply writes a trade as
+`"you give Ike"` and `"Ike gives you"` (was `"give"` and `"want"`, which both sides read from their own
+side: in test1 most replies to an offer asked for the same thing back). The offer on the table, each
+turn's tag, what has changed hands and the day logs all say who gives what to whom, never "X for Y",
+and a request to you says how many of it you have.
+
 **Shared resources.** Everything refills at 05:00 unless noted.
 
 | resource | supply | notes |
@@ -315,7 +359,7 @@ writing, below).
 
 | place | who | hours | what it does |
 |---|---|---|---|
-| Resident Services | Tom Nook | all day | house upgrades on an interest-free loan with no deadline; the loan must be paid off before the next upgrade. Takes bridge contributions |
+| Resident Services | Tom Nook | all day | house upgrades on an interest-free loan with no deadline; the loan must be paid off before the next upgrade. Takes bridge contributions (from prompt version 17, for every bridge and stairs being funded) |
 | Resident Services | Isabelle | all day | sets the island ordinance for 20,000 bells; makes the morning announcement |
 | Nook's Cranny | Timmy and Tommy | 08:00–22:00 | buys almost anything at a fixed price (shop goods and clothes at a quarter of their price). Sells saplings, 2 kinds of flower seeds, 3 rotating items and one DIY recipe card (800 bells) each day, plus every tool's recipe card (200 bells) and every tool ready-made (4x its sell value). Runs started earlier keep 2,000 and 500 and no tools |
 | Able Sisters | the Able Sisters | 09:00–21:00 | 4 pieces of clothing a day, from `clothing` in the world file. The entries are placeholders for your own designs |
@@ -342,8 +386,10 @@ keeps its wear while it is put away. A parcel that doesn't fit in the pockets is
 there's room. Net worth and the explorer's assets count both.
 
 **The bridge** costs 98,000 bells, anyone can chip in, and it's built the moment it is
-funded. It adds 3 rocks and 10 hardwood trees, and on the grid it is a way across the river
-without a pole.
+funded. On the grid it is a way across the river without a pole. Before prompt version 17 it also
+added 3 rocks and 10 hardwood trees at random places on the island; from 17 it only gives access,
+and villagers can propose up to 9 more bridges and stairs, each with its own 98,000-bell fund (see
+[More bridges, and stairs](#environmental-conditions) above).
 
 **Ordinances.** One at a time, paid for by any villager, effective the next morning, for
 everyone.
@@ -380,8 +426,8 @@ from the last 2 days, what they chose to hold on to at night (see
 `data/island_world.yaml` for you; villagers never see it.
 
 The persona and these rules make up the system prompt. Plan calls add a compact action menu
-(verbs and their fields only); conversations and the plaza leave it out. Each planning call
-adds:
+(verbs and their fields only; from prompt version 16, every kind of action and what it needs,
+without how to write it); conversations and the plaza leave it out. Each planning call adds:
 - the date, weather, ordinance, their bells, loan, home, neighbors, inventory, clothes,
   furniture and open requests
 - the recipes they know and the Cranny prices they have seen (they learn prices by selling).
@@ -395,12 +441,15 @@ adds:
   use; and recipe cards, named "<thing> recipe" so a card is never mistaken for the thing. A card
   doesn't say what the recipe needs; learning it does ("learned the vaulting pole recipe (needs
   wood x5)"), and from then on it is in the recipes they know
-- the museum, the bridge fund and today's shop stock
+- the museum, the bridge fund (from prompt version 17, every bridge and stairs, who proposed it and
+  what's raised) and today's shop stock
 - what they remember and their notes from the last 2 days (see [Long-term memory](#long-term-memory)),
   yesterday's actions and today's so far
 - what they noticed today: neighbors heading out, someone who knocked while they were out
 - unread letters, what they spotted, and on the grid, where they are, what tools they carry
   and what they can reach
+- from prompt version 16, the numbered list of what they can do in the hours the plan covers
+  (see [Actions by number](#environmental-conditions)), and the reply picks from it
 
 **Shorter prompts, from prompt version 13.** The ordinance line is left out when there is none
 and the loan when nothing is owed; home reads "At home (a tent holds only bells): 0 bells",
@@ -426,6 +475,7 @@ carried. (Up to day 8 of test1, villagers carrying a ladder kept hoping it, or a
 would get them across the river to the plaza.) In test1 up to
 day 8, plans tried `trade`, `post`, `talk`, `walk`, `travel` and `give` as actions 22 times, fished
 with bait they didn't have 81 times, and tried to `visit` a building or NPC about 40 times.
+From prompt version 16 the menu is replaced by the numbered list, so none of these can be planned.
 
 **Privacy.** Every reply has a `thoughts` field and an optional `note`. Both are private:
 villagers never see each other's. You see the thoughts in the logs, marked 🔒. Villagers are
@@ -438,7 +488,12 @@ are possible. A test checks that no villager's thoughts appear in any other vill
 Each action takes one hour of the day's 10 and carries the clock hour it should happen at,
 for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"home"`,
 `"<villager>'s home"`, a building, `"rock <n>"` or, on the grid, a part of the island such as
-`"north beach"`.
+`"north beach"`. Up to prompt version 15 plans wrote these themselves. From version 16 they pick
+numbered options instead, and each option stands for one of these actions with its fields filled in;
+what puts each one on a villager's list (what they need in their pockets, where, and anything else)
+and what comes of it (what they get and with what chance, what it uses up, what changes) is in
+[docs/actions.md](docs/actions.md), generated by `scripts/actions_doc.py` from the world file. Options with opening hours go in an hour the place is
+open. The tables below are the actions as the island runs them.
 
 **Gathering**
 
@@ -447,8 +502,8 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 | `mine_rock` | `rock` (optional) | take what a rock has left today |
 | `chop_wood` | | take today's wood from the nearest tree that has some |
 | `shake_tree` | | take the fruit from a fruit tree |
-| `fish` | `where`: sea, river, pond (clifftop also works); `size` (optional); `bait: true` (optional) | go after a fish shadow; with fishing bait (Nook's Cranny, 300 bells, some days; or crafted from a manila clam), a fish is sure to appear, though it can still get away |
-| `catch_bug` | `where`: flowers, trees, stumps, rocks, ground; `species` (optional) | go after a bug |
+| `fish` | `where`: sea, river, pond (clifftop also works); `size` (optional, up to prompt version 15); `bait: true` (optional) | go after a fish shadow; with fishing bait (Nook's Cranny, 300 bells, some days; or crafted from a manila clam), a fish is sure to appear, though it can still get away |
+| `catch_bug` | `where`: flowers, trees, stumps, rocks, ground; `species` (optional, up to prompt version 15) | go after a bug |
 | `beachcomb` | `near` (optional) | collect shells; sometimes a message bottle |
 | `dig_fossil` | `near` (optional) | dig up a fossil spot |
 | `dig_clam` | `near` (optional) | dig a manila clam from a clam spot on the beach (shovel; 6 spots a day, `island.clams_per_day`). The first clam teaches the fishing bait recipe: 1 clam makes 1 bait. From prompt version 11 |
@@ -470,7 +525,8 @@ for example `{"hour": 7, "do": "mine_rock"}`. A `<place>` can be `"here"`, `"hom
 |---|---|---|---|
 | `upgrade_house` | | Resident Services | upgrade now, on a loan for the cost |
 | `pay_loan` | `bells` | Resident Services | |
-| `contribute_bridge` | `bells` | Resident Services | |
+| `contribute_bridge` | `bells`; `project` (from prompt version 17: which bridge or stairs; left out, the first bridge) | Resident Services | built the moment its fund reaches 98,000 |
+| `propose_bridge` / `propose_stairs` | | where they stand | prompt version 17: free; the island picks the nearest workable spot within 8 tiles. See [More bridges, and stairs](#environmental-conditions) |
 | `set_ordinance` | `ordinance`: early_bird, night_owl, bell_boom, none | Resident Services | pay Isabelle 20,000 bells; starts tomorrow |
 | `move_house` | `to`: a free homesite | Resident Services | pay Tom Nook 10,000 bells; the home moves overnight, furniture and all |
 | `ask` | `who`: Tom Nook, Isabelle, Blathers, Timmy and Tommy, Able Sisters | their building | hear what they do and what it costs (open hours apply). Only for NPCs: to ask another villager something, talk to them |
@@ -585,6 +641,17 @@ but Ike had only 1 fishing bait, so trade failed"), and is logged as `trade_cant
 conversation so far, an offer's tag reads the same way: "[Ike's offer: you give 1 fishing bait,
 you get 1 wood]" and "[your offer: you give 1 wood, you get 1 fishing bait]".
 
+From prompt version 18 a trade names both people, never "X for Y". The reply writes it as
+`"trade": {"you give Ike": {...}, "Ike gives you": {...}}` (the old `"give"` and `"want"` keys are
+still read). The offer on the table reads "On the table from Ike: Ike gives you 1 wood, you give
+Ike 1 fishing bait (you have none)", tags read "[Ike's offer: Ike gives you 1 wood, you give Ike 1
+fishing bait]" and "[Ari accepted: you gave Ari 1 wood, Ari gave you 1 fishing bait]", and a
+request to you says how many of it you have ("Ike asked you for 1 fishing bait (you have none)").
+Even with version 13's wording, in test1 12 of 18 replies to an offer asked for the same thing
+back, each villager filling in the deal from the other's side. The record in the day logs and the
+explorer names both people for every run from version 12 ("offered Kit a trade: Gus gives 1 selit
+fish, Kit gives 1 fishing bait"; it was "offered a trade: 1 selit fish for 1 fishing bait").
+
 **Item names.** Villagers don't always use an item's exact name ("map" for `island map`, "bait"
 for `fishing bait`). Gifts, parcels and trade offers match what they say against what the giver
 carries, and requests against what the other villager carries and then every item the island
@@ -596,14 +663,17 @@ map failed and requests in loose names never closed. Requests stored that way st
 **Who gave what to whom.** The sim keeps a record of everything that changes hands between two
 villagers: gifts in person, parcels and accepted trades, and whether a gift answered a request.
 From prompt version 8, a villager meeting someone sees the latest 6 of these between the two of
-them ("Between you and Kit so far"), and the nightly page shows the day's.
+them ("Between you and Kit so far"), and the nightly page shows the day's. From prompt version 18
+a trade there reads "you gave Kit 1 selit fish and Kit gave you 1 softwood, in a trade" (was "you
+traded Kit 1 selit fish for 1 softwood").
 
 **Visits.** `visit` is an action. If the host is awake, at home and not busy, they let the
 guest in: the guest sees the furniture inside and they talk, with gifts and requests as
 above. Otherwise nobody answers, and the host later hears that the guest came by.
 
 **The plaza, from prompt version 7.** The plaza is open all day. A plan can set any free hour
-aside for it with `{"hour": <hour>, "do": "plaza"}`: that takes the hour but isn't one of the
+aside for it with `{"hour": <hour>, "do": "plaza"}` (from prompt version 16, an option on the
+list like any other): that takes the hour but isn't one of the
 day's actions, and nothing else limits how often a villager goes except their energy. That hour
 they walk there (a villager who can't reach it with the tools they carry doesn't get there) and
 get one turn: the board, offers, answers to offers, letters and parcels, as below. The turn
@@ -869,6 +939,8 @@ A plan on day 1 was about 2,200 tokens in: about 730 of rules and action menu (t
 prompt), 140 of the nightly page, and 1,370 of situation, of which yesterday's events were the
 largest part (about 355), then where they are and can reach (236), the instructions (188) and
 today so far (118). Later days cost more as villagers accumulate notes, mail and memories.
+From prompt version 16 the numbered list adds about 850 tokens to a plan and the shorter action list
+saves about 150 of the system prompt: about 700 more per plan, around 5% of an island day.
 Mock replies are shorter than real ones, so mock runs undercount.
 
 ### Checkpoints and one island day per real day
@@ -978,6 +1050,7 @@ data/island_world.yaml  island rules: calendar, weather, resources, species, rec
 config/models.yaml      LLM backends (all OpenAI-compatible)
 scripts/daily.sh        start or resume an island run by one day
 scripts/world_doc.py    regenerate docs/world.md and docs/island_grid.png
+scripts/actions_doc.py  regenerate docs/actions.md (every action: what it takes, what comes of it)
 src/llmabm/
   cli.py                run, resume, analyze
   agent.py              villager file format (frontmatter + persona)
@@ -986,7 +1059,8 @@ src/llmabm/
   island/
     world.py            island state and the rules for every action
     sim.py              the day loop: plans, hours, encounters, visits, plaza, Isabelle, checkpoints
-    prompts.py          what villagers are told, and the action menu
+    prompts.py          what villagers are told, and the action menu (and list, from version 16)
+    options.py          version 16: each villager's numbered list of what they can do, and reading picks
     body.py             position, tools, walking, who arrives first
     space.py            the Space interface
     grid.py             the tile island: generation, pathfinding, sight, building
@@ -1002,9 +1076,12 @@ tests/
 
 - New island scenario: copy `scenarios/island_blank.yaml` and change the cast, calendar or
   world file.
-- New island rule: an action is a `_do_<name>` method on `Island` in `island/world.py`, plus
-  a line in `ACTION_MENU` in `island/prompts.py`. If it happens somewhere specific, teach
-  `GridSpace.resolve` where.
+- New island rule: an action is a `_do_<name>` method on `Island` in `island/world.py`. If it
+  happens somewhere specific, teach `GridSpace.resolve` where. For prompt version 16 on, add
+  what puts it on a villager's list to `plan_options` in `island/options.py` and a line to
+  `action_catalogue` in `island/prompts.py`, and its entry to `scripts/actions_doc.py` (then rerun
+  it); for earlier versions, a line in `ACTION_MENU`. Rerun `scripts/actions_doc.py` and
+  `scripts/world_doc.py` after changing the world file too.
 - New measurement: everything is in `events.jsonl`; `analysis.load_run` gives you the events
   and manifest to work from.
 - Not built yet: villagers joining or leaving mid-run, and villagers rewriting their own docs.

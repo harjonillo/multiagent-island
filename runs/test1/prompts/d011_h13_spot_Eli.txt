@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 10.  
+The sun was still high when I went to the plaza, but the board stayed empty. I posted a new request, swapped a selit fish for a log if anyone had one, and tried to be patient. I caught a tubas fish early, but the sea went silent by mid‑morning—no shadows, no bite. I sent Jo a parcel of selit fish, hoping she’d return the favor with a log or at least a vaulting pole. I’ve been running out of energy; the shovel, axe, and rod are still good, but I feel the weight of the day. No new trades, no new items. I’m still missing that log, that rock, that pole. I’ll keep watching Jo’s house, keep posting, and hope a fish or a log comes my way.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 13:00. You are Eli, at the river.
+You just spotted:
+1. a small fish shadow in the river (lower ground, south, near Able Sisters)
+Earlier today:
+- 10:00 looked for fish in the sea, but there were no fish shadows in sight
+- 10:00 spotted a small fish shadow in the river (lower ground, southeast) and went after it at 11:00 instead of plaza
+- 11:00 fished for a small shadow in the river: caught an ashpimi fish
+- 12:00 looked for fish in the sea, but there were no fish shadows in sight
+- 13:00 fished for a medium shadow in the river: caught a selzalne fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still 3 softwood, 1 hardwood, 2 selit fish
+- (day 10) Got a tubas fish.
+- (day 10) Still need Jo’s log or vaulting pole.
+- (day 10) No trades today.
+Your notes from the last 2 days:
+- (day 10) Keep an eye on Jo tomorrow; maybe she has a rock.
+- (day 10) Stay patient, keep posting.
+- (day 10) Check Jo's house tomorrow, maybe she has a log.
+- (day 10) Keep an eye on Jo, maybe she’ll drop a log. If she has a vaulting pole, ask for it.
+- (day 10) Keep an eye on Jo tomorrow, maybe she'll drop a log or rock. Also, consider visiting the beach for more fish.
+- (day 11) Ask Jo in person tomorrow if I can get a log or rock. Also maybe try to trade a selit fish for bait again.
+At 14:00 you planned: ask (who: Able Sisters).
+Actions left today: 1 of 10. Mental energy left today: 97.
+
+You can go after one of them at 14:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (39 tokens, hidden from everyone) ===
+We need choose action. 14:00 planned ask Able Sisters. Maybe better to ask Jo in person? but can't at 14. We can go after Able Sisters. Probably go.
+
+=== REPLY ===
+{"thoughts":"Need that log or pole. Able Sisters might have it. I'll go ask them at 14:00.","go":1}

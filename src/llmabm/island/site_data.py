@@ -96,7 +96,16 @@ def _objects(snap: dict) -> dict:
     o = snap.get("objects") or {}
     return {"trees": o.get("trees", []), "rocks": o.get("rocks", []), "paths": [p[:2] for p in o.get("paths", [])],
             "placed": [p[:2] for p in o.get("placed", [])], "flowers": [f[:2] for f in o.get("flowers", [])],
-            "bridge_open": bool(o.get("bridge_open"))}
+            "bridge_open": bool(o.get("bridge_open")),
+            "bridge_cells": o.get("bridge_cells"),  # prompt version 17: the first bridge's 3-wide footprint
+            "structures": o.get("structures", [])}  # prompt version 17: [kind, cells, built, fund, name]
+
+
+def _act(t: dict, e: dict) -> str:
+    """What a conversation turn did, naming who gives what to whom (prompts.act_record)."""
+    from .prompts import act_record
+
+    return act_record(t, next((v for v in e.get("villagers", []) if v != t["speaker"]), "")) if t.get("act") else ""
 
 
 FELLED = ("brought the tree down", "chopped down")  # chop results that left a stump
@@ -464,7 +473,7 @@ def day_detail(run: Run) -> list[dict]:
 
         talks = []
         for e in of("encounter"):
-            lines = [[t["speaker"], t.get("text") or "", t.get("thoughts") or "", t.get("act") or ""] for t in e["turns"]]
+            lines = [[t["speaker"], t.get("text") or "", t.get("thoughts") or "", _act(t, e)] for t in e["turns"]]
             talks.append({"h": e["hour"], "where": e.get("location") or "", "who": e["villagers"], "visit": bool(e.get("visit")),
                           "lines": lines})
 
@@ -517,7 +526,7 @@ def social_data(run: Run) -> list[dict]:
     done = {snap["day"] for snap in snapshots(run)}  # a day still under way is left out, as on the Days tab
     final = {e["id"]: e for e in run.of("offer_update")}
     visit_talk = {(e["day"], e["hour"], *e["villagers"]): e for e in run.of("encounter") if e.get("visit")}
-    lines = lambda e: [[t["speaker"], t.get("text") or "", t.get("act") or ""] for t in e["turns"]  # noqa: E731
+    lines = lambda e: [[t["speaker"], t.get("text") or "", _act(t, e)] for t in e["turns"]  # noqa: E731
                        if t.get("text") or t.get("act")]
     out = []
     for e in run.events:

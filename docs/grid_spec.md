@@ -78,13 +78,22 @@ Everyone knows the ladder, vaulting pole and simple wooden fence recipes from da
 ## Movement
 
 - **Walking** is 4-directional over beach, grass and bridges, with one step per tile.
-- **Ladder**: climb or descend one tier between adjacent tiles, costing 3 steps. There are no
-  inclines yet.
+- **Ladder**: climb or descend one tier between adjacent tiles, costing 3 steps.
+- **Stairs** (from prompt version 17): proposed by a villager where they stand and built once
+  98,000 bells are donated. 2 tiles wide and 4 long, two rows below a cliff edge and two above; anyone
+  climbs there without a ladder, costing 2 steps. ASSUMPTION on the size, and that they need no
+  cliff-face tiles (the grid has none: a cliff edge is two neighbouring tiles one tier apart).
 - **Vaulting pole**: jump a straight line of up to 3 river tiles onto land at the same level,
   costing the number of tiles plus 2. Ponds and the sea can't be crossed. ASSUMPTION on the
   maximum width.
 - **Bridge**: funding the bridge project opens a short crossing over the lower river near
-  Resident Services.
+  Resident Services. From prompt version 17 villagers can propose more, where they stand: each is 3
+  tiles wide and crosses at most 4 tiles of lower river with a landing on each bank (the first bridge
+  gets the same footprint), and is built once its own 98,000-bell fund is raised. The river averages
+  3.1 tiles across. Up to 10 bridges and stairs in all, at least 6 tiles apart; every land tile under
+  one has to be clear, and once proposed nothing can be planted or put there. Before version 17 the
+  first bridge also added 3 rocks and 10 hardwood trees at random places when built. ASSUMPTION on
+  the width, the span and the spacing.
 - **Tool recipes** are known to everyone from the start: ladder (4 wood, 4 hardwood,
   4 softwood) and vaulting pole (5 wood). ASSUMPTION on the costs. Tools are crafted at home
   and never break.
@@ -187,8 +196,8 @@ notice, decide, talk flow runs. Meetings along the walking path within an hour a
 
 Also not modelled:
 
-- inclines and terraforming
-- more than one bridge
+- terraforming (bridges and stairs are proposed, from prompt version 17, but cliffs and rivers
+  don't move)
 - weeds and beach palms
 - events (fishing tourney, bug-off, birthdays), seasonal items, and snow on the ground
 - fish shadow sizes and fish that need bait

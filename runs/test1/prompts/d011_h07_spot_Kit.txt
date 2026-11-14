@@ -1,0 +1,41 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 10.  
+Still no map, no logs. Fen keeps saying no, but he did give me a map for bait and I still have two selit, two selzalne, a tugorpi. I’m low on bait now – only one left. Tried fishing, bugging, walked everywhere but no one answers. Gus, Bo, Dax all silent. I’m running out of bells, but I’ll keep grinding. Tomorrow I’ll ask Fen again for a small log, maybe trade a selit for a second map. If he says no, I’ll try Dax. I need the vaulting pole to reach the plaza, but that’s a long shot. I’ll rest tonight, keep an eye on bait, and hope the next day brings something.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 07:00. You are Kit, out on a walk.
+You just spotted:
+1. a medium fish shadow in the river (lower ground, centre, near rock 4)
+Earlier today:
+(nothing yet)
+Things you remember (anything you don't hold on to at night fades):
+- (day 10) 1 selit left for trade
+- (day 10) 1 selzalne still unused
+- (day 10) 200 bells, no home stash
+Your notes from the last 2 days:
+- (day 9) If he says no, I'll wait for his bait or trade selzalne next time.
+- (day 10) Remember to keep the selit handy for bait trades tomorrow. Also try to get a small log from someone if possible.
+- (day 10) If Fen says no, plan to ask Dax or Fen for a small log tomorrow. Keep bait count low.
+- (day 10) Ask Fen for a second map. Keep bait low.
+- (day 10) Keep track of bait count after each trade.
+- (day 10) Remember to ask Fen for the second map and a small log if he can. If Dax says no, try Fen again tomorrow. Keep bait count low.
+At 08:00 you have nothing planned.
+Actions left today: 10 of 10. Mental energy left today: 122.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (69 tokens, hidden from everyone) ===
+We need choose who to go after. We have bait 1, selit 1, selzalne 1. Need bait. Going after someone could get bait. Maybe go after Gus? Or Fen? He said no. Maybe Dax. I'll choose 2 (assuming numbering? Not specified). Probably go after Dax.
+
+=== REPLY ===
+{"thoughts":"Need bait. One selit left, one selzalne unused. Try to get more bait by trading with someone. Dax seems quiet, maybe will trade. No risk to go after him. 08:00 slot used to go after Dax.","go":2}

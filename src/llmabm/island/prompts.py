@@ -79,6 +79,29 @@ PROMPT_CHANGES = {
         "is awake and can't get home with the tools they carry stays out (before, any free hour took them home); "
         "call_rescue has the Rescue Service take them home, once a day, for that hour, with a talking-to about why "
         "they got stuck. A second time that day, they get home when they go to sleep",
+    16: "actions by number: each plan lists the actions the villager can do right then, numbered and spelled out "
+        "(worked out from what they carry, their bells, what they keep at home for crafting, where they can walk "
+        "with the tools they carry, and opening hours within the plan's hours), and the plan picks them by number "
+        "(\"pick\"), adding a count, bells or a place where an option takes one. Nothing else can be planned. The "
+        "action menu in the island rules becomes a list of every kind of action and what each needs, without "
+        "how to write it. A pick that can't be read is dropped, and the villager's day says so. An option with "
+        "opening hours is moved to an hour it's open, within the plan",
+    17: "more bridges, and stairs: anyone can propose a bridge across the river or stairs up a cliff (which anyone can "
+        "climb without a ladder) where they stand, free, and each is built once its own fund at Resident Services "
+        "reaches the bridge's cost. Ten in all on the island, the first bridge included, built or proposed; one "
+        "proposal of each villager's still being funded at a time. Each fund is its own line on the list, and plans, "
+        "Tom Nook and the action list say what is proposed, built and raised. A bridge is 3 tiles wide, crossing at "
+        "most 4 river tiles with a landing on each bank; stairs are 2 wide and 4 long, two rows below a cliff edge "
+        "and two above; the first bridge gets the same 3-wide footprint. From the moment one is proposed its "
+        "footprint is a construction site: walkable, but nothing can be planted or put on it. Bridges and stairs "
+        "only give access: "
+        "the first bridge no longer adds 3 rocks and 10 hardwood trees somewhere on the island when built, and Tom "
+        "Nook and the fun fact no longer say it opens more rocks and trees (a fun fact about stairs is added)",
+    18: "trades name both people, never \"X for Y\": a conversation's reply writes a trade as \"you give <them>\" and "
+        "\"<them> gives you\" (was \"give\" and \"want\"); the offer on the table, each turn's tag and what has "
+        "changed hands between you say who gives what to whom (\"Ari's offer: Ari gives you 1 wood, you give Ari 1 "
+        "fishing bait\"; \"you gave Jo 1 selit fish and Jo gave you 1 softwood, in a trade\"). A request to you "
+        "says how many of it you have",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -150,6 +173,37 @@ _MENU_CHANGES = {
           "fishing rod (fish); net (catch_bug); ladder (climbs one cliff up or down); vaulting pole (jumps across "
           "the river). You use a ladder or vaulting pole you carry whenever your way needs it.")],
 }
+
+
+def action_catalogue(world: dict, version: int = PROMPT_VERSION) -> str:
+    """Prompt version 16: every kind of action and what it needs, so a villager knows what exists before it is
+    on their list. How to write one isn't here: plans pick from a numbered list. Says what each needs, not what
+    it gives (that is learned on the island)."""
+    fruit = world["island"]["native_fruit"]
+    structures = ""
+    if version >= 17:
+        from .world import structures_cfg
+
+        cfg = structures_cfg(world)
+        structures = (f"- propose a bridge across the river or stairs up a cliff, where you stand: nothing in your pockets. "
+                      f"A bridge is 3 tiles wide; stairs, 2 wide and 4 long, let anyone climb that cliff without a "
+                      f"ladder. From the moment one is proposed nothing can be planted or put where it goes. Each is "
+                      f"built once {cfg['cost']} bells are "
+                      f"donated at Resident Services; the island can have {cfg['max']} in all, the {world['bridge']['name']} "
+                      "included, and you one proposal still being funded at a time\n")
+    return f"""Actions. Each takes one hour. When you plan, you get a numbered list of the actions you can do then, worked out from what you carry, your bells, where you can get to with the tools you carry, and opening hours; you plan by picking numbers. An action shows up on your list once you have what it needs. Every kind there is, and what it needs:
+- mine a rock, dig for fossils, dig for manila clams on the beach, dig up a stump: a shovel
+- break a rock: a shovel, and {_a_word(fruit)} in your pockets, which you eat first
+- chop wood: an axe or a stone axe (the axe brings a tree down when it takes its last wood); shake a fruit tree: one with fruit on it
+- fish: a fishing rod (fishing bait makes a fish appear); catch bugs: a net
+- beachcomb
+- plant: a sapling, {_a_word(fruit)} or flower seeds; put furniture or fencing outside, fence off your home, pick up what you put out; lay or take up a path
+- craft (at home): a recipe you know and what it needs; put furniture inside your home or take it out; put on clothes you carry
+- visit another villager at their home
+- Nook's Cranny (Timmy and Tommy): sell, buy things, tools and recipe cards; the Able Sisters: buy clothes; the museum (Blathers): donate, assess fossils; Resident Services (Tom Nook, Isabelle): upgrade your home, pay your loan, put bells toward the bridge, set an island ordinance, move your home; ask any of them what they do and what it costs
+- rest; call the Rescue Service (only when you can't get home with the tools you carry; once a day)
+{structures}Gathering anything needs room in your pockets. Not actions: talking, giving and trading happen when you meet someone (visit them to meet on purpose), and you walk wherever an action takes you. You can also spend a free hour at the plaza, which isn't one of your actions: the bulletin board, letters and parcels are there.
+Tools: a ladder climbs one cliff up or down and a vaulting pole jumps across the river; you use one you carry whenever your way needs it."""
 
 
 def action_menu(version: int = PROMPT_VERSION) -> str:
@@ -269,7 +323,8 @@ def system_prompt(spec: AgentSpec, world: dict, n_villagers: int, brief: str, se
         parts.append("## About you\n" + "\n".join(f"- {k}: {v}" for k, v in about.items()))
     for fname, text in spec.docs:
         parts.append(f"## Something you know: {fname}\n{text}")
-    parts.append("## Your island\n" + island_rules(world, n_villagers, version) + (f"\n\n{action_menu(version)}" if menu else ""))
+    actions = action_catalogue(world, version) if version >= 16 else action_menu(version)
+    parts.append("## Your island\n" + island_rules(world, n_villagers, version) + (f"\n\n{actions}" if menu else ""))
     if brief:
         parts.append(brief.strip())
     return "\n\n".join(parts)
@@ -428,6 +483,8 @@ def status_block(isl: Island, vil: Villager, when: str, talk: bool = False) -> s
              + f"\nAble Sisters today ({fmt_window(isl.shop_hours('able'))}): "
              + ", ".join(f"{k} {round(p * f)}" for k, p in isl.able_stock.items()))
     bridge = "built" if isl.bridge_built else f"{isl.bridge_fund}/{w['bridge']['cost']} bells raised"
+    if _v(isl) >= 17:
+        bridge = structures_text(isl)
     requests = request_lines(isl, vil.name) if v12 else isl.favor_lines(vil.name)
     wallet = " in your wallet" if v12 else ""
     ordinance = (f"Island ordinance: {ORDINANCE_TEXT.get(isl.ordinance, isl.ordinance)}"
@@ -454,7 +511,8 @@ def status_block(isl: Island, vil: Villager, when: str, talk: bool = False) -> s
         + (f"Nook's Cranny buys at (prices you've heard): {prices}\n" if v13 else
            f"What Nook's Cranny pays when you sell it there (prices you've heard): {prices}\n" if v12 else
            f"Prices you have seen at Nook's Cranny: {prices}\n")
-        + ("" if talk else f"Museum: {isl.museum_line()}\nBridge: {bridge}\n")
+        + ("" if talk else f"Museum: {isl.museum_line()}\n"
+           + (f"Bridges and stairs: {bridge}\n" if _v(isl) >= 17 else f"Bridge: {bridge}\n"))
         + f"{shops}\n"
         + memory_block(isl, vil)
         + (f"\nGetting around: {getting}" if getting else "")
@@ -462,6 +520,17 @@ def status_block(isl: Island, vil: Villager, when: str, talk: bool = False) -> s
            and getattr(isl, "map_text", "") else "")
         + ("" if talk else spotted_lines(isl, vil) + energy_lines(isl, vil))
     )
+
+
+def structures_text(isl: Island) -> str:
+    """Prompt version 17: every bridge and stairs, built or being funded, and how many more the island can have."""
+    from .world import structures_cfg
+
+    cfg = structures_cfg(isl.w)
+    all_ = isl.structures()
+    parts = [st["name"] + (f" (proposed by {st['by']})" if st["by"] else "")
+             + (": built" if st["built"] else f": {st['fund']}/{cfg['cost']} bells raised") for st in all_]
+    return "; ".join(parts) + f". {len(all_)} of {cfg['max']} so far"
 
 
 ANNOUNCE_WORDS = 70  # from prompt version 5: the announcement itself...
@@ -491,7 +560,8 @@ def fun_facts(isl: Island) -> list[str]:
         "Did you know Timmy and Tommy buy almost anything at a fixed price?",
         "Did you know letters and parcels sent at the plaza arrive the next morning?",
         "Did you know digging up a stump with your shovel clears the spot again?",
-        ("Did you know the bridge, once funded, crosses the river by Resident Services and opens more rocks and trees?"
+        ("Did you know a funded bridge lets anyone cross the river without a vaulting pole?" if v >= 17 else
+         "Did you know the bridge, once funded, crosses the river by Resident Services and opens more rocks and trees?"
          if v >= 15 else "Did you know funding the bridge north opens more rocks and trees to everyone?"),
         f"Did you know anyone can pay Isabelle {w['ordinances']['cost']:,} bells to set an island ordinance?",
     ]
@@ -510,13 +580,16 @@ def fun_facts(isl: Island) -> list[str]:
         facts.append("Did you know a stone axe only gathers wood, but an iron axe fells trees?"
                      if "stone axe" in (w.get("items") or {}) else
                      "Did you know taking a tree's last wood with an axe brings it down?")
+    if v >= 17:
+        facts.append("Did you know funded stairs let anyone climb a cliff without a ladder?")
     if v >= 11 and int(isl_cfg.get("clams_per_day", 0)) > 0:
         facts.append("Did you know digging up a manila clam teaches you to make fishing bait?")
     if getattr(getattr(isl, "energy", None), "enabled", False):
         facts.append("Did you know your mental energy comes back in full every morning?")
     if v >= 15:  # what getting around and tools depend on comes up in the first days, not the last
         first = ["tools break", "ladder climbs", "buy almost anything", "manila clam", "island map", "saplings",
-                 "plant ", "the bridge", "letters and parcels", "fishing bait", "axe", "stump"]
+                 "plant ", "the bridge", "funded bridge", "funded stairs", "letters and parcels", "fishing bait", "axe",
+                 "stump"]
         rank = lambda f: next((i for i, k in enumerate(first) if k in f), len(first))
         facts = sorted(facts, key=rank)  # stable: the rest keep their order
     return facts
@@ -645,23 +718,29 @@ def inbox_text(vil: Villager) -> str:
 
 
 def plan_prompt(isl: Island, vil: Villager, a: int, b: int, n_actions: int, yesterday: list[str],
-                announcement: bool = False, noticed: list[str] | None = None, choices: dict | None = None) -> str:
+                announcement: bool = False, noticed: list[str] | None = None, choices: dict | None = None,
+                options: str | None = None) -> str:
+    """From prompt version 16, `options` is the villager's numbered list (options.options_text), and the
+    plan picks from it by number."""
     done = "\n".join(f"- {r}" for r in vil.today) or "(nothing yet)"
     prev = "\n".join(f"- {r}" for r in yesterday) or "(nothing)"
     inbox = inbox_text(vil)
     isabelle = f"Isabelle's morning announcement: {announcement_text(isl)}\n\n" if announcement else ""
     seen = "\n".join(f"- {x}" for x in (noticed or [])) or "(nothing)"
     v7 = getattr(isl, "prompt_version", 1) >= 7
+    v16 = _v(isl) >= 16 and options is not None
     en = getattr(isl, "energy", None)
     energy = v7 and en is not None and en.enabled
     extra = ""
-    if v7:
+    if v7 and not v16:  # from version 16 the plaza is on the list
         extra += ('\nYou can also spend any free hour at the plaza: add {"hour": <hour>, "do": "plaza"}. '
                   "It isn't one of your actions.")
     home_now = _v(isl) >= 12 and (getattr(isl, "at_home", None) or {}).get(vil.name)
     if home_now:
         extra += ("\nYou're at home, so you can put things from your pockets away or take things out before you go, "
-                  'which takes no time: "home": {"store": {"<item or bells>": <qty>}, "take": {"<item or bells>": <qty>}}.')
+                  'which takes no time: "home": {"store": {"<item or bells>": <qty>}, "take": {"<item or bells>": <qty>}}.'
+                  + (" Your list counts what is in your pockets now; what you take out counts from your next plan."
+                     if v16 else ""))
     if energy:
         if en.plans.get(vil.name) is None:
             extra += (f"\nFirst, decide how you'll spend today's {round(en.daily)} points of mental energy: "
@@ -671,16 +750,28 @@ def plan_prompt(isl: Island, vil: Villager, a: int, b: int, n_actions: int, yest
         else:
             extra += ("\nYou can change today's energy plan if you want: "
                       '"energy": {"inward": <points>, "outward": <points>}.')
+    if v16:
+        listed = (f"What you can do between {clock(a)} and {clock(b - 1)}, with what you carry and where you can get "
+                  f"to (each takes one hour):\n{options}\n\n")
+        ask = (f"Plan up to {n_actions} actions between {clock(a)} and {clock(b - 1)}, one per hour, by picking "
+               "numbers from the list; you may leave hours free and pick a number more than once. Give each an "
+               "\"hour\" (0-23); something at a shop or service goes in the nearest hour it's open. Things may "
+               "not go as planned if someone else gets there first. ")
+        shape = '"actions": [{"hour": <hour>, "pick": <number>}, ...], '
+    else:
+        listed = ""
+        ask = (f"Plan up to {n_actions} actions between {clock(a)} and {clock(b - 1)}, one per hour; you may leave hours free. "
+               "Give each action an \"hour\" (0-23). Things may not go as planned if someone else gets there first. ")
+        shape = '"actions": [{"hour": <hour>, "do": ...}, ...], '
     return (
         "PHASE: plan\n" + status_block(isl, vil, clock(a))
         + f"\n\n{isabelle}Yesterday you:\n{prev}\n\nSo far today you:\n{done}\n\nYou noticed today:\n{seen}\n\nUnread letters:\n{inbox}\n\n"
-        f"Plan up to {n_actions} actions between {clock(a)} and {clock(b - 1)}, one per hour; you may leave hours free. "
-        "Give each action an \"hour\" (0-23). Things may not go as planned if someone else gets there first. "
+        + listed + ask
         + extra + (choices_text(isl, choices) if choices else "") + "\n"
         "Respond with one JSON object and nothing else:\n"
         '{"thoughts": "<your private reasoning; nobody else sees it>", '
         + ('"energy": {"inward": <points>, "outward": <points>}, ' if energy else "")
-        + '"actions": [{"hour": <hour>, "do": ...}, ...], '
+        + shape
         + ('"home": {"store": {}, "take": {}}, ' if home_now else "")
         + '"note": "<optional private note to your future self>"}'
     )
@@ -842,8 +933,10 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
                      opener: bool, visit: str | None = None, last: str | None = None) -> str:
     v12 = _v(isl) >= 12
     v13 = _v(isl) >= 13
+    v18 = _v(isl) >= 18
+    have = (lambda k: vil.bells if k == "bells" else vil.inventory.get(k, 0)) if v18 else None  # noqa: E731
     said = "\n".join(f'{"You" if t["speaker"] == vil.name else t["speaker"]}: {t["text"]}'
-                     + (f" [{turn_act_text(t, vil.name, other, v13) if v12 else t['act']}]" if t.get("act") else "")
+                     + (f" [{turn_act_text(t, vil.name, other, v13, v18, have) if v12 else t['act']}]" if t.get("act") else "")
                      for t in turns if t["text"] or t.get("act"))
     if visit == "guest":
         host = isl.v[other]
@@ -866,7 +959,14 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
         table = open_trade(turns)
         tries = TRADE_TRIES - trade_tries(turns) if v13 else None
         pick = "<item or bells>" if v13 else "<item or bells from your pockets>"
-        if v13:
+        if v18:  # every trade names who gives what to whom
+            options = (f"You can also give {other} something from your pockets now (\"give\"), ask {other} for "
+                       f"something (\"ask\"; open until they give or trade it, up to {REQUEST_DAYS} days)"
+                       + (f", or offer a trade (\"trade\": what you give {other} and what {other} gives you; it "
+                          f"happens only if {other} accepts, both at once)" if tries > 0 else "")
+                       + ". Leave any empty ({}).\n" + trade_tries_text(tries, other)
+                       + trade_table_text_v18(isl, table, vil, other, tries))
+        elif v13:
             options = (f"You can also give {other} something from your pockets now (\"give\"), ask for something "
                        f"(\"ask\"; open until they give or trade it, up to {REQUEST_DAYS} days)"
                        + (f", or offer a trade (\"trade\"; it happens only if {other} accepts, both sides at once)"
@@ -881,9 +981,10 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
                        "hands at once, or nothing does. Leave any of them empty ({}) if you don't want to.\n"
                        + trade_table_text(table, vil.name, other))
         options += f"In your pockets right now: {pocket_summary(isl, vil)}\n"
+        trade_shape = (f'{{"you give {other}": {{"{pick}": <qty>}}, "{other} gives you": {{"<item or bells>": <qty>}}}}'
+                       if v18 else f'{{"give": {{"{pick}": <qty>}}, "want": {{"<item or bells>": <qty>}}}}')
         fields = (f'"give": {{}} or {{"{pick}": <qty>}}, "ask": {{}} or {{"<item or bells>": <qty>}}, '
-                  + (f'"trade": {{}} or {{"give": {{"{pick}": <qty>}}, '
-                     '"want": {"<item or bells>": <qty>}}, ' if tries is None or tries > 0 else "")
+                  + (f'"trade": {{}} or {trade_shape}, ' if tries is None or tries > 0 else "")
                   + ('"accept": true | false, ' if table and table["proposer"] == other
                      and (tries is None or not isl.accept_problem(vil.name, table)) else ""))
     else:
@@ -893,7 +994,7 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
     return (
         "PHASE: encounter\n" + status_block(isl, vil, clock(hour), talk=True)
         + f"\n\nSo far today you:\n" + ("\n".join(f"- {r}" for r in vil.today) or "(nothing yet)")
-        + "\n\n" + (exchanges_with(isl, vil.name, other) if _v(isl) >= 8 else "")
+        + "\n\n" + (exchanges_with(isl, vil.name, other) if _v(isl) >= 8 else "")  # noqa: ISC003
         + (last_chat_with(isl, vil.name, other) if v12 else "")
         + f"{situation}\n"
         + (f"One or two sentences, the way you'd really talk. Only {other} hears it.\n" if v13 else
@@ -958,9 +1059,10 @@ def pocket_summary(isl: Island, vil: Villager) -> str:
     return f"{vil.bells} bells" + (f", {things}" if things else ", nothing else")
 
 
-def turn_act_text(t: dict, me: str, other: str, v13: bool = False) -> str:
+def turn_act_text(t: dict, me: str, other: str, v13: bool = False, v18: bool = False, have=None) -> str:
     """Prompt version 12: what a conversation turn did, told from `me`'s side ("Ike handed you 1 wood"). From
-    version 13 (`v13`) a trade offer reads as what you'd give and get, like the offer on the table."""
+    version 13 (`v13`) a trade offer reads as what you'd give and get, like the offer on the table. From 18 (`v18`)
+    trades name both people, and `have` (item -> how many `me` carries) adds how many of a request you have."""
     acts = t.get("acts")
     if not acts:
         text = t.get("act") or ""
@@ -980,11 +1082,14 @@ def turn_act_text(t: dict, me: str, other: str, v13: bool = False) -> str:
                          else f"{speaker} tried to hand you {what} but {why}")
         elif a["kind"] == "asked":
             line = f"you asked {other} for {what}" if mine else f"{speaker} asked you for {what}"
+            if not mine and have is not None and not a.get("unknown"):  # version 18: how many of it you have
+                line += " (" + ", ".join(f"you have {have(k) or 'none'}" + (f" {k}" if len(a['items']) > 1 else "")
+                                         for k in a["items"]) + ")"
             if a.get("unknown"):
                 line += f", but there's nothing called {' or '.join(a['unknown'])} on this island"
             parts.append(line)
     for a in acts:
-        if trade := _trade_act_text(a, speaker, me, other, v13):
+        if trade := (_trade_act_text_v18(a, speaker, me, other) if v18 else _trade_act_text(a, speaker, me, other, v13)):
             parts.append(trade)
     if t.get("leave"):
         parts.append("then you went your ways")
@@ -1037,6 +1142,116 @@ def _trade_act_text(a: dict, speaker: str, me: str, other: str, v13: bool = Fals
     return ""
 
 
+def _sides(giver: str, gives: dict, taker: str, takes: dict, me: str) -> str:
+    """Prompt version 18: both sides of a trade, each naming who gives what to whom, from `me`'s side:
+    "Ari gives you 1 wood, you give Ari 1 fishing bait"."""
+    name = lambda n: "you" if n == me else n  # noqa: E731
+    verb = lambda n: "give" if n == me else "gives"  # noqa: E731
+    return (f"{name(giver)} {verb(giver)} {name(taker) if taker != me else 'you'} {_count(gives)}, "
+            f"{name(taker)} {verb(taker)} {name(giver) if giver != me else 'you'} {_count(takes)}")
+
+
+def _trade_act_text_v18(a: dict, speaker: str, me: str, other: str) -> str:
+    """Prompt version 18: a trade proposed, made or fallen through in a conversation, naming both people."""
+    mine = speaker == me
+    k, who = a["kind"], ("you" if mine else speaker)
+    if k == "proposed":
+        if a.get("over"):
+            return f"{who} tried to offer another trade, but none were left"
+        if a.get("unknown"):
+            return f"{who} proposed a trade, but there's nothing called {' or '.join(a['unknown'])} on this island"
+        if a.get("one_sided"):
+            return f"{who} proposed a trade with nothing on one side, so there was none"
+        offer = ("your offer: " if mine else f"{speaker}'s offer: ") + _sides(speaker, a["give"], other if mine else me,
+                                                                             a["want"], me)
+        return f"{offer}, but {problem_text(a['problem'], me)}, so there was no offer" if a.get("problem") else offer
+    if k in ("traded", "trade_failed"):
+        p = a["proposer"]
+        q = other if p == me else me
+        accepted = "you accepted" if mine else f"{speaker} accepted"
+        if k == "traded":
+            done = _sides(p, a["give"], q, a["want"], me).replace(" gives ", " gave ").replace(" give ", " gave ")
+            return f"{accepted}: {done}"
+        return f"{accepted}, but the trade fell through, nothing changed hands: {problem_text(a['problem'], me)}"
+    if k == "no_trade":
+        return (f"you accepted, but {other} had no trade on the table" if mine
+                else f"{speaker} accepted, but you had no trade on the table")
+    return ""
+
+
+def trade_table_text_v18(isl: Island, t: dict | None, vil: Villager, other: str, tries: int) -> str:
+    """Prompt version 18: the trade on the table, naming both people, with how many of your side you have."""
+    if not t:
+        return ""
+    me = vil.name
+    if t["proposer"] == me:
+        return f"On the table from you: {_sides(me, t['give'], other, t['want'], me)}, if {other} accepts.\n"
+    have = ", ".join(f"you have {(vil.bells if k == 'bells' else vil.inventory.get(k, 0)) or 'none'}"
+                     + (f" {k}" if len(t["want"]) > 1 else "") for k in t["want"])
+    line = f"On the table from {other}: {_sides(other, t['give'], me, t['want'], me)} ({have}). "
+    problem = isl.accept_problem(me, t)
+    line += ("You can't accept it (no room)" if problem.get("room") else "You can't accept it") if problem \
+        else "\"accept\": true makes the trade"
+    return line + ("; or offer another.\n" if tries > 0 else ".\n")
+
+
+def trade_sides(trade: dict, other: str) -> tuple:
+    """A reply's trade as (what the speaker gives, what they'd get). Prompt version 18 writes "you give <other>" and
+    "<other> gives you"; earlier versions "give" and "want". Either is read, whatever the version."""
+    give = want = None
+    for k, v in trade.items():
+        key = str(k).strip().lower()
+        if key == "give" or key.startswith("you give"):
+            give = v
+        elif key in ("want", "get") or key.endswith("gives you") or key.startswith("you get"):
+            want = v
+    return give, want
+
+
+def act_record(t: dict, other: str) -> str:
+    """For the record (day logs, the explorer; villagers never see it from prompt version 12): what a conversation
+    turn did, naming who gives what to whom. Built from the turn's structured acts, so it reads the same for any
+    run that kept them (from version 12); turns without them keep what was written then."""
+    acts = t.get("acts")
+    if not acts:
+        return t.get("act") or ""
+    s = t["speaker"]
+    out = []
+    for a in acts:
+        k = a["kind"]
+        if k == "gave":
+            out.append(f"gave {other} {_count(a['items'])}")
+        elif k == "failed":
+            out.append(f"tried to give {other} {_count(a['items'])}, but {problem_text(a['problem'])}")
+        elif k == "asked":
+            out.append(f"asked {other} for {_count(a['items'])}"
+                       + (f", but there's nothing called {' or '.join(a['unknown'])}" if a.get("unknown") else ""))
+        elif k == "proposed":
+            deal = f"{s} gives {_count(a['give'])}, {other} gives {_count(a['want'])}"
+            if a.get("over"):
+                out.append(f"tried to offer {other} another trade ({deal}), but none were left")
+            elif a.get("unknown"):
+                out.append(f"offered {other} a trade, but there's nothing called {' or '.join(a['unknown'])}")
+            elif a.get("one_sided"):
+                out.append(f"offered {other} a trade with nothing on one side")
+            elif a.get("problem"):
+                out.append(f"tried to offer {other} a trade ({deal}), but {problem_text(a['problem'])}")
+            else:
+                out.append(f"offered {other} a trade: {deal}")
+        elif k in ("traded", "trade_failed"):
+            p = a["proposer"]
+            q = s if p != s else other
+            deal = f"{p} gave {_count(a['give'])}, {q} gave {_count(a['want'])}"
+            out.append(f"accepted {p}'s trade: {deal}" if k == "traded" else
+                       f"accepted {p}'s trade ({p} gives {_count(a['give'])}, {q} gives {_count(a['want'])}), but it "
+                       f"fell through: {problem_text(a['problem'])}")
+        elif k == "no_trade":
+            out.append(f"accepted, but {other} had no trade on the table")
+    if t.get("leave") or (t.get("act") or "").endswith("then went their way"):
+        out.append("then went their way")
+    return "; ".join(out)
+
+
 def open_trade(turns: list[dict]) -> dict | None:
     """Prompt version 12: the trade on the table in a conversation: the latest one proposed, unless it has
     since been accepted (made or fallen through). A new proposal from either side replaces it."""
@@ -1085,16 +1300,23 @@ def last_chat_with(isl: Island, me: str, other: str) -> str:
              else at_place(c["place"]))
     turns = c["turns"][-LAST_CHAT_LINES:]
     lines = [f'{"You" if t["speaker"] == me else t["speaker"]}: {t["text"][:200]}'
-             + (f" [{turn_act_text(t, me, other, _v(isl) >= 13)}]" if t.get("act") or t.get("acts") else "")
+             + (f" [{turn_act_text(t, me, other, _v(isl) >= 13, _v(isl) >= 18)}]" if t.get("act") or t.get("acts") else "")
              for t in turns]
     return (f"The last time you talked with {other} before today (day {c['day']}, {clock(c['hour'])}, {where}):\n"
             + "\n".join(lines) + "\n\n")
 
 
-def exchange_line(e: dict, me: str) -> str:
-    """One thing that changed hands, as `me` saw it (prompt version 8)."""
+def exchange_line(e: dict, me: str, v18: bool = False) -> str:
+    """One thing that changed hands, as `me` saw it (prompt version 8). From 18 (`v18`) a trade names both sides."""
     mine = e["from"] == me
     other = e["to"] if mine else e["from"]
+    if e["how"] == "trade" and v18:  # e["from"] gave e["items"]; e["to"] gave e["got"]
+        mine_items, theirs = (e["items"], e["got"]) if mine else (e["got"], e["items"])
+        asked_mine = e.get("asked") if mine else e.get("asked_back")
+        asked_theirs = e.get("asked_back") if mine else e.get("asked")
+        return (f"you gave {other} {_count(mine_items)}" + (f" (which {other} had asked for)" if asked_mine else "")
+                + f" and {other} gave you {_count(theirs)}" + (" (which you had asked for)" if asked_theirs else "")
+                + ", in a trade")
     if e["how"] == "trade":
         if mine:  # asked: the taker had asked for e["items"]; asked_back: the giver had asked for e["got"]
             gave = _count(e["items"]) + (f" (which {other} had asked for)" if e.get("asked") else "")
@@ -1118,7 +1340,7 @@ def exchanges_with(isl: Island, me: str, other: str) -> str:
     if not ex:
         return ""
     shown = ex[-EXCHANGES_SHOWN:]
-    lines = [f"- day {e['day']}: {exchange_line(e, me)}" for e in shown]
+    lines = [f"- day {e['day']}: {exchange_line(e, me, _v(isl) >= 18)}" for e in shown]
     more = len(ex) - len(shown)
     return (f"Between you and {other} so far" + (f" (the latest {len(shown)}; {more} earlier)" if more else "")
             + ":\n" + "\n".join(lines) + "\n\n")
@@ -1166,7 +1388,7 @@ def night_facts(isl: Island, vil: Villager, offers: list | None) -> str:
     v12 = _v(isl) >= 12
     requests = request_lines(isl, me) if v12 else isl.favor_lines(me)
     return ("Things that changed hands today:\n"
-            + ("\n".join(f"- {exchange_line(e, me)}" for e in today) or "(nothing)") + "\n\n"
+            + ("\n".join(f"- {exchange_line(e, me, _v(isl) >= 18)}" for e in today) or "(nothing)") + "\n\n"
             + f"What you have tonight:\nBells: {vil.bells}{' in your wallet' if v12 else ''}\n{pockets_text(isl, vil)}\n"
             + f"Recipes you know: {', '.join(sorted(vil.recipes)) or 'none'}\n"
             + since_morning(isl, vil) + "\n"
