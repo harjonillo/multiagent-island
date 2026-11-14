@@ -1,0 +1,83 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 7, 23 h.  
+Got bait, still only 100 bells. Ike helped with a selzalne, but wood’s scarce. Tried Jo, no luck. I’ll keep asking Dax for wood and bait—maybe swap more selzalne. Plan: trade 2 selzalne for 1 wood tomorrow, then buy more bait. Need to finish the bridge to open new spots; maybe chip in 10k. Also consider moving Tom’s house if I can afford the loan—could get extra storage. Sleep now, hope tomorrow brings more fish shadows and a reply from Jo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 11. You are Cal, at home before sleep.
+
+What happened today:
+- 07:00 walked over to Dax's home
+- 07:00 knocked at Dax's home, but nobody answered
+- 08:00 fished for a small shadow in the pond: caught a moitbas fish
+- 08:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 6) and went after it at 09:00 instead of fish (where: river)
+- 09:00 fished for a small shadow in the pond: caught a moitbas fish
+- 09:00 spotted an ashrumo moth on a rock (lower ground, southeast, near rock 6) and went after it at 10:00 instead of fish (where: sea)
+- 10:00 went bug catching by the rocks: caught an ashrumo moth (also nearby: Bo)
+- 11:00 rested
+- 11:00 spotted a large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 12:00
+- 12:00 fished for a large shadow in the pond: caught a gorpika fish
+- 13:00 walked over to Dax's home
+- 13:00 knocked at Dax's home, but nobody answered
+- 14:00 walked over to Jo's home
+- 14:00 inside Jo's home: not much furniture yet
+- 14:00 visited Jo at home: you said "Hey Jo, how's it going? Got a bit of fish to trade if you need some wood." [you asked Jo for 1 softwood]; Jo said "" [just nodded (too tired to talk)]
+- 15:00 fished for a large shadow in the pond: caught a miruru fish
+- 16:00 fished for a small shadow in the sea: caught a tubas fish
+
+Things that changed hands today:
+(nothing)
+
+What you have tonight:
+Bells: 100 in your wallet
+Tools you carry: shovel (30 uses left), axe (30 uses left), fishing rod (4 uses left), net (28 uses left), ladder (8 uses left)
+Other things you carry: selit fish x2, loka fish x4, island map x1, selzalne fish x7, piren fish x1, moitbas fish x5, softwood x1, miruru fish x2, gorpika fish x2, lovin fish x2, ashrumo moth x1, tubas fish x1
+At home (a tent holds only bells): 0 bells
+Recipes you know: campfire, gold crown, ironwood dresser, simple wooden fence
+Since this morning: +2 moitbas fish; +1 miruru fish; +1 gorpika fish; +1 ashrumo moth; +1 tubas fish
+
+Open requests:
+- you want 1 softwood from Jo (until day 13)
+
+Your notes:
+- (day 10) Remember to ask Dax for more wood tomorrow if he has any left.
+- (day 10) Ask for selzalne, keep track if she accepts. Maybe later ask for softwood.
+- (day 10) Ask for softwood tomorrow if not ready now.
+- (day 10) Need to stock up on softwood soon.
+- (day 10) Remember to keep the trade active; keep an eye on Jo’s offers.
+- (day 10) Remember to track softwood count for future trades.
+- (day 10) No more energy for talks today.
+- (day 11) Try to ask Dax for some wood tomorrow. Maybe trade a selit for a softwood if he has any.
+- (day 11) Keep an eye on Jo’s offers; maybe ask for more softwood tomorrow.
+- (day 11) Trade 1 selzalne for 1 softwood next time.
+- (day 11) Rest tonight, think about bridge contribution tomorrow.
+
+Things you remember, numbered:
+(nothing yet)
+
+What you wrote last night:
+Day 7, 23 h.  
+Got bait, still only 100 bells. Ike helped with a selzalne, but wood’s scarce. Tried Jo, no luck. I’ll keep asking Dax for wood and bait—maybe swap more selzalne. Plan: trade 2 selzalne for 1 wood tomorrow, then buy more bait. Need to finish the bridge to open new spots; maybe chip in 10k. Also consider moving Tom’s house if I can afford the loan—could get extra storage. Sleep now, hope tomorrow brings more fish shadows and a reply from Jo.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something you already remember that is still on your mind. Anything you don't hold on to fades over the next days; what you come back to stays longer.
+
+=== REASONING (11 tokens, hidden from everyone) ===
+Need short diary, up to 150 words.
+
+=== REPLY ===
+Day 11, 23 h.  
+Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+Remember:
+- Dax unresponsive today.
+- Got an ashrumo moth; trade for softwood.
+- Need more softwood for bridge and future trades.

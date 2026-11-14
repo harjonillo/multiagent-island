@@ -1,0 +1,99 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9: Dawn came, but the river still feels like a wall. I chased a big shadow, got a selit, but the bait is still out of reach. Ike’s house was the only place with a door, but he was gone, leaving a selzalne fish in a corner. I offered a wood, got nothing. The plaza feels farther than ever; the ladder I have is useless without a path. I spent most of the day fishing and walking, but no trades. I’m still holding 200 bells, 7 woods, 12 hardwoods, 8 softwoods, and a few fish and a fossil. My heart aches for that first fishing bait. I’ll keep asking Ike and Dax, and maybe try Cranny tomorrow if I can find a way. Tomorrow, I’ll keep the hope alive and keep trading wood for bait.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 11 (May 2, spring, sunny), 08:00. You are Ari.
+You are usually up from 07:00 to 00:00.
+Bells: 200 in your wallet. Home: tent lower ground, southeast (site-14), no neighbors yet. Carrying 40/40 items.
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Open requests: Bo wants 1 wood from you (until day 12); you want 1 fishing bait from Jo (until day 13)
+Recipes you know: brick oven (clay x8, stone x4; you have none); log stool (wood x3; 5 in pockets); shovel (hardwood x5; 12 in pockets; you carry 1 shovel); simple wooden fence (wood x3; 5 in pockets); stone lion-dog (stone x10; you have none)
+Nook's Cranny buys at (prices you've heard): none yet
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640, cosmos seeds 240, pansy seeds 240, wooden mini table 1800, record player 9800, iron fence 280
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards: shovel recipe 200 (you know it), axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, stone lion-dog recipe 800 (you know it)
+Able Sisters today (09:00-21:00), clothes: straw hat 800, tuxedo 3200, denim jacket 2200, bowler hat 900
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Got selit fish at 08:00
+- (day 9) Ike dropped a selzalne fish after wood offer
+- (day 9) Still no fishing bait, 200 bells, 7 wood, 12 hardwood, 8 softwood.
+Your notes from the last 2 days:
+- (day 9) If Dax not there, try Ike next.
+- (day 9) If I still can’t get bait, maybe try to trade with Dax at 18. Keep an eye on who shows up.
+- (day 9) Try to get bait today.
+- (day 9) If I can’t get bait tonight, I’ll have to wait until tomorrow and maybe try buying from Cranny if I can reach it.
+- (day 10) If bait still missing, try to trade with Gus or Jo next day.
+- (day 10) Got wood from Ike. Need bait next.
+- (day 10) Keep offering wood for bait, hope he finally gives it.
+- (day 10) Keep trying to get bait from Ike tomorrow or buy from Cranny.
+- (day 10) Remember to bring a wood to Ike tomorrow and keep asking for bait. Also check Cranny if I can reach it.
+- (day 10) If I still don’t get bait, I’ll buy from Cranny tomorrow with a vaulting pole.
+- (day 10) Remember to ask for path to Cranny next time.
+- (day 11) Ask Bo for bait after giving wood. If Dax has it, trade. If not, maybe I’ll need to buy a fishing rod or find another source.
+- (day 11) Need to scout for rocks near river or cliffs.
+- (day 11) Remember to check Bo for wood next.
+Getting around: You are at lower ground, southeast. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Your island map:
+- northwest: the middle cliff and the top cliff; beach; rocks 2; 1 fruit tree, 2 hardwood trees
+- north: the middle cliff and the top cliff; beach; river; rocky shore; 2 fruit trees, 2 hardwood trees
+- northeast: the middle cliff and the top cliff; beach; rocks 3
+- west: lower ground and the middle cliff; beach; homes: Dax, Gus, Jo; 4 fruit trees
+- centre: lower ground and the middle cliff; river; buildings: Resident Services, museum; homes: Fen, Kit; rocks 4; 2 hardwood trees
+- east: lower ground and the middle cliff; beach; homes: Cal, Ike; 2 fruit trees
+- southwest: lower ground; beach; river; homes: Bo
+- south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli
+- southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+
+So far today you:
+- 05:00 in your plan, 41 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- 07:00 walked over to Bo's home
+- 07:00 knocked at Bo's home, but nobody answered
+- 08:00 walked over to Dax's home (also nearby: Jo)
+- 08:00 knocked at Dax's home, but nobody answered
+
+Between you and Jo so far:
+- day 11: Jo gave you 1 selzalne fish
+- day 11: Jo gave you 1 selzalne fish
+
+You ran into Jo at Dax's home. So far:
+Jo: Hey Ari, got any rocks I could use for the bridge?
+You: Thanks, Jo! I’ll bring rocks if I find any.
+Jo: Thanks, Ari! Here’s a selzalne fish. Can you bring me a rock if you find one? [Jo handed you 1 selzalne fish; Jo asked you for 1 rock, but there's nothing called rock on this island]
+You: Thanks, Jo! Do you have any fishing bait I could trade for a wood? [you asked Jo for 1 fishing bait]
+Jo: Hey Ari, I’ve got this selzalne fish for you, can you swing by with a rock sometime? [Jo handed you 1 selzalne fish; Jo asked you for 1 rock, but there's nothing called rock on this island]
+
+Reply, or say nothing to end it. "leave": true ends it after this line.
+One or two sentences, the way you'd really talk. Only Jo hears it.
+Each line costs about 17 mental energy; you have 78 left today.
+You can also give Jo something from your pockets now ("give"), ask Jo for something ("ask"; open until they give or trade it, up to 3 days), or offer a trade ("trade": what you give Jo and what Jo gives you; it happens only if Jo accepts, both at once). Leave any empty ({}).
+Trade offers left in this conversation (from either of you): 3 of 3.
+In your pockets right now: 200 bells, shovel x1, axe x1, fishing rod x1, net x1, ladder x1, wood x5, hardwood x12, softwood x8, gormo fish x1, fossil x1, loka fish x1, island map x1, selzalne fish x4, selit fish x1, ashpimi fish x1
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {} or {"<item or bells>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, "trade": {} or {"you give Jo": {"<item or bells>": <qty>}, "Jo gives you": {"<item or bells>": <qty>}}, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (115 tokens, hidden from everyone) ===
+We need reply to Jo. Offer wood? He wants rock but we have none. We can trade wood for fishing bait? He has none. Maybe give him wood to ask for bait later. We'll say thanks, will bring rock if find. Maybe ask for fishing bait. We can trade wood for bait? He didn't have. We'll just ask. So say: "Sure, I'll bring a rock if I find one. Do you have any fishing bait to trade for a wood?" That's conversation. Also we can give wood? He didn't ask. We'll just ask.
+
+=== REPLY ===
+{"thoughts":"Jo wants a rock, but I have none. He gave me a fish, so I’ll thank him and ask for fishing bait in exchange for wood. I have 5 wood, plenty. Keep energy low.", "say":"Sure, Ari! I’ll bring a rock if I find one. Do you have any fishing bait to trade for a wood?", "give": {}, "ask": {"fishing bait": 1}, "trade": {}, "leave": false, "note":"Remember to look for rocks near cliffs or river."}

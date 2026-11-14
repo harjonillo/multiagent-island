@@ -1,0 +1,38 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, 23:45.  
+Sun’s out, fish are good, but the bridge still feels miles away. Got 2 softwood from Cal and Dax, plus 2 miruru tonight—good for tomorrow’s fishing run. Bait is still a problem; I gave a selit to Dax and got a piece of softwood back, but he’s still silent. Cal’s offering more fish for softwood, so I’ll keep an eye on him. Dax keeps disappearing at the flowers—maybe he’s out fishing or hiding the rocks. I need to ask Eli tomorrow about the bridge fund, but first I’ll post a bait request. Sleep early, wake with the pond’s echo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 11 (May 2, spring, sunny), 07:00. You are Jo, at the museum.
+Nearby: Fen.
+Earlier today:
+- 07:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1. (also nearby: Fen)
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Cal gave 2 softwood, I traded 1 selzalne.
+- (day 9) Dax still wants bait, I owe him one.
+- (day 9) Bridge still 2k.
+Your notes from the last 2 days:
+- (day 10) Got a selit fish. Good for tomorrow’s fishing. Remember to ask Eli about bridge donation tomorrow.
+- (day 10) Keep track of softwood left after trade: 1. Save selit fish for future bait.
+- (day 10) Keep softwood for bridge, remember to ask Eli tomorrow.
+- (day 10) Remember to keep the second softwood for the bridge tomorrow.
+- (day 10) Keep the second softwood for tomorrow’s bridge plan. Ask Eli tomorrow about bridge donation.
+- (day 11) Ask Eli tomorrow for rock if Dax is still away.
+Mental energy left today: 119 (about 17 for each thing you say). Your plan for today: inward 80 (spent 30), outward 70 (spent 1), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (4 tokens, hidden from everyone) ===
+Need JSON.
+
+=== REPLY ===
+{"thoughts":"Need to get softwood for bridge, ask Eli tomorrow, keep Dax bait, maybe talk to Blathers again for fossils?","approach":"Fen","say":"Hey Fen, got any new fossils to show?"}

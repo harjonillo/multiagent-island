@@ -1,0 +1,98 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, 23:45.  
+Sun’s out, fish are good, but the bridge still feels miles away. Got 2 softwood from Cal and Dax, plus 2 miruru tonight—good for tomorrow’s fishing run. Bait is still a problem; I gave a selit to Dax and got a piece of softwood back, but he’s still silent. Cal’s offering more fish for softwood, so I’ll keep an eye on him. Dax keeps disappearing at the flowers—maybe he’s out fishing or hiding the rocks. I need to ask Eli tomorrow about the bridge fund, but first I’ll post a bait request. Sleep early, wake with the pond’s echo.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 11 (May 2, spring, sunny), 08:00. You are Jo.
+You are usually up from 07:00 to 00:00.
+Bells: 50 in your wallet. Home: tent lower ground, west (site-10), neighbors: Dax, Gus. Carrying 16/40 items.
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Open requests: Ari wants 1 fishing bait from you (until day 13)
+Recipes you know: iron fence (iron nugget x2; you have none); shell table (renrenzal shell x2, ashbastu shell x2, dalo shell x1; you have none); simple wooden fence (wood x3; you have none); street lamp (iron nugget x4, clay x2; you have none)
+Nook's Cranny buys at (prices you've heard): none yet
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640, cosmos seeds 240, pansy seeds 240, wooden mini table 1800, record player 9800, iron fence 280
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards: shovel recipe 200, axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, stone lion-dog recipe 800
+Able Sisters today (09:00-21:00), clothes: straw hat 800, tuxedo 3200, denim jacket 2200, bowler hat 900
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Cal gave 2 softwood, I traded 1 selzalne.
+- (day 9) Dax still wants bait, I owe him one.
+- (day 9) Bridge still 2k.
+Your notes from the last 2 days:
+- (day 9) Keep an eye on Dax’s movements; if he’s not home, maybe he’s out fishing. If he gives me a rock, trade it for wood next day. If he gives wood, trade it back for rock. Also remember to ask Eli about bridge donation tomorrow.
+- (day 9) Ask for a rock now, maybe trade selzalne later if he wants something else.
+- (day 9) Got the bait, keep an eye on Dax tomorrow.
+- (day 9) Keep the selzalne handy for future trades.
+- (day 9) Got softwood—will use it for bridge plan tomorrow.
+- (day 9) Keep track of selit usage for future fishing trips.
+- (day 10) Got a selit fish. Good for tomorrow’s fishing. Remember to ask Eli about bridge donation tomorrow.
+- (day 10) Keep track of softwood left after trade: 1. Save selit fish for future bait.
+- (day 10) Keep softwood for bridge, remember to ask Eli tomorrow.
+- (day 10) Remember to keep the second softwood for the bridge tomorrow.
+- (day 10) Keep the second softwood for tomorrow’s bridge plan. Ask Eli tomorrow about bridge donation.
+- (day 11) Ask Eli tomorrow for rock if Dax is still away.
+- (day 11) Keep the selit for next fishing run. Maybe ask for a rock later.
+- (day 11) Remember to keep the selit fish for next fishing run. Ask Eli about bridge donation tomorrow.
+- (day 11) Remember to keep the selzalne handy for future trades.
+- (day 11) Remember to trade selzalne for rock if he can find one.
+- (day 11) Keep track of rocks for bridge.
+Getting around: You are at lower ground, west. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+
+So far today you:
+- 07:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1. (also nearby: Fen)
+- 07:00 ran into Fen at the rocks: Fen said "Hey Jo, got any idea where I can find more bait or a map?"; you said "Hey Fen, here’s a selit fish for you. Good luck!" [you handed Fen 1 selit fish]; Fen said "Thanks, Jo! Got any bait to trade?" [Fen asked you for 1 bait, but there's nothing called bait on this island]; you said "Thanks! I’ll see if you have a rock I can take." [you asked Fen for 1 rock, but there's nothing called rock on this island]; Fen said "Thanks, Jo!" [then you went your ways]
+- 08:00 walked over to Dax's home (also nearby: Ari)
+- 08:00 knocked at Dax's home, but nobody answered
+
+Between you and Ari so far:
+- day 11: you gave Ari 1 selzalne fish
+- day 11: you gave Ari 1 selzalne fish
+- day 11: Ari gave you 1 selit fish
+
+You ran into Ari at Dax's home. So far:
+You: Hey Ari, got any rocks I could use for the bridge?
+Ari: Thanks, Jo! I’ll bring rocks if I find any.
+You: Thanks, Ari! Here’s a selzalne fish. Can you bring me a rock if you find one? [you handed Ari 1 selzalne fish; you asked Ari for 1 rock, but there's nothing called rock on this island]
+Ari: Thanks, Jo! Do you have any fishing bait I could trade for a wood? [Ari asked you for 1 fishing bait (you have none)]
+You: Hey Ari, I’ve got this selzalne fish for you, can you swing by with a rock sometime? [you handed Ari 1 selzalne fish; you asked Ari for 1 rock, but there's nothing called rock on this island]
+Ari: Sure, Ari! I’ll bring a rock if I find one. Do you have any fishing bait to trade for a wood? [Ari asked you for 1 fishing bait (you have none)]
+You: Hey Ari, I’ll trade you a selit fish for a rock, if you can swing one over. [you proposed a trade, but there's nothing called rock on this island]
+Ari: Thanks! Here’s a selit fish, can you trade me a fishing bait? [Ari handed you 1 selit fish; Ari asked you for 1 fishing bait (you have none)]
+
+Reply, or say nothing to end it. "leave": true ends it after this line.
+One or two sentences, the way you'd really talk. Only Ari hears it.
+Each line costs about 17 mental energy; you have 29 left today. This is probably the last thing you'll have the energy to say today.
+You can also give Ari something from your pockets now ("give"), ask Ari for something ("ask"; open until they give or trade it, up to 3 days), or offer a trade ("trade": what you give Ari and what Ari gives you; it happens only if Ari accepts, both at once). Leave any empty ({}).
+Trade offers left in this conversation (from either of you): 2 of 3.
+In your pockets right now: 50 bells, shovel x1, axe x1, fishing rod x1, net x1, ladder x1, selit fish x1, loka fish x1, fossil x2, tugorpi fish x2, softwood x1, miruru fish x2, nevin moth x1, moitbas fish x1
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {} or {"<item or bells>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, "trade": {} or {"you give Ari": {"<item or bells>": <qty>}, "Ari gives you": {"<item or bells>": <qty>}}, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (214 tokens, hidden from everyone) ===
+We need to respond with JSON. We have mental energy 29, each line costs 17, we can do 1 line. We should maybe give Ari a selit fish to get a rock? But no rocks. Maybe ask for rock? But rock not exist. Maybe ask for a fishing bait? He wants bait. We have none. But we can trade selit fish for rock? He wants bait. We can give him selit fish and ask for fishing bait. That seems good. Use trade. So trade: give selit fish, get fishing bait. He wants fishing bait. So trade. That uses 17 energy. So produce JSON with trade. We don't give bells. So:
+
+{"thoughts":"Need bait. Trade selit for bait. 17 energy used.", "say":"", "give":{}, "ask":{}, "trade":{"you give Ari":{"selit fish":1},"Ari gives you":{"fishing bait":1}}, "leave":false, "note":"Remember to keep bait for tomorrow."}
+
+=== REPLY ===
+{"thoughts":"Need bait. Trade selit for bait. 17 energy used.","say":"","give":{},"ask":{},"trade":{"you give Ari":{"selit fish":1},"Ari gives you":{"fishing bait":1}},"leave":false,"note":"Remember to keep bait for tomorrow."}

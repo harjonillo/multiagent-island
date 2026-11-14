@@ -1,0 +1,44 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9: Dawn came, but the river still feels like a wall. I chased a big shadow, got a selit, but the bait is still out of reach. Ike’s house was the only place with a door, but he was gone, leaving a selzalne fish in a corner. I offered a wood, got nothing. The plaza feels farther than ever; the ladder I have is useless without a path. I spent most of the day fishing and walking, but no trades. I’m still holding 200 bells, 7 woods, 12 hardwoods, 8 softwoods, and a few fish and a fossil. My heart aches for that first fishing bait. I’ll keep asking Ike and Dax, and maybe try Cranny tomorrow if I can find a way. Tomorrow, I’ll keep the hope alive and keep trading wood for bait.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 11 (May 2, spring, sunny), 13:00. You are Ari, at home.
+You just spotted:
+1. a very large fish shadow in the river (lower ground, southeast, near rock 6)
+Earlier today:
+- 08:00 spotted a nevin moth on a tree (lower ground, west) and went after it at 09:00
+- 09:00 looked for bugs around the trees, but there seem to be none there at this time
+- 10:00 Bo visited you at home: Bo said "Hey Ari, can I trade 3 wood for a fishing bait?" [Bo's offer: Bo gives you 3 wood, you give Bo 1 fishing bait; then you went your ways]
+- 12:00 too tired to plan, so you planned nothing new
+- 13:00 Ike visited you at home: Ike said "Hey Ari, could you spare some bait for me?" [Ike's offer: Ike gives you 1 wood, you give Ike 1 fishing bait; then you went your ways]
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Got selit fish at 08:00
+- (day 9) Ike dropped a selzalne fish after wood offer
+- (day 9) Still no fishing bait, 200 bells, 7 wood, 12 hardwood, 8 softwood.
+Your notes from the last 2 days:
+- (day 11) Ask Bo for bait after giving wood. If Dax has it, trade. If not, maybe I’ll need to buy a fishing rod or find another source.
+- (day 11) Need to scout for rocks near river or cliffs.
+- (day 11) Remember to check Bo for wood next.
+- (day 11) Remember to look for rocks near cliffs or river.
+- (day 11) Remember to ask for rock later if possible.
+- (day 11) Remember to collect a rock eventually or find another source of bait.
+At 14:00 you have nothing planned.
+Actions left today: 7 of 10. Mental energy left today: 15.
+
+You can go after one of them at 14:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (91 tokens, hidden from everyone) ===
+We choose to go to Ike? but Ike gave bait. We need bait. Maybe go to Bo for wood? already did. Maybe go to river to try fishing? need bait. Maybe go to Dax? but unknown. Let's go to river to try fishing? We have no bait. Maybe go to Cranny? not near. Maybe go to rock near river to get rock. Let's choose 1: go to river to try fishing.
+
+=== REPLY ===
+{"thoughts":"Need bait, but maybe try fishing anyway to see if a fish appears with no bait. No better option now.", "go":1}
