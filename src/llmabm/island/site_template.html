@@ -624,22 +624,28 @@ function econHTML(name, sel) {
 
 // A villager's assets at the end of the last day picked (with the change since the first, if several):
 // bells, the items they hold against their room for them, what those are worth, home and clothes.
-// There is one inventory; the house only adds storage to the pockets.
+// Pockets and what is kept at home (apart from prompt version 12 on) are shown as one, with the split named
+// whenever something is at home.
 function assetsHTML(name, sel) {
   const A = sel[sel.length - 1].assets?.[name], F = sel[0].assets?.[name];
   if (!A) return "";
   const multi = sel.length > 1, room = A.pockets + A.storage;
+  const homeN = (a) => Object.values(a.home_items || {}).reduce((t, n) => t + n, 0);
+  const bells = (a) => a.bells + (a.home_bells || 0), count = (a) => a.n + homeN(a), worth = (a) => a.value + (a.home_value || 0);
+  const split = (pockets, home) => (home ? ` · ${fmt(pockets)} in pockets, ${fmt(home)} at home` : "");
   const change = (a, b) => (a === b ? "no change" : `${a < b ? "+" : "−"}${fmt(Math.abs(b - a))} since day ${sel[0].day}`);
   // Items, with recipe cards ("<recipe> recipe") apart: a card for a recipe they don't know is learned on the
   // spot, so a card still held is a spare copy. "axe" is the iron one; the stone axe is named as such.
   const ITEM_NAME = {axe: "axe (iron)"};
   const chips = (list) => `<div class="items">${list.map(([k, n]) => `<span>${esc(ITEM_NAME[k] || k)}${n > 1 ? ` ×${n}` : ""}</span>`).join("")}</div>`;
-  const kinds = A.items ? Object.entries(A.items).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])) : [];
+  const held = {...(A.items || {})};
+  for (const [k, n] of Object.entries(A.home_items || {})) held[k] = (held[k] || 0) + n;
+  const kinds = A.items ? Object.entries(held).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])) : [];
   const cards = kinds.filter(([k]) => k.endsWith(" recipe")), things = kinds.filter(([k]) => !k.endsWith(" recipe"));
   const items = !A.items
     ? `<div class="small" style="margin-top:10px">Which items: not recorded for day ${sel[sel.length - 1].day} (only counted).</div>`
     : kinds.length
-      ? `<details class="held" open><summary><span class="tri" aria-hidden="true"></span>Everything they hold · ${plural(kinds.length, "kind")}, ${plural(A.n, "item")}</summary>
+      ? `<details class="held" open><summary><span class="tri" aria-hidden="true"></span>Everything they hold · ${plural(kinds.length, "kind")}, ${plural(count(A), "item")}</summary>
           ${things.length ? chips(things) : ""}
           ${cards.length ? `<div class="small" style="margin-top:8px">Spare recipe cards (copies of recipes they already know; they can sell or give them)</div>${chips(cards)}` : ""}</details>`
       : '<div class="small" style="margin-top:10px">Holding nothing.</div>';
@@ -647,9 +653,9 @@ function assetsHTML(name, sel) {
   const wear = Object.values(A.wearing || {});
   return `<div class="sec"><div class="label">Assets · end of day ${sel[sel.length - 1].day}</div>
     <div class="assets">
-      <div><div class="n">${fmt(A.bells)}</div><div class="small">bells${A.loan ? ` · owes ${fmt(A.loan)}` : ""}${multi ? `<br>${change(F.bells, A.bells)}` : ""}</div></div>
-      <div><div class="n">${fmt(A.n)}<span class="of"> / ${fmt(room)}</span></div><div class="small">items held${multi ? `<br>${change(F.n, A.n)}` : ""}</div></div>
-      <div><div class="n">${fmt(A.value)}</div><div class="small">items' worth at Cranny prices</div></div>
+      <div><div class="n">${fmt(bells(A))}</div><div class="small">bells${split(A.bells, A.home_bells)}${A.loan ? ` · owes ${fmt(A.loan)}` : ""}${multi ? `<br>${change(bells(F), bells(A))}` : ""}</div></div>
+      <div><div class="n">${fmt(count(A))}<span class="of"> / ${fmt(room)}</span></div><div class="small">items held${split(A.n, homeN(A))}${multi ? `<br>${change(count(F), count(A))}` : ""}</div></div>
+      <div><div class="n">${fmt(worth(A))}</div><div class="small">items' worth at Cranny prices${split(A.value, A.home_value)}</div></div>
     </div>
     ${items}
     <div class="alist">
