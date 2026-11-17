@@ -1,5 +1,5 @@
-"""Every prompt a villager saw, for the explorer: read from <run_dir>/prompts/ (written while the run
-logs prompts, the default from November 2026) and split into one script per day next to the page.
+"""Every prompt a villager saw, for the explorer: read from <run_dir>/villagers/<name>/prompts/ and, for
+Isabelle and older runs, <run_dir>/prompts/ (written while the run logs prompts, the default from November 2026) and split into one script per day next to the page.
 
 A day's file is loaded only when someone opens a prompt on the page, so the page itself stays small. It
 is a script rather than JSON so that it also loads when the page is opened from disk (file://), where
@@ -37,8 +37,23 @@ def _parts(text: str) -> dict:
     return out
 
 
-def _call(path: Path) -> dict | None:
-    m = _NAME.match(path.stem)
+def prompt_files(run_dir: Path, villagers: list[str]) -> list[tuple[Path, str | None]]:
+    """Every prompt file of a run, with whose folder it is in: villagers/<name>/prompts/<tag>.txt for a
+    villager's calls, and prompts/<tag>_<name>.txt for Isabelle's (and, in runs from before villagers had
+    their own folders, for everyone's; the name is then None here and read from the file name)."""
+    run_dir = Path(run_dir)
+    out = [(p, None) for p in sorted((run_dir / "prompts").glob("d*.txt"))]
+    for n in villagers:
+        out += [(p, n) for p in sorted((run_dir / "villagers" / n / "prompts").glob("d*.txt"))]
+    return out
+
+
+def _call(path: Path, owner: str | None = None) -> dict | None:
+    stem = path.stem
+    if owner:  # <tag>.txt or <tag>_<n>.txt in the villager's folder: the same call as <tag>_<name>[_<n>].txt
+        tag, _, n = stem.rpartition("_")
+        stem = f"{tag}_{owner}_{n}" if tag and n.isdigit() else f"{stem}_{owner}"
+    m = _NAME.match(stem)
     if not m:
         return None
     day, plan, hour, kind, reflect, isabelle, name, seq = m.groups()
@@ -55,7 +70,7 @@ def _call(path: Path) -> dict | None:
         kind, hour = "isabelle", None
     else:
         kind, hour = kind or "evening", int(hour)
-    return {"id": path.stem, "day": int(day), "kind": kind if kind in KINDS else "other", "hour": hour,
+    return {"id": stem, "day": int(day), "kind": kind if kind in KINDS else "other", "hour": hour,
             "name": name, "seq": int(seq or 1), **parts}
 
 
@@ -68,14 +83,13 @@ def _order(c: dict) -> tuple:
 def build(run_dir: Path, days: int, villagers: list[str]) -> tuple[dict | None, dict[int, dict]]:
     """(index, files): the index for the page's data, {day: {name: [[id, kind, hour], ...]}} in the order
     each villager made them, and each day's file contents. (None, {}) when the run kept no prompts."""
-    folder = Path(run_dir) / "prompts"
-    if not folder.is_dir():
-        return None, {}
     by_day: dict[int, list[dict]] = defaultdict(list)
-    for p in sorted(folder.glob("d*.txt")):
-        c = _call(p)
+    for p, name in prompt_files(run_dir, villagers):
+        c = _call(p, name)
         if c and c["day"] < days and (c["name"] in villagers or c["kind"] == "isabelle"):
             by_day[c["day"]].append(c)
+    if not by_day and not (Path(run_dir) / "prompts").is_dir() and not (Path(run_dir) / "villagers").is_dir():
+        return None, {}
     index, files = {}, {}
     for day, calls in sorted(by_day.items()):
         calls.sort(key=_order)

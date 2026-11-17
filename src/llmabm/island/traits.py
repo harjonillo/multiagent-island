@@ -8,7 +8,7 @@ alongside, not scored.
 Outputs (written by `write_traits`):
   traits_daily.csv    one row per villager per day: behavioural metrics
   villagers_env.csv   what each villager was dealt: homesite and reachability
-  selves/<name>.md    what each villager wrote to themselves, night by night
+  villagers/<name>/pages.md   what each villager wrote to themselves, night by night
   traits_divergence.png   how far apart villagers are on each metric, day by day
   traits_profile.png      each villager's recent behavioural profile, z-scored
 """
@@ -285,18 +285,9 @@ def write_traits(run: Run, out_dir: Path) -> list[Path]:
             w.writerow([n, *[env[n].get(c, "") for c in cols]])
     paths.append(p)
 
-    sdir = out_dir / "selves"
-    sdir.mkdir(exist_ok=True)
-    by = defaultdict(list)
-    for e in run.of("reflection"):
-        by[e["agent"]].append(e)
-    for n, evs in by.items():
-        lines = [f"# {n}: what they wrote to themselves, night by night", ""]
-        for e in evs:
-            lines += [f"## Day {e['day']}", "", e.get("self_doc") or "(none)", ""]
-        (sdir / f"{n}.md").write_text("\n".join(lines))
-    if by:
-        paths.append(sdir)
+    from .villager_files import write_pages
+
+    paths += write_pages(run, out_dir)
 
     paths += _plots(run, out_dir, m, names, days)
     return paths

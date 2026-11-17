@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11.  
+Got a selzalne, gormo, and loka today – good haul. Fen still a ghost, but he traded a bait for a selit, so I’m one bait short. No logs yet. I’m keeping the selit close, maybe another trade tomorrow. Still no vaulting pole. I’ll keep fishing the river, maybe more large fish. Bells are fine, but I need to save for tools.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 12 (May 3, spring, rain), 08:00. You are Kit, at the river.
+Nearby: Fen.
+Earlier today:
+- 05:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- 07:00 fished for a medium shadow in the river: caught a selzalne fish
+- 07:00 spotted a medium fish shadow in the river (lower ground, centre) and went after it at 08:00 instead of fish (where: river)
+- 08:00 fished for a medium shadow in the river: caught a selzalne fish (also nearby: Fen)
+Things you remember (anything you don't hold on to at night fades):
+- (day 10) 1 selit left for trade
+- (day 11) One selit trade for bait with Fen.
+- (day 11) Three new fish: selzalne, gormo, loka.
+- (day 11) Still no map or log.
+Your notes from the last 2 days:
+- (day 10) Keep track of bait count after each trade.
+- (day 10) Remember to ask Fen for the second map and a small log if he can. If Dax says no, try Fen again tomorrow. Keep bait count low.
+- (day 11) Try to trade selit for bait tomorrow, maybe Fen will give a map then.
+- (day 11) Keep bait low, try Fen again tomorrow.
+- (day 11) Keep the second selit for tomorrow, maybe trade for a map later.
+- (day 12) Keep an eye on the map, maybe trade the selit next time.
+Mental energy left today: 118 (about 17 for each thing you say). Your plan for today: inward 70 (spent 32), outward 80 (spent 0), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (4 tokens, hidden from everyone) ===
+Need JSON.
+
+=== REPLY ===
+{"thoughts":"Need bait back, maybe trade selit again. Fen nearby, maybe give map or log. Keep bait low.", "approach":"Fen","say":"Hey Fen, got a second selit. Can you trade it for a map or a log?"}

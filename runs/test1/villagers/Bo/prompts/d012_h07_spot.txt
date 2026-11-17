@@ -1,0 +1,51 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Still no bait, no fish, no bells.  
+Ari didn’t answer, but I finally got 1 wood from him for the trade—still 7 wood left.  
+Gus is still silent, but I’m not giving up.  
+I dug a stump, cleared a spot, but pockets full when I tried to fish.  
+Shovels 28/30 uses, ladder 10 uses.  
+Plan: tomorrow bring 3 wood to Dax or Kit, maybe try Gus again.  
+Watch the river, maybe a fish will appear.  
+Sleep is thin, but I’ll keep pushing.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 07:00. You are Bo, at Ari's home.
+You just spotted:
+1. a rune moth on a rock (lower ground, southeast, near rock 6)
+2. a large fish shadow in the river (lower ground, southeast, near rock 6)
+Earlier today:
+- 07:00 walked over to Ari's home
+- 07:00 knocked at Ari's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ladder 22 uses left, need more wood
+- (day 10) Shovel uses 29 left.
+- (day 11) 28 shovel uses left
+- (day 11) Gus wants 1 bait from me tomorrow
+Your notes from the last 2 days:
+- (day 10) If Ari has wood, trade for shovel later. If Dax gives bait, fish tomorrow. Stay tuned.
+- (day 11) Keep 3‑5 wood in reserve for tomorrow's bait trade. If Dax or Gus don’t answer, maybe try Ari for a second wood later.
+- (day 11) Keep 4 wood for future trades. Ask Ari for path next time.
+- (day 11) Remember to keep 3‑5 wood for next bait trade. Keep an eye on Ari for any new offers.
+- (day 11) Tomorrow: bring 3 wood to Ari, maybe try Dax or Gus for bait.
+- (day 12) If Ari doesn’t answer, maybe try again tomorrow. Keep 3 wood reserve.
+At 08:00 you planned: visit (who: Dax).
+Actions left today: 5 of 10. Mental energy left today: 126.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (75 tokens, hidden from everyone) ===
+Need to decide. We have 5 actions left. Should we go after Dax at 08:00? We need bait. We have 7 wood? Actually last notes: 7 wood left after trade with Ari. Need 3-5 wood reserve. We have 7 wood. Maybe go to Dax to get bait. So go 1.
+
+=== REPLY ===
+{"thoughts":"I have 7 wood, need 3‑5 for bait. Dax can give me bait tomorrow if I give wood. I'll go to Dax now at 08:00.", "go":1}

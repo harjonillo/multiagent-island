@@ -39,8 +39,10 @@ from .prompts import (PROMPT_CHANGES, PROMPT_VERSION, BOARD_CHARS, TRADE_TRIES, 
                       encounter_prompt, evening_prompt, plaza_prompt, spot_prompt, action_text,
                       announcement_text, inbox_text, isabelle_announce_prompt,
                       light_system_prompt, notice_prompt, reflect_prompt,
-                      isabelle_summary_prompt, plan_prompt, system_prompt)
+                      isabelle_summary_prompt, plan_prompt, system_prompt,
+                      island_101, island_101_closed, island_101_open)
 from .energy import MentalEnergy
+from .villager_files import prompt_dir
 from .memory import consolidate, forget, settings as memory_settings, split_picks
 from .options import options_text, plan_options, read_picks, unread_line
 from .grid import GridSpace
@@ -234,17 +236,20 @@ class IslandSimulation:
         return state
 
     def _prompt_file(self, tag: str, name: str) -> Path:
-        """Where this call's prompt is logged: <tag>_<name>.txt for the first call with that tag (a day,
-        an hour and a kind of call), then <tag>_<name>_2.txt and so on, so a villager's several turns in one
-        conversation are all kept. The count starts again in each process, so a resume that replays a day
-        writes the same files again."""
+        """Where this call's prompt is logged. A villager's calls go in their own folder,
+        villagers/<name>/prompts/<tag>.txt for the first call with that tag (a day, an hour and a kind of
+        call), then <tag>_2.txt and so on, so their several turns in one conversation are all kept. Calls
+        that are nobody's (Isabelle's) go in prompts/<tag>_<name>.txt. The count starts again in each
+        process, so a resume that replays a day writes the same files again."""
         with _PROMPT_LOCK:
             seq = self.__dict__.setdefault("_prompt_seq", Counter())
             seq[(tag, name)] += 1
             n = seq[(tag, name)]
-        d = self.run_dir / "prompts"
-        d.mkdir(exist_ok=True)
-        return d / (f"{tag}_{name}.txt" if n == 1 else f"{tag}_{name}_{n}.txt")
+        d, stem = prompt_dir(self.run_dir, name if name in self.isl.v else None), tag
+        if name not in self.isl.v:
+            stem = f"{tag}_{name}"
+        d.mkdir(parents=True, exist_ok=True)
+        return d / (f"{stem}.txt" if n == 1 else f"{stem}_{n}.txt")
 
     def _intervene(self, from_day: int, what: str, details: list[str]) -> None:
         """Record a deliberate mid-run change, in the events and in the manifest."""
@@ -435,9 +440,12 @@ class IslandSimulation:
 
     def _call(self, name: str, user: str, tag: str, system: str | None = None, backend_name: str | None = None,
               max_tokens: int | None = None, free_text: bool = False, kind: str | None = None, what: str = "other",
-              social: str = ""):
+              social: str = "", open_101: bool = False, free: str = ""):
         """One LLM call. `social` is the part of the prompt that is other villagers' mail: reading it
-        is booked as talking, whatever kind of call carries it."""
+        is booked as talking, whatever kind of call carries it. With `open_101` (prompt version 19: plans, the
+        plaza, conversations) a reply that opens the Island 101 is answered with the same prompt, the
+        reference open in it, and that second reply is the one returned. Neither the reply that opens it nor
+        reading the reference (`free`: text in the prompt that isn't charged) costs mental energy."""
         if backend_name is None:
             backend_name = self.override or self.sc.villagers[name].model
         backend = self.backends[backend_name]
@@ -474,18 +482,39 @@ class IslandSimulation:
         else:
             obj, err = parse_action_obj(reply.text)
             thought = " ".join(str((obj or {}).get(k) or "") for k in ("thoughts", "note"))
+        if open_101 and name in self.isl.v and isinstance(obj, dict) and obj.get("open"):
+            closed = island_101_closed(self.isl)
+            if closed and closed in user:
+                opened = island_101_open(self.isl)
+                self.energy.record(name, None, "lookup", self._need(name, user), self.energy.points(reply.text), 0.0,
+                                   immediate=threading.current_thread() is threading.main_thread(),
+                                   hidden=reply.reasoning_tokens / self.energy.tpp)
+                self._looked_up(name, "plaza" if what == "evening" else what, len(island_101(self.isl)))
+                return self._call(name, user.replace(closed, opened), tag, system=system, backend_name=backend_name,
+                                  max_tokens=max_tokens, kind=kind, what=what, social=social, free=opened)
         if name in self.isl.v:
-            read = self._need(name, user)
+            read = max(0.0, self._need(name, user) - self.energy.points(free))
             self.energy.record(name, kind, what, read, self.energy.points(reply.text), self.energy.points(thought),
                                immediate=threading.current_thread() is threading.main_thread(),
                                fixed=self.energy.points(msgs[0]["content"], user) - read,
                                social=self.energy.points(social), hidden=reply.reasoning_tokens / self.energy.tpp)
         return reply, obj, err
 
+    def _looked_up(self, name: str, during: str, entries: int) -> None:
+        """Record that a villager opened the Island 101. Calls made in parallel are recorded afterwards, in
+        name order, so a resumed run logs exactly the same."""
+        if threading.current_thread() is threading.main_thread():
+            self.log("lookup", day=self.isl.day, agent=name, during=during, entries=entries)
+        else:
+            with _PROMPT_LOCK:
+                self.__dict__.setdefault("_lookups", []).append((name, during, entries))
+
     def _parallel(self, fn, names):
         with ThreadPoolExecutor(self.concurrency) as pool:
             out = dict(zip(names, pool.map(fn, names)))
         self.energy.settle()
+        for name, during, entries in sorted(self.__dict__.pop("_lookups", [])):
+            self.log("lookup", day=self.isl.day, agent=name, during=during, entries=entries)
         return out
 
     # --- main loop ---------------------------------------------------------
@@ -845,7 +874,7 @@ class IslandSimulation:
                               "act": "just nodded (too tired to talk)"})
                 break
             reply, obj, err = self._call(speaker, user, f"d{d:03d}_h{h % 24:02d}_chat", system=self.talk_systems[speaker],
-                                         kind="talking", what="chat")
+                                         kind="talking", what="chat", open_101=True)
             say = str((obj or {}).get("say") or "").strip()[:500]
             turn = {"speaker": speaker, "text": say, "thoughts": _thoughts(obj), "error": err}
             self._chat_acts(d, speaker, other, obj or {}, turn, turns)
@@ -1096,7 +1125,8 @@ class IslandSimulation:
             self.first_plan[name] = False
             mail = inbox_text(vil) if vil.inbox else ""
             vil.inbox = vil.inbox[INBOX_SHOWN:]  # what was shown has been read
-            return self._call(name, user, f"d{d:03d}_p{phase}", kind="planning", what="plan", social=mail)
+            return self._call(name, user, f"d{d:03d}_p{phase}", kind="planning", what="plan", social=mail,
+                              open_101=True)
 
         results = self._parallel(plan, who)
         for name in who:
@@ -1366,7 +1396,7 @@ class IslandSimulation:
             mail = inbox_text(vil) if vil.inbox else ""
             vil.inbox = vil.inbox[INBOX_SHOWN:]
             return self._call(name, user, f"d{d:03d}_h{h % 24:02d}_plaza", system=self.talk_systems[name],
-                              kind="talking", what="evening", social=mail)
+                              kind="talking", what="evening", social=mail, open_101=True)
 
         results = self._parallel(turn, there)
         order = list(there)

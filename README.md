@@ -47,7 +47,7 @@ same seed (or `llmabm resume` it the next day): cached replies replay the finish
 A resume that switched the prompt version (`--prompt-version`) needs the flag again until its
 first day finishes, because the checkpoint it replays from still has the old version. Small models sometimes return broken
 JSON; check the error count in `summary.txt` before reading much into a run. A run saves exactly what
-each villager saw in `prompts/` (turn it off with `--no-log-prompts`); the explorer shows it.
+each villager saw in their folder, `villagers/<name>/prompts/` (turn it off with `--no-log-prompts`); the explorer shows it.
 
 Other providers (Gemini, Cerebras, Mistral, NVIDIA, OpenRouter, or a local model through Ollama
 with no key) are in `config/models.yaml`: put their key in `.env` and pass `--backend <name>`.
@@ -58,11 +58,12 @@ See [Models, free tiers and caching](#models-free-tiers-and-caching).
 | what | where |
 |---|---|
 | daily logs and conversations | `days/day_NNN.md`, hour by hour; private thoughts are marked 🔒 |
-| reflections | `selves/<name>.md`, night by night, and at the end of each day log |
+| reflections | `villagers/<name>/pages.md`, night by night, and at the end of each day log |
 | Isabelle's report | `days/day_NNN_isabelle.md` |
 | plans | the reasoning is in the day logs; the full scheduled and dropped lists are `plan` events in `events.jsonl` |
 | everything, raw | `events.jsonl`, including each model's raw reply |
-| prompts | `prompts/` (unless `--no-log-prompts`): one file per call, what the villager was shown, then the model's hidden reasoning and its reply. A villager's second call with the same tag (say, another turn in the same conversation hour) is `<tag>_<name>_2.txt` |
+| prompts | `villagers/<name>/prompts/` (unless `--no-log-prompts`): one file per call, what the villager was shown, then the model's hidden reasoning and its reply. A villager's second call with the same tag (say, another turn in the same conversation hour, or the same prompt again with the Island 101 open) is `<tag>_2.txt`. Isabelle's calls are in `prompts/` |
+| each villager | `villagers/<name>/`: `profile.md` (who they are), `memory.md` (what they carry from earlier days), `assets.md` (what they own, now and day by day), `pages.md` and `prompts/` |
 
 `llmabm analyze <run_dir>` rebuilds the logs, summary and plots from `events.jsonl` without any
 LLM calls. More under [Outputs](#outputs).
@@ -84,9 +85,11 @@ that touches `runs/`, `src/` or `data/` (or when run by hand from the Actions ta
 package, runs `llmabm site runs --out _site` and deploys `_site/`: the Experiments page at the site's
 root and each run at `<run>/`. The build makes no LLM calls.
 
-A run is published when its `manifest.json` and `events.jsonl` are committed; everything else in a
-run directory stays ignored, and the site is built from those two files, plus `prompts/` if that is
-committed too. The prompts are what the "How they work" tab's examples and each villager's Prompts
+A run is published when its `manifest.json` and `events.jsonl` are committed. The site is built from
+those two files, plus the prompts (`villagers/<name>/prompts/` and `prompts/`) if they are committed too.
+Each villager's folder can be committed whole, so their `profile.md`, `memory.md`, `assets.md` and
+`pages.md` can be read on GitHub (the site doesn't use them); everything else in a run directory stays
+ignored. The prompts are what the "How they work" tab's examples and each villager's Prompts
 section on the Days tab show (loaded a day at a time, so the page stays small); without them the
 site says the run didn't keep its prompts. They are large (test1: about 7.6 MB of text for 10 days,
 1.3 MB compressed in git). To publish a run:
@@ -118,7 +121,7 @@ git add runs/<run>/manifest.json runs/<run>/events.jsonl runs/<run>/prompts
 git commit -m "Publish <run> through day N" && git push
 ```
 
-The site shows the villagers' private thoughts, notes and nightly pages (and, with `prompts/`, every
+The site shows the villagers' private thoughts, notes and nightly pages (and, with the prompts, every
 prompt and the model's hidden reasoning), and anyone with the link
 can read it. The villagers themselves can't: they are model calls with no web access, and their
 prompts only ever hold their own thoughts, notes and pages (conversations pass on only what was said
@@ -332,6 +335,15 @@ villagers made plans around a "bridge rock".
 side: in test1 most replies to an offer asked for the same thing back). The offer on the table, each
 turn's tag, what has changed hands and the day logs all say who gives what to whom, never "X for Y",
 and a request to you says how many of it you have.
+
+**The Island 101, from prompt version 19.** As in Animal Crossing, the island has a reference with
+the fun facts of Isabelle's morning announcements so far, the same for every villager, one more
+each day. It is looked up, not shown. A plan, a turn at the plaza and a turn in a conversation say
+how many facts are in it, closed; a reply of only `{"open": "island 101"}` gets the same prompt again
+with it open, once per prompt. Opening it takes no action, no hour and no mental energy. It is worked
+out from the rules as they are now, so nothing in it is out of date, and what Tom Nook or Isabelle
+answer when asked isn't in it. Each lookup is a `lookup` event, in the day logs and counted per
+villager in `summary.txt`.
 
 **Shared resources.** Everything refills at 05:00 unless noted.
 
@@ -775,7 +787,7 @@ write. Their old page stays.
 **Hidden reasoning.** Reasoning models (gpt-oss on Groq, for example) think before they answer,
 in text the villager never writes down. That reasoning is always recorded: the provider's
 reasoning token count per villager and call type goes into each day's `energy` event and the
-summary, and the reasoning text itself is saved after each prompt in `prompts/`. By
+summary, and the reasoning text itself is saved after each prompt in the villager's `prompts/` folder. By
 default it isn't charged, so a villager could deliberate at length and pay only for what it
 writes. Set `charge_reasoning: true` under `mental_energy` to charge it as thinking, like the
 `thoughts` field; villagers are then told that thinking things over costs energy too. How much
@@ -861,7 +873,7 @@ alongside, not scored. Analysis of a run with reflection writes:
   bridge money, trades).
 - `villagers_env.csv`: what each villager was dealt: homesite, steps to Resident Services, and
   buildings and rocks reachable without tools.
-- `selves/<name>.md`: what each villager wrote to themselves, night by night.
+- `villagers/<name>/pages.md`: what each villager wrote to themselves, night by night.
 - `traits_divergence.png`: each metric by villager, with the spread across villagers. A rising
   spread means villagers are differentiating.
 - `traits_profile.png`: each villager's recent behavioural profile, z-scored.
@@ -896,7 +908,8 @@ Each island run directory has:
 | `events.jsonl` | every event with its day and hour. Each action has a `delta` (bells, loan, items, recipes, house) and a `pools_delta` (public resources it changed). An `hour_state` snapshot every hour |
 | `manifest.json` | the scenario, world and villagers used |
 | `checkpoint.pkl` | the whole simulation, saved after every day |
-| `prompts/` | every call, one file each (unless `--no-log-prompts`): the system prompt, the prompt, the model's hidden reasoning and its reply |
+| `villagers/<name>/` | each villager's own folder. `profile.md`: their persona, hours, model and home. `memory.md`: what they carry from earlier days into their prompts as of the last finished day (the nightly page, what they chose to hold on to and when each fades, their notes, yesterday, the last conversation and what changed hands with each villager), then night by night what they held on to, came back to and forgot. `assets.md`: what they own now and at the end of each day. `pages.md`: their nightly pages in order. `prompts/`: every call they made, one file each (unless `--no-log-prompts`): the system prompt, the prompt, the model's hidden reasoning and its reply. The `.md` files are written by the analysis and never read by the simulation |
+| `prompts/` | Isabelle's calls, one file each. Runs from before villagers had their own folders have everyone's prompts here, as `<tag>_<name>.txt`; the explorer reads both |
 | `site/` | the explorer page, `llmabm site <run_dir>`: Home, Days (with each villager's prompts), Social, and How they work (the model, what carries over from day to day, each kind of call with an example, the prompt versions) |
 
 `summary.txt` covers:
@@ -1018,7 +1031,7 @@ tokens don't count toward its limits, but repeating the same system prompt showe
 a test, so plan on paying for every token. `--concurrency N` runs calls within an hour in parallel. Responses are cached
 in `.cache/llm/`, keyed on the prompt and the run seed. Re-running the same seed replays for
 free; a new seed resamples. Use `--no-cache` to force fresh calls. Every full prompt is saved in
-`prompts/` (unless `--no-log-prompts`), which is the fastest way to see what an agent actually saw.
+`villagers/<name>/prompts/` (unless `--no-log-prompts`), which is the fastest way to see what an agent actually saw.
 
 Small free models often return malformed JSON. Those turns are logged as errors with the raw
 reply, and the agent does nothing that turn. Check the error count in `summary.txt` before

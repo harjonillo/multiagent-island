@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11.  
+Fished early, got a kalo and a tubas, then the sea went quiet. Switched to the river; found two ashpimi and a selzalne. The river’s lower ground was busy. Spotted a selashren moth on a stump and caught it at the airport. Gave Jo another selit fish—hope she’s still hiding that log. Energy’s low, but tools are still good. No new trades, no board posts. I’m still chasing that log and a vaulting pole. Maybe tomorrow I’ll ask Jo face‑to‑face instead of a parcel. The island feels quieter, but the river’s alive.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 08:00. You are Eli, at the sea.
+You just spotted:
+1. a small fish shadow in the sea (lower ground, southwest)
+Earlier today:
+- 07:00 spotted a small fish shadow in the sea (lower ground, southwest) and went after it at 08:00
+- 08:00 fished for a small shadow in the sea: caught a tubas fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) No trades today
+- (day 10) Got a tubas fish.
+- (day 11) No log yet, but Jo still a mystery
+- (day 11) Tools: shovel 30, axe 27, rod 17, net 29, ladder 30
+Your notes from the last 2 days:
+- (day 10) Stay patient, keep posting.
+- (day 10) Check Jo's house tomorrow, maybe she has a log.
+- (day 10) Keep an eye on Jo, maybe she’ll drop a log. If she has a vaulting pole, ask for it.
+- (day 10) Keep an eye on Jo tomorrow, maybe she'll drop a log or rock. Also, consider visiting the beach for more fish.
+- (day 11) Ask Jo in person tomorrow if I can get a log or rock. Also maybe try to trade a selit fish for bait again.
+- (day 11) Sleep well, maybe catch a fish tomorrow.
+At 09:00 you have nothing planned.
+Actions left today: 9 of 10. Mental energy left today: 123.
+
+You can go after one of them at 09:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (16 tokens, hidden from everyone) ===
+We have two options: fish shadow or nothing. Probably go after fish.
+
+=== REPLY ===
+{"thoughts":"Need more food, small fish likely easy catch. Go after it now.", "go":1}

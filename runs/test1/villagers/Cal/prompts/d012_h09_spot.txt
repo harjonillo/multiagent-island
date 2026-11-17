@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, 23 h.  
+Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 09:00. You are Cal, at the pond.
+You just spotted:
+1. a rune moth on a rock (lower ground, southeast, near rock 1)
+Earlier today:
+- 08:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 09:00
+- 09:00 fished for a small shadow in the pond: it got away
+Things you remember (anything you don't hold on to at night fades):
+- (day 11) Dax unresponsive today.
+- (day 11) Got an ashrumo moth; trade for softwood.
+- (day 11) Need more softwood for bridge and future trades.
+Your notes from the last 2 days:
+- (day 10) Remember to track softwood count for future trades.
+- (day 10) No more energy for talks today.
+- (day 11) Try to ask Dax for some wood tomorrow. Maybe trade a selit for a softwood if he has any.
+- (day 11) Keep an eye on Jo’s offers; maybe ask for more softwood tomorrow.
+- (day 11) Trade 1 selzalne for 1 softwood next time.
+- (day 11) Rest tonight, think about bridge contribution tomorrow.
+At 10:00 you have nothing planned.
+Actions left today: 9 of 10. Mental energy left today: 110.
+
+You can go after one of them at 10:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (25 tokens, hidden from everyone) ===
+We should pick one to go after: maybe the rune moth? It's on rock 1. Let's go after it.
+
+=== REPLY ===
+{"thoughts":"Need softwood. Rune moth is good trade. Will try to catch it now.","go":1}

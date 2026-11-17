@@ -40,7 +40,7 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--concurrency", type=int, default=1, help="parallel LLM calls within an hour")
     r.add_argument("--no-cache", action="store_true")
     r.add_argument("--log-prompts", action="store_true", default=True,
-                   help="save every full prompt, reasoning and reply under <run_dir>/prompts/ (the default; the "
+                   help="save every full prompt, reasoning and reply under <run_dir>/villagers/<name>/prompts/ (the default; the "
                         "explorer shows them)")
     r.add_argument("--no-log-prompts", dest="log_prompts", action="store_false", help="don't save the prompts")
     r.add_argument("--out", type=Path, default=Path("runs"))

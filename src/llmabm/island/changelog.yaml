@@ -2,6 +2,14 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-14 19:40
+  what: Prompt version 19, the Island 101
+  when: new runs from now on, or a run resumed with --prompt-version 19
+  details:
+    - "what it is: one reference, the same for every villager, as in Animal Crossing, with the fun facts of Isabelle's morning announcements so far. One more each day until all have been told. Before, a fact was in one morning's first plan and then gone unless it was one of the night's three things to hold on to"
+    - "looked up, not shown: a plan, a turn at the plaza and a turn in a conversation have one line saying how many facts are in it, closed, and a reply of only {\"open\": \"island 101\"} gets the same prompt again with it open. Once per prompt. Not when noticing someone or spotting something, and not in the nightly page"
+    - "free: opening it takes no action, no hour and no mental energy; neither the reply that opens it nor reading it is charged, and the rest of the prompt costs what it would have. The real tokens are counted, and each lookup is a lookup event and a second prompt file"
+    - "facts only: it is worked out from the island's rules as they are now, not kept from what was said, so a run switched to version 19 has the facts of its days so far as they read today, and nothing a later version made untrue. What Tom Nook and Isabelle answer when asked isn't in it; that is about the one who asked and the day"
 - time: 2026-11-13 12:00
   what: Prompt version 18, trades name both people
   when: new runs from now on, or a run resumed with --prompt-version 18; the record, for every run

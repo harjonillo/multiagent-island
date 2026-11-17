@@ -3,12 +3,15 @@ __pycache__/
 .pytest_cache/
 .env
 .cache/
-# Runs stay local, except the two files the explorer site is built from: commit a run's
-# manifest.json and events.jsonl to publish it (README, "Publishing the explorer").
+# Runs stay local, except the files the explorer site is built from: commit a run's
+# manifest.json and events.jsonl to publish it, and its prompts (each villager's in
+# villagers/<name>/prompts/, Isabelle's in prompts/) to show those too (README, "Publishing the explorer").
+# Each villager's folder is kept whole, so their profile, memory, assets and nightly pages can be read on GitHub.
 runs/*
 !runs/*/
 runs/*/*
 !runs/*/manifest.json
 !runs/*/events.jsonl
 !runs/*/prompts/
+!runs/*/villagers/
 _site/

@@ -1,0 +1,50 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Still no bait, no fish, no bells.  
+Ari didn’t answer, but I finally got 1 wood from him for the trade—still 7 wood left.  
+Gus is still silent, but I’m not giving up.  
+I dug a stump, cleared a spot, but pockets full when I tried to fish.  
+Shovels 28/30 uses, ladder 10 uses.  
+Plan: tomorrow bring 3 wood to Dax or Kit, maybe try Gus again.  
+Watch the river, maybe a fish will appear.  
+Sleep is thin, but I’ll keep pushing.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 12 (May 3, spring, rain), 09:00. You are Bo, at the Gus's home.
+Nearby: Gus.
+Earlier today:
+- 07:00 spotted a rune moth on a rock (lower ground, southeast, near rock 6) and went after it at 08:00 instead of visit (who: Dax)
+- 08:00 tried to catch_bug: pockets full (also nearby: Ike)
+- 08:00 ran into Ike at the rocks: you said "Hey Ike, you got any spare wood?"; Ike said "Sure thing, here's one." [Ike tried to hand you 1 wood but you had no room]; you said "Hey Ike, can I trade you a shovel for a wood?" [your offer: you give Ike 1 shovel, Ike gives you 1 wood]; Ike said "Sure, that works." [Ike accepted: you gave Ike 1 shovel, Ike gave you 1 wood; Ike's offer: Ike gives you 1 wood, you give Ike 1 shovel]; you said "Sure, let's do it." [you accepted: Ike gave you 1 wood, you gave Ike 1 shovel]; Ike said "Sure thing, just give me a fishing rod for a shovel." [Ike's offer: Ike gives you 1 shovel, you give Ike 1 fishing rod]; you said "Sure thing, here's the rod." [you accepted: Ike gave you 1 shovel, you gave Ike 1 fishing rod]; Ike said "Hey Bo, how about a swap? One shovel for a wood, deal?" [Ike tried to hand you 1 shovel but you had no room; Ike asked you for 1 wood]; you said "Sure, I'll trade a wood for your shovel." [you handed Ike 1 wood]; Ike said "Hey Bo, can I trade you a wood for some fishing bait?" [Ike handed you 1 wood; Ike asked you for 1 fishing bait]; you said "Sure, I'll give you a wood for the bait." [you asked Ike for 1 fishing bait]; Ike said "Sorry, no bait here." [then you went your ways]
+- 09:00 walked over to Gus's home (also nearby: Gus)
+- 09:00 knocked at Gus's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ladder 22 uses left, need more wood
+- (day 10) Shovel uses 29 left.
+- (day 11) 28 shovel uses left
+- (day 11) Gus wants 1 bait from me tomorrow
+Your notes from the last 2 days:
+- (day 12) If Ari doesn’t answer, maybe try again tomorrow. Keep 3 wood reserve.
+- (day 12) Keep track of trades, maybe get more wood tomorrow.
+- (day 12) Got 1 wood from Ike, shovel gone.
+- (day 12) Got a shovel from Ike, fishing rod traded away. Keep wood reserve.
+- (day 12) Keep 8 wood, 2 shovels.
+- (day 12) Remember to keep 3 wood reserve for future trades.
+Mental energy left today: 44 (about 16 for each thing you say). Your plan for today: inward 30 (spent 32: 2 more than planned, from your spare), outward 120 (spent 74), spare 0 (used 2).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (58 tokens, hidden from everyone) ===
+Need to decide whom to talk: Gus? Ike? Maybe Dax or Kit. Gus hasn't answered. Plan: go to Gus? But need bait for Gus. I have no bait. Maybe try Kit? But no info. Maybe go to Gus to ask. Let's choose Gus.
+
+=== REPLY ===
+{"thoughts":"Need bait for Gus tomorrow, but I have none. Maybe try to get wood or ask for help. Gus hasn't answered yet. I'll try to see if he's out and ask.","approach":"Gus","say":"Hey Gus, got a minute?"}

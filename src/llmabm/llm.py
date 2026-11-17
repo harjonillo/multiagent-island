@@ -199,6 +199,10 @@ class MockBackend:
 
         prompt = messages[-1]["content"]
         rng = random.Random(hashlib.sha256(prompt.encode()).hexdigest())
+        # Prompt version 19: open the Island 101 about one time in four it is there, closed. Decided from the
+        # prompt and not from `rng`, so the reply to a prompt is drawn as it was before.
+        if "\nThe Island 101 (closed): " in prompt and hashlib.sha256(prompt.encode()).digest()[0] < 64:
+            return Completion('{"open": "island 101"}')
         routes = {"PHASE: plan": island_mock.plan_reply,
                   "PHASE: isabelle": island_mock.isabelle_reply, "PHASE: encounter": island_mock.encounter_reply,
                   "PHASE: notice": island_mock.notice_reply, "PHASE: reflect": island_mock.reflect_reply,

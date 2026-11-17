@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Sun rose over the river, and I chased the ashrumo moth like a kid in a forest. It was worth the trip—two moths, a tugorpi, and a lovin’ fish, all without bait. I traded one wood for a fishing bait from Ari, and he seemed happier when I left. The rock at 07:00 was a goldmine—6,750 bells tucked into my tent. I hammered a hardwood tree and found clay, stone, and an iron nugget near rock 6. The river is generous today, but I still have no bells in my hand—just the 6,750 in the tent. Tomorrow I’ll head to the plaza, try to buy more bait, and maybe ask Ari for another trade. The island feels quiet, but the water’s alive, and I’m tired but hopeful.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 08:00. You are Ike, at Ari's home.
+You just spotted:
+1. a large fish shadow in the river (lower ground, southeast, near rock 6)
+Earlier today:
+- 07:00 rested
+- 08:00 walked over to Ari's home (also nearby: Bo)
+- 08:00 knocked at Ari's home, but nobody answered
+- 08:00 ran into Bo at the rocks: Bo said "Hey Ike, you got any spare wood?"; you said "Sure thing, here's one." [you tried to hand Bo 1 wood but Bo had no room]; Bo said "Hey Ike, can I trade you a shovel for a wood?" [Bo's offer: Bo gives you 1 shovel, you give Bo 1 wood]; you said "Sure, that works." [you accepted: Bo gave you 1 shovel, you gave Bo 1 wood; your offer: you give Bo 1 wood, Bo gives you 1 shovel]; Bo said "Sure, let's do it." [Bo accepted: you gave Bo 1 wood, Bo gave you 1 shovel]; you said "Sure thing, just give me a fishing rod for a shovel." [your offer: you give Bo 1 shovel, Bo gives you 1 fishing rod]; Bo said "Sure thing, here's the rod." [Bo accepted: you gave Bo 1 shovel, Bo gave you 1 fishing rod]; you said "Hey Bo, how about a swap? One shovel for a wood, deal?" [you tried to hand Bo 1 shovel but Bo had no room; you asked Bo for 1 wood]; Bo said "Sure, I'll trade a wood for your shovel." [Bo handed you 1 wood]; you said "Hey Bo, can I trade you a wood for some fishing bait?" [you handed Bo 1 wood; you asked Bo for 1 fishing bait]; Bo said "Sure, I'll give you a wood for the bait." [Bo asked you for 1 fishing bait]; you said "Sorry, no bait here." [then you went your ways]
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still no fishing bait.
+- (day 10) Ari keeps offering wood, but no bait.
+- (day 11) 6,750 bells in the tent.
+- (day 11) Ari gave me bait for 1 wood.
+Your notes from the last 2 days:
+- (day 12) Keep an eye on Bo tomorrow for more wood. Also consider trading for fishing bait if I can get it.
+- (day 12) Got a second shovel. Maybe use it later.
+- (day 12) Keep an eye on Bo tomorrow for more wood and bait.
+- (day 12) Keep track of wood count.
+- (day 12) Keep track of bait count
+- (day 12) Need to collect bait soon.
+At 09:00 you planned: rest.
+Actions left today: 5 of 10. Mental energy left today: 24.
+
+You can go after one of them at 09:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (49 tokens, hidden from everyone) ===
+We need to choose action 1-5. We have 5 actions left. We saw large fish shadow. Maybe go fishing? We have a fishing rod now. Let's go fishing at 09:00. That's action 1.
+
+=== REPLY ===
+{"thoughts":"Got a fishing rod, big fish shadow spotted. Time to try fishing before it leaves. 5 actions left, plenty of mental energy.", "go":1}

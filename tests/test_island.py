@@ -21,6 +21,13 @@ def _seen(prompt_file: Path) -> str:
     return prompt_file.read_text().split("\n=== REASONING")[0]
 
 
+def _prompts(run_dir, tag: str = "*", name: str = "*") -> list:
+    """The logged prompt files of a run: each villager's in villagers/<name>/prompts/, Isabelle's in prompts/."""
+    run_dir = Path(run_dir)
+    return sorted(run_dir.glob(f"villagers/{name}/prompts/{tag}.txt")) + (
+        sorted(run_dir.glob(f"prompts/{tag}.txt")) if name == "*" else [])
+
+
 def _island(names=("A", "B")):
     isl = Island(load_world(WORLD), list(names), random.Random(0))
     for n in names:  # everyone already moved in; start on day 1
@@ -175,7 +182,7 @@ def test_day0_random_homes_and_private_thoughts():
         # Everyone lands together at the start of day 0 on a homesite drawn for them: no LLM call to choose.
         arrivals = run.of("arrival")
         assert len(arrivals) == 10 and {e["hour"] for e in arrivals} == {sc.world["calendar"]["day_start"]}
-        assert not list((Path(d) / "run" / "prompts").glob("*arrival*"))
+        assert not _prompts(Path(d) / "run", "*arrival*")
         assert {e["homesite"] for e in arrivals} == set(run.of("snapshot")[0]["homes"].values())
         # Thoughts are logged for the observer ...
         thoughts = {e["thoughts"] for e in run.of("plan") if e.get("thoughts")}
@@ -183,7 +190,7 @@ def test_day0_random_homes_and_private_thoughts():
         thoughts |= {e["thoughts"] for e in run.of("encounter_decision") if e.get("thoughts")}
         assert thoughts
         # ... and never appear in any prompt a villager sees.
-        for f in (Path(d) / "run" / "prompts").glob("*.txt"):
+        for f in _prompts(Path(d) / "run"):
             text = _seen(f)
             assert not any(t in text for t in thoughts), f.name
         assert (Path(d) / "run" / "days" / "day_000_isabelle.md").exists()
@@ -318,26 +325,26 @@ def test_blank_villagers_reflect_privately():
         personas = {s.persona.replace(n, "NAME") for n, s in sc.villagers.items()}
         assert len(personas) == 1
         # What a villager wrote is in their own prompt the next day, and in nobody else's.
-        prompts = Path(d) / "run" / "prompts"
+        vdir = Path(d) / "run" / "villagers"
         for e in [x for x in refl if x["day"] == 1]:
-            mine = (prompts / f"d002_p0_{e['agent']}.txt")
+            mine = vdir / e["agent"] / "prompts" / "d002_p0.txt"
             if mine.exists():
                 assert e["self_doc"] in mine.read_text()
         tagged = {}
         for e in [x for x in refl if x["day"] == 1]:
             tagged[e["agent"]] = e["self_doc"]
-        for f in prompts.glob("d002_*.txt"):
-            parts = f.stem.split("_")
-            owner = parts[-2] if parts[-1].isdigit() else parts[-1]  # a second call that hour is <tag>_<name>_2
+        for f in vdir.glob("*/prompts/d002_*.txt"):
+            owner = f.parent.parent.name
             # the mock writes from a small pool of sentences, so only check full self docs that are unique
             for who, doc in tagged.items():
                 if (who != owner and list(tagged.values()).count(doc) == 1 and doc in _seen(f)
                         and doc not in tagged.get(owner, "")):
-                    raise AssertionError(f"{who}'s nightly page leaked into {f.name}")
+                    raise AssertionError(f"{who}'s nightly page leaked into {owner}'s {f.name}")
         from llmabm.island.traits import write_traits
 
         paths = write_traits(run, Path(d) / "run")
-        assert (Path(d) / "run" / "traits_daily.csv").exists() and (Path(d) / "run" / "selves").exists()
+        assert (Path(d) / "run" / "traits_daily.csv").exists()
+        assert all((vdir / e["agent"] / "pages.md").exists() for e in refl) and not (Path(d) / "run" / "selves").exists()
 
 
 def _grid_island(names=("A", "B")):
@@ -827,7 +834,7 @@ def test_memories_are_chosen_at_night_and_fade_unless_revisited():
         # What they held on to is in their next plans; notes older than notes_days are gone.
         for n, vil in sim.isl.v.items():
             assert all(nd > sim.isl.day - 2 for nd, _ in vil.notes)
-            prompt = next((Path(d) / "run" / "prompts").glob(f"d005_p0_{n}.txt"), None)
+            prompt = next(iter(_prompts(Path(d) / "run", "d005_p0", n)), None)
             if prompt and vil.memories:
                 assert "Things you remember" in _seen(prompt)
         assert "Long-term memory:" in summary(run)
@@ -1202,14 +1209,14 @@ def test_mental_energy_in_a_run():
             for v in e["villagers"].values():
                 assert sum(v["spent"].values()) <= 25 + 40
         # Villagers see their energy and choose where it goes.
-        prompt = next((Path(d) / "run" / "prompts").glob("d001_p0_*.txt")).read_text()
+        prompt = _prompts(Path(d) / "run", "d001_p0")[0].read_text()
         assert "Mental energy today: 25" in prompt and '"energy": {"inward": <points>, "outward": <points>}' in prompt
         assert "25 points of mental energy a day" in prompt
         text = summary(run)
         assert "Estimated villager tokens" in text and "ran out" in text and "hidden reasoning: 0 tokens" in text
         assert "Who gave to the island" in text
         assert "=== REASONING (0 tokens" in prompt or "=== REASONING (0 tokens" in next(
-            (Path(d) / "run" / "prompts").glob("d001_*.txt")).read_text()
+            _prompts(Path(d) / "run", "d001_*")).read_text()
         assert run.manifest["backends"]["mock"] == "mock"
 
 
@@ -1409,7 +1416,6 @@ def test_from_version_7_the_plaza_is_open_all_day_and_energy_is_planned():
                                log_prompts=True)
         sim.run(3)
         run = load_run(Path(d) / "run")
-        prompts = Path(d) / "run" / "prompts"
         social = sc.world["calendar"]["social_hours"]
         # Visits happen whenever a plan sets a free hour aside, not in evening rounds.
         visits = [e for e in run.of("evening_turn") if e.get("place") == "plaza" and not e.get("skipped")]
@@ -1423,17 +1429,17 @@ def test_from_version_7_the_plaza_is_open_all_day_and_energy_is_planned():
         planned = {(p["day"], p["agent"], x["at"]) for p in run.of("plan") for x in p["scheduled"] if x["do"] == "plaza"}
         assert {(e["day"], e["agent"], e["hour"]) for e in visits} <= planned
         # The plaza turn doesn't say who else is there.
-        turn = next(prompts.glob("d*_plaza_*.txt")).read_text()
+        turn = _prompts(Path(d) / "run", "d*_plaza*")[0].read_text()
         assert "PHASE: plaza" in turn and "Here now" not in turn
         # Plaza trade offers until prompt version 12; from 12, trades happen in person.
         assert ("offers expire after 2 days" in turn) == (sim.isl.prompt_version < 12)
         # The first plan splits the day's energy; later prompts show the plan against what was spent.
-        first = next(prompts.glob("d001_p0_*.txt")).read_text()
+        first = _prompts(Path(d) / "run", "d001_p0")[0].read_text()
         assert "Mental energy today: 150" in first and "First, decide how you'll spend" in first
         assert '"next"' not in first and "habit" not in first
         split = [p for p in run.of("plan") if p.get("energy_plan")]
         assert split
-        later = [f.read_text() for f in prompts.glob("d00[12]_p1_*.txt")]
+        later = [f.read_text() for f in _prompts(Path(d) / "run", "d00[12]_p1*")]
         assert any("Your plan for today: inward" in t and "You can change today's energy plan" in t for t in later)
         assert any(v.get("plan") for e in run.of("energy") for v in e["villagers"].values())
         # Offers wait for an answer on the day they're made and the next, then expire.
@@ -2034,7 +2040,7 @@ def test_prompts_are_kept_and_on_the_site():
         sim = IslandSimulation(sc, load_backends(None), run_dir, seed=3, backend_override="mock", verbose=False,
                                log_prompts=True)
         sim.run(1)
-        files = sorted((run_dir / "prompts").glob("*.txt"))
+        files = _prompts(run_dir)
         assert len(files) == sim.calls  # one file per call, none overwritten
         out = build_site(run_dir)
         page = out.read_text()
@@ -2211,7 +2217,7 @@ def test_version_16_mock_run_has_no_malformed_actions():
             assert " is closed at " not in a["result"], a
         plans = run.of("plan")
         assert any(p["scheduled"] for p in plans)
-        prompt = _seen(next((Path(d) / "run" / "prompts").glob("d001_p0_*.txt")))
+        prompt = _seen(_prompts(Path(d) / "run", "d001_p0")[0])
         assert "by picking numbers from the list" in prompt and '"pick": <number>' in prompt
         assert "Write each as JSON" not in prompt  # the old menu's instructions are gone
 
@@ -2333,3 +2339,173 @@ def test_version_18_trades_name_both_people():
     assert exchange_line(e, "Ari", True) == "you gave Ike 1 fishing bait and Ike gave you 1 wood, in a trade"
     assert exchange_line(e, "Ike", True) == "you gave Ari 1 wood and Ari gave you 1 fishing bait, in a trade"
     assert exchange_line(e, "Ari") == "Ike traded you 1 wood for your 1 fishing bait"  # earlier versions as they were
+
+
+def test_version_19_island_101_is_the_same_for_everyone():
+    from llmabm.island.prompts import (encounter_prompt, fun_facts, island_101, island_101_closed, island_101_open,
+                                       island_rules, notice_prompt, plan_prompt, plaza_prompt, reflect_prompt, spot_prompt)
+
+    isl = _island(("Ari", "Bo"))  # day 1: Isabelle has told two facts, on days 0 and 1
+    assert isl.prompt_version >= 19 and isl.day == 1
+    ari, bo = isl.v["Ari"], isl.v["Bo"]
+    plan = lambda v: plan_prompt(isl, v, 9, 15, 3, [])  # noqa: E731
+    facts = fun_facts(isl)
+    assert island_101(isl) == facts[:2]
+    assert "kept in the Island 101, the same for everyone" in island_rules(isl.w, 2, 19)
+    assert "Island 101" not in island_rules(isl.w, 2, 18)
+    # Closed, it says how many facts are in it and how to open it, in plans, at the plaza and in conversations,
+    # and the same to everyone. The facts themselves aren't in the prompt.
+    closed = island_101_closed(isl)
+    assert closed == ('The Island 101 (closed): 2 of Isabelle\'s morning facts so far. To read it, reply with only '
+                      '{"open": "island 101"}; you\'ll be asked this again with it open.')
+    for prompt in (plan(ari), plan(bo), plaza_prompt(isl, ari, 10, [], []),
+                   encounter_prompt(isl, bo, "Ari", "plaza", 10, [], opener=True)):
+        assert closed in prompt and facts[0] not in prompt
+    # Not in snap decisions or the nightly page.
+    for prompt in (notice_prompt(isl, ari, "plaza", 10, ["Bo"]), spot_prompt(isl, ari, "plaza", 10, ["a bug"], None, 3, 10),
+                   reflect_prompt(isl, ari, 150)):
+        assert "Island 101" not in prompt
+    # Open: the facts so far, in the order they were told, and nothing else. What a villager asked Tom Nook
+    # isn't in it.
+    assert isl.act("Ari", {"do": "ask", "who": "Tom Nook"}, 10)[0]
+    assert island_101_open(isl) == ("The Island 101 (open), Isabelle's morning facts so far:\n"
+                                    f"- {facts[0]}\n- {facts[1]}")
+    # It grows by a fact a day until every fact has been told, then stays.
+    isl.new_day()
+    assert island_101(isl) == facts[:3]
+    isl.day = 10 * len(facts)
+    assert island_101(isl) == facts and len(set(facts)) == len(facts)
+    # It follows the rules as they are now, so a fact a later version changed is never in it as it was.
+    isl.day = 1
+    isl.prompt_version = 18
+    assert island_101(isl) == [] and "Island 101" not in plan(ari)
+
+
+def test_version_19_opening_island_101_is_free_and_asks_again():
+    import json
+    from llmabm.island.prompts import island_101_closed, island_101_open
+    from llmabm.llm import Completion
+
+    class Opens:
+        """The mock, except that it never opens the Island 101 by itself, and opens it for `who` when told to."""
+        name = model_id = "mock"
+
+        def __init__(self, mock):
+            self.mock, self.who, self.seen = mock, None, []
+
+        def complete(self, messages, temperature=0.7, max_tokens=600):
+            user = messages[-1]["content"]
+            closed = "\nThe Island 101 (closed): " in user
+            if closed and self.who and f"You are {self.who}." in user:
+                self.seen.append(user)
+                return Completion('{"open": "island 101"}')
+            if closed:  # reply as the mock would to the prompt without the line, so it doesn't open
+                user = "\n".join(ln for ln in user.split("\n") if not ln.startswith("The Island 101 (closed): "))
+            elif "The Island 101 (open)" in user:
+                self.seen.append(user)
+            return self.mock.complete([messages[0], {"role": "user", "content": user}], temperature, max_tokens)
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=4)
+    with tempfile.TemporaryDirectory() as d:
+        backends = load_backends(None)
+        backends["mock"] = opens = Opens(backends["mock"])
+        sim = IslandSimulation(sc, backends, Path(d) / "run", seed=4, backend_override="mock", verbose=False, log_prompts=True)
+        sim.run(1)
+        assert not load_run(sim.run_dir).of("lookup") and not opens.seen
+        # Day 1: one villager opens it at their first plan. The same prompt comes back with it open.
+        name = sorted(sim.isl.v)[0]
+        opens.who = name
+        calls = sim.calls
+        sim.isl.new_day(), sim.energy.new_day(), sim.space.new_day(sim.isl, sim.rng), sim.space.sync(sim.isl), sim.bodies.new_day()
+        sim._open_log("a")
+        sim.hour, sim.first_plan = 5, {n: True for n in sim.isl.v}
+        sim.used, sim.schedule, sim.noticed = {n: 0 for n in sim.isl.v}, {}, {n: [] for n in sim.isl.v}
+        slots = sim._plan_slots()
+        at = min(h for h, s in slots.items() if any(x[0] == name for x in s))
+        sim.hour = at
+        sim._plan(1, at, [x for x in slots[at] if x[0] == name])
+        first, second = opens.seen
+        assert sim.calls == calls + 2
+        closed, opened = island_101_closed(sim.isl), island_101_open(sim.isl)
+        assert "2 of Isabelle's morning facts" in closed and closed in first
+        assert second == first.replace(closed, opened) and "(closed)" not in second
+        # Both prompts are kept, the second as the same kind of call; the plan in the second reply stands.
+        files = [p.name for p in _prompts(sim.run_dir, "d001_p0*", name)]
+        assert files == ["d001_p0.txt", "d001_p0_2.txt"]
+        sim._raw_log.close()
+        run = load_run(sim.run_dir)
+        (look,) = run.of("lookup")
+        assert (look["agent"], look["during"], look["entries"], look["day"]) == (name, "plan", 2, 1)
+        plan = [p for p in run.of("plan") if p["day"] == 1][-1]
+        assert plan["agent"] == name and plan["scheduled"] and json.loads(plan["raw"]).get("actions")
+        # Free: the villager is charged what the open prompt costs without the reference, plus that reply;
+        # not the reply that opened it, and not the reference.
+        en = sim.energy
+        cost = en.points(sim._self_doc(name) or "", second) - en.points(opened) + en.points(plan["raw"])
+        assert abs((en.daily - en.left[name]) - cost) < 1e-6
+
+
+def test_version_19_mock_run_opens_island_101_and_the_record_shows_it():
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock", verbose=False,
+                               log_prompts=True)
+        run = load_run(sim.run(3))
+        looks = run.of("lookup")
+        assert looks and all(e["entries"] == e["day"] + 1 and e["during"] in ("plan", "plaza", "chat") for e in looks)
+        e = looks[0]
+        assert f"🔒 {e['agent']} opened the Island 101 ({e['entries']} fact" in day_log(run, e["day"])
+        assert "Island 101 opened (Isabelle's morning facts so far): " in summary(run)
+        # Every call has its prompt file, the re-sent ones too, and each open reply is followed by an open prompt.
+        files = _prompts(sim.run_dir, "d*")
+        assert len(files) == sim.calls
+        opened = [f for f in files if "\nThe Island 101 (open), Isabelle's morning facts so far:" in _seen(f)]
+        assert len(opened) == len(looks) and all("(closed)" not in _seen(f) for f in opened)
+
+
+def test_each_villager_has_a_folder_with_their_memory_assets_pages_and_prompts():
+    from llmabm.island.analysis import analyze_island
+    from llmabm.island.site_prompts import build
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock",
+                               verbose=False, log_prompts=True)
+        run_dir = sim.run(3)
+        import contextlib
+        import io
+
+        with contextlib.redirect_stdout(io.StringIO()):
+            analyze_island(run_dir)
+        run = load_run(run_dir)
+        # Villagers' prompts are in their own folders; only Isabelle's are left in prompts/.
+        assert len(_prompts(run_dir)) == sim.calls
+        assert all("isabelle" in p.name for p in (run_dir / "prompts").glob("*.txt"))
+        index, _ = build(run_dir, 3, list(sc.villagers))
+        assert sum(len(calls) for day in index.values() for calls in day.values()) == sim.calls
+        for name, vil in sim.isl.v.items():
+            folder = run_dir / "villagers" / name
+            assert {p.name for p in folder.iterdir()} == {"profile.md", "memory.md", "assets.md", "pages.md", "prompts"}
+            assert sc.villagers[name].persona.strip() in (folder / "profile.md").read_text()
+            memory = (folder / "memory.md").read_text()
+            assert f"# {name}'s memory, waking on day 3" in memory
+            # What they carry is what their prompts are built from: the page, what they hold on to, their notes.
+            if vil.self_doc:
+                assert vil.self_doc.strip() in memory
+            assert all(m["text"] in memory for m in vil.memories) and all(n in memory for _, n in vil.notes)
+            nights = [e for e in run.of("reflection") if e["agent"] == name]
+            assert all(f"- Day {e['day']}: " in memory for e in nights)
+            assets = (folder / "assets.md").read_text()
+            snap = run.of("snapshot")[-1]["villagers"][name]
+            assert f"- Bells with them: {snap['bells']:,}" in assets and assets.count("\n| ") == 3 + 1
+        # A run that kept the older layout (everyone's prompts in prompts/) is read the same.
+        old = Path(d) / "old"
+        (old / "prompts").mkdir(parents=True)
+        for name in sc.villagers:
+            for p in (run_dir / "villagers" / name / "prompts").glob("*.txt"):
+                tag, _, n = p.stem.rpartition("_")
+                stem = f"{tag}_{name}_{n}" if tag and n.isdigit() else f"{p.stem}_{name}"
+                (old / "prompts" / f"{stem}.txt").write_text(p.read_text())
+        for p in (run_dir / "prompts").glob("*.txt"):
+            (old / "prompts" / p.name).write_text(p.read_text())
+        assert build(old, 3, list(sc.villagers)) == build(run_dir, 3, list(sc.villagers))

@@ -366,7 +366,8 @@ def summary(run: Run) -> str:
               "  flowers planted: " + (", ".join(f"{n} {k}" for n, k in flowers_by.most_common()) or "none"),
               f"  stumps left standing: {stumps}; rocks broken: {broken}"]
 
-    L += weather_lines(run) + sight_lines(run, names) + social_ties_lines(run, names) + energy_lines(run, names)
+    L += (weather_lines(run) + sight_lines(run, names) + lookup_lines(run, names) + social_ties_lines(run, names)
+          + energy_lines(run, names))
     L += memory_summary(run, names)
 
     L += ["", "When each villager acted (share of actions in each part of the day):"]
@@ -440,6 +441,17 @@ def sight_lines(run: Run, names: list[str]) -> list[str]:
                 if tries[k]),
             "  things spotted (bugs, shadows, shells, dig spots) by villager: "
             + ", ".join(f"{n} {per[n]}" for n in names)]
+
+
+def lookup_lines(run: Run, names: list[str]) -> list[str]:
+    """Prompt version 19: how often each villager opened the Island 101, and during what."""
+    looks = run.of("lookup")
+    if not looks:
+        return []
+    per, during = Counter(e["agent"] for e in looks), Counter(e["during"] for e in looks)
+    return ["", "Island 101 opened (Isabelle's morning facts so far): " + ", ".join(f"{n} {per[n]}" for n in names),
+            "  while: " + ", ".join(f"{'in a conversation' if k == 'chat' else 'planning' if k == 'plan' else 'at the plaza'} {c}"
+                                    for k, c in sorted(during.items()))]
 
 
 def social_ties_lines(run: Run, names: list[str]) -> list[str]:
@@ -708,6 +720,9 @@ def day_log(run: Run, day: int, private: bool = True) -> str:
         if private:
             for e in [x for x in hev if x["type"] in ("arrival", "plan", "evening_turn") and x.get("thoughts")]:
                 out.append(f"- 🔒 {e['agent']} thinks: {e['thoughts']}")
+            for e in [x for x in hev if x["type"] == "lookup"]:
+                out.append(f"- 🔒 {e['agent']} opened the Island 101 ({e['entries']} fact{'' if e['entries'] == 1 else 's'} in it) "
+                           + {"plan": "while planning", "chat": "in a conversation"}.get(e["during"], "at the plaza"))
             for e in [x for x in hev if x["type"] == "encounter_decision"]:
                 out.append(f"- 🔒 {e['agent']} noticed {', '.join(e['nearby'])} at the {e['place']} and {e['outcome']}"
                            + (f"; thinks: {e['thoughts']}" if e.get("thoughts") else ""))
@@ -1010,6 +1025,10 @@ def analyze_island(run_dir: Path) -> None:
 
         for p in write_traits(run, run.dir):
             print(f"wrote {p}")
+    from .villager_files import write as write_villager_files
+
+    for p in write_villager_files(run):
+        print(f"wrote {p}/")
     snaps = snapshots(run)
     if snaps:
         for p in render_grid_outputs(run):

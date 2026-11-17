@@ -1,0 +1,44 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9: Dawn came, but the river still feels like a wall. I chased a big shadow, got a selit, but the bait is still out of reach. Ike’s house was the only place with a door, but he was gone, leaving a selzalne fish in a corner. I offered a wood, got nothing. The plaza feels farther than ever; the ladder I have is useless without a path. I spent most of the day fishing and walking, but no trades. I’m still holding 200 bells, 7 woods, 12 hardwoods, 8 softwoods, and a few fish and a fossil. My heart aches for that first fishing bait. I’ll keep asking Ike and Dax, and maybe try Cranny tomorrow if I can find a way. Tomorrow, I’ll keep the hope alive and keep trading wood for bait.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 10:00. You are Ari, out on a walk.
+You just spotted:
+1. a medium fish shadow in the river (lower ground, south, near the plaza)
+Earlier today:
+- 07:00 knocked at Jo's home, but nobody answered
+- 07:00 ran into Dax at Jo's home: you said "Hey Dax, got any rocks or fishing bait?"; Dax said "Hey Ari, could I get a fishing bait?" [Dax asked you for 1 fishing bait]; you said "Sorry, no bait today. I’ll get some soon."; Dax said "Sure thing, Ari. I'll give you a wood for a bait." [Dax's offer: Dax gives you 1 wood, you give Dax 1 fishing bait]; you said "Sure thing, Dax. I'll bring you a rock instead if you can give me some wood." [you asked Dax for 1 rock, but there's nothing called rock on this island]; Dax said "Sure, here’s a wood for the bait." [Dax's offer: Dax gives you 1 wood, you give Dax 1 fishing bait]; you said "Sorry, no bait today. I’ll bring a rock later." [then you went your ways]
+- 07:00 spotted a nevin moth on a tree (lower ground, west) and went after it at 08:00 instead of visit (who: Bo)
+- 08:00 tried to catch_bug: pockets full
+- 09:00 bought the axe recipe card for 200 bells; learned the axe recipe (needs stone x3, iron nugget x1)
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Got selit fish at 08:00
+- (day 9) Ike dropped a selzalne fish after wood offer
+- (day 9) Still no fishing bait, 200 bells, 7 wood, 12 hardwood, 8 softwood.
+Your notes from the last 2 days:
+- (day 11) Remember to look for rocks near cliffs or river.
+- (day 11) Remember to ask for rock later if possible.
+- (day 11) Remember to collect a rock eventually or find another source of bait.
+- (day 12) Need to find rocks or ask someone else for bait tomorrow.
+- (day 12) Remember to keep rocks handy for future trades.
+- (day 12) Need to find rocks soon.
+At 11:00 you have nothing planned.
+Actions left today: 7 of 10. Mental energy left today: 52.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (183 tokens, hidden from everyone) ===
+We need to choose action. Need rocks or bait. Dax already gave wood for bait but I gave nothing. Could go to Dax to trade? But no bait. Maybe go to Ike? He dropped fish but no bait. Could go to Dax to trade for wood? But already gave. We need rock but none. Maybe go to Dax for wood? We have 7 wood already. Need bait. Could go to Dax to ask for fishing bait? He offered wood for bait, but we have no bait. Could trade? We can give Dax a rock but none. So maybe go to Dax to get a wood? We already have wood. Maybe go to Dax to trade wood for bait? He said wood for bait. We can give him 1 wood and get bait. We have 7 wood. Let's do that. go 1 (Dax).
+
+=== REPLY ===
+{"thoughts":"I need bait. Dax can give me a fishing bait for 1 wood. I have enough wood, so I’ll trade and get the bait I need for tomorrow’s fishing attempts.", "go":1}

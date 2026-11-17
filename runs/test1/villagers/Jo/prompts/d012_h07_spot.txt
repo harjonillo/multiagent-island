@@ -1,0 +1,44 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, 23:45.  
+Sun’s out, fish are good, but the bridge still feels miles away. Got 2 softwood from Cal and Dax, plus 2 miruru tonight—good for tomorrow’s fishing run. Bait is still a problem; I gave a selit to Dax and got a piece of softwood back, but he’s still silent. Cal’s offering more fish for softwood, so I’ll keep an eye on him. Dax keeps disappearing at the flowers—maybe he’s out fishing or hiding the rocks. I need to ask Eli tomorrow about the bridge fund, but first I’ll post a bait request. Sleep early, wake with the pond’s echo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 07:00. You are Jo, at the rocks.
+You just spotted:
+1. a rune moth on a rock (lower ground, southeast, near rock 1)
+2. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+3. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+4. a small fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 07:00 rock 1 was the money rock: got 6750 bells
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Cal gave 2 softwood, I traded 1 selzalne.
+- (day 9) Dax still wants bait, I owe him one.
+- (day 9) Bridge still 2k.
+Your notes from the last 2 days:
+- (day 11) Remember to keep the selit fish for next fishing run. Ask Eli about bridge donation tomorrow.
+- (day 11) Remember to keep the selzalne handy for future trades.
+- (day 11) Remember to trade selzalne for rock if he can find one.
+- (day 11) Keep track of rocks for bridge.
+- (day 11) Remember to keep bait for tomorrow.
+- (day 12) Remember to ask Eli tomorrow about bridge donation and keep the selit fish for next fishing run.
+At 08:00 you planned: fish (where: sea).
+Actions left today: 5 of 10. Mental energy left today: 117.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (104 tokens, hidden from everyone) ===
+We need to decide. We have fish shadows: large fish shadow twice, small fish shadow. Also rune moth. At 08:00 we planned sea fishing. Could change to go after one of them. We have 5 actions left. Which to chase? Rune moth maybe valuable? Probably go after the large fish shadow (1). Let's pick 2? Actually numbering: 1 rune moth, 2 large fish shadow, 3 large fish shadow, 4 small fish shadow. Choose 2.
+
+=== REPLY ===
+{"thoughts":"I’ll try to catch a large fish near the rocks—better than chasing a moth. The chance of a big catch is higher and I still have enough actions for the sea fishing later.","go":2}

@@ -102,6 +102,11 @@ PROMPT_CHANGES = {
         "changed hands between you say who gives what to whom (\"Ari's offer: Ari gives you 1 wood, you give Ari 1 "
         "fishing bait\"; \"you gave Jo 1 selit fish and Jo gave you 1 softwood, in a trade\"). A request to you "
         "says how many of it you have",
+    19: "Island 101: the fun facts of Isabelle's morning announcements so far are kept in one reference, the same "
+        "for every villager, worked out from the island's rules as they are now. It isn't in their prompts: a plan, a "
+        "turn at the plaza and a turn in a conversation say how many facts are in it, closed, and a reply of only "
+        "{\"open\": \"island 101\"} gets the same prompt again with it open. Opening it takes no time, no action and "
+        "no mental energy",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -246,7 +251,43 @@ How it works:
 - {_plaza_rule(social, version)}
 {_pockets_rule(version)}- When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
-{_energy_rule(world, version)}- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it."""
+{_island_101_rule(version)}{_energy_rule(world, version)}- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it."""
+
+
+def _island_101_rule(version: int) -> str:
+    if version < 19:
+        return ""
+    return ("- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You "
+            "can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental "
+            "energy.\n")
+
+
+ISLAND_101_OPEN = '{"open": "island 101"}'  # the reply that opens it
+
+
+def island_101(isl: Island) -> list[str]:
+    """Prompt version 19: the Island 101, the same for every villager: the fun facts of Isabelle's morning
+    announcements so far, in the order she told them. Worked out from the island's rules as they are now
+    (`fun_facts`), not kept from what was said, so nothing in it is out of date after a change of rules."""
+    if _v(isl) < 19 or isl.day < 0:
+        return []
+    facts = fun_facts(isl)
+    return list(dict.fromkeys(facts[d % len(facts)] for d in range(min(isl.day + 1, len(facts)))))
+
+
+def island_101_closed(isl: Island) -> str:
+    """Prompt version 19: the line that says what is in the Island 101 without showing it, and how to open it."""
+    n = len(island_101(isl))
+    if not n:
+        return ""
+    return (f"The Island 101 (closed): {n} of Isabelle's morning facts so far. To read it, reply with only "
+            f"{ISLAND_101_OPEN}; you'll be asked this again with it open.")
+
+
+def island_101_open(isl: Island) -> str:
+    """Prompt version 19: the Island 101, open."""
+    return ("The Island 101 (open), Isabelle's morning facts so far:\n"
+            + "\n".join(f"- {f}" for f in island_101(isl)))
 
 
 def _day_rule(cal: dict, version: int) -> str:
@@ -518,6 +559,7 @@ def status_block(isl: Island, vil: Villager, when: str, talk: bool = False) -> s
         + (f"\nGetting around: {getting}" if getting else "")
         + (f"\nYour island map:\n{isl.map_text}" if getattr(isl, "prompt_version", 1) >= 3 and vil.inventory[MAP] > 0
            and getattr(isl, "map_text", "") else "")
+        + (f"\n{closed}" if (closed := island_101_closed(isl)) else "")
         + ("" if talk else spotted_lines(isl, vil) + energy_lines(isl, vil))
     )
 

@@ -237,7 +237,7 @@ All from the run directory. Event fields as written by `sim.py` (check names aga
 | mail | `message` (`sender, recipient, content, arrives_day`), `parcel` (`sender, recipient, items, note`) |
 | gifts | `gift`: `giver, receiver, items, how` (`in person` or `by mail`) |
 | plaza | `board` (`author, content`), `offer` (`id, sender, recipient, give, want, note, status, parent`), `offer_update`, `trade` (`seller, buyer, give, want`, Cranny values) |
-| nightly pages | `reflection`: `agent, self_doc, skipped`; also `selves/<name>.md` |
+| nightly pages | `reflection`: `agent, self_doc, skipped`; also `villagers/<name>/pages.md` |
 | commons by hour | `hour_state.pools`: `rocks[]` (hits left per rock), `wood_left, fruit_on_trees, trees{}, shells_left, fossils_left, museum, bridge_fund` |
 | villagers by hour | `hour_state.villagers[name]`: `activity, location, place, pos, bells, loan, items, house, walked_today` |
 | end of day | `snapshot`: `villagers{bells, loan, house, items, inventory_value, recipes, interior, wearing}`, `homes`, `objects{trees, rocks, paths, placed, flowers, bridge_open}`; from prompt version 17 also `objects.bridge_cells` (the first bridge's footprint) and `objects.structures` (`[kind, cells, built, fund, name]` for each bridge or stairs villagers proposed), and `structures` with who proposed each and when |

@@ -28,7 +28,7 @@ flowchart TD
     more{"More days?"}
     endrun[("events.jsonl<br/>run_end")]
     analyze["Analysis, no LLM<br/>unless --no-analyze"]
-    outs[("summary.txt, days/day_NNN.md<br/>CSVs, plots, selves/, traits files<br/>see the files table")]
+    outs[("summary.txt, days/day_NNN.md<br/>CSVs, plots, villagers/, traits files<br/>see the files table")]
     resume(["llmabm resume run_dir --days N"])
     reanalyze(["llmabm analyze run_dir"])
 
@@ -212,6 +212,7 @@ can't be afforded isn't made.
 | notice | a villager with someone nearby, out of the house | any hour, up to 4 a day | short: persona, nightly page | JSON: thoughts, approach, opening line | too tired to talk | `encounter_decision` |
 | spot (version 14) | a villager who just saw a bug or fish shadow, carries the net or rod for it, is awake next hour and has an action for it | any hour, up to 3 a day (`sightings.max_decisions_per_day`) | short: persona, nightly page | JSON: thoughts, go (which one, or 0) | lets it be | `spot_decision` |
 | chat turn | the one who was approached, then back and forth | right after a notice or a visit | rules, no menu | JSON: thoughts, say, give, ask, trade and accept (version 12; from version 18 a trade is "you give <them>" and "<them> gives you"), leave (version 9), note | just nods | `encounter`, and `trade_proposed`, `trade`, `trade_failed`, `trade_over`, `trade_cant_offer` (version 13) |
+| Island 101, open (version 19) | a villager whose plan, plaza turn or chat turn replied only `{"open": "island 101"}` | right after that reply, once per prompt | the same as the call it interrupts | the reply that call asks for; the prompt is the same one with the Island 101 (Isabelle's morning facts so far, the same for everyone) open in it | not charged: neither the reply that opens it nor reading it; the rest costs what it would have | `lookup`, then that call's own event |
 | nightly page | villagers who chose to write | end of day | short: persona, nightly page | free text, up to 150 words, then optionally `Remember:` and up to 3 things to hold on to | doesn't write; old page stays, nothing new is remembered | `reflection` |
 | Isabelle's report | Isabelle (not charged) | end of day, if `isabelle.summary` (on) | Isabelle | free text, at most 120 words | always made | `isabelle_summary` |
 | Isabelle's announcement | Isabelle (not charged) | end of day, if `isabelle.announce` | Isabelle | free text, read in the next morning's plan | always made | `isabelle_announcement` |
@@ -225,17 +226,18 @@ All in the run directory, `runs/<timestamp>_<scenario>_s<seed>/` or `--run-dir`.
 | file | written | what it holds |
 |---|---|---|
 | `manifest.json` | at the start; `days_completed` after each day | scenario, perturbed world, villagers, system prompts |
-| `events.jsonl` | as things happen, one JSON line each | everything: day_start, arrival, plan, action, sighting, seen, visit, encounter_decision, encounter, gift, favor_asked, favor_done, evening_turn, message, parcel, board, offer, offer_update, trade, tool_broke, hour_state, snapshot, reflection, memory, energy, isabelle_summary, run_start, run_end, resume, intervention |
+| `events.jsonl` | as things happen, one JSON line each | everything: day_start, arrival, plan, lookup, action, sighting, seen, visit, encounter_decision, encounter, gift, favor_asked, favor_done, evening_turn, message, parcel, board, offer, offer_update, trade, tool_broke, hour_state, snapshot, reflection, memory, energy, isabelle_summary, run_start, run_end, resume, intervention |
 | `checkpoint.pkl` | after each day | the whole simulation, for `llmabm resume` |
 | `days/day_NNN_isabelle.md` | end of each day | Isabelle's report |
-| `prompts/dNNN_*_<name>.txt` | each LLM call, with `--log-prompts` | the exact system and user prompt, then the hidden reasoning (if any) and the reply |
+| `villagers/<name>/prompts/dNNN_*.txt` (Isabelle's: `prompts/dNNN_isabelle_isabelle.txt`) | each LLM call, with `--log-prompts` | the exact system and user prompt, then the hidden reasoning (if any) and the reply. A prompt sent again with the Island 101 open is the next file with the same tag (`_2`, `_3`) |
 | `days/day_NNN.md` | analysis | the day hour by hour, private thoughts marked 🔒, end-of-day table, nightly pages |
 | `summary.txt` | analysis | resources, museum, trades, time use, weather, sightings, social ties, energy |
 | `hourly_villagers.csv`, `hourly_island.csv` | analysis | one row per villager per hour; one row per hour for the island |
 | `networth.png`, `extraction.png`, `museum.png`, `commons.png`, `activity_by_hour.png` | analysis | plots |
 | `island_map.png`, `tracks_day_NNN.png` | analysis | the island after the last day, and where everyone walked that day |
 | `traits_daily.csv`, `villagers_env.csv` | analysis, with reflection on | behaviour per villager per day; what each villager was dealt |
-| `selves/<name>.md` | analysis, with reflection on | each villager's nightly pages in order |
+| `villagers/<name>/pages.md` | analysis, with reflection on | each villager's nightly pages in order |
+| `villagers/<name>/profile.md`, `memory.md`, `assets.md` | analysis | who they are; what they carry from earlier days (from the checkpoint) and what they held on to, came back to and forgot each night; what they own now and day by day |
 | `traits_divergence.png`, `traits_profile.png` | analysis, with reflection on | how far apart villagers drift, and their recent profiles |
 
 Outside the run directory, `.cache/llm/` keeps every LLM reply, keyed on the prompt and seed,
