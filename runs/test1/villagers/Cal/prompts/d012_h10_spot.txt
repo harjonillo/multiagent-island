@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, 23 h.  
+Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 10:00. You are Cal, at the river.
+You just spotted:
+1. a very large fish shadow in the river (lower ground, southeast, near rock 6)
+2. a very large fish shadow in the river (lower ground, southeast)
+Earlier today:
+- 07:00 spotted a rune moth on a rock (lower ground, southeast, near rock 1) and went after it at 08:00 instead of mine_rock (rock: 6)
+- 08:00 tried to catch_bug: pockets full
+- 08:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 09:00 instead of fish (where: sea)
+- 09:00 tried to fish: pockets full
+- 10:00 tried to fish: pockets full
+Things you remember (anything you don't hold on to at night fades):
+- (day 11) Dax unresponsive today.
+- (day 11) Got an ashrumo moth; trade for softwood.
+- (day 11) Need more softwood for bridge and future trades.
+Your notes from the last 2 days:
+- (day 10) No more energy for talks today.
+- (day 11) Try to ask Dax for some wood tomorrow. Maybe trade a selit for a softwood if he has any.
+- (day 11) Keep an eye on Jo’s offers; maybe ask for more softwood tomorrow.
+- (day 11) Trade 1 selzalne for 1 softwood next time.
+- (day 11) Rest tonight, think about bridge contribution tomorrow.
+- (day 12) If I run out of time, skip the bridge and just finish fishing.
+At 11:00 you planned: propose_bridge.
+Actions left today: 5 of 10. Mental energy left today: 108.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (36 tokens, hidden from everyone) ===
+We should choose fish or moth? We need softwood. We have ashrumo moth earlier but pockets full. Maybe go after fish shadow to get fish. Probably fish.
+
+=== REPLY ===
+{"thoughts":"Need softwood for bridge. Fishing might give me a large fish, but pockets are full. If I go after fish shadow now, I might get a fish later after emptying pockets. Better to wait? I only have 5 actions left. I'll go after the fish shadow at 11:00 to try to get a fish before pockets fill again.","go":1}

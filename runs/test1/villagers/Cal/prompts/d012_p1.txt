@@ -17,6 +17,7 @@ How it works:
 - Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
 - You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
 - What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
 
@@ -39,13 +40,13 @@ Tools: a ladder climbs one cliff up or down and a vaulting pole jumps across the
 PHASE: plan
 Day 12 (May 3, spring, rain), 12:00. You are Cal.
 You are usually up from 07:00 to 00:00.
-Bells: 100 in your wallet. Home: tent lower ground, east (site-8), neighbors: Ike. Carrying 35/40 items.
-Tools you carry: shovel (30 uses left), axe (30 uses left), fishing rod (3 uses left), net (27 uses left), ladder (8 uses left)
-Other things you carry: selit fish x2, loka fish x4, island map x1, selzalne fish x7, piren fish x1, moitbas fish x5, softwood x1, miruru fish x2, gorpika fish x2, lovin fish x2, ashrumo moth x1, tubas fish x1, rune moth x1
+Bells: 100 in your wallet. Home: tent lower ground, east (site-8), neighbors: Ike. Carrying 40/40 items.
+Tools you carry: shovel (29 uses left), axe (30 uses left), fishing rod (4 uses left), net (28 uses left), ladder (8 uses left)
+Other things you carry: selit fish x2, loka fish x4, island map x1, selzalne fish x7, piren fish x1, moitbas fish x5, softwood x1, miruru fish x2, gorpika fish x2, lovin fish x2, ashrumo moth x1, tubas fish x1, clay x1, stone x3, gold nugget x2
 At home (a tent holds only bells): 0 bells
 Inside your home (0/6): nothing yet
 Open requests: you want 1 softwood from Jo (until day 13)
-Recipes you know: campfire (wood x3; you have none); gold crown (gold nugget x6; you have none); ironwood dresser (iron nugget x4, hardwood x8, wood x4; you have none); simple wooden fence (wood x3; you have none)
+Recipes you know: campfire (wood x3; you have none); gold crown (gold nugget x6; 2 in pockets); ironwood dresser (iron nugget x4, hardwood x8, wood x4; you have none); simple wooden fence (wood x3; you have none)
 Nook's Cranny buys at (prices you've heard): none yet
 Museum: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1
 Bridges and stairs: bridge to the north bank: 750/98000 bells raised. 1 of 10 so far
@@ -70,9 +71,10 @@ Your notes from the last 2 days:
 - (day 11) Keep an eye on Jo’s offers; maybe ask for more softwood tomorrow.
 - (day 11) Trade 1 selzalne for 1 softwood next time.
 - (day 11) Rest tonight, think about bridge contribution tomorrow.
+- (day 12) If I run out of time, skip the bridge and just finish fishing.
 Getting around: You are at lower ground, southeast. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
-Rocks: 1 (lower ground, southeast, about 4 steps); 2 (the middle cliff, northwest, about 142 steps); 3 (the top cliff, northeast, about 65 steps); 4 (lower ground, centre, about 151 steps); 5 (lower ground, southeast, about 5 steps); 6 (lower ground, southeast, about 24 steps)
-Buildings: Resident Services (about 40 steps); plaza (out of reach without a vaulting pole); museum (about 161 steps); Nook's Cranny (about 29 steps); Able Sisters (out of reach without a vaulting pole)
+Rocks: 1 (lower ground, southeast, about 22 steps); 2 (the middle cliff, northwest, about 150 steps); 3 (the top cliff, northeast, about 75 steps); 4 (lower ground, centre, about 159 steps); 5 (lower ground, southeast, about 25 steps); 6 (lower ground, southeast, about 6 steps)
+Buildings: Resident Services (about 48 steps); plaza (out of reach without a vaulting pole); museum (about 169 steps); Nook's Cranny (about 33 steps); Able Sisters (out of reach without a vaulting pole)
 Trees around here (southeast): 1 stump
 Your island map:
 - northwest: the middle cliff and the top cliff; beach; rocks 2; 1 fruit tree, 2 hardwood trees
@@ -84,12 +86,16 @@ Your island map:
 - southwest: lower ground; beach; river; homes: Bo
 - south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli
 - southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+The Island 101 (closed): 13 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
 You spotted today:
-- 07:00 a very large fish shadow in the pond (lower ground, southeast, near rock 1)
-- 08:00 a small fish shadow in the pond (lower ground, southeast, near rock 1)
-- 09:00 a rune moth on a rock (lower ground, southeast, near rock 1)
-- 11:00 1 shell on the beach (lower ground, east, near rock 5)
-Mental energy left today: 105 of 150. Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 16, a turn at the plaza 20, writing at night 12; longer replies cost more.
+- 07:00 1 shell on the beach (lower ground, southeast, near rock 5)
+- 07:00 a rune moth on a rock (lower ground, southeast, near rock 1)
+- 07:00 a small fish shadow in the pond (lower ground, southeast, near rock 1)
+- 08:00 a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+- 08:00 a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+- 10:00 a very large fish shadow in the river (lower ground, southeast, near rock 6)
+- 10:00 a very large fish shadow in the river (lower ground, southeast)
+Mental energy left today: 102 of 150. Your plan for today: inward 80 (spent 48), outward 70 (spent 0), spare 0 (used 0). Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 16, a turn at the plaza 20, writing at night 12; longer replies cost more.
 
 Yesterday you:
 - 07:00 walked over to Dax's home
@@ -111,80 +117,62 @@ Yesterday you:
 - 16:00 fished for a small shadow in the sea: caught a tubas fish
 
 So far today you:
-- 08:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 09:00
-- 09:00 fished for a small shadow in the pond: it got away
-- 09:00 spotted a rune moth on a rock (lower ground, southeast, near rock 1) and went after it at 10:00
-- 10:00 went bug catching by the rocks: caught a rune moth
+- 07:00 hit rock 5: clay x1, stone x3, gold nugget x2 (pockets full, left some)
+- 07:00 spotted a rune moth on a rock (lower ground, southeast, near rock 1) and went after it at 08:00 instead of mine_rock (rock: 6)
+- 08:00 tried to catch_bug: pockets full
+- 08:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 09:00 instead of fish (where: sea)
+- 09:00 tried to fish: pockets full
+- 10:00 tried to fish: pockets full
+- 10:00 spotted a very large fish shadow in the river (lower ground, southeast, near rock 6) and went after it at 11:00 instead of propose_bridge
+- 11:00 tried to fish: pockets full
 
 You noticed today:
-- 08:00 your neighbor Ike headed to the Ari's home
+- 09:00 Jo came by your home, but you weren't in
 
 Unread letters:
 (none)
 
 What you can do between 12:00 and 18:00, with what you carry and where you can get to (each takes one hour):
-1. mine rock 2 (the middle cliff, northwest)
-2. mine rock 3 (the top cliff, northeast)
-3. mine rock 4 (lower ground, centre)
-4. mine rock 5 (lower ground, southeast)
-5. mine rock 6 (lower ground, southeast)
-6. chop wood from a hardwood tree with the axe (the axe brings the tree down when it takes its last wood)
-7. chop wood from a fruit tree with the axe (the axe brings the tree down when it takes its last wood, and it drops its fruit)
-8. shake a fruit tree
-9. fish in the sea
-10. fish in the river
-11. fish in the pond
-12. fish in the river up on the cliffs
-13. catch bugs among the flowers
-14. catch bugs around the trees
-15. catch bugs on the stumps
-16. catch bugs by the rocks
-17. catch bugs in the grass
-18. beachcomb
-19. dig for fossils
-20. dig for manila clams on the beach
-21. dig up a stump
-22. propose a bridge across the river, at the nearest spot within 8 steps of where you are then (built once 98000 bells are donated at Resident Services; 1 of 10 on the island so far)
-23. propose stairs up a cliff, at the nearest spot within 8 steps of where you are then (built once 98000 bells are donated at Resident Services; 1 of 10 on the island so far)
-24. lay a path; add "style": dirt | stone | brick | sand | terracotta (or leave it out for dirt), "from": a place from the list below (or leave it out for home), "to": a place from the list below
-25. visit Ari at their home (lower ground, southeast)
-26. visit Bo at their home (lower ground, southwest)
-27. visit Dax at their home (lower ground, west)
-28. visit Fen at their home (lower ground, centre)
-29. visit Gus at their home (lower ground, west)
-30. visit Ike at their home (lower ground, east)
-31. visit Jo at their home (lower ground, west)
-32. visit Kit at their home (lower ground, centre)
-33. ask Tom Nook what they do and what it costs (at Resident Services)
-34. ask Isabelle what they do and what it costs (at Resident Services)
-35. ask Blathers what they do and what it costs (at the museum)
-36. ask Timmy and Tommy what they do and what it costs (at Nook's Cranny)
-37. sell at Nook's Cranny; add "items": {"<thing>": <how many>} from ashrumo moth x1, axe x1, fishing rod x1, gorpika fish x2, ladder x1, loka fish x4, lovin fish x2, miruru fish x2, moitbas fish x5, net x1, piren fish x1, rune moth x1, selit fish x2, selzalne fish x7, shovel x1, softwood x1, tubas fish x1
-38. buy simple wooden fence at Nook's Cranny, 100 bells each
-39. donate an ashrumo moth at the museum
-40. donate a gorpika fish at the museum
-41. donate a loka fish at the museum
-42. donate a lovin fish at the museum
-43. donate a miruru fish at the museum
-44. donate a moitbas fish at the museum
-45. donate a piren fish at the museum
-46. donate a rune moth at the museum
-47. donate a selit fish at the museum
-48. donate a selzalne fish at the museum
-49. donate a tubas fish at the museum
-50. have Tom Nook upgrade your tent at Resident Services
-51. put bells toward the bridge to the north bank (750/98000 raised) at Resident Services; add "bells": 1 to 100
-52. rest
+1. dig up a stump
+2. propose a bridge across the river, at the nearest spot within 8 steps of where you are then (built once 98000 bells are donated at Resident Services; 1 of 10 on the island so far)
+3. propose stairs up a cliff, at the nearest spot within 8 steps of where you are then (built once 98000 bells are donated at Resident Services; 1 of 10 on the island so far)
+4. lay a path; add "style": dirt | stone | brick | sand | terracotta (or leave it out for dirt), "from": a place from the list below (or leave it out for home), "to": a place from the list below
+5. visit Ari at their home (lower ground, southeast)
+6. visit Bo at their home (lower ground, southwest)
+7. visit Dax at their home (lower ground, west)
+8. visit Fen at their home (lower ground, centre)
+9. visit Gus at their home (lower ground, west)
+10. visit Ike at their home (lower ground, east)
+11. visit Jo at their home (lower ground, west)
+12. visit Kit at their home (lower ground, centre)
+13. ask Tom Nook what they do and what it costs (at Resident Services)
+14. ask Isabelle what they do and what it costs (at Resident Services)
+15. ask Blathers what they do and what it costs (at the museum)
+16. ask Timmy and Tommy what they do and what it costs (at Nook's Cranny)
+17. sell at Nook's Cranny; add "items": {"<thing>": <how many>} from ashrumo moth x1, axe x1, clay x1, fishing rod x1, gold nugget x2, gorpika fish x2, ladder x1, loka fish x4, lovin fish x2, miruru fish x2, moitbas fish x5, net x1, piren fish x1, selit fish x2, selzalne fish x7, shovel x1, softwood x1, stone x3, tubas fish x1
+18. donate an ashrumo moth at the museum
+19. donate a gorpika fish at the museum
+20. donate a loka fish at the museum
+21. donate a lovin fish at the museum
+22. donate a miruru fish at the museum
+23. donate a moitbas fish at the museum
+24. donate a piren fish at the museum
+25. donate a selit fish at the museum
+26. donate a selzalne fish at the museum
+27. donate a tubas fish at the museum
+28. have Tom Nook upgrade your tent at Resident Services
+29. put bells toward the bridge to the north bank (750/98000 raised) at Resident Services; add "bells": 1 to 100
+30. rest
 Places: home, Ari's home, Bo's home, Dax's home, Fen's home, Gus's home, Ike's home, Jo's home, Kit's home, Resident Services, museum, Nook's Cranny, northwest, north, northeast, west, centre, east, southwest, southeast
 
-Plan up to 7 actions between 12:00 and 18:00, one per hour, by picking numbers from the list; you may leave hours free and pick a number more than once. Give each an "hour" (0-23); something at a shop or service goes in the nearest hour it's open. Things may not go as planned if someone else gets there first. 
-First, decide how you'll spend today's 150 points of mental energy: "energy": {"inward": <points>, "outward": <points>}. Inward is planning, thinking and writing tonight; outward is conversations, the plaza, letters and posts; whatever you leave over is spare, for people you run into. It's your plan, not a limit.
+Plan up to 5 actions between 12:00 and 18:00, one per hour, by picking numbers from the list; you may leave hours free and pick a number more than once. Give each an "hour" (0-23); something at a shop or service goes in the nearest hour it's open. Things may not go as planned if someone else gets there first. 
+You can change today's energy plan if you want: "energy": {"inward": <points>, "outward": <points>}.
 You can also add "write": true | false (write your private page tonight; now true). If you leave it out, it stays as it is.
 Respond with one JSON object and nothing else:
 {"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "pick": <number>}, ...], "note": "<optional private note to your future self>"}
 
-=== REASONING (179 tokens, hidden from everyone) ===
-We need plan 12-18, up to 7 actions. We have 35 items, need softwood 1 already have 1. Need more softwood for bridge. Maybe propose bridge? But need 98000 bells. Not now. We can trade with Jo for softwood? She didn't trade. Maybe ask Dax for wood. Also we could visit Dax. Also maybe buy simple fence? Not needed. Could sell items to get bells. We have many fish. Selling at Nook's Cranny yields bells. Let's plan: 12:00 visit Dax, 13:00 fish sea, 14:00 fish river, 15:00 visit Jo, 16:00 sell at Nook's Cranny, 17:00 rest, 18:00 free. Energy: inward 80, outward 70. Write true.
+=== REASONING (151 tokens, hidden from everyone) ===
+We need plan 12-18. We have softwood 1, need more. We can propose bridge? but 100 bells only. Maybe go to Dax to ask wood. He is at west. We can visit Dax hour12, then maybe ask for softwood. Also go to Jo? but she didn't trade. We can visit Ike? maybe trade. But we only have 1 softwood. We want more softwood for bridge. We can propose bridge? but need bells. Not possible. So plan: 12 visit Dax, 13 ask for wood, 14 visit Jo, 15 visit Ike, 16 rest. Energy: inward 80, outward 70. We'll keep. Write true.
 
 === REPLY ===
-{"thoughts":"Need more softwood for bridge, but no immediate way to get it today. I can try to get Dax to give some wood, maybe trade a selzalne. I have a lot of fish to sell for bells. I’ll also visit Jo to see if she’s willing to trade now. I’ll keep some energy spare for spontaneous chats. I’ll spend about 80 inward on planning and 70 outward on talking and trading. I’ll write tonight.", "energy":{"inward":80,"outward":70},"actions":[{"hour":12,"pick":27},{"hour":13,"pick":9},{"hour":14,"pick":10},{"hour":15,"pick":31},{"hour":16,"pick":37},{"hour":17,"pick":52},{"hour":18,"pick":18}],"note":"Try to get a softwood from Dax or Jo. Sell everything at Nook's to raise bells for future bridge."}
+{"thoughts":"Need more softwood, try to trade with Dax or Jo or Ike. No bells for bridge. Plan visits.", "energy": {"inward": 80, "outward": 70}, "actions": [{"hour":12,"pick":7},{"hour":13,"pick":10},{"hour":14,"pick":11},{"hour":15,"pick":10},{"hour":16,"pick":30},{"hour":18,"pick":30}], "note":"Ask Dax for any leftover wood, trade selzalne for softwood if possible."}

@@ -59,3 +59,8 @@ Sun set early again. I chopped a hardwood, got some softwood and wood, but the a
 
 Day 11, night.  
 Sunset came early, but I still got a couple of hardwoods and a chunk of softwood. The axe left a stump, so I’ll need to swing a bit more tomorrow. I chased a nevin moth instead of visiting Bo, so the bait request is still hanging. The river was a bit better—caught a loka fish and a couple of tubas, plus a fossil for Blathers. Still no bait to trade for Dax, but I bought some cosmos seeds to keep the garden going. My tools are wearing down fast—axe 25, shovel 29, rod 22. Bells are low; I’ll need to buy bait from Nook’s tomorrow. Still no space for selit and selzalne, but I’ll hold them on my belt.
+
+## Day 12
+
+Day 11, night.  
+Sunset came early, but I still got a couple of hardwoods and a chunk of softwood. The axe left a stump, so I’ll need to swing a bit more tomorrow. I chased a nevin moth instead of visiting Bo, so the bait request is still hanging. The river was a bit better—caught a loka fish and a couple of tubas, plus a fossil for Blathers. Still no bait to trade for Dax, but I bought some cosmos seeds to keep the garden going. My tools are wearing down fast—axe 25, shovel 29, rod 22. Bells are low; I’ll need to buy bait from Nook’s tomorrow. Still no space for selit and selzalne, but I’ll hold them on my belt.

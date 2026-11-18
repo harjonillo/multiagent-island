@@ -17,6 +17,7 @@ How it works:
 - Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
 - You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
 - What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
 
@@ -75,6 +76,7 @@ Getting around: You are at lower ground, south. You carry: ladder. Cliffs need a
 Rocks: 1 (lower ground, southeast, out of reach without a vaulting pole); 2 (the middle cliff, northwest, out of reach without a vaulting pole); 3 (the top cliff, northeast, out of reach without a vaulting pole); 4 (lower ground, centre, out of reach without a vaulting pole); 5 (lower ground, southeast, out of reach without a vaulting pole); 6 (lower ground, southeast, out of reach without a vaulting pole)
 Buildings: Resident Services (out of reach without a vaulting pole); plaza (about 22 steps); museum (out of reach without a vaulting pole); Nook's Cranny (out of reach without a vaulting pole); Able Sisters (about 26 steps)
 Trees around here (south): 4 stumps
+The Island 101 (closed): 13 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
 Mental energy today: 150. Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 17, a turn at the plaza 20, writing at night 12; longer replies cost more.
 
 Isabelle's morning announcement: Good morning, everyone! It's day 12. The island ordinance is no ordinance. It's May 3 and the weather today is rain. Nothing much to report from yesterday. Did you know digging up a stump with your shovel clears the spot again?
@@ -127,8 +129,8 @@ You can also add "write": true | false (write your private page tonight; now tru
 Respond with one JSON object and nothing else:
 {"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "pick": <number>}, ...], "home": {"store": {}, "take": {}}, "note": "<optional private note to your future self>"}
 
-=== REASONING (110 tokens, hidden from everyone) ===
-We need plan 5 actions 07-11. Likely fish river 07, 08, 09, 10, 11 maybe. But 11 is rest? We can fish 07-10, then 11 rest. We have 4 fish actions. Could also propose bridge? but 10 hours? Bridge requires 8 steps near. Maybe skip. We'll do fish river each hour 07-10. 11 rest. Plan energy: inward 30, outward 120. Write true. Provide JSON.
+=== REASONING (0 tokens, hidden from everyone) ===
+(none returned)
 
 === REPLY ===
-{"thoughts":"Just keep fishing in the river until I get a good haul. I have enough bait in my pockets and the river’s busy. No need to visit the plaza today. Energy split: a bit for planning and writing, most for outward actions.","energy":{"inward":30,"outward":120},"actions":[{"hour":7,"pick":2},{"hour":8,"pick":2},{"hour":9,"pick":2},{"hour":10,"pick":2},{"hour":11,"pick":13}],"home":{"store":{},"take":{}},{"note":"Hope the river gives me a selit or something useful for trading tomorrow."}
+{"thoughts":"Plan to get more fish and bugs, rest a bit, no travel to shops today. Keep energy split 70/80, write tonight.","energy":{"inward":70,"outward":80},"actions":[{"hour":7,"pick":2},{"hour":8,"pick":2},{"hour":9,"pick":4},{"hour":10,"pick":13},{"hour":11,"pick":2}],"home":{"store":{},"take":{},"note":"Maybe ask Jo tomorrow for log."}}

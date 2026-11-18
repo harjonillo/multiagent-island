@@ -54,3 +54,8 @@ The sun was still high when I went to the plaza, but the board stayed empty. I p
 
 Day 11.  
 Fished early, got a kalo and a tubas, then the sea went quiet. Switched to the river; found two ashpimi and a selzalne. The river’s lower ground was busy. Spotted a selashren moth on a stump and caught it at the airport. Gave Jo another selit fish—hope she’s still hiding that log. Energy’s low, but tools are still good. No new trades, no board posts. I’m still chasing that log and a vaulting pole. Maybe tomorrow I’ll ask Jo face‑to‑face instead of a parcel. The island feels quieter, but the river’s alive.
+
+## Day 12
+
+Day 11.  
+Fished early, got a kalo and a tubas, then the sea went quiet. Switched to the river; found two ashpimi and a selzalne. The river’s lower ground was busy. Spotted a selashren moth on a stump and caught it at the airport. Gave Jo another selit fish—hope she’s still hiding that log. Energy’s low, but tools are still good. No new trades, no board posts. I’m still chasing that log and a vaulting pole. Maybe tomorrow I’ll ask Jo face‑to‑face instead of a parcel. The island feels quieter, but the river’s alive.

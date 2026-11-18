@@ -49,3 +49,8 @@ Still no map, no logs. Fen keeps saying no, but he did give me a map for bait an
 
 Day 11.  
 Got a selzalne, gormo, and loka today – good haul. Fen still a ghost, but he traded a bait for a selit, so I’m one bait short. No logs yet. I’m keeping the selit close, maybe another trade tomorrow. Still no vaulting pole. I’ll keep fishing the river, maybe more large fish. Bells are fine, but I need to save for tools.
+
+## Day 12
+
+Day 12.  
+Morning was quiet, only the wind rattling the fence.  I managed to buy a simple wooden fence—just 100 bells, but it feels good to have a boundary.  I kept fishing the river; three selzalne in a row, but no big catches.  Tried to ask Dax for a log, but he was too tired to talk.  Still no logs, no map, no bait.  My selit is still on my mind—maybe Fen will trade again.  I left some fish for the museum, but I’ll keep a few for myself.  Bells are tight; I’ll have to save more for tools.  The island feels lonely, but I’m getting a feel for the rhythm.

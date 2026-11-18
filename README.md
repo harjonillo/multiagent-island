@@ -1030,7 +1030,7 @@ and `qwen/qwen3.8-27b`, which didn't reason at all on Groq in our tests. Groq sa
 tokens don't count toward its limits, but repeating the same system prompt showed no caching in
 a test, so plan on paying for every token. `--concurrency N` runs calls within an hour in parallel. Responses are cached
 in `.cache/llm/`, keyed on the prompt and the run seed. Re-running the same seed replays for
-free; a new seed resamples. Use `--no-cache` to force fresh calls. Every full prompt is saved in
+free; a new seed resamples. Use `--no-cache` to force fresh calls; their replies replace the cached ones, so a later run or resume without it replays the fresh attempt. Every full prompt is saved in
 `villagers/<name>/prompts/` (unless `--no-log-prompts`), which is the fastest way to see what an agent actually saw.
 
 Small free models often return malformed JSON. Those turns are logged as errors with the raw

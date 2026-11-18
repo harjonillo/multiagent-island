@@ -38,7 +38,8 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--backend", help="use this backend for every agent (e.g. mock, groq)")
     r.add_argument("--config", type=Path, default=Path("config/models.yaml"))
     r.add_argument("--concurrency", type=int, default=1, help="parallel LLM calls within an hour")
-    r.add_argument("--no-cache", action="store_true")
+    r.add_argument("--no-cache", action="store_true",
+                   help="make every call afresh; the new replies replace the cached ones")
     r.add_argument("--log-prompts", action="store_true", default=True,
                    help="save every full prompt, reasoning and reply under <run_dir>/villagers/<name>/prompts/ (the default; the "
                         "explorer shows them)")
@@ -53,7 +54,9 @@ def main(argv: list[str] | None = None) -> int:
     rs.add_argument("--backend", help="switch every villager (and Isabelle) to this backend")
     rs.add_argument("--config", type=Path, default=Path("config/models.yaml"))
     rs.add_argument("--concurrency", type=int)
-    rs.add_argument("--no-cache", action="store_true")
+    rs.add_argument("--no-cache", action="store_true",
+                    help="make every call afresh (redoing an unfinished day instead of replaying it); the new "
+                         "replies replace the cached ones, so a later resume without this replays them")
     rs.add_argument("--no-analyze", action="store_true")
     rs.add_argument("--prompt-version", help="switch the run's prompt wording from the next day on ('latest' or a "
                                              "number); logged as an intervention. By default a run keeps its wording")
@@ -75,9 +78,8 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         sc = load_island_scenario(args.scenario, seed=args.seed)
         models = {a.model for a in sc.villagers.values()}
-        cache = None if args.no_cache else Path(".cache/llm")
         try:
-            backends = load_backends(args.config, cache, salt=str(args.seed))
+            backends = load_backends(args.config, Path(".cache/llm"), salt=str(args.seed), refresh=args.no_cache)
         except LLMError as e:
             print(f"error: {e}", file=sys.stderr)
             return 2
@@ -110,8 +112,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: no checkpoint in {args.run_dir}", file=sys.stderr)
             return 2
         seed = json.loads((args.run_dir / "manifest.json").read_text())["seed"]
-        cache = None if args.no_cache else Path(".cache/llm")
-        backends = load_backends(args.config, cache, salt=str(seed))
+        backends = load_backends(args.config, Path(".cache/llm"), salt=str(seed), refresh=args.no_cache)
         try:
             IslandSimulation.resume(args.run_dir, backends, days=args.days, backend_override=args.backend,
                                     concurrency=args.concurrency, prompt_version=args.prompt_version)

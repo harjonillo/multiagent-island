@@ -1,0 +1,52 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 15:00. You are Fen, at the museum.
+You just spotted:
+1. an ashrumo moth on a rock (lower ground, centre, near rock 4)
+Earlier today:
+- 13:00 knocked at Gus's home, but nobody answered
+- 14:00 walked over to Jo's home (also nearby: Cal)
+- 14:00 knocked at Jo's home, but nobody answered
+- 14:00 ran into Cal at Jo's home: Cal said "Hey Fen, could I borrow a bit of your wood? I could trade a selzalne for softwood."; you said "Thanks, Cal!" [you asked Cal for 1 selzalne fish]; Cal said "Sure thing, Fen. Here’s a selzalne for your softwood." [Cal's offer: Cal gives you 1 selzalne fish, you give Cal 1 softwood]; you said "Got it, thanks!" [you accepted: Cal gave you 1 selzalne fish, you gave Cal 1 softwood]; Cal said "Hey Fen, could I snag another softwood if you have one spare?" [Cal asked you for 1 softwood]; you said "Sure, can you give me another selzalne?" [you asked Cal for 1 selzalne fish]; Cal said "Sure thing, another one!" [Cal tried to hand you 1 selzalne fish but you had no room]; you said "" [just nodded (too tired to talk)]
+- 15:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1.
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Need apple before rock break
+- (day 8) Gus traded selzalne for bait, but gave me none
+- (day 8) Still only 1 map in hand, still no path to plaza
+Your notes from the last 2 days:
+- (day 11) Stay ready for the next morning, keep the selit fish handy.
+- (day 12) Check if Gus has ladder or vaulting pole tomorrow. Maybe ask Jo for more selit fish if needed.
+- (day 12) Remember to ask Dax about any map or ladder. Good luck.
+- (day 12) Need to get selzalne soon; maybe from Gus or Dax.
+- (day 12) Keep an eye on Cal for more bait later.
+- (day 12) Keep an eye on Cal’s willingness; maybe offer selit fish if he wants it.
+At 16:00 you planned: rest.
+Actions left today: 0 of 10. Mental energy left today: 16.
+
+You can go after one of them at 16:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (24 tokens, hidden from everyone) ===
+Need choose action. Maybe go after Cal? He has selzalne. Go 0? choose 0.
+
+=== REPLY ===
+{"thoughts":"I’ll just rest now. No one to chase, no urgent tasks. 0","go":0}

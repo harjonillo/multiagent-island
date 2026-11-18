@@ -14,28 +14,29 @@ PHASE: notice
 Day 12 (May 3, spring, rain), 08:00. You are Ike, at the Ari's home.
 Nearby: Bo.
 Earlier today:
-- 07:00 rested
-- 08:00 walked over to Ari's home (also nearby: Bo)
-- 08:00 knocked at Ari's home, but nobody answered
+- 07:00 walked over to Ari's home (also nearby: Bo)
+- 07:00 knocked at Ari's home, but nobody answered
+- 07:00 ran into Bo at Ari's home: Bo said "Hey Ike, got any wood spare?"; you said "Hey Bo, can I trade 3 wood for one of those fishing rods?" [you asked Bo for 1 fishing rod]; Bo said "Hey Ike, I can trade you my fishing rod for your 3 wood." [Bo's offer: Bo gives you 1 fishing rod, you give Bo 3 wood, but Bo had no room, so there was no offer]; you said "Sorry, Bo. No room right now. Maybe later."; Bo said "Sure, maybe later. Good luck!"; you said "Hey Bo, can I trade you my fishing rod for a wood?" [your offer: you give Bo 1 fishing rod, Bo gives you 1 wood]; Bo said "Sure, I'll trade you a wood for the rod." [Bo accepted: you gave Bo 1 fishing rod, Bo gave you 1 wood; Bo's offer: Bo gives you 1 wood, you give Bo 1 fishing rod]; you said "Sure, but I don't have a rod right now." [you asked Bo for 1 fishing rod]; Bo said "Sure thing, here's a wood." [Bo handed you 1 wood]; you said "Thanks, Bo! I could use a fishing rod, if you have one." [you asked Bo for 1 fishing rod]; Bo said "Sure, here's a rod." [Bo handed you 1 fishing rod]; you said "Sure, here's my rod." [you accepted: Bo gave you 1 wood, you gave Bo 1 fishing rod; then you went your ways]
+- 08:00 tried to fish: you have no fishing rod (also nearby: Bo)
 Things you remember (anything you don't hold on to at night fades):
 - (day 8) Still no fishing bait.
 - (day 10) Ari keeps offering wood, but no bait.
 - (day 11) 6,750 bells in the tent.
 - (day 11) Ari gave me bait for 1 wood.
 Your notes from the last 2 days:
-- (day 10) Make sure I have a fishing rod tomorrow.
-- (day 10) Keep an eye on Ari tomorrow; maybe he'll have bait after I buy one.
-- (day 10) If Ari comes by, offer him a wood for a fish or something useful. If I run out of bait, maybe post a request again tomorrow.
-- (day 11) Keep an eye on Ari for a wood trade tomorrow.
-- (day 11) Remember to bring the bait back tomorrow to trade back for wood.
-- (day 12) Remember to ask Ari for more wood tomorrow. Maybe try to get a fishing rod before the river dries up.
-Mental energy left today: 120 (about 17 for each thing you say). Your plan for today: inward 80 (spent 30), outward 70 (spent 0), spare 0 (used 0).
+- (day 12) Remember to bring the rod tomorrow to catch more fish.
+- (day 12) Keep an eye on Bo, maybe he’ll have space soon.
+- (day 12) Got a rod and a wood. Remember to keep an eye on Cal for more wood tomorrow.
+- (day 12) Need to collect more wood to keep trading.
+- (day 12) Remember to bring 3 wood next time to trade for a rod.
+- (day 12) Got another wood, keep trading if needed.
+Mental energy left today: 16 (about 16 for each thing you say). Your plan for today: inward 70 (spent 41), outward 80 (spent 93: 13 more than planned, from your spare), spare 0 (used 13).
 
 Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
 {"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
 
-=== REASONING (20 tokens, hidden from everyone) ===
-Need JSON with thoughts, approach, say. choose maybe Bo? or Ari? Probably Ari.
+=== REASONING (17 tokens, hidden from everyone) ===
+Need to decide whom to talk. Likely Ari for bait. Provide JSON.
 
 === REPLY ===
-{"thoughts":"Need more bait, maybe trade wood again. Keep eye on Ari tomorrow.","approach":"Ari","say":"Hey Ari, could I trade another piece of wood for some fishing bait?"}
+{"thoughts":"Need bait and more wood. Ari offers wood, maybe bait. Bo already gave wood. Go to Ari to trade 1 wood for bait.","approach":"Ari","say":"Hey Ari, got any bait I can trade for a wood?"}

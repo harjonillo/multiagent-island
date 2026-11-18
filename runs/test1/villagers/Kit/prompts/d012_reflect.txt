@@ -1,0 +1,84 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11.  
+Got a selzalne, gormo, and loka today – good haul. Fen still a ghost, but he traded a bait for a selit, so I’m one bait short. No logs yet. I’m keeping the selit close, maybe another trade tomorrow. Still no vaulting pole. I’ll keep fishing the river, maybe more large fish. Bells are fine, but I need to save for tools.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 12. You are Kit, at home before sleep.
+
+What happened today:
+- 05:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- 07:00 rested
+- 09:00 bought a simple wooden fence for 100 bells
+- 10:00 walked over to Fen's home
+- 10:00 knocked at Fen's home, but nobody answered
+- 11:00 rested
+- 12:00 fished for a medium shadow in the river: it got away
+- 12:00 spotted a medium fish shadow in the river (lower ground, centre) and went after it at 13:00 instead of fish (where: river)
+- 13:00 fished for a medium shadow in the river: caught a selzalne fish
+- 13:00 spotted a medium fish shadow in the river (the middle cliff, centre) and went after it at 14:00 instead of fish (where: river)
+- 14:00 fished for a medium shadow in the river: caught a selzalne fish
+- 14:00 spotted a medium fish shadow in the clifftop (the middle cliff, centre) and went after it at 15:00 instead of propose_bridge
+- 15:00 fished for a medium shadow in the clifftop: caught a selzalne fish
+- 16:00 walked over to Dax's home
+- 16:00 inside Dax's home: not much furniture yet
+- 16:00 visited Dax at home: you said "Hey Dax, could you spare a small log for me?" [you asked Dax for 1 small log, but there's nothing called small log on this island]; Dax said "" [just nodded (too tired to talk)]
+- 17:00 rested
+
+Things that changed hands today:
+(nothing)
+
+What you have tonight:
+Bells: 100 in your wallet
+Tools you carry: axe (29 uses left), fishing rod (21 uses left), net (29 uses left), ladder x2 (uses left: 2, 23)
+Other things you carry: selit fish x2, hardwood x2, wood x1, selzalne fish x6, tugorpi fish x1, gormo fish x1, loka fish x1, simple wooden fence x1
+At home (a tent holds only bells): 0 bells
+Recipes you know: campfire, clay furnace, iron garden bench, shovel, simple wooden fence
+Since this morning: +3 selzalne fish; +1 simple wooden fence; bells 200 → 100 in your wallet
+
+Open requests:
+(none)
+
+Your notes:
+- (day 11) Try to trade selit for bait tomorrow, maybe Fen will give a map then.
+- (day 11) Keep bait low, try Fen again tomorrow.
+- (day 11) Keep the second selit for tomorrow, maybe trade for a map later.
+- (day 12) Leave some fish for museum tomorrow.
+- (day 12) Remember to keep the selit handy for tomorrow's bait trade.
+- (day 12) Ask Dax for a small log; hope he says yes.
+- (day 12) Remember to ask Dax for a log tomorrow and keep the selit handy for bait trades.
+
+Things you remember, numbered:
+1. (day 10) 1 selit left for trade
+2. (day 10) 1 selzalne still unused
+3. (day 10) 200 bells, no home stash
+4. (day 11) One selit trade for bait with Fen.
+5. (day 11) Three new fish: selzalne, gormo, loka.
+6. (day 11) Still no map or log.
+
+What you wrote last night:
+Day 11.  
+Got a selzalne, gormo, and loka today – good haul. Fen still a ghost, but he traded a bait for a selit, so I’m one bait short. No logs yet. I’m keeping the selit close, maybe another trade tomorrow. Still no vaulting pole. I’ll keep fishing the river, maybe more large fish. Bells are fine, but I need to save for tools.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something you already remember that is still on your mind. Anything you don't hold on to fades over the next days; what you come back to stays longer.
+
+=== REASONING (18 tokens, hidden from everyone) ===
+Need to write diary entry up to 150 words, then "Remember:" lines.
+
+=== REPLY ===
+Day 12.  
+Morning was quiet, only the wind rattling the fence.  I managed to buy a simple wooden fence—just 100 bells, but it feels good to have a boundary.  I kept fishing the river; three selzalne in a row, but no big catches.  Tried to ask Dax for a log, but he was too tired to talk.  Still no logs, no map, no bait.  My selit is still on my mind—maybe Fen will trade again.  I left some fish for the museum, but I’ll keep a few for myself.  Bells are tight; I’ll have to save more for tools.  The island feels lonely, but I’m getting a feel for the rhythm.  
+
+Remember:  
+- Fen still ghost; selit trade tomorrow.  
+- 3 selzalne, 1 gormo, 1 loka today.  
+- 100 bells spent on fence, wallet empty.

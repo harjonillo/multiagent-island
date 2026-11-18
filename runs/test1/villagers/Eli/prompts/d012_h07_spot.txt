@@ -11,11 +11,12 @@ You live on a small island with other villagers. What you think is private; othe
 
 === USER ===
 PHASE: spot
-Day 12 (May 3, spring, rain), 07:00. You are Eli, out on a walk.
+Day 12 (May 3, spring, rain), 07:00. You are Eli, at the river.
 You just spotted:
-1. a small fish shadow in the sea (lower ground, southwest)
+1. a large fish shadow in the river (lower ground, southwest)
+2. a medium fish shadow in the river (lower ground, south)
 Earlier today:
-(nothing yet)
+- 07:00 fished for a small shadow in the river: caught an ashpimi fish
 Things you remember (anything you don't hold on to at night fades):
 - (day 8) No trades today
 - (day 10) Got a tubas fish.
@@ -28,15 +29,15 @@ Your notes from the last 2 days:
 - (day 10) Keep an eye on Jo tomorrow, maybe she'll drop a log or rock. Also, consider visiting the beach for more fish.
 - (day 11) Ask Jo in person tomorrow if I can get a log or rock. Also maybe try to trade a selit fish for bait again.
 - (day 11) Sleep well, maybe catch a fish tomorrow.
-At 08:00 you have nothing planned.
-Actions left today: 10 of 10. Mental energy left today: 128.
+At 08:00 you planned: fish (where: river).
+Actions left today: 5 of 10. Mental energy left today: 128.
 
-You can go after one of them at 08:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
 Respond with one JSON object and nothing else:
 {"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
 
-=== REASONING (42 tokens, hidden from everyone) ===
-Need choose action. Probably go fishing. Shadow small fish sea southwest. Go to sea? That's action 1? We don't have numbered actions list. Probably 1 is sea? We'll pick 1.
+=== REASONING (10 tokens, hidden from everyone) ===
+We choose to chase medium fish (2).
 
 === REPLY ===
-{"thoughts":"I should head out early to try and catch that small fish shadow. The sea seems quiet, but maybe I can get something before the tide shifts. No other urgent tasks today, so I’ll go fishing.","go":1}
+{"thoughts":"I’ll try the medium shadow; it’s closer and maybe easier to catch. If I miss it, I’ll just keep fishing later.","go":2}

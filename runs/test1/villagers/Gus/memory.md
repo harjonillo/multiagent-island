@@ -1,4 +1,4 @@
-# Gus's memory, waking on day 12
+# Gus's memory, waking on day 13
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -15,49 +15,52 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 9 | No bait from Bo or Dax today. | 2 | 0.88 | day 22 |
-| 9 | Got a tubas fish. | 1 | 0.47 | day 14 |
-| 9 | Still have 1 selit, 1 selzalne, 2 loka, 1 gormo. | 2 | 0.78 | day 21 |
-| 10 | No bait yet; still need wood to trade | 1 | 0.61 | day 15 |
-| 10 | Dax says he wants bait first, so I’ll bring wood tomorrow. | 2 | 0.88 | day 22 |
-| 11 | Bo and Dax still want bait, I need wood tomorrow. | 1 | 0.78 | day 16 |
+| 9 | No bait from Bo or Dax today. | 2 | 0.78 | day 22 |
+| 9 | Got a tubas fish. | 1 | 0.37 | day 14 |
+| 9 | Still have 1 selit, 1 selzalne, 2 loka, 1 gormo. | 2 | 0.69 | day 21 |
+| 10 | No bait yet; still need wood to trade | 1 | 0.47 | day 15 |
+| 10 | Dax says he wants bait first, so I’ll bring wood tomorrow. | 2 | 0.78 | day 22 |
+| 11 | Bo and Dax still want bait, I need wood tomorrow. | 1 | 0.61 | day 16 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 10) If Dax refuses, try Bo or buy bait tomorrow.
-- (day 10) Need to get bait soon.
-- (day 10) Need to get bait tomorrow, maybe buy from Nook's.
-- (day 10) Keep track of wood count for next day trade.
-- (day 10) Remember to leave enough wood for future trades.
 - (day 11) Keep an eye on the wood count, maybe chop more tomorrow.
 - (day 11) Remember to bring wood tomorrow for Dax if he still wants bait. Also maybe ask Bo for a quick trade. Keep an eye on my apple supply for breaking rocks next time.
 - (day 11) Remember to bring more wood tomorrow for Dax.
+- (day 12) Keep track of wood usage for tomorrow's Dax trade.
+- (day 12) Remember to trade the fishing rod for bait later if possible. Keep wood for Dax tomorrow.
+- (day 12) Remember to gather more wood tomorrow for Dax, and keep fishing rod for future trades.
+- (day 12) Need to catch a fish tomorrow to get bait.
+- (day 12) Remember to get bait tomorrow, maybe buy from Nook or trade with Dax.
+- (day 12) Remember to bring extra wood tomorrow for Dax if he still wants bait.
 
-## Yesterday (day 11)
+## Yesterday (day 12)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 chopped a hardwood tree: hardwood x2, wood x1; with the last wood the axe brought the tree down, leaving a stump
-- 07:00 spotted a nevin moth on a tree (the middle cliff, centre) and went after it at 08:00 instead of mine_rock (rock: 1)
-- 08:00 went bug catching around the trees: caught a nevin moth
-- 09:00 walked over to Bo's home
-- 09:00 knocked at Bo's home, but nobody answered
-- 10:00 bought a cosmos seeds for 240 bells
-- 10:00 spotted a medium fish shadow in the river (lower ground, south, near Able Sisters) and went after it at 11:00 instead of rest
-- 11:00 fished for a very large shadow in the river: caught a loka fish
-- 12:00 walked over to Dax's home
+- 11:00 ran into Ari at Gus's home: Ari said "Hey Gus, I was hoping you had a spare wood or could point me to some rocks near the river for bait."; you said "Here’s some wood, Ari." [you tried to hand Ari 3 wood but Ari had no room]; Ari said "Hey Gus, can I trade you my fishing rod and one wood for a fishing bait?" [Ari's offer: Ari gives you 1 fishing rod, 1 wood, you give Ari 1 fishing bait]; you said "Hey Ari, I can give you a piece of wood. In return, can you spare a fishing bait?" [you asked Ari for 1 fishing bait]; Ari said "Sure, just give me a bait." [Ari asked you for 1 fishing bait]; you said "Sure, but I need a bait. Can you spare one?" [you asked Ari for 1 fishing bait]; Ari said "Sorry, I have none right now."; you said "Sorry, I need a bait." [you asked Ari for 1 fishing bait]; Ari said "" [Ari handed you 1 wood; Ari asked you for 1 fishing bait]; you said "Sorry, I still need a bait. Can you spare one?" [you asked Ari for 1 fishing bait]; Ari said "Sorry, I really don’t have any bait right now." [then you went your ways]
+- 12:00 walked over to Dax's home (also nearby: Fen, Cal)
 - 12:00 knocked at Dax's home, but nobody answered
-- 13:00 walked over to Bo's home
-- 13:00 knocked at Bo's home, but nobody answered
+- 12:00 ran into Fen at Dax's home: Fen said "Hey Gus, any ladder or pole for crossing the river?"; you said "" [just nodded (too tired to talk)]
+- 13:00 walked over to Ari's home
+- 13:00 inside Ari's home: not much furniture yet
+- 13:00 visited Ari at home: you said "" [just nodded (too tired to talk)]
+- 14:00 fished for a small shadow in the river: caught an ashpimi fish
 - 15:00 rested
 - 16:00 rested
 - 17:00 rested
+- 18:00 rested
+- 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
 
 Shown to them when they meet that villager again (the latest lines; "you" is Gus).
+
+### Ari (day 12, 13:00, at Ari's home)
+
+- **Gus:**  [just nodded (too tired to talk)]
 
 ### Bo (day 9, 08:00, out on a walk)
 
@@ -72,11 +75,10 @@ Shown to them when they meet that villager again (the latest lines; "you" is Gus
 - **Dax:** Sure, but I need bait first. [Dax asked you for 1 fishing bait]
 - **Gus:** Sorry, I don’t have a bait right now. Maybe later. [then you went your ways]
 
-### Fen (day 8, 08:00, at Kit's home)
+### Fen (day 12, 12:00, at Dax's home)
 
-- **Gus:** Hey Fen, any extra fishing bait you can spare?
-- **Fen:** Sure, I can trade you my selzalne for bait. [Fen asked you for 1 fishing bait]
-- **Gus:** Sure thing, give me the bait. [your offer: you give Fen 1 selzalne fish, Fen gives you 1 fishing bait]
+- **Fen:** Hey Gus, any ladder or pole for crossing the river?
+- **Gus:**  [just nodded (too tired to talk)]
 
 ### Kit (day 8, 20:00, at Gus's home)
 
@@ -85,6 +87,10 @@ Shown to them when they meet that villager again (the latest lines; "you" is Gus
 ## What has changed hands with each villager
 
 Shown to them when they meet that villager ("you" is Gus).
+
+### Ari
+
+- day 12: Ari gave you 1 wood
 
 ### Bo
 
@@ -132,3 +138,4 @@ apple 90, axe 230, fishing rod 160, fossil 400, gormo fish 120, hardwood 90, lad
 - Day 9: Wrote the page. Held on to: "No bait from Bo or Dax today."; "Got a tubas fish."; "Still have 1 selit, 1 selzalne, 2 loka, 1 gormo.".
 - Day 10: Wrote the page. Held on to: "No bait yet; still need wood to trade"; "Dax says he wants bait first, so I’ll bring wood tomorrow.". Came back to: "Still have 1 selit, 1 selzalne, 2 loka, 1 gormo.".
 - Day 11: Wrote the page. Held on to: "Bo and Dax still want bait, I need wood tomorrow.". Came back to: "Dax says he wants bait first, so I’ll bring wood tomorrow."; "No bait from Bo or Dax today.".
+- Day 12: Didn't write (no energy left).

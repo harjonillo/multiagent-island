@@ -1,0 +1,47 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11.  
+Got a selzalne, gormo, and loka today – good haul. Fen still a ghost, but he traded a bait for a selit, so I’m one bait short. No logs yet. I’m keeping the selit close, maybe another trade tomorrow. Still no vaulting pole. I’ll keep fishing the river, maybe more large fish. Bells are fine, but I need to save for tools.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 14:00. You are Kit, at the river.
+You just spotted:
+1. a medium fish shadow in the clifftop (the middle cliff, centre)
+2. a small fish shadow in the clifftop (the middle cliff, north)
+Earlier today:
+- 12:00 fished for a medium shadow in the river: it got away
+- 12:00 spotted a medium fish shadow in the river (lower ground, centre) and went after it at 13:00 instead of fish (where: river)
+- 13:00 fished for a medium shadow in the river: caught a selzalne fish
+- 13:00 spotted a medium fish shadow in the river (the middle cliff, centre) and went after it at 14:00 instead of fish (where: river)
+- 14:00 fished for a medium shadow in the river: caught a selzalne fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 10) 1 selit left for trade
+- (day 11) One selit trade for bait with Fen.
+- (day 11) Three new fish: selzalne, gormo, loka.
+- (day 11) Still no map or log.
+Your notes from the last 2 days:
+- (day 10) Remember to ask Fen for the second map and a small log if he can. If Dax says no, try Fen again tomorrow. Keep bait count low.
+- (day 11) Try to trade selit for bait tomorrow, maybe Fen will give a map then.
+- (day 11) Keep bait low, try Fen again tomorrow.
+- (day 11) Keep the second selit for tomorrow, maybe trade for a map later.
+- (day 12) Leave some fish for museum tomorrow.
+- (day 12) Remember to keep the selit handy for tomorrow's bait trade.
+At 15:00 you planned: propose_bridge.
+Actions left today: 0 of 10. Mental energy left today: 86.
+
+You can go after one of them at 15:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (13 tokens, hidden from everyone) ===
+Choose medium fish shadow in clifftop center (1).
+
+=== REPLY ===
+{"thoughts":"Got two shadows now, medium ones are best for bait. I’ll chase the one at the clifftop centre to keep my bait count low and maybe catch a selzalne. Fen still needs a selit, I’ll have it ready for trade tomorrow. No logs yet, keep fishing for logs. Going after #1.","go":1}

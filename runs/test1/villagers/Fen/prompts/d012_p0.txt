@@ -24,6 +24,7 @@ How it works:
 - Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
 - You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
 - What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
 
@@ -90,6 +91,7 @@ Your island map:
 - southwest: lower ground; beach; river; homes: Bo
 - south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli
 - southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+The Island 101 (closed): 13 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
 Mental energy today: 150. Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 17, a turn at the plaza 20, writing at night 12; longer replies cost more.
 
 Isabelle's morning announcement: Good morning, everyone! It's day 12. The island ordinance is no ordinance. It's May 3 and the weather today is rain. Nothing much to report from yesterday. Did you know digging up a stump with your shovel clears the spot again?
@@ -162,8 +164,8 @@ You can also add "write": true | false (write your private page tonight; now tru
 Respond with one JSON object and nothing else:
 {"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "pick": <number>}, ...], "home": {"store": {}, "take": {}}, "note": "<optional private note to your future self>"}
 
-=== REASONING (239 tokens, hidden from everyone) ===
-Need plan 5 actions 07-11. We have time 07-11 inclusive 5 hours. Choose: 1 mine rock 4 at 07, 13? Actually 07-11: hours 07,08,09,10,11. We can pick. Maybe 1 mine rock4 07, 5 fish river 08, 6 catch bugs around trees 09, 4 fish sea 10, 20 visit Bo 11? But Bo is southwest, need vaulting pole to get there? We have no vaulting pole. Can't. Maybe visit Dax 11 (west) but need vaulting pole. Can't. Maybe 22 visit Gus 11 but need vaulting pole. Can't. Maybe 24 ask Blathers 11 but need vaulting pole. Can't. So need to travel to west without vaulting pole? Can't. So maybe we stay home or rest. We can do 32 rest. So 07 mine rock4, 08 fish river, 09 rest, 10 rest, 11 rest. That's 5 actions. energy: inward 60, outward 90. write true.
+=== REASONING (0 tokens, hidden from everyone) ===
+(none returned)
 
 === REPLY ===
-{"thoughts":"Plan: mine rock 4 for resources, fish river for more food, then just rest the rest of the day. No need to travel west yet – can't reach without a vaulting pole. Keep energy balanced for tomorrow when I might get a ladder or pole. Write tonight.","energy":{"inward":60,"outward":90},"actions":[{"hour":7,"pick":1},{"hour":8,"pick":5},{"hour":9,"pick":32},{"hour":10,"pick":32},{"hour":11,"pick":32}],"home":{"store":{},"take":{},"note":"Keep an eye on the map for any new rocks or cliffs. Maybe ask Gus tomorrow for a ladder if I can get a vaulting pole."}}
+{"thoughts":"Plan to try getting a ladder from Gus, use Jo for extra selit if possible, fish a bit, rest. Keep energy balanced.", "energy":{"inward":50,"outward":100},"actions":[{"hour":7,"pick":23},{"hour":8,"pick":22},{"hour":9,"pick":14},{"hour":10,"pick":5},{"hour":11,"pick":32}],"home":{"store":{},"take":{}},"note":"Check if Gus has ladder or vaulting pole tomorrow. Maybe ask Jo for more selit fish if needed."}

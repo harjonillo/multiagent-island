@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Sun rose over the river, and I chased the ashrumo moth like a kid in a forest. It was worth the trip—two moths, a tugorpi, and a lovin’ fish, all without bait. I traded one wood for a fishing bait from Ari, and he seemed happier when I left. The rock at 07:00 was a goldmine—6,750 bells tucked into my tent. I hammered a hardwood tree and found clay, stone, and an iron nugget near rock 6. The river is generous today, but I still have no bells in my hand—just the 6,750 in the tent. Tomorrow I’ll head to the plaza, try to buy more bait, and maybe ask Ari for another trade. The island feels quiet, but the water’s alive, and I’m tired but hopeful.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 14:00. You are Ike, at home.
+You just spotted:
+1. a selashren moth on a stump (lower ground, east, near rock 1)
+Earlier today:
+- 08:00 tried to fish: you have no fishing rod (also nearby: Bo)
+- 08:00 ran into Bo at the rocks: Bo said "Hey Ike, can I grab a couple more rods?"; you said "" [just nodded (too tired to talk)]
+- 09:00 hit rock 4: stone x6, iron nugget x1 (pockets full, left some)
+- 10:00 rested
+- 12:00 too tired to plan, so you planned nothing new
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still no fishing bait.
+- (day 10) Ari keeps offering wood, but no bait.
+- (day 11) 6,750 bells in the tent.
+- (day 11) Ari gave me bait for 1 wood.
+Your notes from the last 2 days:
+- (day 12) Remember to bring the rod tomorrow to catch more fish.
+- (day 12) Keep an eye on Bo, maybe he’ll have space soon.
+- (day 12) Got a rod and a wood. Remember to keep an eye on Cal for more wood tomorrow.
+- (day 12) Need to collect more wood to keep trading.
+- (day 12) Remember to bring 3 wood next time to trade for a rod.
+- (day 12) Got another wood, keep trading if needed.
+At 15:00 you have nothing planned.
+Actions left today: 6 of 10. Mental energy left today: 7.
+
+You can go after one of them at 15:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (112 tokens, hidden from everyone) ===
+We need choose an action. We have spotted selashren moth. We could go after it. Also could go to Bo? But we have no rod. We have rod? notes say got a rod and a wood? unclear. We have rod? Let's assume we have rod. Going to catch fish? but we have no bait. Might go after moth for resources. Go number? The list of actions not given. But we just need number of one to go after. Probably 1 corresponds to selashren moth. So go=1.
+
+=== REPLY ===
+{"thoughts":"I’m tired but the moth might give me some food or materials. I’ll chase it before it disappears.", "go":1}

@@ -21,29 +21,30 @@ PHASE: notice
 Day 12 (May 3, spring, rain), 08:00. You are Bo, at the rocks.
 Nearby: Ike.
 Earlier today:
-- 07:00 walked over to Ari's home
+- 07:00 walked over to Ari's home (also nearby: Ike)
 - 07:00 knocked at Ari's home, but nobody answered
-- 07:00 spotted a rune moth on a rock (lower ground, southeast, near rock 6) and went after it at 08:00 instead of visit (who: Dax)
-- 08:00 tried to catch_bug: pockets full (also nearby: Ike)
+- 07:00 ran into Ike at Ari's home: you said "Hey Ike, got any wood spare?"; Ike said "Hey Bo, can I trade 3 wood for one of those fishing rods?" [Ike asked you for 1 fishing rod]; you said "Hey Ike, I can trade you my fishing rod for your 3 wood." [your offer: you give Ike 1 fishing rod, Ike gives you 3 wood, but you had no room, so there was no offer]; Ike said "Sorry, Bo. No room right now. Maybe later."; you said "Sure, maybe later. Good luck!"; Ike said "Hey Bo, can I trade you my fishing rod for a wood?" [Ike's offer: Ike gives you 1 fishing rod, you give Ike 1 wood]; you said "Sure, I'll trade you a wood for the rod." [you accepted: Ike gave you 1 fishing rod, you gave Ike 1 wood; your offer: you give Ike 1 wood, Ike gives you 1 fishing rod]; Ike said "Sure, but I don't have a rod right now." [Ike asked you for 1 fishing rod]; you said "Sure thing, here's a wood." [you handed Ike 1 wood]; Ike said "Thanks, Bo! I could use a fishing rod, if you have one." [Ike asked you for 1 fishing rod]; you said "Sure, here's a rod." [you handed Ike 1 fishing rod]; Ike said "Sure, here's my rod." [Ike accepted: you gave Ike 1 wood, Ike gave you 1 fishing rod; then you went your ways]
+- 07:00 spotted a rune moth on a rock (lower ground, southeast, near rock 6) and went after it at 08:00
+- 08:00 went bug catching by the rocks: caught a rune moth (also nearby: Ike)
 Things you remember (anything you don't hold on to at night fades):
 - (day 8) Ladder 22 uses left, need more wood
 - (day 10) Shovel uses 29 left.
 - (day 11) 28 shovel uses left
 - (day 11) Gus wants 1 bait from me tomorrow
 Your notes from the last 2 days:
-- (day 10) If Ari has wood, trade for shovel later. If Dax gives bait, fish tomorrow. Stay tuned.
-- (day 11) Keep 3‑5 wood in reserve for tomorrow's bait trade. If Dax or Gus don’t answer, maybe try Ari for a second wood later.
-- (day 11) Keep 4 wood for future trades. Ask Ari for path next time.
-- (day 11) Remember to keep 3‑5 wood for next bait trade. Keep an eye on Ari for any new offers.
-- (day 11) Tomorrow: bring 3 wood to Ari, maybe try Dax or Gus for bait.
-- (day 12) If Ari doesn’t answer, maybe try again tomorrow. Keep 3 wood reserve.
-Mental energy left today: 121 (about 17 for each thing you say). Your plan for today: inward 30 (spent 29), outward 120 (spent 0), spare 0 (used 0).
+- (day 12) If Ari still silent, try Gus tomorrow. Keep 3 wood ready.
+- (day 12) Keep 4 wood after trade, still enough for bait.
+- (day 12) Keep 3-5 wood ready for tomorrow’s bait trade.
+- (day 12) Got another fishing rod. Keep wood count in mind.
+- (day 12) Keep 5 wood left for bait trade tomorrow.
+- (day 12) Got wood back, keep 4 wood reserve for bait trade tomorrow.
+Mental energy left today: 42 (about 16 for each thing you say). Your plan for today: inward 70 (spent 35), outward 80 (spent 73), spare 0 (used 0).
 
 Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
 {"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
 
-=== REASONING (15 tokens, hidden from everyone) ===
-Need to pick nearby: Ike. So approach Ike. Open line.
+=== REASONING (4 tokens, hidden from everyone) ===
+Need JSON.
 
 === REPLY ===
-{"thoughts":"Need wood, bait, maybe trade shovel. Ike might have info or wood. Keep it short.","approach":"Ike","say":"Hey Ike, you got any spare wood?"}
+{"thoughts":"Need wood, maybe trade with Ike again for more rods. Try to get more wood from Ari if possible.","approach":"Ike","say":"Hey Ike, can I grab a couple more rods?"}

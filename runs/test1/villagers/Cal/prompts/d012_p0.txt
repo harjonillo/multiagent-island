@@ -17,6 +17,7 @@ How it works:
 - Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
 - You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
 - What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
 
@@ -84,6 +85,7 @@ Your island map:
 - southwest: lower ground; beach; river; homes: Bo
 - south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli
 - southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+The Island 101 (closed): 13 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
 Mental energy today: 150. Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 17, a turn at the plaza 20, writing at night 12; longer replies cost more.
 
 Isabelle's morning announcement: Good morning, everyone! It's day 12. The island ordinance is no ordinance. It's May 3 and the weather today is rain. Nothing much to report from yesterday. Did you know digging up a stump with your shovel clears the spot again?
@@ -178,8 +180,8 @@ You can also add "write": true | false (write your private page tonight; now tru
 Respond with one JSON object and nothing else:
 {"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "pick": <number>}, ...], "home": {"store": {}, "take": {}}, "note": "<optional private note to your future self>"}
 
-=== REASONING (217 tokens, hidden from everyone) ===
-Need plan 5 actions 07-11. We have 150 energy. Let's spend 70 inward, 70 outward, spare 10. Plan: 07:00 visit Jo to ask again? but already. Maybe ask Dax for wood? but he's unresponsive. Maybe propose bridge? but need bells. We have 0 bells at home. We can take some fish to sell? we have 100 bells in wallet. Could buy simple fence? we need 100 bells. We have 100. But we don't need fence. Maybe visit Dax to ask for wood. Let's plan: 07 visit Dax, 08 visit Jo, 09 fish in sea, 10 mine rock 6, 11 rest. But we have no rock 6? we can mine. We'll pick numbers: 28 (visit Dax), 32 (visit Jo), 10 (fish sea), 6 (mine rock 6), 52 (rest). Let's do that. Energy: inward 70, outward 70. write true.
+=== REASONING (0 tokens, hidden from everyone) ===
+(none returned)
 
 === REPLY ===
-{"thoughts":"Plan to get some wood from Dax, keep trading with Jo, fish a bit, mine a rock for maybe a fossil or stone, then rest. Energy split evenly, keep some spare.","energy":{"inward":70,"outward":70},"actions":[{"hour":7,"pick":28},{"hour":8,"pick":32},{"hour":9,"pick":10},{"hour":10,"pick":6},{"hour":11,"pick":52}],"home":{"store":{},"take":{},"note":"Maybe ask Dax for wood tomorrow if he wakes up."}
+{"thoughts":"Plan to gather more wood and fish before heading to Nook’s. I’ll mine the two southeast rocks, then fish in sea and river to get variety. I’ll also propose a bridge now that I have the ladder nearby. I keep the rest of the day free for talks or the plaza. Energy split 80/70, write tonight.", "energy":{"inward":80,"outward":70},"actions":[{"hour":7,"pick":5},{"hour":8,"pick":6},{"hour":9,"pick":10},{"hour":10,"pick":11},{"hour":11,"pick":23}],"home":{"store":{},"take":{}}, "note":"If I run out of time, skip the bridge and just finish fishing."}

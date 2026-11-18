@@ -17,6 +17,7 @@ How it works:
 - Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
 - You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
 - What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
 
@@ -40,8 +41,8 @@ PHASE: plan
 Day 12 (May 3, spring, rain), 12:00. You are Eli.
 You are usually up from 07:00 to 00:00.
 Bells: 100 in your wallet. Home: tent lower ground, south (site-12), no neighbors yet. Carrying 20/40 items.
-Tools you carry: shovel (30 uses left), axe (27 uses left), fishing rod (15 uses left), net (29 uses left), ladder (30 uses left)
-Other things you carry: selzalne fish x2, softwood x3, hardwood x1, selit fish x1, tubas fish x4, kalo fish x1, ashpimi fish x2, selashren moth x1
+Tools you carry: shovel (30 uses left), axe (27 uses left), fishing rod (15 uses left), net (28 uses left), ladder (30 uses left)
+Other things you carry: selzalne fish x3, softwood x3, hardwood x1, selit fish x1, tubas fish x2, kalo fish x1, ashpimi fish x3, selashren moth x1
 At home (a tent holds only bells): 0 bells
 Inside your home (0/6): nothing yet
 Recipes you know: clay furnace (clay x6, iron nugget x2; you have none); fruit basket (apple x6, softwood x2; in pockets: softwood 3); ironwood dresser (iron nugget x4, hardwood x8, wood x4; in pockets: hardwood 1); simple wooden fence (wood x3; you have none)
@@ -73,13 +74,16 @@ Your notes from the last 2 days:
 - (day 11) Sleep well, maybe catch a fish tomorrow.
 Getting around: You are at lower ground, south. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
 Rocks: 1 (lower ground, southeast, out of reach without a vaulting pole); 2 (the middle cliff, northwest, out of reach without a vaulting pole); 3 (the top cliff, northeast, out of reach without a vaulting pole); 4 (lower ground, centre, out of reach without a vaulting pole); 5 (lower ground, southeast, out of reach without a vaulting pole); 6 (lower ground, southeast, out of reach without a vaulting pole)
-Buildings: Resident Services (out of reach without a vaulting pole); plaza (about 22 steps); museum (out of reach without a vaulting pole); Nook's Cranny (out of reach without a vaulting pole); Able Sisters (about 26 steps)
+Buildings: Resident Services (out of reach without a vaulting pole); plaza (about 13 steps); museum (out of reach without a vaulting pole); Nook's Cranny (out of reach without a vaulting pole); Able Sisters (about 31 steps)
 Trees around here (south): 4 stumps
+The Island 101 (closed): 13 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
 You spotted today:
-- 07:00 1 shell on the beach (lower ground, south, near the airport)
-- 07:00 a small fish shadow in the sea (lower ground, southwest)
-- 08:00 a small fish shadow in the sea (lower ground, southwest)
-Mental energy left today: 118 of 150. Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 16, a turn at the plaza 20, writing at night 12; longer replies cost more.
+- 07:00 a large fish shadow in the river (lower ground, southwest)
+- 07:00 a medium fish shadow in the river (lower ground, south)
+- 10:00 1 shell on the beach (lower ground, south, near the airport)
+- 11:00 a small fish shadow in the river (lower ground, south)
+- 11:00 a very large fish shadow in the river (lower ground, south, near the museum)
+Mental energy left today: 117 of 150. Your plan for today: inward 70 (spent 33), outward 80 (spent 0), spare 0 (used 0). Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 16, a turn at the plaza 20, writing at night 12; longer replies cost more.
 
 Yesterday you:
 - 07:00 fished for a tiny shadow in the sea: caught a kalo fish
@@ -97,10 +101,13 @@ Yesterday you:
 - 16:00 went bug catching on the stumps: caught a selashren moth
 
 So far today you:
-- 07:00 spotted a small fish shadow in the sea (lower ground, southwest) and went after it at 08:00
-- 08:00 fished for a small shadow in the sea: caught a tubas fish
-- 08:00 spotted a small fish shadow in the sea (lower ground, southwest) and went after it at 09:00
-- 09:00 fished for a small shadow in the sea: caught a tubas fish
+- 07:00 fished for a small shadow in the river: caught an ashpimi fish
+- 07:00 spotted a medium fish shadow in the river (lower ground, south) and went after it at 08:00 instead of fish (where: river)
+- 08:00 fished for a medium shadow in the river: caught a selzalne fish
+- 09:00 went bug catching on the stumps: it got away
+- 10:00 rested
+- 11:00 looked for fish in the river, but there were no fish shadows in sight
+- 11:00 spotted a very large fish shadow in the river (lower ground, south, near the museum) and went after it at 12:00
 
 You noticed today:
 (nothing)
@@ -125,15 +132,14 @@ What you can do between 12:00 and 18:00, with what you carry and where you can g
 14. spend the hour at the plaza: the bulletin board, letters and parcels (not one of your actions)
 Places: home, plaza, Able Sisters, airport, south
 
-Plan up to 7 actions between 12:00 and 18:00, one per hour, by picking numbers from the list; you may leave hours free and pick a number more than once. Give each an "hour" (0-23); something at a shop or service goes in the nearest hour it's open. Things may not go as planned if someone else gets there first. 
-You're at home, so you can put things from your pockets away or take things out before you go, which takes no time: "home": {"store": {"<item or bells>": <qty>}, "take": {"<item or bells>": <qty>}}. Your list counts what is in your pockets now; what you take out counts from your next plan.
-First, decide how you'll spend today's 150 points of mental energy: "energy": {"inward": <points>, "outward": <points>}. Inward is planning, thinking and writing tonight; outward is conversations, the plaza, letters and posts; whatever you leave over is spare, for people you run into. It's your plan, not a limit.
+Plan up to 4 actions between 12:00 and 18:00, one per hour, by picking numbers from the list; you may leave hours free and pick a number more than once. Give each an "hour" (0-23); something at a shop or service goes in the nearest hour it's open. Things may not go as planned if someone else gets there first. 
+You can change today's energy plan if you want: "energy": {"inward": <points>, "outward": <points>}.
 You can also add "write": true | false (write your private page tonight; now true). If you leave it out, it stays as it is.
 Respond with one JSON object and nothing else:
-{"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "pick": <number>}, ...], "home": {"store": {}, "take": {}}, "note": "<optional private note to your future self>"}
+{"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "pick": <number>}, ...], "note": "<optional private note to your future self>"}
 
-=== REASONING (96 tokens, hidden from everyone) ===
-Need plan 12-18. Use energy. Do fishing sea at 12, fish river 13, bug stumps 14, rest 15, plaza 16, maybe propose bridge 17? but need time. Let's choose: 12 fish sea,13 fish river,14 bug stumps,15 rest,16 plaza,17 fish sea? but 17 open. 18 nothing. Energy: inward 80, outward 70. Write true.
+=== REASONING (135 tokens, hidden from everyone) ===
+We need plan 12-18. Likely go to plaza at 13 to get a log? But need vaulting pole. Maybe ask Jo tomorrow. Today: propose bridge? but need bells. Not possible. So maybe go to plaza at 13 to post? But no need. Maybe fish in river at 12, 13, 14, 15. We have 4 actions. Let's pick fish river each hour. Also could rest. We'll plan 12 fish river, 13 fish river, 14 fish river, 15 fish river. That's 4 actions. Energy: inward 70, outward 80 unchanged. write true.
 
 === REPLY ===
-{"thoughts":"I want to keep moving, try to get more fish, maybe catch a bug on the stumps and finish the day at the plaza to post a note. I’ll keep energy balanced, give myself a bit more inward to plan tomorrow. I’ll store the softwood I have in my tent so I can craft later. I’ll also remember to ask Jo about the log tomorrow. I’ll write tonight because I have spare energy.","energy":{"inward":80,"outward":70},"actions":[{"hour":12,"pick":1},{"hour":13,"pick":2},{"hour":14,"pick":4},{"hour":15,"pick":13},{"hour":16,"pick":14},{"hour":17,"pick":1}],"home":{"store":{"softwood":3},"take":{},"note":"Remember to ask Jo for a log tomorrow. Maybe trade a selit fish for bait if she’s near. Also keep an eye on the river rocks. Good day."}
+{"thoughts":"Plan to keep fishing in the river, hoping for a log or vaulting pole. No other urgent tasks today. Energy stays same.", "energy":{"inward":70,"outward":80},"actions":[{"hour":12,"pick":2},{"hour":13,"pick":2},{"hour":14,"pick":2},{"hour":15,"pick":2}],"note":"Keep an eye on Jo tomorrow."}

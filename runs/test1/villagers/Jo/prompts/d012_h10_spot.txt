@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9, 23:45.  
+Sun’s out, fish are good, but the bridge still feels miles away. Got 2 softwood from Cal and Dax, plus 2 miruru tonight—good for tomorrow’s fishing run. Bait is still a problem; I gave a selit to Dax and got a piece of softwood back, but he’s still silent. Cal’s offering more fish for softwood, so I’ll keep an eye on him. Dax keeps disappearing at the flowers—maybe he’s out fishing or hiding the rocks. I need to ask Eli tomorrow about the bridge fund, but first I’ll post a bait request. Sleep early, wake with the pond’s echo.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 12 (May 3, spring, rain), 10:00. You are Jo, at the pond.
+You just spotted:
+1. a small fish shadow in the pond (lower ground, southeast, near rock 1)
+2. a small fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 08:00 looked for fish in the river, but there were no fish shadows in sight
+- 09:00 walked over to Cal's home
+- 09:00 knocked at Cal's home, but nobody answered
+- 09:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 10:00 instead of fish (where: river)
+- 10:00 fished for a very large shadow in the pond: it got away
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Cal gave 2 softwood, I traded 1 selzalne.
+- (day 9) Dax still wants bait, I owe him one.
+- (day 9) Bridge still 2k.
+Your notes from the last 2 days:
+- (day 11) Keep the selit for next fishing run. Maybe ask for a rock later.
+- (day 11) Remember to keep the selit fish for next fishing run. Ask Eli about bridge donation tomorrow.
+- (day 11) Remember to keep the selzalne handy for future trades.
+- (day 11) Remember to trade selzalne for rock if he can find one.
+- (day 11) Keep track of rocks for bridge.
+- (day 11) Remember to keep bait for tomorrow.
+At 11:00 you planned: rest.
+Actions left today: 5 of 10. Mental energy left today: 112.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (34 tokens, hidden from everyone) ===
+Need to decide. Likely go after fish. Choose one: maybe the large shadow? But already missed. Maybe small fish? risk? I'll pick 1.
+
+=== REPLY ===
+{"thoughts":"I’ll try for a small fish near rock 1; it’s less likely to escape than the big one. Might get a selzalne if I catch something. 112 energy, 5 actions left. 1 is the first fish spotted.","go":1}

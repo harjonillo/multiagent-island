@@ -17,6 +17,7 @@ How it works:
 - Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
 - You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
 - What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
 
@@ -73,6 +74,7 @@ Getting around: You are at lower ground, centre. You carry: ladder. Cliffs need 
 Rocks: 1 (lower ground, southeast, about 50 steps); 2 (the middle cliff, northwest, about 94 steps); 3 (the top cliff, northeast, about 57 steps); 4 (lower ground, centre, about 103 steps); 5 (lower ground, southeast, about 53 steps); 6 (lower ground, southeast, about 48 steps)
 Buildings: Resident Services (about 14 steps); plaza (out of reach without a vaulting pole); museum (about 113 steps); Nook's Cranny (about 23 steps); Able Sisters (out of reach without a vaulting pole)
 Trees around here (centre): 1 hardwood tree, 5 stumps
+The Island 101 (closed): 13 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
 Mental energy today: 150. Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 17, a turn at the plaza 20, writing at night 12; longer replies cost more.
 
 Isabelle's morning announcement: Good morning, everyone! It's day 12. The island ordinance is no ordinance. It's May 3 and the weather today is rain. Nothing much to report from yesterday. Did you know digging up a stump with your shovel clears the spot again?
@@ -158,14 +160,8 @@ You can also add "write": true | false (write your private page tonight; now tru
 Respond with one JSON object and nothing else:
 {"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "pick": <number>}, ...], "home": {"store": {}, "take": {}}, "note": "<optional private note to your future self>"}
 
-=== REASONING (304 tokens, hidden from everyone) ===
-Need plan 5 actions 07-11. We have axe, fishing rod, net, ladder. Can fish river 5 times? but we only have 5 hours. Maybe fish river twice, visit Fen, go to Nook's Cranny to sell? But need 8 steps to Nook's. Need ladder to reach plaza? Actually Nook's is 23 steps away, need ladder? Ladder climbs cliffs. Not needed. We have 5 hours, can do: 07:00 fish river, 08:00 fish river, 09:00 visit Fen (visit 21), 10:00 sell at Nook's Cranny (29), 11:00 rest? But selling at 10:00 okay. We need to bring items: we have many items in pockets. Sell at Nook's Cranny requires 10:00 open. Good. We might need to take items out? We already have them. We can store some? Maybe store some fish to keep for later? But we sell all? We'll sell all items listed. Let's pick 29 at 10. We also could propose bridge? But 14 requires 14 steps. Not.
-
-Ok plan: 07:00 fish river, 08:00 fish river, 09:00 visit Fen, 10:00 sell at Nook's Cranny, 11:00 rest.
-
-Energy: Inward 70, outward 80. Write true.
-
-Return JSON.
+=== REASONING (163 tokens, hidden from everyone) ===
+Need plan: maybe visit Fen again? but already visited. Maybe go to Nook's to sell items. Need to be there 08-22. Plan: 07:00 rest? maybe 07:00 rest, 08:00 sell at Nook's. Use 1 hour. 09:00 propose bridge? can't until at Resident Services. Maybe 10:00 visit Fen? but he might be busy. Maybe 10:00 go to Nook's to buy fence? but need to be there. Let's do 07:00 rest, 08:00 sell, 09:00 buy simple wooden fence, 10:00 visit Fen, 11:00 rest. Use 5 actions. Energy: inward 100, outward 50. Write true.
 
 === REPLY ===
-{"thoughts":"I’ll clear the river a couple of times, see if Fen has anything new, then off to Nook’s to cash in the haul. Rest after that. Energy split 70 inward for planning, 80 outward for talking and trading. I’ll write tonight.","energy":{"inward":70,"outward":80},"actions":[{"hour":7,"pick":5},{"hour":8,"pick":5},{"hour":9,"pick":21},{"hour":10,"pick":29},{"hour":11,"pick":45}],"home":{"store":{},"take":{}},"note":"Keep an eye on the map, maybe trade the selit next time."}
+{"thoughts":"Plan to get rid of surplus fish and gear, buy a fence, and see Fen for a log. Keep energy low, leave some spare for unexpected talks.","energy":{"inward":100,"outward":50},"actions":[{"hour":7,"pick":45},{"hour":8,"pick":29},{"hour":9,"pick":30},{"hour":10,"pick":21},{"hour":11,"pick":45}],"home":{"store":{},"take":{}},"note":"Leave some fish for museum tomorrow."}

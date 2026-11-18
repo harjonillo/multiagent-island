@@ -11,10 +11,9 @@ You live on a small island with other villagers. What you think is private; othe
 === USER ===
 PHASE: notice
 Day 12 (May 3, spring, rain), 07:00. You are Ari, at the Jo's home.
-Nearby: Dax.
+Nearby: Fen.
 Earlier today:
-- 05:00 in your plan, 19 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
-- 07:00 walked over to Jo's home (also nearby: Dax)
+- 07:00 walked over to Jo's home (also nearby: Fen)
 - 07:00 knocked at Jo's home, but nobody answered
 Things you remember (anything you don't hold on to at night fades):
 - (day 9) Got selit fish at 08:00
@@ -27,13 +26,13 @@ Your notes from the last 2 days:
 - (day 11) Remember to look for rocks near cliffs or river.
 - (day 11) Remember to ask for rock later if possible.
 - (day 11) Remember to collect a rock eventually or find another source of bait.
-Mental energy left today: 117 (about 17 for each thing you say). Your plan for today: inward 70 (spent 33), outward 80 (spent 0), spare 0 (used 0).
+Mental energy left today: 117 (about 17 for each thing you say). Your plan for today: inward 80 (spent 33), outward 70 (spent 0), spare 0 (used 0).
 
 Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
 {"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
 
-=== REASONING (4 tokens, hidden from everyone) ===
-Need JSON.
+=== REASONING (26 tokens, hidden from everyone) ===
+We need JSON with thoughts, approach, say. Choose a nearby villager: Jo or Fen. Maybe talk to Jo.
 
 === REPLY ===
-{"thoughts":"Need bait, try Dax first. Maybe he has a rock or can trade. Keep quiet about plans.","approach":"Dax","say":"Hey Dax, got any rocks or fishing bait?"}
+{"thoughts":"Need bait. Try to get it from Jo or Fen. Jo might have supplies. Keep energy low.","approach":"Jo","say":"Hey Jo, got a minute?"}

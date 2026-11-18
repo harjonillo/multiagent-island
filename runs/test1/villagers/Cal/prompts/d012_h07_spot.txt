@@ -11,31 +11,32 @@ You live on a small island with other villagers. What you think is private; othe
 
 === USER ===
 PHASE: spot
-Day 12 (May 3, spring, rain), 07:00. You are Cal, at home.
+Day 12 (May 3, spring, rain), 07:00. You are Cal, at the rocks.
 You just spotted:
-1. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+1. a rune moth on a rock (lower ground, southeast, near rock 1)
+2. a small fish shadow in the pond (lower ground, southeast, near rock 1)
 Earlier today:
-(nothing yet)
+- 07:00 hit rock 5: clay x1, stone x3, gold nugget x2 (pockets full, left some)
 Things you remember (anything you don't hold on to at night fades):
 - (day 11) Dax unresponsive today.
 - (day 11) Got an ashrumo moth; trade for softwood.
 - (day 11) Need more softwood for bridge and future trades.
 Your notes from the last 2 days:
-- (day 10) Remember to track softwood count for future trades.
 - (day 10) No more energy for talks today.
 - (day 11) Try to ask Dax for some wood tomorrow. Maybe trade a selit for a softwood if he has any.
 - (day 11) Keep an eye on Jo’s offers; maybe ask for more softwood tomorrow.
 - (day 11) Trade 1 selzalne for 1 softwood next time.
 - (day 11) Rest tonight, think about bridge contribution tomorrow.
-At 08:00 you have nothing planned.
-Actions left today: 10 of 10. Mental energy left today: 120.
+- (day 12) If I run out of time, skip the bridge and just finish fishing.
+At 08:00 you planned: mine_rock (rock: 6).
+Actions left today: 5 of 10. Mental energy left today: 119.
 
-You can go after one of them at 08:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
 Respond with one JSON object and nothing else:
 {"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
 
-=== REASONING (106 tokens, hidden from everyone) ===
-Need to decide which target to go after: Dax, Jo, or maybe fishing? But only "go after one" means go to a person? Probably go after Dax or Jo. Need softwood. Dax unresponsive today, maybe go after him? But he may be away. Jo offered fish, but no trade. Maybe go after Jo to ask for softwood. So go=2? Let's assume target numbers: 1=Dax,2=Jo? Not specified. We choose 2.
+=== REASONING (11 tokens, hidden from everyone) ===
+We choose to go after rune moth (1).
 
 === REPLY ===
-{"thoughts":"I need softwood for the bridge and to trade with Dax tomorrow. Jo might have some left, and she offered fish earlier. I'll go to her and try to negotiate a softwood exchange. If she’s tired, I’ll offer a selzalne in return. If that fails, I'll just fish for more wood myself. No other urgent tasks today.","go":2}
+{"thoughts":"Need softwood for bridge. Rune moth gives 1 softwood. Go after it.","go":1}

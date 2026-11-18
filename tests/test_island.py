@@ -747,6 +747,13 @@ def test_hidden_reasoning_is_recorded_and_optionally_charged():
         first, again = c.complete([{"role": "user", "content": "x"}]), c.complete([{"role": "user", "content": "x"}])
         assert again.cached and again.tokens == 0 and (again.reasoning, again.reasoning_tokens) == ("thinking...", 12)
         assert first.reasoning_tokens == 12
+        # --no-cache: the call is made again, and its reply is what a later replay gets.
+        fresh = Cached(Fake(), Path(d), refresh=True)
+        fresh.inner.complete = lambda messages, temperature=0.7, max_tokens=600: Completion("new", tokens=50)
+        redo = fresh.complete([{"role": "user", "content": "x"}])
+        assert redo.text == "new" and not redo.cached
+        replay = c.complete([{"role": "user", "content": "x"}])
+        assert replay.text == "new" and replay.cached
 
 
 def test_commons_contributions_split_public_from_home():

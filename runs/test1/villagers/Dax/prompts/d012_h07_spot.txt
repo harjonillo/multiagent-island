@@ -10,34 +10,32 @@ You live on a small island with other villagers. What you think is private; othe
 
 === USER ===
 PHASE: spot
-Day 12 (May 3, spring, rain), 07:00. You are Dax, at Jo's home.
+Day 12 (May 3, spring, rain), 07:00. You are Dax, out on a walk.
 You just spotted:
 1. a nevin moth on a tree (lower ground, west)
 Earlier today:
-- 07:00 walked over to Jo's home (also nearby: Ari)
-- 07:00 knocked at Jo's home, but nobody answered
-- 07:00 ran into Ari at Jo's home: Ari said "Hey Dax, got any rocks or fishing bait?"; you said "Hey Ari, could I get a fishing bait?" [you asked Ari for 1 fishing bait]; Ari said "Sorry, no bait today. I’ll get some soon."; you said "Sure thing, Ari. I'll give you a wood for a bait." [your offer: you give Ari 1 wood, Ari gives you 1 fishing bait]; Ari said "Sure thing, Dax. I'll bring you a rock instead if you can give me some wood." [Ari asked you for 1 rock, but there's nothing called rock on this island]; you said "Sure, here’s a wood for the bait." [your offer: you give Ari 1 wood, Ari gives you 1 fishing bait]; Ari said "Sorry, no bait today. I’ll bring a rock later." [then you went your ways]
+(nothing yet)
 Things you remember (anything you don't hold on to at night fades):
 - (day 9) I traded 1 softwood for 1 selit fish with Jo.
 - (day 11) No wood stash at home today.
 - (day 11) Got a gormo fish.
 - (day 11) Still need fishing bait.
 Your notes from the last 2 days:
+- (day 10) Remember to follow up at the plaza tomorrow for bait.
+- (day 10) Keep an eye on Jo tomorrow, maybe trade selit for bait there.
+- (day 10) If Jo doesn’t have bait, Gus might. If neither, I’ll head to the plaza tomorrow with a vaulting pole.
+- (day 11) Keep wood stash at home for future trades.
 - (day 11) Keep an eye on Jo tomorrow for extra bait. Keep wood stash at home when possible.
 - (day 11) Remember to ask Gus for bait tomorrow morning.
-- (day 12) If Jo says no, head to Gus tomorrow. Keep an eye on Gus’s schedule. If I get bait, fish for selzalne tonight.
-- (day 12) Keep asking Jo later if no bait.
-- (day 12) Keep wood stash at home tomorrow.
-- (day 12) Remember to store wood at home tomorrow.
-At 08:00 you planned: visit (who: Jo).
-Actions left today: 5 of 10. Mental energy left today: 65.
+At 08:00 you have nothing planned.
+Actions left today: 10 of 10. Mental energy left today: 119.
 
-You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+You can go after one of them at 08:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
 Respond with one JSON object and nothing else:
 {"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
 
-=== REASONING (32 tokens, hidden from everyone) ===
-Need to decide go to Jo or not. We have 5 actions left. We have fish bait need. Jo may have. So go to Jo.
+=== REASONING (12 tokens, hidden from everyone) ===
+Need to decide. Probably go to Jo for bait.
 
 === REPLY ===
-{"thoughts":"I need bait. Jo might have some. I'll head to Jo instead of Ari. 5 actions remain. 65 energy.", "go":1}
+{"thoughts":"I need bait for fishing, and Jo might have selit fish to trade. I’ll head to the plaza and ask Jo first; if no bait, I’ll try Gus. 08:00 is the only slot to go somewhere. I'll go to Jo.", "go": 1}

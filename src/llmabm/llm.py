@@ -213,9 +213,12 @@ class MockBackend:
 
 class Cached:
     """Disk cache keyed on (model, prompt, sampling params, salt). The salt is the
-    run seed, so the same seed replays a run for free and a new seed resamples."""
+    run seed, so the same seed replays a run for free and a new seed resamples. With `refresh`
+    (`--no-cache`) nothing is read from the cache: every call is made, and its reply replaces
+    whatever was kept for that prompt, so a later replay gets the new replies."""
 
-    def __init__(self, inner, cache_dir: Path, salt: str = ""):
+    def __init__(self, inner, cache_dir: Path, salt: str = "", refresh: bool = False):
+        self.refresh = refresh
         self.inner = inner
         self.name = inner.name
         self.model_id = inner.model_id
@@ -227,7 +230,7 @@ class Cached:
             json.dumps([self.model_id, messages, temperature, max_tokens, self.salt], sort_keys=True).encode()
         ).hexdigest()
         path = self.dir / key[:2] / f"{key}.json"
-        if path.exists():
+        if path.exists() and not self.refresh:
             d = json.loads(path.read_text())
             return Completion(d["text"], cached=True, reasoning=d.get("reasoning", ""),
                               reasoning_tokens=d.get("reasoning_tokens", 0))
@@ -238,7 +241,8 @@ class Cached:
         return c
 
 
-def load_backends(config_path: Path | None, cache_dir: Path | None = None, salt: str = "") -> dict:
+def load_backends(config_path: Path | None, cache_dir: Path | None = None, salt: str = "",
+                  refresh: bool = False) -> dict:
     """Returns {name: backend}. 'mock' is always present; 'default' aliases the configured default."""
     backends: dict = {"mock": MockBackend()}
     default = "mock"
@@ -248,7 +252,7 @@ def load_backends(config_path: Path | None, cache_dir: Path | None = None, salt:
         for name, spec in (cfg.get("backends") or {}).items():
             backends[name] = OpenAICompatible(name=name, **spec)
     if cache_dir is not None:
-        backends = {n: (b if isinstance(b, MockBackend) else Cached(b, cache_dir, salt)) for n, b in backends.items()}
+        backends = {n: (b if isinstance(b, MockBackend) else Cached(b, cache_dir, salt, refresh)) for n, b in backends.items()}
     if default not in backends:
         raise LLMError(f"default backend '{default}' is not defined in {config_path}")
     backends["default"] = backends[default]

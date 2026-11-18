@@ -16,6 +16,7 @@ How it works:
 - Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
 - You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
 - What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
 
@@ -86,6 +87,7 @@ Your island map:
 - southwest: lower ground; beach; river; homes: Bo
 - south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli
 - southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+The Island 101 (closed): 13 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
 Mental energy today: 150. Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 17, a turn at the plaza 20, writing at night 12; longer replies cost more.
 
 Isabelle's morning announcement: Good morning, everyone! It's day 12. The island ordinance is no ordinance. It's May 3 and the weather today is rain. Nothing much to report from yesterday. Did you know digging up a stump with your shovel clears the spot again?
@@ -178,8 +180,8 @@ You can also add "write": true | false (write your private page tonight; now tru
 Respond with one JSON object and nothing else:
 {"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "pick": <number>}, ...], "home": {"store": {}, "take": {}}, "note": "<optional private note to your future self>"}
 
-=== REASONING (233 tokens, hidden from everyone) ===
-Need plan: need bait from Gus. Can't reach plaza. Maybe ask Jo? But need bait. Maybe trade wood. Have wood 1. Ask Jo for bait? He has? Maybe propose bridge? No time. Maybe go to Gus at 08? But earlier tried. Maybe at 09 go to Jo, ask bait. Use 5 energy for noticing. Plan: 07:00 ask Jo? But at 07 he not? Let's plan: 07:00 visit Jo. 08:00 ask for bait. 09:00 fish for bait? Actually need bait. Maybe trade wood for bait with Jo. He may have. Use 10:00 fish for selzalne? but need bait. Maybe propose bridge later? Not now. So actions: 07:00 visit Jo, 08:00 ask Jo for bait, 09:00 ask for bait, 10:00 fish? but no bait. Maybe trade wood for bait at 10. So 10:00 visit Jo again to trade. 11:00 rest. Use energy: inward 80, outward 70. write true.
+=== REASONING (0 tokens, hidden from everyone) ===
+(none returned)
 
 === REPLY ===
-{"thoughts":"Need bait, only way is trade with Jo or Gus. Gus not answering; Jo is nearby. I’ll spend the first hours visiting Jo, ask for bait, try to trade my wood. If he has none, I’ll at least get a conversation to keep energy. I’ll then fish a bit if I get bait, otherwise rest. I’ll keep the ladder and fence in pockets for later. No storage, so keep items minimal. I’ll set inward 80, outward 70. I’ll write tonight. No extra notes.","energy":{"inward":80,"outward":70},"actions":[{"hour":7,"pick":34},{"hour":8,"pick":34},{"hour":9,"pick":34},{"hour":10,"pick":34},{"hour":11,"pick":52}],"home":{"store":{},"take":{}},"note":"If Jo says no, head to Gus tomorrow. Keep an eye on Gus’s schedule. If I get bait, fish for selzalne tonight."}
+{"thoughts":"Plan to catch more fish today, hoping to trade for bait tomorrow. Keep energy low for conversations tomorrow. No need to store anything now.","energy":{"inward":70,"outward":80},"actions":[{"hour":7,"pick":11},{"hour":8,"pick":11},{"hour":9,"pick":11},{"hour":10,"pick":11},{"hour":11,"pick":52}],"home":{"store":{},"take":{}},{"note":"Remember to ask Jo for bait tomorrow morning after fishing."}

@@ -1,0 +1,89 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11.  
+Got a selzalne, gormo, and loka today – good haul. Fen still a ghost, but he traded a bait for a selit, so I’m one bait short. No logs yet. I’m keeping the selit close, maybe another trade tomorrow. Still no vaulting pole. I’ll keep fishing the river, maybe more large fish. Bells are fine, but I need to save for tools.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 12 (May 3, spring, rain), 16:00. You are Kit.
+You are usually up from 07:00 to 00:00.
+Bells: 100 in your wallet. Home: tent lower ground, centre (site-6), neighbors: Fen. Carrying 20/40 items.
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Recipes you know: campfire (wood x3; 1 in pockets); clay furnace (clay x6, iron nugget x2; you have none); iron garden bench (iron nugget x3, hardwood x4; in pockets: hardwood 2); shovel (hardwood x5; 2 in pockets); simple wooden fence (wood x3; 1 in pockets; you carry 1 simple wooden fence)
+Nook's Cranny buys at (prices you've heard): axe 230, fishing rod 160, gormo fish 120, hardwood 90, ladder 570, loka fish 390, net 180, selit fish 410, selzalne fish 660, shovel 220, tugorpi fish 3670, vaulting pole 230, wood 90
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640, pansy seeds 240, hyacinth seeds 240, garden lantern 2200, simple wooden fence 100, record player 9800
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards: shovel recipe 200 (you know it), axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, iron garden bench recipe 800 (you know it)
+Able Sisters today (09:00-21:00), clothes: denim jacket 2200, straw hat 800, tuxedo 3200, rose crown 1200
+Things you remember (anything you don't hold on to at night fades):
+- (day 10) 1 selit left for trade
+- (day 10) 1 selzalne still unused
+- (day 10) 200 bells, no home stash
+- (day 11) One selit trade for bait with Fen.
+- (day 11) Three new fish: selzalne, gormo, loka.
+- (day 11) Still no map or log.
+Your notes from the last 2 days:
+- (day 10) Remember to keep the selit handy for bait trades tomorrow. Also try to get a small log from someone if possible.
+- (day 10) If Fen says no, plan to ask Dax or Fen for a small log tomorrow. Keep bait count low.
+- (day 10) Ask Fen for a second map. Keep bait low.
+- (day 10) Keep track of bait count after each trade.
+- (day 10) Remember to ask Fen for the second map and a small log if he can. If Dax says no, try Fen again tomorrow. Keep bait count low.
+- (day 11) Try to trade selit for bait tomorrow, maybe Fen will give a map then.
+- (day 11) Keep bait low, try Fen again tomorrow.
+- (day 11) Keep the second selit for tomorrow, maybe trade for a map later.
+- (day 12) Leave some fish for museum tomorrow.
+- (day 12) Remember to keep the selit handy for tomorrow's bait trade.
+Getting around: You are at lower ground, centre. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+The Island 101 (closed): 13 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
+
+So far today you:
+- 05:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- 07:00 rested
+- 09:00 bought a simple wooden fence for 100 bells
+- 10:00 walked over to Fen's home
+- 10:00 knocked at Fen's home, but nobody answered
+- 11:00 rested
+- 12:00 fished for a medium shadow in the river: it got away
+- 12:00 spotted a medium fish shadow in the river (lower ground, centre) and went after it at 13:00 instead of fish (where: river)
+- 13:00 fished for a medium shadow in the river: caught a selzalne fish
+- 13:00 spotted a medium fish shadow in the river (the middle cliff, centre) and went after it at 14:00 instead of fish (where: river)
+- 14:00 fished for a medium shadow in the river: caught a selzalne fish
+- 14:00 spotted a medium fish shadow in the clifftop (the middle cliff, centre) and went after it at 15:00 instead of propose_bridge
+- 15:00 fished for a medium shadow in the clifftop: caught a selzalne fish
+- 16:00 walked over to Dax's home
+- 16:00 inside Dax's home: not much furniture yet
+
+You are visiting Dax at their home. Inside you can see: nothing much yet. You can start a short conversation, or say nothing.
+One or two sentences, the way you'd really talk. Only Dax hears it.
+Each line costs about 17 mental energy; you have 80 left today.
+You can also give Dax something from your pockets now ("give"), ask Dax for something ("ask"; open until they give or trade it, up to 3 days), or offer a trade ("trade": what you give Dax and what Dax gives you; it happens only if Dax accepts, both at once). Leave any empty ({}).
+Trade offers left in this conversation (from either of you): 3 of 3.
+In your pockets right now: 100 bells, axe x1, fishing rod x1, net x1, ladder x2, selit fish x2, hardwood x2, wood x1, selzalne fish x6, tugorpi fish x1, gormo fish x1, loka fish x1, simple wooden fence x1
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {} or {"<item or bells>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, "trade": {} or {"you give Dax": {"<item or bells>": <qty>}, "Dax gives you": {"<item or bells>": <qty>}}, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (140 tokens, hidden from everyone) ===
+We need to decide. We are at Dax. We have 100 bells, 1 axe, fishing rod, net, ladder x2, selit x2, hardwood x2, wood x1, selzalne x6, tugorpi x1, gormo x1, loka x1, fence x1. We want maybe a log or map. Dax may have logs? We can ask for a small log or map. Let's ask for a small log. Maybe trade selzalne? But Dax might not accept. We can ask for log. We'll spend some mental energy. Let's give nothing. Ask for small log. We'll say something friendly.
+
+=== REPLY ===
+{"thoughts":"Need a log for my logbook. Dax probably has one. Offer friendly chat, ask for log.","say":"Hey Dax, could you spare a small log for me?","give":{},"ask":{"small log":1},"trade":{},"leave":false,"note":"Ask Dax for a small log; hope he says yes."}

@@ -16,6 +16,7 @@ How it works:
 - Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
 - When you are near another villager, you can go and talk to them. Talking costs no action.
 - Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
 - You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
 - What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
 
@@ -85,6 +86,7 @@ Your island map:
 - southwest: lower ground; beach; river; homes: Bo
 - south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli
 - southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+The Island 101 (closed): 13 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
 Mental energy today: 150. Typical costs: a plan 22, noticing someone 5, one thing you say in a conversation 17, a turn at the plaza 20, writing at night 12; longer replies cost more.
 
 Isabelle's morning announcement: Good morning, everyone! It's day 12. The island ordinance is no ordinance. It's May 3 and the weather today is rain. Nothing much to report from yesterday. Did you know digging up a stump with your shovel clears the spot again?
@@ -160,8 +162,8 @@ You can also add "write": true | false (write your private page tonight; now tru
 Respond with one JSON object and nothing else:
 {"thoughts": "<your private reasoning; nobody else sees it>", "energy": {"inward": <points>, "outward": <points>}, "actions": [{"hour": <hour>, "pick": <number>}, ...], "home": {"store": {}, "take": {}}, "note": "<optional private note to your future self>"}
 
-=== REASONING (69 tokens, hidden from everyone) ===
-Need plan: maybe visit Jo for bait, Bo for wood, then Nook's Cranny to buy fishing rod? but need bait. Maybe ask Jo for bait, then buy fishing rod recipe. Also propose bridge? maybe not. Let's pick 4 actions. Use 4 hours. energy: inward 70, outward 80.
+=== REASONING (0 tokens, hidden from everyone) ===
+(none returned)
 
 === REPLY ===
-{"thoughts":"I’m still short on fishing bait. I’ll try to trade with Jo for one, then ask Bo for wood in exchange. If that fails, I’ll buy a fishing rod recipe at Cranny, hoping I can craft one later. I’ll leave the rest of the day free to walk and maybe find a rock for the bridge if I get a vaulting pole later. I’ll keep my mental energy split fairly evenly so I can chat with Jo and Bo without running out of energy for the rest of the day.", "energy":{"inward":70,"outward":80},"actions":[{"hour":7,"pick":13},{"hour":8,"pick":7},{"hour":9,"pick":20},{"hour":10,"pick":19}],"home":{"store":{},"take":{},"note":"Try to get a fishing rod soon. Also keep an eye on the river for rocks."}}
+{"thoughts":"I need fishing bait. Jo and Ike offered to trade. I’ll visit Jo first to ask for bait, then Ike, maybe Bo for wood to trade. I’ll leave 2 hours free for walking or talking. Energy split 80 inward for planning, 70 outward for conversations. I’ll write tonight.","energy":{"inward":80,"outward":70},"actions":[{"hour":7,"pick":13},{"hour":8,"pick":12},{"hour":9,"pick":7},{"hour":10,"pick":7},{"hour":11,"pick":11}],"home":{"store":{},"take":{},"note":"Try to get bait today; if not, consider buying a fishing rod later."}}

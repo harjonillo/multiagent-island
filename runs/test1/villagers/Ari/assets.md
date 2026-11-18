@@ -1,18 +1,18 @@
 # Ari's assets
 
-## At the end of day 11
+## At the end of day 12
 
 - Bells with them: 200
 - Bells at home: 0
 - Loan from Tom Nook: 0
 - Home: a tent in lower ground, southeast (storage for 0 items)
-- Pockets (40 of 40 slots, worth 7,770 at Nook's Cranny): ashpimi fish x1, axe x1, fishing rod x1, fossil x1, gormo fish x1, hardwood x12, island map x1, ladder x1, loka fish x1, net x1, selit fish x1, selzalne fish x4, shovel x1, softwood x8, wood x5
+- Pockets (39 of 40 slots, worth 7,680 at Nook's Cranny): ashpimi fish x1, axe x1, fishing rod x1, fossil x1, gormo fish x1, hardwood x12, island map x1, ladder x1, loka fish x1, net x1, selit fish x1, selzalne fish x4, shovel x1, softwood x8, wood x4
 - Kept at home (worth 0): nothing
-- Tools, uses so far: axe 10, fishing rod 8, ladder 25, net 0, shovel 2
+- Tools, uses so far: axe 10, fishing rod 8, ladder 27, net 0, shovel 2
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: brick oven, log stool, shovel, simple wooden fence, stone lion-dog
-- Net worth (bells and things at Cranny prices, less the loan): 7,970
+- Net worth (bells and things at Cranny prices, less the loan): 7,880
 
 ## Day by day
 
@@ -32,3 +32,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 9 | 200 | 0 | 39 | 6,510 | 0 | tent | 0 | 6,710 |
 | 10 | 200 | 0 | 38 | 6,450 | 0 | tent | 0 | 6,650 |
 | 11 | 200 | 0 | 40 | 7,770 | 0 | tent | 0 | 7,970 |
+| 12 | 200 | 0 | 39 | 7,680 | 0 | tent | 0 | 7,880 |
