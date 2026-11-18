@@ -984,8 +984,24 @@ def render_grid_outputs(run: Run, day: int | None = None) -> list[Path]:
             for n, v in st["villagers"].items():
                 if v.get("pos") and v["activity"] not in ("asleep", "not arrived"):
                     tracks[n].append(tuple(v["pos"]))
+    # The walk between those positions, tile by tile (around the river and up the cliffs as they went), not a
+    # straight line from one to the next.
+    from .site_data import _STEP, day_routes
+
+    move = {v: k for k, v in _STEP.items()}
+    walks = {}
+    for n, legs in day_routes(g, [st for st in run.of("hour_state") if st["day"] == snap["day"]]).items():
+        cells = []
+        for _, x, y, steps, *_ in legs:
+            cells.append((x, y))
+            for c in steps:
+                x, y = x + move[c][0], y + move[c][1]
+                cells.append((x, y))
+        walks[n] = cells
     out.append(render_tracks(g, run.dir / f"tracks_day_{snap['day']:03d}.png", tracks, homes, trees, rocks, objects=objs,
-                             title=f"Where each villager was, hour by hour, on day {snap['day']} (orange = first position)"))
+                             walks=walks,
+                             title=f"Where each villager walked on day {snap['day']}, with a dot where they were at the end "
+                                   "of each hour (orange = first position)"))
     return out
 
 

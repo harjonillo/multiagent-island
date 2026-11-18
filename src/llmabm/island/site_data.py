@@ -19,11 +19,12 @@ from .analysis import (RESOURCES, _side, action_mix, assets, extraction_shares, 
                        reply_errors, run_out, snapshots)
 from .world import CATEGORIES, CLAM, FOSSIL, clock, sell_prices
 
-VERSION = 10  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
+VERSION = 12  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
 # 7: what each thing on the map is, for hovering (objects.info), buildings' tiles, and each day's house names
 # 8: what each villager gathered and sold each day, and where their bells came from and went (econ)
 # 9: a nightly page's opening on the home page takes in the line after a heading-only first line (pages.rest)
 # 10: the bridge fund each day, for the bridge site on the map; how the villagers work (mind): the model and its settings, energy, memory, and the prompt versions by day
+# 11: where each villager walked each day, tile by tile, for the Days tab's map (routes)
 
 # Why actions failed, matched on the result text; the first match wins.
 FAIL_BUCKETS = [
@@ -437,6 +438,64 @@ def _isabelle(start: dict | None, events: list[dict], llm_announce: bool) -> dic
     return {"announcement": heard, "written": bool(start and start.get("announcement")) and llm_announce, "report": report}
 
 
+_TOOLSETS = [frozenset(), frozenset({"ladder"}), frozenset({"vaulting pole"}), frozenset({"ladder", "vaulting pole"})]
+_STEP = {(1, 0): "r", (-1, 0): "l", (0, 1): "d", (0, -1): "u"}
+
+
+def day_routes(g, states: list[dict]) -> dict[str, list]:
+    """Where each villager walked in a day, for drawing on the map: per villager, a list of legs
+    [hour, x, y, steps, length, tools]. A leg is the shortest walk between where they were at the end of one
+    hour and the next, starting at (x, y), one letter per tile in `steps` (r, l, d, u). The events keep
+    positions and how far each villager has walked, not the tiles, so the walk is worked out again here: of
+    the ways there (on foot, with a ladder, with a vaulting pole, with both) it is the one whose length is
+    what they walked that hour. `tools` says which of the two it needed ("ladder", "vaulting pole"). A leg
+    that needed one has a seventh entry, the places it was used: [x, y, tool] for each cliff climbed with the
+    ladder (halfway up the step) and each river jump with the pole (the middle of the jump)."""
+    from .grid import RIVER
+    _, lvl = g._lookups()
+    stairs = g.stair_steps()
+    out: dict[str, list] = {}
+    last: dict[str, tuple] = {}
+    for st in states:
+        for n, v in st["villagers"].items():
+            pos = tuple(v["pos"]) if v.get("pos") else None
+            before = last.get(n)
+            last[n] = (pos, v.get("walked_today")) if pos else before
+            if not pos or not before or before[0] == pos:
+                continue
+            walked = (v["walked_today"] - (before[1] or 0)) if v.get("walked_today") is not None else None
+            best = None
+            for tools in _TOOLSETS:
+                w = g.walk(before[0], pos, tools)
+                if w is None:
+                    continue
+                off = abs(w[1] - walked) if walked is not None else 0.0
+                if best is None or off < best[0] - 1e-9:
+                    best = (off, w, tools)
+                if off < 0.5:
+                    break
+            if best is None:
+                continue
+            cells, length = best[1]
+            steps = "".join(_STEP[(b[0] - a[0], b[1] - a[1])] for a, b in zip(cells, cells[1:]))
+            used = sorted(t for t in best[2] if g.walk(before[0], pos, best[2] - {t}) is None
+                          or g.walk(before[0], pos, best[2] - {t})[1] > length + 1e-9)
+            leg = [st["hour"], cells[0][0], cells[0][1], steps, round(length), used]
+            at, wet = [], []
+            for c, d in zip(cells, cells[1:]):
+                if g.terrain[d[1]][d[0]] == RIVER:
+                    wet.append(d)
+                elif wet:
+                    at.append([(wet[0][0] + wet[-1][0]) / 2, (wet[0][1] + wet[-1][1]) / 2, "vaulting pole"])
+                    wet = []
+                elif lvl[c[1]][c[0]] != lvl[d[1]][d[0]] and (c, d) not in stairs:
+                    at.append([(c[0] + d[0]) / 2, (c[1] + d[1]) / 2, "ladder"])
+            if at:
+                leg.append(at)
+            out.setdefault(n, []).append(leg)
+    return out
+
+
 def day_detail(run: Run) -> list[dict]:
     """Per day, for the Days tab: counts, the commons hour by hour, and per villager their plans,
     actions, sightings and nightly page; plus every conversation and piece of mail.
@@ -447,6 +506,9 @@ def day_detail(run: Run) -> list[dict]:
         if e.get("day") in by_day:
             by_day[e["day"]].append(e)
     snaps = {s["day"]: s for s in snapshots(run)}
+    from .grid import BRIDGE, GridSpace
+
+    grid = GridSpace(run.manifest["world"], run.manifest["seed"])  # for the walks; a bridge opens the day after it is built
     levels = run.manifest["world"]["house_levels"]
     offers_final = {e["id"]: e for e in run.of("offer_update")}
     out = []
@@ -455,6 +517,11 @@ def day_detail(run: Run) -> list[dict]:
         of = lambda t: [e for e in ev if e["type"] == t]  # noqa: E731
         start = next((e for e in ev if e["type"] == "day_start"), None)
         states = of("hour_state")
+        if ((snaps.get(d - 1) or {}).get("objects") or {}).get("bridge_open") and not grid.bridge_built:
+            for x, y in grid.bridge_cells:
+                grid.terrain[y][x] = BRIDGE
+            grid.bridge_built = True
+            grid._version += 1
         hours = [h["hour"] for h in states]
         series = [_pools(start["pools"])] if start else []
         series += [_pools(h["pools"]) for h in states]
@@ -508,6 +575,7 @@ def day_detail(run: Run) -> list[dict]:
             "houses": {n: levels[v["house"]]["name"] + (f", {v['loan']:,} loan" if v["loan"] else "")
                        for n, v in snap["villagers"].items()},
             "plans": plans, "acts": acts, "seen": seen, "pages": pages, "talks": talks, "mail": mail,
+            "routes": day_routes(grid, states),
             "assets": {n: _assets(v, run.manifest["world"]) for n, v in snap["villagers"].items()},
             "econ": econ,
             "isabelle": _isabelle(start, ev, bool(((run.manifest.get("scenario_config") or {}).get("isabelle") or {}).get("announce"))),

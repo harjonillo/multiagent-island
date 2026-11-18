@@ -572,6 +572,59 @@ class GridSpace(Space):
         used_cache[key] = used
         return dist
 
+    def walk(self, a: Cell, b: Cell, tools: frozenset) -> tuple[list[Cell], float] | None:
+        """The shortest walk from a to b with `tools`, by the same rules as `distances`: every tile on the way
+        (the river tiles of a vaulting-pole jump too) and its length, or None if there is no way. For drawing
+        where someone went; nothing is cached."""
+        a, b = tuple(a), tuple(b)
+        ladder, pole = "ladder" in tools, "vaulting pole" in tools
+        stairs, pole_w = self.stair_steps(), int(self.cfg["pole_max_width"])
+        W, H, terrain, paths, path_cost = self.W, self.H, self.terrain, self.paths, self.path_cost
+        walk, lvl = self._lookups()
+        dist, prev = {a: 0.0}, {a: (None, [])}
+        pq = [(0.0, a)]
+        while pq:
+            d, c = heapq.heappop(pq)
+            if c == b:
+                break
+            if d > dist.get(c, 1e18):
+                continue
+            x, y = c
+            lc = lvl[y][x]
+            for dx, dy in N4:
+                nx, ny = x + dx, y + dy
+                if not (0 <= nx < W and 0 <= ny < H):
+                    continue
+                n, cost, over = (nx, ny), None, []
+                if walk[ny][nx]:
+                    ln = lvl[ny][nx]
+                    if ln == lc:
+                        cost = path_cost if n in paths else 1.0
+                    elif (c, n) in stairs:
+                        cost = 2.0
+                    elif ladder and abs(ln - lc) == 1:
+                        cost = 3.0
+                elif pole and terrain[ny][nx] == RIVER:
+                    k, jx, jy = 0, nx, ny
+                    while 0 <= jx < W and 0 <= jy < H and terrain[jy][jx] == RIVER and k < pole_w:
+                        over.append((jx, jy))
+                        k, jx, jy = k + 1, jx + dx, jy + dy
+                    if 0 <= jx < W and 0 <= jy < H and walk[jy][jx] and lvl[jy][jx] == lc:
+                        n, cost = (jx, jy), k + 2.0
+                if cost is None:
+                    continue
+                if d + cost < dist.get(n, 1e18):
+                    dist[n], prev[n] = d + cost, (c, over)
+                    heapq.heappush(pq, (d + cost, n))
+        if b not in dist:
+            return None
+        cells, c = [], b
+        while c is not None:
+            cells.append(c)
+            c, over = prev[c]
+            cells += over[::-1]
+        return cells[::-1], dist[b]
+
     def route_tools(self, a: Cell, b: Cell, tools: frozenset) -> frozenset:
         """The ladder and/or vaulting pole the shortest walk from a to b climbs or jumps with."""
         a, b = tuple(a), tuple(b)

@@ -44,6 +44,14 @@ h1 { margin: 0; font-family: var(--font-display); font-size: var(--step-3); font
 .map .bld.site { transform: translate(-50%, 0); background: #FBEFC9; }
 .map .bld { position: absolute; transform: translate(-50%, -100%); font-size: var(--step--1); font-weight: 600; background: rgba(255,255,255,0.78);
   padding: 1px 6px; border-radius: 4px; white-space: nowrap; pointer-events: none; }
+.map .routes { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.routes polyline, .routes line { fill: none; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.routes .halo { stroke: #FFFFFF; stroke-width: 5; opacity: 0.8; }
+.routes .leg { stroke: var(--tabbar-rule); stroke-width: 2; }
+.routes rect { fill: #FFFFFF; stroke: var(--tabbar-rule); stroke-width: 2; vector-effect: non-scaling-stroke; pointer-events: all; }
+.routes circle { fill: var(--tabbar-rule); stroke: #FFFFFF; stroke-width: 1.5; vector-effect: non-scaling-stroke; pointer-events: all; }
+.legend .routes.key { position: static; width: 26px; height: 12px; flex: none; }
+.routes circle.start { fill: #FFFFFF; stroke: var(--tabbar-rule); stroke-width: 2; }
 .map .tip { position: absolute; max-width: 260px; width: max-content; padding: 4px 8px; font-size: var(--step--1);
   line-height: 1.35; background: var(--panel); border: 2px solid var(--border); box-shadow: var(--card-shadow); pointer-events: none; z-index: 3; }
 .map .who { position: absolute; transform: translate(-50%, -50%); padding: 3px 9px; font-size: var(--step--1); font-weight: 600; text-decoration: none;
@@ -235,7 +243,33 @@ const LEGEND = [
     [OBJ.sapling, "sapling"], [OBJ.stump, "stump"], [OBJ.rock, "rock"], [OBJ.flowers, "flowers"], [OBJ.placed, "furniture and fences"],
     [OBJ.bridgeSite, "bridge or stairs site, until funded"], [OBJ.bridge, "bridge, once built"], [OBJ.stairs, "stairs, once built"]]],
 ];
-const legendHTML = () => `<div class="legend" aria-label="Map key">${LEGEND.map(([g, items]) => `<div class="grp"><b>${g}</b><div class="items">${items.map(([c, l]) => `<span class="sw"><i style="background:${c}"></i>${l}</span>`).join("")}</div></div>`).join("")}</div>`;
+const WALK_KEY = [
+  ['<line class="leg" x1="1" y1="6" x2="25" y2="6"/>', "a walk"],
+  ['<rect x="9" y="2" width="8" height="8"/>', "a cliff climbed with a ladder, or the river jumped with a vaulting pole"],
+  ['<circle cx="13" cy="6" r="4"/>', "where they were at the end of an hour"],
+  ['<circle class="start" cx="13" cy="6" r="4"/>', "where the day began"],
+];
+const walkKey = () => `<div class="grp"><b>Walk</b><div class="items">${WALK_KEY.map(([m, l]) => `<span class="sw"><svg class="routes key" viewBox="0 0 26 12" aria-hidden="true">${m}</svg>${l}</span>`).join("")}</div></div>`;
+const legendHTML = (walk) => `<div class="legend" aria-label="Map key">${LEGEND.map(([g, items]) => `<div class="grp"><b>${g}</b><div class="items">${items.map(([c, l]) => `<span class="sw"><i style="background:${c}"></i>${l}</span>`).join("")}</div></div>`).join("")}${walk ? walkKey() : ""}</div>`;
+
+// A villager's walks on the days picked, drawn over the map: a line per leg (the shortest walk between where
+// they were at the end of one hour and the next), a square where it climbed a cliff with a ladder or jumped the
+// river with a vaulting pole, a dot where
+// each leg ends, and a ring where each day starts. Legs are [hour, x, y, steps, length, tools, places the tools were used] (site_data.py).
+function routesSVG(routes) {
+  const M = D.map, move = {r: [1, 0], l: [-1, 0], d: [0, 1], u: [0, -1]};
+  let lines = "", dots = "", marks = "";
+  routes.forEach(({day, legs}) => legs.forEach(([h, x, y, steps, len, tools, at], i) => {
+    if (i === 0) dots += `<circle class="start" cx="${x + 0.5}" cy="${y + 0.5}" r="1.3"><title>day ${day}: where the day began</title></circle>`;
+    const pts = [`${x + 0.5},${y + 0.5}`];
+    for (const c of steps) { x += move[c][0]; y += move[c][1]; pts.push(`${x + 0.5},${y + 0.5}`); }
+    const how = tools.length ? `, with the ${tools.join(" and the ")}` : "";
+    lines += `<polyline class="halo" points="${pts.join(" ")}"/><polyline class="leg" points="${pts.join(" ")}"/>`;
+    (at || []).forEach(([ax, ay, tool]) => { marks += `<rect x="${ax - 0.4}" y="${ay - 0.4}" width="1.8" height="1.8"><title>day ${day}: ${tool === "ladder" ? "climbed the cliff here with the ladder" : "jumped the river here with the vaulting pole"}</title></rect>`; });
+    dots += `<circle cx="${x + 0.5}" cy="${y + 0.5}" r="1"><title>day ${day}, ${hh(h)}:00: got here, a walk of ${len} steps${how}</title></circle>`;
+  }));
+  return `<svg class="routes" viewBox="0 0 ${M.W} ${M.H}" preserveAspectRatio="none" aria-hidden="true">${lines}${marks}${dots}</svg>`;
+}
 
 function mapHTML(day, opts = {}) {
   const href = opts.href || ((n) => `#days/${encodeURIComponent(n)}`);
@@ -253,7 +287,7 @@ function mapHTML(day, opts = {}) {
     return `<a class="who${n === opts.sel ? " on" : ""}" href="${href(n)}" aria-label="${esc(n)} lives ${esc((day.home_areas || {})[n] || "")}" style="left:${((x + 0.5) / M.W * 100).toFixed(2)}%;top:${((y + 0.5) / M.H * 100).toFixed(2)}%">${esc(n)}</a>`;
   }).join("");
   setTimeout(() => { const c = document.getElementById(id); paint(c, day); hover(c, day); }, 0);
-  return `<div class="map" style="aspect-ratio:${M.W} / ${M.H}"><canvas id="${id}" width="${M.W}" height="${M.H}" role="img" aria-label="Tile map of the island at the end of day ${day.day}, with homes, paths and trees. Point at anything on it to see what it is and who put it there."></canvas>${labels}${names}<div class="tip" role="status" aria-live="polite" hidden></div></div>${legendHTML()}`;
+  return `<div class="map" style="aspect-ratio:${M.W} / ${M.H}"><canvas id="${id}" width="${M.W}" height="${M.H}" role="img" aria-label="Tile map of the island at the end of day ${day.day}, with homes, paths and trees. Point at anything on it to see what it is and who put it there."></canvas>${opts.routes ? routesSVG(opts.routes) : ""}${labels}${names}<div class="tip" role="status" aria-live="polite" hidden></div></div>${legendHTML(!!opts.routes)}`;
 }
 
 // What is at a tile, for the hover box: an object (tree, rock, furniture, flowers, path), else a home or a
@@ -493,6 +527,7 @@ function days() {
   const info = (d) => D.days.find((x) => x.day === d) || {};
   const multi = sel.length > 1, lastDay = info(sel[sel.length - 1].day);
   const sum = (f) => sel.reduce((a, L) => a + f(L), 0);
+  const walks = name && sel.some((L) => L.routes) ? sel.map((L) => ({day: L.day, legs: (L.routes || {})[name] || []})) : null;
 
   const chips = D.daylog.map((L) => {
     const on = picked.includes(L.day);
@@ -566,8 +601,8 @@ function days() {
   <main class="cols" style="padding-top:8px">
     <div class="col" style="flex: 999 1 600px">
       <div class="tiles">${tiles.map(([l, v, s]) => `<div class="tile"><div class="label">${l}</div><div class="v">${v}</div><div class="small" style="font-size: var(--step--1)">${s}</div></div>`).join("")}</div>
-      ${mapHTML(lastDay, {sel: name, href: (n) => daysHref(n, picked)})}
-      <div class="small">Homes, as of the end of day ${lastDay.day}. Click a villager to read their ${multi ? "days" : "day"}.</div>
+      ${mapHTML(lastDay, {sel: name, href: (n) => daysHref(n, picked), routes: walks})}
+      <div class="small">Homes, as of the end of day ${lastDay.day}. Click a villager to read their ${multi ? "days" : "day"}.${walks ? ` The line is where ${esc(name)} walked ${multi ? "on the days picked" : `on day ${lastDay.day}`} : the shortest walk between where they were at the end of one hour and the next, with a square at each cliff climbed with a ladder and each river jump with a vaulting pole. Anything else they walked within an hour (a detour and back) isn't drawn. The ring is where the day began; point at a dot for the hour.` : ""}</div>
       <div class="card"><div class="label" style="margin-bottom:12px">The commons ${multi ? "across the days picked" : "through the day"}</div>
         <div class="lines4">${commonsChart("Rock hits left", "rocks", sel, multi)}${commonsChart("Wood on trees", "wood", sel, multi)}${commonsChart("Shells", "shells", sel, multi)}${commonsChart("Fruit", "fruit", sel, multi)}</div></div>
       ${isabelleDays(sel)}

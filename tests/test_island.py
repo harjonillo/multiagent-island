@@ -2516,3 +2516,33 @@ def test_each_villager_has_a_folder_with_their_memory_assets_pages_and_prompts()
         for p in (run_dir / "prompts").glob("*.txt"):
             (old / "prompts" / p.name).write_text(p.read_text())
         assert build(old, 3, list(sc.villagers)) == build(run_dir, 3, list(sc.villagers))
+
+
+def test_walks_on_the_map_follow_the_ground_and_match_what_was_walked():
+    from llmabm.island.grid import RIVER, GridSpace
+    from llmabm.island.site_data import _STEP, day_detail
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock", verbose=False)
+        run = load_run(sim.run(2))
+        g = GridSpace(run.manifest["world"], run.manifest["seed"])
+        move = {v: k for k, v in _STEP.items()}
+        legs = exact = 0
+        for day in day_detail(run):
+            states = [e for e in run.of("hour_state") if e["day"] == day["day"]]
+            for name, route in day["routes"].items():
+                at = {st["hour"]: st["villagers"][name] for st in states}
+                for hour, x, y, steps, length, tools, *used_at in route:
+                    crossed = False
+                    # a leg says where a tool was used exactly when it needed one
+                    assert {t for _, _, t in (used_at[0] if used_at else [])} == set(tools)
+                    for c in steps:
+                        x, y = x + move[c][0], y + move[c][1]
+                        crossed = crossed or g.terrain[y][x] == RIVER
+                    assert [x, y] == at[hour]["pos"]  # each leg ends where they were at the end of that hour
+                    assert not crossed or "vaulting pole" in tools  # the river is only crossed with a pole
+                    before = max((h for h in at if h < hour), default=None)
+                    walked = at[hour]["walked_today"] - (at[before]["walked_today"] if before is not None else 0)
+                    legs, exact = legs + 1, exact + (abs(walked - length) < 1)
+        assert legs > 20 and exact / legs > 0.6  # most hours are one walk; some have a detour that isn't located

@@ -904,13 +904,13 @@ Each island run directory has:
 | `contributions.csv` | one row per villager: what they gave to the island (museum, bridge, public paths, decor, flowers, trees, ordinances), bells and hours it cost them, gifts to others, and their share of shared resources taken |
 | `hourly_island.csv` | one row per hour: rock hits left, wood, fruit, shells, fossil spots, trees, museum, bridge fund |
 | `networth.png`, `extraction.png`, `museum.png`, `commons.png`, `activity_by_hour.png` | plots |
-| `island_map.png`, `tracks_day_NNN.png` | the island, and where every villager was hour by hour on the last day (grid) |
+| `island_map.png`, `tracks_day_NNN.png` | the island, and where every villager walked on the last day, tile by tile, with a dot where they were at the end of each hour (grid) |
 | `events.jsonl` | every event with its day and hour. Each action has a `delta` (bells, loan, items, recipes, house) and a `pools_delta` (public resources it changed). An `hour_state` snapshot every hour |
 | `manifest.json` | the scenario, world and villagers used |
 | `checkpoint.pkl` | the whole simulation, saved after every day |
 | `villagers/<name>/` | each villager's own folder. `profile.md`: their persona, hours, model and home. `memory.md`: what they carry from earlier days into their prompts as of the last finished day (the nightly page, what they chose to hold on to and when each fades, their notes, yesterday, the last conversation and what changed hands with each villager), then night by night what they held on to, came back to and forgot. `assets.md`: what they own now and at the end of each day. `pages.md`: their nightly pages in order. `prompts/`: every call they made, one file each (unless `--no-log-prompts`): the system prompt, the prompt, the model's hidden reasoning and its reply. The `.md` files are written by the analysis and never read by the simulation |
 | `prompts/` | Isabelle's calls, one file each. Runs from before villagers had their own folders have everyone's prompts here, as `<tag>_<name>.txt`; the explorer reads both |
-| `site/` | the explorer page, `llmabm site <run_dir>`: Home, Days (with each villager's prompts), Social, and How they work (the model, what carries over from day to day, each kind of call with an example, the prompt versions) |
+| `site/` | the explorer page, `llmabm site <run_dir>`: Home, Days (with each villager's prompts, and their walks drawn on the map), Social, and How they work (the model, what carries over from day to day, each kind of call with an example, the prompt versions) |
 
 `summary.txt` covers:
 - who took each resource, with a concentration index (HHI), and net worth with its Gini

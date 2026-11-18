@@ -148,8 +148,10 @@ def render_grid_map(g: GridSpace, out: Path, homes: dict | None = None, trees: l
 
 
 def render_tracks(g: GridSpace, out: Path, tracks: dict[str, list], homes: dict | None, trees: list, rocks: list,
-                  title: str, objects: dict | None = None) -> Path:
-    """Small multiples: each villager's hour-by-hour positions over one day on a faint map."""
+                  title: str, objects: dict | None = None, walks: dict | None = None) -> Path:
+    """Small multiples: each villager's hour-by-hour positions over one day on a faint map. With `walks`
+    (per villager, every tile they walked in order) the line follows the walk; without, it joins the
+    positions straight."""
     import matplotlib
 
     matplotlib.use("Agg")
@@ -168,7 +170,8 @@ def render_tracks(g: GridSpace, out: Path, tracks: dict[str, list], homes: dict 
         pts = [p for p in tracks[n] if p]
         if pts:
             xs, ys = zip(*pts)
-            ax.plot(xs, ys, "-", color=SERIES[0], lw=1.2, alpha=0.9)
+            lx, ly = zip(*walks[n]) if walks and walks.get(n) else (xs, ys)
+            ax.plot(lx, ly, "-", color=SERIES[0], lw=1.2, alpha=0.9)
             ax.plot(xs, ys, "o", color=SERIES[0], ms=2.5)
             ax.plot([xs[0]], [ys[0]], "o", color=SERIES[1], ms=5)
         ax.set_title(n, fontsize=9)
