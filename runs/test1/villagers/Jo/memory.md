@@ -1,4 +1,4 @@
-# Jo's memory, waking on day 13
+# Jo's memory, waking on day 14
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -15,49 +15,47 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 9 | Cal gave 2 softwood, I traded 1 selzalne. | 1 | 0.37 | day 14 |
-| 9 | Dax still wants bait, I owe him one. | 1 | 0.37 | day 14 |
-| 9 | Bridge still 2k. | 1 | 0.37 | day 14 |
-| 12 | Cal only nodded, no talk. | 1 | 0.78 | day 17 |
-| 12 | I caught a gorpika and extra moitbas. | 1 | 0.78 | day 17 |
-| 12 | Ari needs bait tomorrow. | 1 | 0.78 | day 17 |
+| 9 | Cal gave 2 softwood, I traded 1 selzalne. | 1 | 0.29 | day 14 |
+| 9 | Dax still wants bait, I owe him one. | 1 | 0.29 | day 14 |
+| 9 | Bridge still 2k. | 1 | 0.29 | day 14 |
+| 12 | Cal only nodded, no talk. | 1 | 0.61 | day 17 |
+| 12 | I caught a gorpika and extra moitbas. | 1 | 0.61 | day 17 |
+| 12 | Ari needs bait tomorrow. | 1 | 0.61 | day 17 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 11) Ask Eli tomorrow for rock if Dax is still away.
-- (day 11) Keep the selit for next fishing run. Maybe ask for a rock later.
-- (day 11) Remember to keep the selit fish for next fishing run. Ask Eli about bridge donation tomorrow.
-- (day 11) Remember to keep the selzalne handy for future trades.
-- (day 11) Remember to trade selzalne for rock if he can find one.
-- (day 11) Keep track of rocks for bridge.
-- (day 11) Remember to keep bait for tomorrow.
 - (day 12) Ask Cal for a fish in exchange for softwood. Then see if Dax can give a rock.
 - (day 12) Remember to ask Eli about bridge donation tomorrow.
+- (day 13) Remember to ask Dax about a rock tomorrow. Keep the softwood ready for Cal.
+- (day 13) Keep selzalne handy for future trades. Remember to ask Dax for a rock tomorrow.
+- (day 13) Remember to keep the selzalne handy for future trades.
+- (day 13) Remember to check with Gus tomorrow for the wood he needs.
+- (day 13) Remember to keep selzalne handy for future trades.
 
-## Yesterday (day 12)
+## Yesterday (day 13)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 looked for fish in the river, but there were no fish shadows in sight
-- 08:00 looked for fish in the river, but there were no fish shadows in sight
-- 09:00 walked over to Cal's home
-- 09:00 knocked at Cal's home, but nobody answered
-- 09:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 10:00 instead of fish (where: river)
-- 10:00 fished for a very large shadow in the pond: it got away
-- 10:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 11:00 instead of rest
-- 11:00 fished for a small shadow in the pond: caught a moitbas fish
-- 11:00 spotted a large fish shadow in the pond (lower ground, southeast, near rock 6) and went after it at 12:00
-- 12:00 fished for a large shadow in the pond: caught a gorpika fish
-- 13:00 walked over to Cal's home
+- 07:00 hit rock 1: stone x2, iron nugget x6
+- 08:00 rock 2 was the money rock: got 6750 bells
+- 09:00 hit rock 3: iron nugget x3, clay x2, stone x3
+- 10:00 hit rock 4: iron nugget x1, clay x4 (pockets full, left some) (also nearby: Cal)
+- 10:00 ran into Cal at the rocks: you said "Hey Cal, got any fish to trade for a bit of softwood?"; Cal said "Hey Jo, I’ve got a selzalne fish for a softwood, deal?" [Cal's offer: Cal gives you 1 selzalne fish, you give Cal 1 softwood]; you said "Sure, deal." [you accepted: Cal gave you 1 selzalne fish, you gave Cal 1 softwood; your offer: you give Cal 1 softwood, Cal gives you 1 selzalne fish, but you had no softwood, so there was no offer]; Cal said "" [just nodded (too tired to talk)]
+- 10:00 spotted a medium fish shadow in the river (lower ground, centre, near rock 4) and went after it at 11:00 instead of mine_rock (rock: 5)
+- 11:00 tried to fish: pockets full
+- 12:00 walked over to Ari's home (also nearby: Gus, Ari)
+- 12:00 knocked at Ari's home, but nobody answered
+- 12:00 ran into Gus at Ari's home: Gus said "Hey Jo, could I borrow a bit of wood for tomorrow? I’ve got some bait to trade with Dax."; you said "Sure, I’ll see if I can find some for you." [you asked Gus for 1 wood]; Gus said "Sure thing, here’s one." [Gus tried to hand you 1 wood but you had no room]; you said "Sure, here’s my selzalne." [your offer: you give Gus 1 selzalne fish, Gus gives you 1 wood]; Gus said "Deal, thanks!" [Gus accepted: you gave Gus 1 selzalne fish, Gus gave you 1 wood]; you said "" [just nodded (too tired to talk)]
+- 13:00 walked over to Cal's home (also nearby: Fen, Cal)
 - 13:00 knocked at Cal's home, but nobody answered
-- 14:00 walked over to Cal's home
-- 14:00 knocked at Cal's home, but nobody answered
-- 15:00 walked over to Dax's home
+- 14:00 walked over to Dax's home
+- 14:00 inside Dax's home: not much furniture yet
+- 14:00 visited Dax at home: you said "" [just nodded (too tired to talk)]
+- 15:00 walked over to Dax's home (also nearby: Kit, Dax)
 - 15:00 knocked at Dax's home, but nobody answered
-- 16:00 fished for a small shadow in the pond: caught a moitbas fish
-- 17:00 ran into Cal out on a walk: you said "Hey Cal, could I trade a fish for some softwood? I could use a rock for the bridge too."; Cal said "" [just nodded (too tired to talk)]
+- 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
 
@@ -82,16 +80,16 @@ Shown to them when they meet that villager again (the latest lines; "you" is Jo)
 - **Jo:** Sure thing! [your offer: you give Bo 1 selzalne fish, Bo gives you 1 fishing bait]
 - **Bo:** Sorry, I need the bait. [then you went your ways]
 
-### Cal (day 12, 17:00, out on a walk)
+### Cal (day 13, 10:00, at the rocks)
 
-- **Jo:** Hey Cal, could I trade a fish for some softwood? I could use a rock for the bridge too.
+- **Jo:** Hey Cal, got any fish to trade for a bit of softwood?
+- **Cal:** Hey Jo, I’ve got a selzalne fish for a softwood, deal? [Cal's offer: Cal gives you 1 selzalne fish, you give Cal 1 softwood]
+- **Jo:** Sure, deal. [you accepted: Cal gave you 1 selzalne fish, you gave Cal 1 softwood; your offer: you give Cal 1 softwood, Cal gives you 1 selzalne fish, but you had no softwood, so there was no offer]
 - **Cal:**  [just nodded (too tired to talk)]
 
-### Dax (day 9, 08:00, at the flowers)
+### Dax (day 13, 14:00, at Dax's home)
 
-- **Dax:** Hey Jo, got some wood—could we trade it for some bait?
-- **Jo:** Sure, here’s a selit for your wood. [your offer: you give Dax 1 selit fish, Dax gives you 1 softwood]
-- **Dax:** Sure, that works. [Dax accepted: you gave Dax 1 selit fish, Dax gave you 1 softwood; Dax's offer: Dax gives you 1 softwood, you give Dax 1 selit fish, but Dax had no softwood, so there was no offer; then you went your ways]
+- **Jo:**  [just nodded (too tired to talk)]
 
 ### Fen (day 11, 07:00, at the rocks)
 
@@ -100,6 +98,15 @@ Shown to them when they meet that villager again (the latest lines; "you" is Jo)
 - **Fen:** Thanks, Jo! Got any bait to trade? [Fen asked you for 1 bait, but there's nothing called bait on this island]
 - **Jo:** Thanks! I’ll see if you have a rock I can take. [you asked Fen for 1 rock, but there's nothing called rock on this island]
 - **Fen:** Thanks, Jo! [then you went your ways]
+
+### Gus (day 13, 12:00, at Ari's home)
+
+- **Gus:** Hey Jo, could I borrow a bit of wood for tomorrow? I’ve got some bait to trade with Dax.
+- **Jo:** Sure, I’ll see if I can find some for you. [you asked Gus for 1 wood]
+- **Gus:** Sure thing, here’s one. [Gus tried to hand you 1 wood but you had no room]
+- **Jo:** Sure, here’s my selzalne. [your offer: you give Gus 1 selzalne fish, Gus gives you 1 wood]
+- **Gus:** Deal, thanks! [Gus accepted: you gave Gus 1 selzalne fish, Gus gave you 1 wood]
+- **Jo:**  [just nodded (too tired to talk)]
 
 ## What has changed hands with each villager
 
@@ -119,14 +126,14 @@ Shown to them when they meet that villager ("you" is Jo).
 - day 5: you gave Bo 1 selzalne fish, which they had asked for
 - day 5: Bo gave you 1 selzalne fish
 
-### Cal (the latest 6; 2 earlier)
+### Cal (the latest 6; 3 earlier)
 
-- day 9: you gave Cal 1 fishing bait, which they had asked for
 - day 9: you gave Cal 1 selzalne fish and Cal gave you 1 softwood, in a trade
 - day 10: you gave Cal 1 selzalne fish and Cal gave you 1 selit fish, in a trade
 - day 10: you gave Cal 1 softwood, which they had asked for
 - day 10: you gave Cal 1 selit fish and Cal gave you 1 softwood, in a trade
 - day 10: you gave Cal 1 softwood
+- day 13: you gave Cal 1 softwood (which Cal had asked for) and Cal gave you 1 selzalne fish, in a trade
 
 ### Dax
 
@@ -144,6 +151,10 @@ Shown to them when they meet that villager ("you" is Jo).
 ### Fen
 
 - day 11: you gave Fen 1 selit fish
+
+### Gus
+
+- day 13: you gave Gus 1 selzalne fish and Gus gave you 1 wood (which you had asked for), in a trade
 
 ### Kit
 
@@ -165,3 +176,4 @@ Shown to them when they meet that villager ("you" is Jo).
 - Day 10: Didn't write (no energy left).
 - Day 11: Didn't write (no energy left).
 - Day 12: Wrote the page. Held on to: "Cal only nodded, no talk."; "I caught a gorpika and extra moitbas."; "Ari needs bait tomorrow.".
+- Day 13: Didn't write (no energy left).

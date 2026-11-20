@@ -51,3 +51,7 @@ Day 11: The river keeps giving, but my tent is still a void—only bells fit. I 
 ## Day 12
 
 Day 11: The river keeps giving, but my tent is still a void—only bells fit. I chased shadows all day, ending with a gormo and more selzalne. Gus stayed silent, so no bait. I still have the ladder, but no bridge spot close enough. I’m running low on wood for future trades; the map’s still a guide but useless without storage. I’ll keep the fence piece, maybe it’ll help somewhere. Sleep feels thin, but the fish feel good. I’ll ask Gus again tomorrow, maybe Bo will have some.
+
+## Day 13
+
+Day 11: The river keeps giving, but my tent is still a void—only bells fit. I chased shadows all day, ending with a gormo and more selzalne. Gus stayed silent, so no bait. I still have the ladder, but no bridge spot close enough. I’m running low on wood for future trades; the map’s still a guide but useless without storage. I’ll keep the fence piece, maybe it’ll help somewhere. Sleep feels thin, but the fish feel good. I’ll ask Gus again tomorrow, maybe Bo will have some.

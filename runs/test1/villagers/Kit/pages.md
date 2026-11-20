@@ -54,3 +54,8 @@ Got a selzalne, gormo, and loka today – good haul. Fen still a ghost, but he t
 
 Day 12.  
 Morning was quiet, only the wind rattling the fence.  I managed to buy a simple wooden fence—just 100 bells, but it feels good to have a boundary.  I kept fishing the river; three selzalne in a row, but no big catches.  Tried to ask Dax for a log, but he was too tired to talk.  Still no logs, no map, no bait.  My selit is still on my mind—maybe Fen will trade again.  I left some fish for the museum, but I’ll keep a few for myself.  Bells are tight; I’ll have to save more for tools.  The island feels lonely, but I’m getting a feel for the rhythm.
+
+## Day 13
+
+Day 13.  
+The sun was high when I left for Gus and Fen, but both were gone. I spent most of the day by the river—got a gormo, a tugorpi, a selzalne, and a selit. My ladder finally gave out after 30 uses, so I’ll need to replace it soon. I suggested stairs to Tom Nook; maybe we can chip in. No one answered at Dax’s place either—he’s still tired. I kept the selit fish handy for tomorrow’s trade, hoping Fen will finally respond. Bells are still tight; I have 100 in my wallet, nothing at home. The island feels quiet but steady.

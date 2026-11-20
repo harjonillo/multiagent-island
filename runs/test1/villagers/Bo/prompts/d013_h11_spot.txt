@@ -1,0 +1,53 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Still no bait, no fish, no bells.  
+Ari didn’t answer, but I finally got 1 wood from him for the trade—still 7 wood left.  
+Gus is still silent, but I’m not giving up.  
+I dug a stump, cleared a spot, but pockets full when I tried to fish.  
+Shovels 28/30 uses, ladder 10 uses.  
+Plan: tomorrow bring 3 wood to Dax or Kit, maybe try Gus again.  
+Watch the river, maybe a fish will appear.  
+Sleep is thin, but I’ll keep pushing.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 13 (May 4, spring, rain), 11:00. You are Bo, at Ari's home.
+You just spotted:
+1. a small fish shadow in the river (lower ground, southeast, near rock 6)
+Earlier today:
+- 10:00 inside Ike's home: not much furniture yet
+- 10:00 visited Ike at home: you said "Hey Ike, can I trade you a couple of woods for a wood back?" [your offer: you give Ike 2 wood, Ike gives you 1 wood]; Ike said "Sure thing, thanks!" [Ike's offer: Ike gives you 1 wood, you give Ike 2 wood, but Ike had no room, so there was no offer]; you said "Hey Ike, could I get a fishing rod in return for a wood?" [you asked Ike for 1 fishing rod]; Ike said "Sure, here's a wood for a rod." [Ike's offer: Ike gives you 1 wood, you give Ike 1 fishing rod]; you said "Sure thing, Ike." [you tried to hand Ike 1 fishing rod but Ike had no room; you accepted: Ike gave you 1 wood, you gave Ike 1 fishing rod]; Ike said "Thanks, Bo." [then you went your ways]
+- 11:00 walked over to Ari's home
+- 11:00 inside Ari's home: not much furniture yet
+- 11:00 visited Ari at home: you said "Hey Ari, got any bait? I can spare a few woods." [your offer: you give Ari 3 wood, Ari gives you 1 fishing bait]; Ari said "Sorry, I don’t have bait right now."; you said "Sorry, I'll come back later."; Ari said "Sorry, I still don’t have any bait. Do you have one I could take?" [Ari asked you for 1 fishing bait]; you said "" [your offer: you give Ari 3 wood, Ari gives you 1 fishing bait]; Ari said "Sorry, I still don’t have any bait. Can I borrow one?"; you said "" [just nodded (too tired to talk)]
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ladder 22 uses left, need more wood
+- (day 10) Shovel uses 29 left.
+- (day 11) 28 shovel uses left
+- (day 11) Gus wants 1 bait from me tomorrow
+Your notes from the last 2 days:
+- (day 13) Keep 4 wood ready.
+- (day 13) Keep track of wood trade with Ike, maybe next time I can give more wood for more gear.
+- (day 13) Got wood, keep 3 wood for bait trade tomorrow.
+- (day 13) Keep 2 wood left, 5-6 wood reserve.
+- (day 13) Remember to keep at least 4 wood in pocket for next bait trade.
+- (day 13) Keep 2 wood for next day, maybe try Dax or Gus again.
+At 12:00 you have nothing planned.
+Actions left today: 5 of 10. Mental energy left today: 8.
+
+You can go after one of them at 12:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (48 tokens, hidden from everyone) ===
+We should decide to go after someone. Need wood. Maybe go to Dax or Gus. But we need bait. We have 4 wood ready. Go to Dax? We need to trade. Let's go to Dax.
+
+=== REPLY ===
+{"thoughts":"Need bait. I have 4 wood ready. Going to Dax to trade for a bait or gear. Gus wants bait tomorrow; maybe get one here. Dax might have something. I'll head to Dax at 12:00.","go":4}

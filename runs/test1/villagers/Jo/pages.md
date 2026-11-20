@@ -65,3 +65,8 @@ Sun’s out, fish are good, but the bridge still feels miles away. Got 2 softwoo
 
 Day 12, 23:30.  
 The river stayed empty; the pond kept giving. I chased a big shadow and ended up with a gorpika, then a moitbas at 11. I kept going for fish, trading nothing, but the day was steady. Cal’s house was silent again, but I finally saw him at the walk—he just nodded, too tired to talk. No trades happened, but I kept my softwood and the extra moitbas. Ari still wants a bait; I’ll offer one tomorrow. I’m still short on rocks for the bridge, and Dax is still missing. I’ll ask Eli about the donation and maybe ask Cal for a fish next time. The bridge feels farther each day, but the fish keep coming.
+
+## Day 13
+
+Day 12, 23:30.  
+The river stayed empty; the pond kept giving. I chased a big shadow and ended up with a gorpika, then a moitbas at 11. I kept going for fish, trading nothing, but the day was steady. Cal’s house was silent again, but I finally saw him at the walk—he just nodded, too tired to talk. No trades happened, but I kept my softwood and the extra moitbas. Ari still wants a bait; I’ll offer one tomorrow. I’m still short on rocks for the bridge, and Dax is still missing. I’ll ask Eli about the donation and maybe ask Cal for a fish next time. The bridge feels farther each day, but the fish keep coming.

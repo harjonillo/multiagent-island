@@ -1,4 +1,4 @@
-# Dax's memory, waking on day 13
+# Dax's memory, waking on day 14
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -14,46 +14,39 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 8 | Ari: 1 wood for 1 bait, still pending | 1 | 0.29 | day 13 |
-| 8 | Cal: offered 1 wood for bait, need to confirm | 1 | 0.29 | day 13 |
-| 8 | Tent: no storage, only bells allowed | 1 | 0.29 | day 13 |
-| 9 | I traded 1 softwood for 1 selit fish with Jo. | 1 | 0.37 | day 14 |
-| 9 | I have 3 moths: lobas, kaselzal, nevin. | 1 | 0.37 | day 14 |
-| 9 | I still need fishing bait from Bo and Jo. | 1 | 0.37 | day 14 |
-| 11 | No wood stash at home today. | 1 | 0.61 | day 16 |
-| 11 | Got a gormo fish. | 1 | 0.61 | day 16 |
-| 11 | Still need fishing bait. | 1 | 0.61 | day 16 |
+| 9 | I traded 1 softwood for 1 selit fish with Jo. | 1 | 0.29 | day 14 |
+| 9 | I have 3 moths: lobas, kaselzal, nevin. | 1 | 0.29 | day 14 |
+| 9 | I still need fishing bait from Bo and Jo. | 1 | 0.29 | day 14 |
+| 11 | No wood stash at home today. | 1 | 0.47 | day 16 |
+| 11 | Got a gormo fish. | 1 | 0.47 | day 16 |
+| 11 | Still need fishing bait. | 1 | 0.47 | day 16 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 11) Keep wood stash at home for future trades.
-- (day 11) Keep an eye on Jo tomorrow for extra bait. Keep wood stash at home when possible.
-- (day 11) Remember to ask Gus for bait tomorrow morning.
 - (day 12) Need to get wood stash or find a way to trade for bait tomorrow.
 - (day 12) Remember to ask Jo for bait tomorrow if Gus doesn't have any.
 - (day 12) Remember to trade the wood for bait soon.
 - (day 12) Got the selit fish. Need to ask Jo for bait tomorrow.
 - (day 12) Remember to find a rock or log soon, or trade for one with someone else.
+- (day 13) Keep ladder handy for cliffs.
+- (day 13) Got a selit fish. Need more bait soon.
+- (day 13) Remember to ask Gus for bait tomorrow morning. Keep the map for future trades.
+- (day 13) Try to keep wood stash at home next time.
+- (day 13) Remember to keep the map safe after trading.
+- (day 13) Remember to follow up tomorrow if he has wood.
 
-## Yesterday (day 12)
+## Yesterday (day 13)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 spotted a nevin moth on a tree (lower ground, west) and went after it at 08:00
-- 08:00 went bug catching around the trees: caught a nevin moth
-- 09:00 Bo visited you at home: Bo said "Hey Dax, got a spare bait for me?" [Bo's offer: Bo gives you 3 wood, you give Bo 1 fishing bait]
-- 12:00 walked over to Bo's home (also nearby: Bo)
-- 12:00 knocked at Bo's home, but nobody answered
-- 13:00 looked for fish in the river, but there were no fish shadows in sight
-- 14:00 walked over to Gus's home
-- 14:00 knocked at Gus's home, but nobody answered
-- 15:00 fished for a small shadow in the river: caught an ashpimi fish (also nearby: Eli)
-- 15:00 ran into Eli at the river: Eli said "Hey Dax, got a selit fish—can you swap it for some bait?"; you said "Sure, give me a wood and I'll swap it for your selit fish." [your offer: you give Eli 1 selit fish, Eli gives you 1 wood]; Eli said "Sure, give me 1 selit fish for a wood." [Eli's offer: Eli gives you 1 selit fish, you give Eli 1 wood]; you said "Sure thing, here's the wood." [you accepted: Eli gave you 1 selit fish, you gave Eli 1 wood; your offer: you give Eli 1 wood, Eli gives you 1 selit fish, but you had no wood, so there was no offer]; Eli said "Hey Dax, any chance you have a rock or log I could trade for a selit fish?" [Eli asked you for 1 rock, but there's nothing called rock on this island]; you said "Got a selit fish, can I get a rock?" [you asked Eli for 1 rock, but there's nothing called rock on this island]; Eli said "Hey Dax, could I trade a selzalne for a log?" [Eli asked you for 1 log, but there's nothing called log on this island]; you said "" [just nodded (too tired to talk)]
-- 16:00 rested
-- 16:00 Kit visited you at home: Kit said "Hey Dax, could you spare a small log for me?" [Kit asked you for 1 small log, but there's nothing called small log on this island]; you said "" [just nodded (too tired to talk)]
-- 17:00 rested
+- 07:00 ran into Fen at Dax's home: Fen said "Morning Dax, got a minute? I could use a map or a ladder if you have one."; you said "Sure thing, here's the ladder." [you tried to hand Fen 1 ladder but Fen had no room]; Fen said "Thanks, Dax! I’ll swap a selit fish for that ladder." [Fen's offer: Fen gives you 1 selit fish, you give Fen 1 ladder]; you said "Thanks, Fen! Deal." [you accepted: Fen gave you 1 selit fish, you gave Fen 1 ladder; your offer: you give Fen 1 ladder, Fen gives you 1 selit fish, but you had no ladder, so there was no offer]; Fen said "Thanks, Dax. I can trade a selit fish for a map if you have one." [Fen's offer: Fen gives you 1 selit fish, you give Fen 1 island map]; you said "Sure thing, Fen. Keep the fish." [then you went your ways]
+- 08:00 ran into Cal out on a walk: you said "Morning Cal, got a minute? I could use some fishing bait if you have any."; Cal said "Sure thing, here's a selit fish for your bait." [Cal handed you 1 selit fish]; you said "Hey Cal, can I grab a wood for a selit fish?" [your offer: you give Cal 1 selit fish, Cal gives you 1 wood]; Cal said "" [Cal asked you for 1 wood]; you said "" [your offer: you give Cal 1 island map, Cal gives you 1 wood]; Cal said "Hey Dax, could I swap a selzalne for a softwood?" [Cal's offer: Cal gives you 1 selzalne fish, you give Cal 1 softwood]; you said "" [you asked Cal for 1 wood]; Cal said "Hey Dax, can I trade one selzalne fish for a softwood?" [Cal handed you 1 selzalne fish; Cal asked you for 1 softwood]; you said "" [just nodded (too tired to talk)]
+- 09:00 Bo visited you at home: Bo said "Hey Dax, got any bait?" [Bo's offer: Bo gives you 3 wood, you give Bo 1 fishing bait; then you went your ways]
+- 12:00 too tired to plan, so you planned nothing new
+- 12:00 Fen visited you at home: Fen said "Hey Dax, any chance you’ll find a map soon? I’d love to see the island better." [Fen asked you for 1 island map; then you went your ways]
+- 14:00 Jo visited you at home: Jo said "" [just nodded (too tired to talk)]
 - 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
@@ -64,13 +57,20 @@ Shown to them when they meet that villager again (the latest lines; "you" is Dax
 
 - **Ari:**  [just nodded (too tired to talk)]
 
-### Bo (day 12, 09:00, at Dax's home)
+### Bo (day 13, 09:00, at Dax's home)
 
-- **Bo:** Hey Dax, got a spare bait for me? [Bo's offer: Bo gives you 3 wood, you give Bo 1 fishing bait]
+- **Bo:** Hey Dax, got any bait? [Bo's offer: Bo gives you 3 wood, you give Bo 1 fishing bait; then you went your ways]
 
-### Cal (day 8, 21:00, at Dax's home)
+### Cal (day 13, 08:00, out on a walk)
 
-- **Cal:**  [just nodded (too tired to talk)]
+- **Cal:** Sure thing, here's a selit fish for your bait. [Cal handed you 1 selit fish]
+- **Dax:** Hey Cal, can I grab a wood for a selit fish? [your offer: you give Cal 1 selit fish, Cal gives you 1 wood]
+- **Cal:**  [Cal asked you for 1 wood]
+- **Dax:**  [your offer: you give Cal 1 island map, Cal gives you 1 wood]
+- **Cal:** Hey Dax, could I swap a selzalne for a softwood? [Cal's offer: Cal gives you 1 selzalne fish, you give Cal 1 softwood]
+- **Dax:**  [you asked Cal for 1 wood]
+- **Cal:** Hey Dax, can I trade one selzalne fish for a softwood? [Cal handed you 1 selzalne fish; Cal asked you for 1 softwood]
+- **Dax:**  [just nodded (too tired to talk)]
 
 ### Eli (day 12, 15:00, at the river)
 
@@ -83,6 +83,10 @@ Shown to them when they meet that villager again (the latest lines; "you" is Dax
 - **Eli:** Hey Dax, could I trade a selzalne for a log? [Eli asked you for 1 log, but there's nothing called log on this island]
 - **Dax:**  [just nodded (too tired to talk)]
 
+### Fen (day 13, 12:00, at Dax's home)
+
+- **Fen:** Hey Dax, any chance you’ll find a map soon? I’d love to see the island better. [Fen asked you for 1 island map; then you went your ways]
+
 ### Gus (day 10, 10:00, at Dax's home)
 
 - **Gus:** Hey Dax, I got a selit fish—let’s swap for your bait. [Gus's offer: Gus gives you 1 selit fish, you give Gus 1 fishing bait]
@@ -91,11 +95,9 @@ Shown to them when they meet that villager again (the latest lines; "you" is Dax
 - **Dax:** Sure, but I need bait first. [you asked Gus for 1 fishing bait]
 - **Gus:** Sorry, I don’t have a bait right now. Maybe later. [then you went your ways]
 
-### Jo (day 9, 08:00, at the flowers)
+### Jo (day 13, 14:00, at Dax's home)
 
-- **Dax:** Hey Jo, got some wood—could we trade it for some bait?
-- **Jo:** Sure, here’s a selit for your wood. [Jo's offer: Jo gives you 1 selit fish, you give Jo 1 softwood]
-- **Dax:** Sure, that works. [you accepted: Jo gave you 1 selit fish, you gave Jo 1 softwood; your offer: you give Jo 1 softwood, Jo gives you 1 selit fish, but you had no softwood, so there was no offer; then you went your ways]
+- **Jo:**  [just nodded (too tired to talk)]
 
 ### Kit (day 12, 16:00, at Dax's home)
 
@@ -125,6 +127,8 @@ Shown to them when they meet that villager ("you" is Dax).
 - day 4: Cal gave you 1 wood, which you had asked for
 - day 5: Cal gave you 1 selzalne fish
 - day 5: Cal gave you 1 wood
+- day 13: Cal gave you 1 selit fish
+- day 13: Cal gave you 1 selzalne fish
 
 ### Eli
 
@@ -133,6 +137,7 @@ Shown to them when they meet that villager ("you" is Dax).
 ### Fen
 
 - day 2: you gave Fen 100 bells
+- day 13: you gave Fen 1 ladder and Fen gave you 1 selit fish, in a trade
 
 ### Gus
 
@@ -160,3 +165,4 @@ Shown to them when they meet that villager ("you" is Dax).
 - Day 10: Didn't write (no energy left).
 - Day 11: Wrote the page. Held on to: "No wood stash at home today."; "Got a gormo fish."; "Still need fishing bait.".
 - Day 12: Didn't write (no energy left).
+- Day 13: Didn't write (no energy left). Forgot: "Ari: 1 wood for 1 bait, still pending"; "Cal: offered 1 wood for bait, need to confirm"; "Tent: no storage, only bells allowed".

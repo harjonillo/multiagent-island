@@ -59,3 +59,8 @@ Fished early, got a kalo and a tubas, then the sea went quiet. Switched to the r
 
 Day 11.  
 Fished early, got a kalo and a tubas, then the sea went quiet. Switched to the river; found two ashpimi and a selzalne. The river’s lower ground was busy. Spotted a selashren moth on a stump and caught it at the airport. Gave Jo another selit fish—hope she’s still hiding that log. Energy’s low, but tools are still good. No new trades, no board posts. I’m still chasing that log and a vaulting pole. Maybe tomorrow I’ll ask Jo face‑to‑face instead of a parcel. The island feels quieter, but the river’s alive.
+
+## Day 13
+
+Day 13.  
+The river sang all morning.  I snagged an ashpimo, a selzalne, and two ashpimi before lunch.  A gormo slipped past at 14:00, but I caught another at 15:00.  By dusk a selit drifted near the plaza—happy to add it to the haul.  I kept looking for that bridge spot; still no suitable stretch within 8 steps.  The log remains elusive, and Jo is as silent as ever.  My tools are still solid, but the fishing rod is close to breaking—only six uses left.  I’ll ask Jo face‑to‑face tomorrow for the log or vaulting pole.  The island feels calm, but the river keeps moving.  I’ll rest now, hoping tomorrow brings answers.

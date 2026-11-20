@@ -65,3 +65,8 @@ Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas an
 
 Day 11, 23 h.  
 Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+## Day 13
+
+Day 11, 23 h.  
+Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.

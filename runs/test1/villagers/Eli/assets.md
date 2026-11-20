@@ -1,18 +1,18 @@
 # Eli's assets
 
-## At the end of day 12
+## At the end of day 13
 
 - Bells with them: 100
 - Bells at home: 0
 - Loan from Tom Nook: 0
 - Home: a tent in lower ground, south (storage for 0 items)
-- Pockets (22 of 40 slots, worth 6,250 at Nook's Cranny): ashpimi fish x3, axe x1, fishing rod x1, hardwood x1, kalo fish x1, ladder x1, net x1, selashren moth x2, selit fish x1, selzalne fish x3, shovel x1, softwood x3, tubas fish x2, wood x1
+- Pockets (29 of 40 slots, worth 14,590 at Nook's Cranny): ashpimi fish x5, ashpimo fish x1, axe x1, fishing rod x1, gormo fish x2, hardwood x1, kalo fish x1, ladder x1, net x1, selashren moth x2, selit fish x2, selzalne fish x4, shovel x1, softwood x3, tubas fish x2, wood x1
 - Kept at home (worth 0): nothing
-- Tools, uses so far: axe 3, fishing rod 16, ladder 0, net 3, shovel 0
+- Tools, uses so far: axe 3, fishing rod 24, ladder 0, net 3, shovel 0
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: clay furnace, fruit basket, ironwood dresser, simple wooden fence
-- Net worth (bells and things at Cranny prices, less the loan): 6,350
+- Net worth (bells and things at Cranny prices, less the loan): 14,690
 
 ## Day by day
 
@@ -33,3 +33,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 10 | 100 | 0 | 12 | 3,030 | 0 | tent | 0 | 3,130 |
 | 11 | 100 | 0 | 18 | 4,860 | 0 | tent | 0 | 4,960 |
 | 12 | 100 | 0 | 22 | 6,250 | 0 | tent | 0 | 6,350 |
+| 13 | 100 | 0 | 29 | 14,590 | 0 | tent | 0 | 14,690 |

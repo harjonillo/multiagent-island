@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 12, 23:30.  
+The river stayed empty; the pond kept giving. I chased a big shadow and ended up with a gorpika, then a moitbas at 11. I kept going for fish, trading nothing, but the day was steady. Cal’s house was silent again, but I finally saw him at the walk—he just nodded, too tired to talk. No trades happened, but I kept my softwood and the extra moitbas. Ari still wants a bait; I’ll offer one tomorrow. I’m still short on rocks for the bridge, and Dax is still missing. I’ll ask Eli about the donation and maybe ask Cal for a fish next time. The bridge feels farther each day, but the fish keep coming.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 13 (May 4, spring, rain), 08:00. You are Jo, at the rocks.
+You just spotted:
+1. an ashrumo moth on a rock (the middle cliff, northwest, near rock 2)
+Earlier today:
+- 07:00 hit rock 1: stone x2, iron nugget x6
+- 08:00 rock 2 was the money rock: got 6750 bells
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Cal gave 2 softwood, I traded 1 selzalne.
+- (day 12) Cal only nodded, no talk.
+- (day 12) I caught a gorpika and extra moitbas.
+- (day 12) Ari needs bait tomorrow.
+Your notes from the last 2 days:
+- (day 11) Remember to trade selzalne for rock if he can find one.
+- (day 11) Keep track of rocks for bridge.
+- (day 11) Remember to keep bait for tomorrow.
+- (day 12) Ask Cal for a fish in exchange for softwood. Then see if Dax can give a rock.
+- (day 12) Remember to ask Eli about bridge donation tomorrow.
+- (day 13) Remember to ask Dax about a rock tomorrow. Keep the softwood ready for Cal.
+At 09:00 you planned: mine_rock (rock: 3).
+Actions left today: 5 of 10. Mental energy left today: 117.
+
+You can go after one of them at 09:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (105 tokens, hidden from everyone) ===
+We need decide action. Need softwood ready for Cal. We have softwood? last day got 2 from Cal. We traded 1 selzalne. So have 1 softwood left. We need more? Cal only nodded. We plan to ask Dax for rock tomorrow. At 09:00 we can go after Dax? but he missing. Maybe go after Ari for bait. He needs bait tomorrow. We have extra moitbas. We could give one. So go after Ari.
+
+=== REPLY ===
+{"thoughts":"I need to secure bait for Ari tomorrow and keep my softwood ready for Cal. I’ll go after Ari at 09:00 to give him a moitbas, then return to mine rock 3. That’s my plan for today.", "go": 5}

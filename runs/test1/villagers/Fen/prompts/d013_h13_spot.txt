@@ -1,0 +1,53 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 13 (May 4, spring, rain), 13:00. You are Fen, at Cal's home.
+You just spotted:
+1. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+2. a small fish shadow in the pond (lower ground, southeast, near rock 6)
+Earlier today:
+- 12:00 walked over to Dax's home
+- 12:00 inside Dax's home: not much furniture yet
+- 12:00 visited Dax at home: you said "Hey Dax, any chance you’ll find a map soon? I’d love to see the island better." [you asked Dax for 1 island map; then you went your ways]
+- 13:00 walked over to Cal's home (also nearby: Jo, Cal)
+- 13:00 knocked at Cal's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Need apple before rock break
+- (day 8) Gus traded selzalne for bait, but gave me none
+- (day 8) Still only 1 map in hand, still no path to plaza
+Your notes from the last 2 days:
+- (day 12) Keep an eye on Cal’s willingness; maybe offer selit fish if he wants it.
+- (day 13) Try to get a vaulting pole from Dax tomorrow. Keep selit fish handy for Cal trade.
+- (day 13) Got ladder by trading a selit fish. Remember to keep an eye on Cal for bait later.
+- (day 13) Remember to check if Dax actually has a map before tomorrow. If not, keep trading selit fish elsewhere.
+- (day 13) Get the map from Dax tomorrow. Keep the selit fish handy for future trades.
+- (day 13) Remember to keep the selit fish handy for future trades.
+At 14:00 you planned: rest.
+Actions left today: 0 of 10. Mental energy left today: 29.
+
+You can go after one of them at 14:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (45 tokens, hidden from everyone) ===
+Need to choose target 1 or 2 or 0. We have map 1, need apple, but no. Fish? Probably fish is small fish shadow. I think go after small fish to get food.
+
+=== REPLY ===
+{"thoughts":"Need food for tomorrow, small fish likely easier to catch. No risk of losing map. I'll go after small fish.","go":2}

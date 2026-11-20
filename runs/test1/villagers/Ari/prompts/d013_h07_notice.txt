@@ -1,0 +1,37 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 9: Dawn came, but the river still feels like a wall. I chased a big shadow, got a selit, but the bait is still out of reach. Ike’s house was the only place with a door, but he was gone, leaving a selzalne fish in a corner. I offered a wood, got nothing. The plaza feels farther than ever; the ladder I have is useless without a path. I spent most of the day fishing and walking, but no trades. I’m still holding 200 bells, 7 woods, 12 hardwoods, 8 softwoods, and a few fish and a fossil. My heart aches for that first fishing bait. I’ll keep asking Ike and Dax, and maybe try Cranny tomorrow if I can find a way. Tomorrow, I’ll keep the hope alive and keep trading wood for bait.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 13 (May 4, spring, rain), 07:00. You are Ari, at the rocks.
+Nearby: Ike.
+Earlier today:
+- 07:00 hit rock 6: gold nugget x1 (pockets full, left some) (also nearby: Ike)
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Got selit fish at 08:00
+- (day 9) Ike dropped a selzalne fish after wood offer
+- (day 9) Still no fishing bait, 200 bells, 7 wood, 12 hardwood, 8 softwood.
+Your notes from the last 2 days:
+- (day 11) Remember to collect a rock eventually or find another source of bait.
+- (day 12) Got a trade, hope Gus has bait. Keep an eye on inventory.
+- (day 12) Need bait tomorrow, keep offering wood
+- (day 12) Keep looking for rocks near the river and maybe try to trade with Jo or Dax tomorrow.
+- (day 12) Keep track of Gus's patience; maybe he'll give me bait next time if I keep offering wood.
+- (day 12) Remember to stock up on bait tomorrow, maybe trade with Dax or buy from Cranny when I get a ladder.
+Mental energy left today: 116 (about 17 for each thing you say). Your plan for today: inward 120 (spent 34), outward 30 (spent 0), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (8 tokens, hidden from everyone) ===
+We choose to talk to Ike.
+
+=== REPLY ===
+{"thoughts":"Need bait ASAP. Ike might have it or can trade for it. Offer wood, maybe get a selit or selzalne. Keep it short.","approach":"Ike","say":"Hey Ike, any chance you have some fishing bait?"}

@@ -1,0 +1,94 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Still no bait, no fish, no bells.  
+Ari didn’t answer, but I finally got 1 wood from him for the trade—still 7 wood left.  
+Gus is still silent, but I’m not giving up.  
+I dug a stump, cleared a spot, but pockets full when I tried to fish.  
+Shovels 28/30 uses, ladder 10 uses.  
+Plan: tomorrow bring 3 wood to Dax or Kit, maybe try Gus again.  
+Watch the river, maybe a fish will appear.  
+Sleep is thin, but I’ll keep pushing.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 13 (May 4, spring, rain), 09:00. You are Bo.
+You are usually up from 07:00 to 00:00.
+Bells: 0 in your wallet. Home: tent lower ground, southwest (site-7), no neighbors yet. Carrying 40/40 items.
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Recipes you know: campfire (wood x3; 4 in pockets); clay furnace (clay x6, iron nugget x2; you have none); iron worktable (iron nugget x5, wood x4; in pockets: wood 4); shovel (hardwood x5; 7 in pockets; you carry 2 shovel); simple wooden fence (wood x3; 4 in pockets)
+Nook's Cranny buys at (prices you've heard): none yet
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640, tulip seeds 240, pansy seeds 240, garden lantern 2200, simple wooden fence 100, wooden mini table 1800
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards: shovel recipe 200 (you know it), axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, fruit basket recipe 800
+Able Sisters today (09:00-21:00), clothes: sundress 1400, tuxedo 3200, rose crown 1200, bowler hat 900
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still no bait, need wood trade
+- (day 8) Dax wants bait, I have none
+- (day 8) Ladder 22 uses left, need more wood
+- (day 10) Shovel uses 29 left.
+- (day 10) No bait yet.
+- (day 11) 28 shovel uses left
+- (day 11) Gus wants 1 bait from me tomorrow
+Your notes from the last 2 days:
+- (day 11) Keep 3‑5 wood in reserve for tomorrow's bait trade. If Dax or Gus don’t answer, maybe try Ari for a second wood later.
+- (day 11) Keep 4 wood for future trades. Ask Ari for path next time.
+- (day 11) Remember to keep 3‑5 wood for next bait trade. Keep an eye on Ari for any new offers.
+- (day 11) Tomorrow: bring 3 wood to Ari, maybe try Dax or Gus for bait.
+- (day 12) If Ari still silent, try Gus tomorrow. Keep 3 wood ready.
+- (day 12) Keep 4 wood after trade, still enough for bait.
+- (day 12) Keep 3-5 wood ready for tomorrow’s bait trade.
+- (day 12) Got another fishing rod. Keep wood count in mind.
+- (day 12) Keep 5 wood left for bait trade tomorrow.
+- (day 12) Got wood back, keep 4 wood reserve for bait trade tomorrow.
+- (day 12) Keep 1 wood reserve.
+- (day 13) Remember to leave at least 4 wood in pocket for next bait trade.
+Getting around: You are at lower ground, southwest. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+The Island 101 (closed): 14 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
+
+So far today you:
+- 07:00 tried to propose_bridge: there's no stretch of river narrow enough for a bridge within 8 steps of here (lower ground, southwest), away from other bridges and stairs; the nearest you can walk to is about 11 steps away (lower ground, southwest)
+- 08:00 dug up a stump; the spot is clear now
+- 09:00 walked over to Dax's home
+- 09:00 inside Dax's home: not much furniture yet
+
+Between you and Dax so far:
+- day 7: Dax gave you 1 wood
+
+The last time you talked with Dax before today (day 12, 09:00, at Dax's home):
+You: Hey Dax, got a spare bait for me? [your offer: you give Dax 3 wood, Dax gives you 1 fishing bait]
+
+You are visiting Dax at their home. Inside you can see: nothing much yet. You can start a short conversation, or say nothing.
+One or two sentences, the way you'd really talk. Only Dax hears it.
+Each line costs about 17 mental energy; you have 122 left today.
+You can also give Dax something from your pockets now ("give"), ask Dax for something ("ask"; open until they give or trade it, up to 3 days), or offer a trade ("trade": what you give Dax and what Dax gives you; it happens only if Dax accepts, both at once). Leave any empty ({}).
+Trade offers left in this conversation (from either of you): 3 of 3.
+In your pockets right now: 0 bells, shovel x2, axe x1, fishing rod x2, net x1, ladder x1, hardwood x7, wood x4, selit fish x1, softwood x10, miphosel shell x2, ashbastu shell x2, loka fish x2, gormo fish x2, shovel recipe x1, fossil x1, rune moth x1
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {} or {"<item or bells>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, "trade": {} or {"you give Dax": {"<item or bells>": <qty>}, "Dax gives you": {"<item or bells>": <qty>}}, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (42 tokens, hidden from everyone) ===
+We need to decide: Dax likely still wants bait. We have 4 wood. Offer 3 wood for 1 bait. He gave 1 wood earlier. So propose trade. Use trade.
+
+=== REPLY ===
+{"thoughts":"Dax still needs bait. I have 4 wood, enough to give 3 for 1 bait. He gave me wood before, so he might accept. Offer trade now.", "say":"Hey Dax, got any bait?", "give":{},"ask":{},"trade":{"you give Dax":{"wood":3},"Dax gives you":{"fishing bait":1}}, "leave":true,"note":"Remember to keep at least 4 wood in pocket after trade for future bait."}

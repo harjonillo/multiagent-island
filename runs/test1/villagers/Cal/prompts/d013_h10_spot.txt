@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, 23 h.  
+Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 13 (May 4, spring, rain), 10:00. You are Cal, out on a walk.
+You just spotted:
+1. a small fish shadow in the river (lower ground, centre, near the plaza)
+2. a rune moth on a rock (lower ground, centre, near rock 4)
+Earlier today:
+- 08:00 knocked at Dax's home, but nobody answered
+- 08:00 ran into Dax out on a walk: Dax said "Morning Cal, got a minute? I could use some fishing bait if you have any."; you said "Sure thing, here's a selit fish for your bait." [you handed Dax 1 selit fish]; Dax said "Hey Cal, can I grab a wood for a selit fish?" [Dax's offer: Dax gives you 1 selit fish, you give Dax 1 wood]; you said "" [you asked Dax for 1 wood]; Dax said "" [Dax's offer: Dax gives you 1 island map, you give Dax 1 wood]; you said "Hey Dax, could I swap a selzalne for a softwood?" [your offer: you give Dax 1 selzalne fish, Dax gives you 1 softwood]; Dax said "" [Dax asked you for 1 wood]; you said "Hey Dax, can I trade one selzalne fish for a softwood?" [you handed Dax 1 selzalne fish; you asked Dax for 1 softwood]; Dax said "" [just nodded (too tired to talk)]
+- 09:00 walked over to Jo's home
+- 09:00 knocked at Jo's home, but nobody answered
+- 10:00 ran into Jo at the rocks: Jo said "Hey Cal, got any fish to trade for a bit of softwood?"; you said "Hey Jo, I’ve got a selzalne fish for a softwood, deal?" [your offer: you give Jo 1 selzalne fish, Jo gives you 1 softwood]; Jo said "Sure, deal." [Jo accepted: you gave Jo 1 selzalne fish, Jo gave you 1 softwood; Jo's offer: Jo gives you 1 softwood, you give Jo 1 selzalne fish, but Jo had no softwood, so there was no offer]; you said "" [just nodded (too tired to talk)]
+Things you remember (anything you don't hold on to at night fades):
+- (day 11) Dax unresponsive today.
+- (day 11) Got an ashrumo moth; trade for softwood.
+- (day 11) Need more softwood for bridge and future trades.
+Your notes from the last 2 days:
+- (day 13) If Fen runs out of wood, trade another selzalne for a softwood. If still none, consider asking Jo or Dax. Keep an eye on bridge fund tomorrow.
+- (day 13) Remember to ask Fen for softwood tomorrow. Keep an eye on Jo as well.
+- (day 13) Ask for wood, keep selit fish for later.
+- (day 13) Got one more softwood, keep trading selzalne if needed. Remember to ask Dax for wood tomorrow if he has any.
+- (day 13) Remember to check Jo tomorrow for more softwood.
+- (day 13) Keep trading selzalne for softwood until I hit the bridge fund goal.
+At 11:00 you planned: rest.
+Actions left today: 6 of 10. Mental energy left today: 16.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (103 tokens, hidden from everyone) ===
+We need choose action: go after one of them at 11:00. Which? We have fish shadow and rune moth. Probably better to go after fish shadow for selit fish? We have selit fish already used. Maybe get more softwood? The fish is selit? Not sure. Rune moth? Maybe trade for softwood? We already have ashrumo moth trade. But rune moth might trade for softwood? Not known. Probably go after fish shadow. So go 1.
+
+=== REPLY ===
+{"thoughts":"I need more softwood for the bridge. The fish shadow could give me a selit fish, which I can use to trade for softwood. The rune moth might be useful later, but I’m short on time and resources. I’ll head for the fish shadow now and see if I can snag something useful.","go":1}

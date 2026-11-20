@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Sunset came early, but I still got a couple of hardwoods and a chunk of softwood. The axe left a stump, so I’ll need to swing a bit more tomorrow. I chased a nevin moth instead of visiting Bo, so the bait request is still hanging. The river was a bit better—caught a loka fish and a couple of tubas, plus a fossil for Blathers. Still no bait to trade for Dax, but I bought some cosmos seeds to keep the garden going. My tools are wearing down fast—axe 25, shovel 29, rod 22. Bells are low; I’ll need to buy bait from Nook’s tomorrow. Still no space for selit and selzalne, but I’ll hold them on my belt.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 13 (May 4, spring, rain), 13:00. You are Gus, at the river.
+You just spotted:
+1. a small fish shadow in the river (lower ground, south, near Able Sisters)
+Earlier today:
+- 12:00 walked over to Ari's home (also nearby: Jo, Ari)
+- 12:00 knocked at Ari's home, but nobody answered
+- 12:00 ran into Jo at Ari's home: you said "Hey Jo, could I borrow a bit of wood for tomorrow? I’ve got some bait to trade with Dax."; Jo said "Sure, I’ll see if I can find some for you." [Jo asked you for 1 wood]; you said "Sure thing, here’s one." [you tried to hand Jo 1 wood but Jo had no room]; Jo said "Sure, here’s my selzalne." [Jo's offer: Jo gives you 1 selzalne fish, you give Jo 1 wood]; you said "Deal, thanks!" [you accepted: Jo gave you 1 selzalne fish, you gave Jo 1 wood]; Jo said "" [just nodded (too tired to talk)]
+- 12:00 spotted a small fish shadow in the river (lower ground, southeast, near rock 6) and went after it at 13:00 instead of chop_wood (kind: hardwood, axe: axe)
+- 13:00 looked for fish in the river, but there were no fish shadows in sight (also nearby: Bo)
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) No bait from Bo or Dax today.
+- (day 9) Still have 1 selit, 1 selzalne, 2 loka, 1 gormo.
+- (day 10) Dax says he wants bait first, so I’ll bring wood tomorrow.
+- (day 11) Bo and Dax still want bait, I need wood tomorrow.
+Your notes from the last 2 days:
+- (day 12) Need to catch a fish tomorrow to get bait.
+- (day 12) Remember to get bait tomorrow, maybe buy from Nook or trade with Dax.
+- (day 12) Remember to bring extra wood tomorrow for Dax if he still wants bait.
+- (day 13) Remember to keep 3 wood in pockets for tomorrow's Dax trade. Also, keep the fishing bait for later.
+- (day 13) Remember to keep 3 wood for Dax tomorrow.
+- (day 13) Remember to keep 3 wood for tomorrow's Dax trade.
+At 14:00 you planned: chop_wood (kind: hardwood, axe: axe).
+Actions left today: 3 of 10. Mental energy left today: 34.
+
+You can go after one of them at 14:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (41 tokens, hidden from everyone) ===
+We need choose action. We have fish shadow at 13:00 already missed. At 14:00 can chase. Probably fish again. I'll go after fish shadow at 14:00.
+
+=== REPLY ===
+{"thoughts":"Time to try fishing again; maybe catch something useful for bait. I’ll head to the river now.", "go":1}

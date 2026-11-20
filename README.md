@@ -843,6 +843,9 @@ personality.
 
 ### Long-term memory
 
+Flowcharts of every store, which prompt reads it and what happens at night are in
+[docs/memory.md](docs/memory.md).
+
 A basic model, loosely after how human memory works. Salience comes from the villagers, not from
 rules: after the nightly page, a villager can add a `Remember:` line and up to 3 short lines,
 each something from the day in their own words, or the number of a memory they already have
@@ -1055,7 +1058,7 @@ reading anything into a run.
 ## Layout
 
 ```
-docs/                   day_flow.md (flowcharts of a run), token_design.md (why the token budget works as it does),
+docs/                   day_flow.md (flowcharts of a run), memory.md (flowcharts of what villagers keep and for how long), token_design.md (why the token budget works as it does),
                         world.md and island_grid.png (generated), the grid spec
 scenarios/              island scenarios
 villagers/              island villager templates and casts

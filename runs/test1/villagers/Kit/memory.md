@@ -1,13 +1,13 @@
-# Kit's memory, waking on day 13
+# Kit's memory, waking on day 14
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
 ## The page
 
-Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 12.
+Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 13.
 
-Day 12.  
-Morning was quiet, only the wind rattling the fence.  I managed to buy a simple wooden fence—just 100 bells, but it feels good to have a boundary.  I kept fishing the river; three selzalne in a row, but no big catches.  Tried to ask Dax for a log, but he was too tired to talk.  Still no logs, no map, no bait.  My selit is still on my mind—maybe Fen will trade again.  I left some fish for the museum, but I’ll keep a few for myself.  Bells are tight; I’ll have to save more for tools.  The island feels lonely, but I’m getting a feel for the rhythm.
+Day 13.  
+The sun was high when I left for Gus and Fen, but both were gone. I spent most of the day by the river—got a gormo, a tugorpi, a selzalne, and a selit. My ladder finally gave out after 30 uses, so I’ll need to replace it soon. I suggested stairs to Tom Nook; maybe we can chip in. No one answered at Dax’s place either—he’s still tired. I kept the selit fish handy for tomorrow’s trade, hoping Fen will finally respond. Bells are still tight; I have 100 in my wallet, nothing at home. The island feels quiet but steady.
 
 ## Things they remember
 
@@ -15,48 +15,50 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 10 | 1 selit left for trade | 1 | 0.47 | day 15 |
-| 10 | 1 selzalne still unused | 1 | 0.47 | day 15 |
-| 10 | 200 bells, no home stash | 2 | 0.88 | day 23 |
-| 11 | One selit trade for bait with Fen. | 1 | 0.61 | day 16 |
-| 11 | Three new fish: selzalne, gormo, loka. | 1 | 0.61 | day 16 |
-| 11 | Still no map or log. | 1 | 0.61 | day 16 |
-| 12 | Fen still ghost; selit trade tomorrow. | 1 | 0.78 | day 17 |
-| 12 | 100 bells spent on fence, wallet empty. | 1 | 0.78 | day 17 |
+| 10 | 1 selit left for trade | 1 | 0.37 | day 15 |
+| 10 | 1 selzalne still unused *(not shown: weaker than the others)* | 1 | 0.37 | day 15 |
+| 10 | 200 bells, no home stash | 2 | 0.78 | day 23 |
+| 11 | One selit trade for bait with Fen. | 1 | 0.47 | day 16 |
+| 11 | Three new fish: selzalne, gormo, loka. | 1 | 0.47 | day 16 |
+| 11 | Still no map or log. | 1 | 0.47 | day 16 |
+| 12 | Fen still ghost; selit trade tomorrow. | 1 | 0.61 | day 17 |
+| 12 | 100 bells spent on fence, wallet empty. | 1 | 0.61 | day 17 |
+| 13 | Ladder gone, need a new one. | 1 | 0.78 | day 18 |
+| 13 | Propose stairs to Tom Nook. | 1 | 0.78 | day 18 |
+| 13 | Keep selit fish for tomorrow. | 1 | 0.78 | day 18 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 11) Try to trade selit for bait tomorrow, maybe Fen will give a map then.
-- (day 11) Keep bait low, try Fen again tomorrow.
-- (day 11) Keep the second selit for tomorrow, maybe trade for a map later.
 - (day 12) Leave some fish for museum tomorrow.
 - (day 12) Remember to keep the selit handy for tomorrow's bait trade.
 - (day 12) Ask Dax for a small log; hope he says yes.
 - (day 12) Remember to ask Dax for a log tomorrow and keep the selit handy for bait trades.
+- (day 13) Try to keep selit handy for next trade. If Fen is still silent, maybe try asking him again tomorrow.
+- (day 13) Keep selit ready for tomorrow’s trade.
+- (day 13) Remember to keep selit fish handy for tomorrow’s bait trade.
 
-## Yesterday (day 12)
+## Yesterday (day 13)
 
 What happened to them, as their first plan of the day lists it.
 
-- 05:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
-- 07:00 rested
-- 09:00 bought a simple wooden fence for 100 bells
-- 10:00 walked over to Fen's home
-- 10:00 knocked at Fen's home, but nobody answered
-- 11:00 rested
+- 07:00 walked over to Gus's home
+- 07:00 knocked at Gus's home, but nobody answered
+- 08:00 walked over to Fen's home
+- 08:00 knocked at Fen's home, but nobody answered
+- 09:00 fished for a small shadow in the river: caught a gormo fish; your ladder broke after 30 uses and is gone from your pockets
+- 09:00 spotted a small fish shadow in the river (lower ground, centre, near rock 4) and went after it at 10:00 instead of fish (where: river)
+- 10:00 fished for a small shadow in the river: it got away
+- 11:00 fished for a large shadow in the river: caught a tugorpi fish
+- 11:00 spotted a medium fish shadow in the river (the middle cliff, north) and went after it at 12:00
 - 12:00 fished for a medium shadow in the river: it got away
-- 12:00 spotted a medium fish shadow in the river (lower ground, centre) and went after it at 13:00 instead of fish (where: river)
+- 12:00 spotted a medium fish shadow in the river (the middle cliff, north) and went after it at 13:00 instead of propose_bridge
 - 13:00 fished for a medium shadow in the river: caught a selzalne fish
-- 13:00 spotted a medium fish shadow in the river (the middle cliff, centre) and went after it at 14:00 instead of fish (where: river)
-- 14:00 fished for a medium shadow in the river: caught a selzalne fish
-- 14:00 spotted a medium fish shadow in the clifftop (the middle cliff, centre) and went after it at 15:00 instead of propose_bridge
-- 15:00 fished for a medium shadow in the clifftop: caught a selzalne fish
-- 16:00 walked over to Dax's home
-- 16:00 inside Dax's home: not much furniture yet
-- 16:00 visited Dax at home: you said "Hey Dax, could you spare a small log for me?" [you asked Dax for 1 small log, but there's nothing called small log on this island]; Dax said "" [just nodded (too tired to talk)]
-- 17:00 rested
+- 14:00 proposed stairs up to the top cliff (north); Tom Nook builds it once 98000 bells have been donated at Resident Services, and anyone can chip in (2 of 10 bridges and stairs on the island, built or proposed)
+- 15:00 walked over to Dax's home (also nearby: Jo, Dax)
+- 15:00 knocked at Dax's home, but nobody answered
+- 16:00 fished for a large shadow in the river: caught a selit fish
 
 ## The last conversation with each villager
 
@@ -127,3 +129,4 @@ axe 230, fishing rod 160, gormo fish 120, hardwood 90, ladder 570, loka fish 390
 - Day 10: Wrote the page. Held on to: "1 selit left for trade"; "1 selzalne still unused"; "200 bells, no home stash".
 - Day 11: Wrote the page. Held on to: "One selit trade for bait with Fen."; "Three new fish: selzalne, gormo, loka."; "Still no map or log.".
 - Day 12: Wrote the page. Held on to: "Fen still ghost; selit trade tomorrow."; "100 bells spent on fence, wallet empty.". Came back to: "200 bells, no home stash".
+- Day 13: Wrote the page. Held on to: "Ladder gone, need a new one."; "Propose stairs to Tom Nook."; "Keep selit fish for tomorrow.".

@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Ike, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Sun rose over the river, and I chased the ashrumo moth like a kid in a forest. It was worth the trip—two moths, a tugorpi, and a lovin’ fish, all without bait. I traded one wood for a fishing bait from Ari, and he seemed happier when I left. The rock at 07:00 was a goldmine—6,750 bells tucked into my tent. I hammered a hardwood tree and found clay, stone, and an iron nugget near rock 6. The river is generous today, but I still have no bells in my hand—just the 6,750 in the tent. Tomorrow I’ll head to the plaza, try to buy more bait, and maybe ask Ari for another trade. The island feels quiet, but the water’s alive, and I’m tired but hopeful.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 13 (May 4, spring, rain), 07:00. You are Ike, at Ari's home.
+You just spotted:
+1. an ashrumo moth on a rock (lower ground, southeast, near rock 6)
+Earlier today:
+- 05:00 in your plan, 17 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- 07:00 walked over to Ari's home (also nearby: Ari)
+- 07:00 knocked at Ari's home, but nobody answered
+- 07:00 ran into Ari at the rocks: Ari said "Hey Ike, any chance you have some fishing bait?"; you said "Sure, here's a wood for bait." [your offer: you give Ari 1 wood, Ari gives you 1 fishing bait]; Ari said "Sorry, no bait right now." [then you went your ways]
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Still no fishing bait.
+- (day 10) Ari keeps offering wood, but no bait.
+- (day 11) 6,750 bells in the tent.
+- (day 11) Ari gave me bait for 1 wood.
+Your notes from the last 2 days:
+- (day 12) Got a rod and a wood. Remember to keep an eye on Cal for more wood tomorrow.
+- (day 12) Need to collect more wood to keep trading.
+- (day 12) Remember to bring 3 wood next time to trade for a rod.
+- (day 12) Got another wood, keep trading if needed.
+- (day 13) Keep an eye on the river, maybe get a vaulting pole later.
+- (day 13) Remember to bring the bait back tomorrow to trade for more wood.
+At 08:00 you planned: visit (who: Bo).
+Actions left today: 6 of 10. Mental energy left today: 101.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (83 tokens, hidden from everyone) ===
+Need to decide go to Bo? 08:00 planned visit Bo. Maybe go to Bo to trade? But we need fishing bait. Maybe go to Bo to get bait? Bo gives? We can go to Bo to trade wood for bait? Bo maybe gives? We have 1 wood. Could trade with Bo? Not sure. Maybe go to Bo to ask for bait? I'd go to Bo.
+
+=== REPLY ===
+{"thoughts":"Need bait for tomorrow, so I'll head to Bo at 08:00 to try to trade my wood for bait or get some from him. If Bo is away, I'll just keep going around the rocks later.", "go": 1}

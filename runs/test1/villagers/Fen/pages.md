@@ -105,3 +105,15 @@ Tools: shovel 2, axe, rod, net, ladder.
 No bells, no progress on the bridge.  
 Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
 Hope the plaza is closer than it feels.
+
+## Day 13
+
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.

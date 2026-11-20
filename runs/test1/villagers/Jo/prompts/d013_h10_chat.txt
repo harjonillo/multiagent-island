@@ -1,0 +1,96 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 12, 23:30.  
+The river stayed empty; the pond kept giving. I chased a big shadow and ended up with a gorpika, then a moitbas at 11. I kept going for fish, trading nothing, but the day was steady. Cal’s house was silent again, but I finally saw him at the walk—he just nodded, too tired to talk. No trades happened, but I kept my softwood and the extra moitbas. Ari still wants a bait; I’ll offer one tomorrow. I’m still short on rocks for the bridge, and Dax is still missing. I’ll ask Eli about the donation and maybe ask Cal for a fish next time. The bridge feels farther each day, but the fish keep coming.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 13 (May 4, spring, rain), 10:00. You are Jo.
+You are usually up from 07:00 to 00:00.
+Bells: 6800 in your wallet. Home: tent lower ground, west (site-10), neighbors: Dax, Gus. Carrying 40/40 items.
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Open requests: Ari wants 1 fishing bait from you (until day 13); Cal wants 1 softwood from you (until day 13)
+Recipes you know: iron fence (iron nugget x2; 10 in pockets); shell table (renrenzal shell x2, ashbastu shell x2, dalo shell x1; you have none); simple wooden fence (wood x3; you have none); street lamp (iron nugget x4, clay x2; in pockets: iron nugget 10, clay 6)
+Nook's Cranny buys at (prices you've heard): none yet
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640, tulip seeds 240, pansy seeds 240, garden lantern 2200, simple wooden fence 100, wooden mini table 1800
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards: shovel recipe 200, axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, fruit basket recipe 800
+Able Sisters today (09:00-21:00), clothes: sundress 1400, tuxedo 3200, rose crown 1200, bowler hat 900
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Cal gave 2 softwood, I traded 1 selzalne.
+- (day 9) Dax still wants bait, I owe him one.
+- (day 9) Bridge still 2k.
+- (day 12) Cal only nodded, no talk.
+- (day 12) I caught a gorpika and extra moitbas.
+- (day 12) Ari needs bait tomorrow.
+Your notes from the last 2 days:
+- (day 11) Ask Eli tomorrow for rock if Dax is still away.
+- (day 11) Keep the selit for next fishing run. Maybe ask for a rock later.
+- (day 11) Remember to keep the selit fish for next fishing run. Ask Eli about bridge donation tomorrow.
+- (day 11) Remember to keep the selzalne handy for future trades.
+- (day 11) Remember to trade selzalne for rock if he can find one.
+- (day 11) Keep track of rocks for bridge.
+- (day 11) Remember to keep bait for tomorrow.
+- (day 12) Ask Cal for a fish in exchange for softwood. Then see if Dax can give a rock.
+- (day 12) Remember to ask Eli about bridge donation tomorrow.
+- (day 13) Remember to ask Dax about a rock tomorrow. Keep the softwood ready for Cal.
+Getting around: You are at lower ground, west. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+The Island 101 (closed): 14 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
+
+So far today you:
+- 07:00 hit rock 1: stone x2, iron nugget x6
+- 08:00 rock 2 was the money rock: got 6750 bells
+- 09:00 hit rock 3: iron nugget x3, clay x2, stone x3
+- 10:00 hit rock 4: iron nugget x1, clay x4 (pockets full, left some) (also nearby: Cal)
+
+Between you and Cal so far (the latest 6; 2 earlier):
+- day 9: you gave Cal 1 fishing bait, which they had asked for
+- day 9: you gave Cal 1 selzalne fish and Cal gave you 1 softwood, in a trade
+- day 10: you gave Cal 1 selzalne fish and Cal gave you 1 selit fish, in a trade
+- day 10: you gave Cal 1 softwood, which they had asked for
+- day 10: you gave Cal 1 selit fish and Cal gave you 1 softwood, in a trade
+- day 10: you gave Cal 1 softwood
+
+The last time you talked with Cal before today (day 12, 17:00, out on a walk):
+You: Hey Cal, could I trade a fish for some softwood? I could use a rock for the bridge too.
+Cal:  [just nodded (too tired to talk)]
+
+You ran into Cal at the rocks. So far:
+You: Hey Cal, got any fish to trade for a bit of softwood?
+Cal: Hey Jo, I’ve got a selzalne fish for a softwood, deal? [Cal's offer: Cal gives you 1 selzalne fish, you give Cal 1 softwood]
+
+Reply, or say nothing to end it. "leave": true ends it after this line.
+One or two sentences, the way you'd really talk. Only Cal hears it.
+Each line costs about 17 mental energy; you have 106 left today.
+You can also give Cal something from your pockets now ("give"), ask Cal for something ("ask"; open until they give or trade it, up to 3 days), or offer a trade ("trade": what you give Cal and what Cal gives you; it happens only if Cal accepts, both at once). Leave any empty ({}).
+Trade offers left in this conversation (from either of you): 2 of 3.
+On the table from Cal: Cal gives you 1 selzalne fish, you give Cal 1 softwood (you have 1). "accept": true makes the trade; or offer another.
+In your pockets right now: 6800 bells, shovel x1, axe x1, fishing rod x1, net x1, ladder x1, selit fish x1, loka fish x1, fossil x2, tugorpi fish x2, softwood x1, miruru fish x2, nevin moth x1, moitbas fish x3, gorpika fish x1, stone x5, iron nugget x10, clay x6
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {} or {"<item or bells>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, "trade": {} or {"you give Cal": {"<item or bells>": <qty>}, "Cal gives you": {"<item or bells>": <qty>}}, "accept": true | false, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (6 tokens, hidden from everyone) ===
+We should accept trade.
+
+=== REPLY ===
+{"thoughts":"Accepting the trade keeps me stocked with selzalne, which I can use later. I still have softwood for Cal’s request tomorrow. No need to ask or give anything now.", "say":"Sure, deal.", "give": {}, "ask": {}, "trade": {"you give Cal": {"softwood": 1}, "Cal gives you": {"selzalne fish": 1}}, "accept": true, "leave": false, "note":"Keep selzalne handy for future trades. Remember to ask Dax for a rock tomorrow."}

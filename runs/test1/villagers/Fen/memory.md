@@ -1,4 +1,4 @@
-# Fen's memory, waking on day 13
+# Fen's memory, waking on day 14
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -20,47 +20,45 @@ Hope the plaza is closer than it feels.
 
 Chosen by them at night, up to 3 a night, in their own words. Each fades unless they come back to it at night, which doubles how long it lasts. Plans, the plaza and conversations show the strongest 10; quick decisions show 4.
 
-| from day | memory | times held | strength now | comes to mind through |
-|---|---|---|---|---|
-| 8 | Need apple before rock break | 1 | 0.29 | day 13 |
-| 8 | Gus traded selzalne for bait, but gave me none | 1 | 0.29 | day 13 |
-| 8 | Still only 1 map in hand, still no path to plaza | 1 | 0.29 | day 13 |
+(nothing)
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 11) Remember to trade selit fish for bait at Kit tomorrow.
-- (day 11) Hope Jo will give me bait. If not, maybe trade later.
-- (day 11) Remember to stock up on rocks before next trade.
-- (day 11) Tomorrow, try to get a vaulting pole or ladder. Also ask Kit again for bait, maybe bring a rock to trade.
-- (day 11) Stay ready for the next morning, keep the selit fish handy.
 - (day 12) Check if Gus has ladder or vaulting pole tomorrow. Maybe ask Jo for more selit fish if needed.
 - (day 12) Remember to ask Dax about any map or ladder. Good luck.
 - (day 12) Need to get selzalne soon; maybe from Gus or Dax.
 - (day 12) Keep an eye on Cal for more bait later.
 - (day 12) Keep an eye on Cal’s willingness; maybe offer selit fish if he wants it.
+- (day 13) Try to get a vaulting pole from Dax tomorrow. Keep selit fish handy for Cal trade.
+- (day 13) Got ladder by trading a selit fish. Remember to keep an eye on Cal for bait later.
+- (day 13) Remember to check if Dax actually has a map before tomorrow. If not, keep trading selit fish elsewhere.
+- (day 13) Get the map from Dax tomorrow. Keep the selit fish handy for future trades.
+- (day 13) Remember to keep the selit fish handy for future trades.
 
-## Yesterday (day 12)
+## Yesterday (day 13)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 walked over to Jo's home (also nearby: Ari)
-- 07:00 knocked at Jo's home, but nobody answered
-- 07:00 spotted a nevin moth on a tree (lower ground, west) and went after it at 08:00 instead of visit (who: Gus)
-- 08:00 went bug catching around the trees: caught a nevin moth
-- 09:00 tried to propose_bridge: there's no stretch of river narrow enough for a bridge within 8 steps of here (lower ground, west), away from other bridges and stairs; the nearest you can walk to is about 42 steps away (lower ground, southwest)
-- 10:00 fished for a small shadow in the river: caught an ashpimi fish
+- 07:00 walked over to Dax's home (also nearby: Dax)
+- 07:00 knocked at Dax's home, but nobody answered
+- 07:00 ran into Dax at Dax's home: you said "Morning Dax, got a minute? I could use a map or a ladder if you have one."; Dax said "Sure thing, here's the ladder." [Dax tried to hand you 1 ladder but you had no room]; you said "Thanks, Dax! I’ll swap a selit fish for that ladder." [your offer: you give Dax 1 selit fish, Dax gives you 1 ladder]; Dax said "Thanks, Fen! Deal." [Dax accepted: you gave Dax 1 selit fish, Dax gave you 1 ladder; Dax's offer: Dax gives you 1 ladder, you give Dax 1 selit fish, but Dax had no ladder, so there was no offer]; you said "Thanks, Dax. I can trade a selit fish for a map if you have one." [your offer: you give Dax 1 selit fish, Dax gives you 1 island map]; Dax said "Sure thing, Fen. Keep the fish." [then you went your ways]
+- 08:00 walked over to Gus's home
+- 08:00 knocked at Gus's home, but nobody answered
+- 09:00 rested
+- 10:00 walked over to Jo's home
+- 10:00 knocked at Jo's home, but nobody answered
 - 11:00 rested
-- 12:00 walked over to Dax's home (also nearby: Gus, Cal)
-- 12:00 knocked at Dax's home, but nobody answered
-- 12:00 ran into Gus at Dax's home: you said "Hey Gus, any ladder or pole for crossing the river?"; Gus said "" [just nodded (too tired to talk)]
-- 13:00 walked over to Gus's home
-- 13:00 knocked at Gus's home, but nobody answered
-- 14:00 walked over to Jo's home (also nearby: Cal)
-- 14:00 knocked at Jo's home, but nobody answered
-- 14:00 ran into Cal at Jo's home: Cal said "Hey Fen, could I borrow a bit of your wood? I could trade a selzalne for softwood."; you said "Thanks, Cal!" [you asked Cal for 1 selzalne fish]; Cal said "Sure thing, Fen. Here’s a selzalne for your softwood." [Cal's offer: Cal gives you 1 selzalne fish, you give Cal 1 softwood]; you said "Got it, thanks!" [you accepted: Cal gave you 1 selzalne fish, you gave Cal 1 softwood]; Cal said "Hey Fen, could I snag another softwood if you have one spare?" [Cal asked you for 1 softwood]; you said "Sure, can you give me another selzalne?" [you asked Cal for 1 selzalne fish]; Cal said "Sure thing, another one!" [Cal tried to hand you 1 selzalne fish but you had no room]; you said "" [just nodded (too tired to talk)]
-- 15:00 asked Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay 400 bells for an unassessed one. So far: fish 0/19 (none); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1.
+- 12:00 walked over to Dax's home
+- 12:00 inside Dax's home: not much furniture yet
+- 12:00 visited Dax at home: you said "Hey Dax, any chance you’ll find a map soon? I’d love to see the island better." [you asked Dax for 1 island map; then you went your ways]
+- 13:00 walked over to Cal's home (also nearby: Jo, Cal)
+- 13:00 knocked at Cal's home, but nobody answered
+- 13:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 6) and went after it at 14:00 instead of rest
+- 14:00 tried to fish: pockets full
+- 14:00 spotted a large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 15:00 instead of rest
+- 15:00 tried to fish: pockets full
 - 16:00 rested
 - 19:00 too tired to plan, so you planned nothing new
 
@@ -78,6 +76,10 @@ Shown to them when they meet that villager again (the latest lines; "you" is Fen
 - **Fen:** Sure, can you give me another selzalne? [you asked Cal for 1 selzalne fish]
 - **Cal:** Sure thing, another one! [Cal tried to hand you 1 selzalne fish but you had no room]
 - **Fen:**  [just nodded (too tired to talk)]
+
+### Dax (day 13, 12:00, at Dax's home)
+
+- **Fen:** Hey Dax, any chance you’ll find a map soon? I’d love to see the island better. [you asked Dax for 1 island map; then you went your ways]
 
 ### Gus (day 12, 12:00, at Dax's home)
 
@@ -117,6 +119,7 @@ Shown to them when they meet that villager ("you" is Fen).
 ### Dax
 
 - day 2: Dax gave you 100 bells
+- day 13: you gave Dax 1 selit fish and Dax gave you 1 ladder, in a trade
 
 ### Gus
 
@@ -162,3 +165,4 @@ axe 230, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, s
 - Day 10: Didn't write (no energy left).
 - Day 11: Didn't write (no energy left).
 - Day 12: Didn't write (no energy left).
+- Day 13: Didn't write (no energy left). Forgot: "Need apple before rock break"; "Gus traded selzalne for bait, but gave me none"; "Still only 1 map in hand, still no path to plaza".

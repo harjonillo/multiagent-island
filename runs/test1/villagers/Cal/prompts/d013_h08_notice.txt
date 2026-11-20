@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, 23 h.  
+Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 13 (May 4, spring, rain), 08:00. You are Cal, at the Dax's home.
+Nearby: Dax.
+Earlier today:
+- 05:00 in your plan, 17 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- 07:00 walked over to Fen's home
+- 07:00 knocked at Fen's home, but nobody answered
+- 08:00 walked over to Dax's home (also nearby: Dax)
+- 08:00 knocked at Dax's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 11) Dax unresponsive today.
+- (day 11) Got an ashrumo moth; trade for softwood.
+- (day 11) Need more softwood for bridge and future trades.
+Your notes from the last 2 days:
+- (day 12) If I run out of time, skip the bridge and just finish fishing.
+- (day 12) Ask Dax for any leftover wood, trade selzalne for softwood if possible.
+- (day 12) Got the trade. Keep an eye on Jo for more softwood tomorrow.
+- (day 12) Keep track of softwood count
+- (day 12) Keep track of softwood count for bridge.
+- (day 13) If Fen runs out of wood, trade another selzalne for a softwood. If still none, consider asking Jo or Dax. Keep an eye on bridge fund tomorrow.
+Mental energy left today: 120 (about 16 for each thing you say). Your plan for today: inward 30 (spent 30), outward 120 (spent 0), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (4 tokens, hidden from everyone) ===
+Need JSON.
+
+=== REPLY ===
+{"thoughts":"Dax still silent, need wood. Maybe talk to Dax first; if no answer, go to Jo. Keep energy low.","approach":"Dax","say":"Hey, Dax! Need some leftover wood for the bridge."}
