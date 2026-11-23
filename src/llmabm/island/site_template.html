@@ -923,6 +923,7 @@ function mind() {
 
   const memory = mem ? `<li><b>Long-term memories.</b> At night, after the page, a villager can name up to ${mem.picks} things to hold on to, in their own words, or the number of an older memory still on their mind. A memory fades: its strength is e<sup>−days since last recalled ÷ stability</sup>, stability starts at ${mem.stability} days and doubles each time it is picked again, and below ${mem.threshold} it is gone for good. At most ${mem.shown} are in a prompt, strongest first.</li>
       <li><b>Notes.</b> Each plan can leave a note to self. Notes last ${mem.notes_days} day${mem.notes_days === 1 ? "" : "s"}; what isn't picked at night fades with them.</li>`
+      + (vs.some(([, v]) => v >= 20) ? `<li><b>From prompt version 20, memory is retrieved.</b> Everything a villager lived through is kept (each line of each day, each note, each night's page) and nothing is gone for good. A prompt shows the few records closest to the situation in it, by text embedding, weighed by how recent they are; what a villager chose to hold on to at night counts double and fades more slowly each time they come back to it. Notes still show in full for ${mem.notes_days} day${mem.notes_days === 1 ? "" : "s"}, and are kept after that.</li>` : "")
     : `<li><b>Notes.</b> Each plan can leave a note to self; the last ${M.memory_size || 15} are kept.</li>`;
 
   return `

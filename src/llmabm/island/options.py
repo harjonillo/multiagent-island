@@ -20,7 +20,8 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass, field
 
-from .world import AXES, BAIT, FOSSIL, NPCS, _a, category_of, clock, item_info, resolve_item, structures_cfg
+from .npc import ROSTER
+from .world import AXES, BAIT, FOSSIL, _a, category_of, clock, item_info, resolve_item, structures_cfg
 
 AREAS = ["northwest", "north", "northeast", "west", "centre", "east", "southwest", "south", "southeast"]  # as in region()
 
@@ -287,11 +288,10 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
         ok = frozenset(h for h in hours if isl.is_open(place, h))
         return ok or None
 
-    for who in ("Tom Nook", "Isabelle", "Blathers", "Timmy and Tommy", "Able Sisters"):
-        building, place = NPCS[who.lower()]
-        if (ok := open_in(place, building)):
-            add(Option(f"ask {_the(who)} what they do and what it costs (at {_the(building)})",
-                       {"do": "ask", "who": who}, ok))
+    for npc in ROSTER:
+        if npc.listed and (ok := open_in(npc.place, npc.building)):
+            add(Option(f"ask {_the(npc.name)} what they do and what it costs (at {_the(npc.building)})",
+                       {"do": "ask", "who": npc.name}, ok))
 
     if (ok := open_in("cranny", "Nook's Cranny")):
         at = " at Nook's Cranny"

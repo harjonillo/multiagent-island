@@ -219,6 +219,12 @@ can't be afforded isn't made.
 
 Day 0 has no extra call: homesites are drawn, not chosen.
 
+From prompt version 20, each villager call above is preceded by a retrieval step, not an LLM call:
+the villager's memories are compared with the situation in the prompt, and the closest go in it
+(logged as `recall`). It needs each text as a vector, from the embedder set under `embeddings:` in
+`config/models.yaml` (a local model by default); every vector is cached, so a text is embedded once. See
+[memory.md](memory.md#5-from-prompt-version-20-memory-by-retrieval).
+
 ## Every file a run writes
 
 All in the run directory, `runs/<timestamp>_<scenario>_s<seed>/` or `--run-dir`.
@@ -226,7 +232,7 @@ All in the run directory, `runs/<timestamp>_<scenario>_s<seed>/` or `--run-dir`.
 | file | written | what it holds |
 |---|---|---|
 | `manifest.json` | at the start; `days_completed` after each day | scenario, perturbed world, villagers, system prompts |
-| `events.jsonl` | as things happen, one JSON line each | everything: day_start, arrival, plan, lookup, action, sighting, seen, visit, encounter_decision, encounter, gift, favor_asked, favor_done, evening_turn, message, parcel, board, offer, offer_update, trade, tool_broke, hour_state, snapshot, reflection, memory, energy, isabelle_summary, run_start, run_end, resume, intervention |
+| `events.jsonl` | as things happen, one JSON line each | everything: day_start, arrival, plan, lookup, recall (version 20), action, sighting, seen, visit, encounter_decision, encounter, gift, favor_asked, favor_done, evening_turn, message, parcel, board, offer, offer_update, trade, tool_broke, hour_state, snapshot, reflection, memory, energy, isabelle_summary, run_start, run_end, resume, intervention |
 | `checkpoint.pkl` | after each day | the whole simulation, for `llmabm resume` |
 | `days/day_NNN_isabelle.md` | end of each day | Isabelle's report |
 | `villagers/<name>/prompts/dNNN_*.txt` (Isabelle's: `prompts/dNNN_isabelle_isabelle.txt`) | each LLM call, with `--log-prompts` | the exact system and user prompt, then the hidden reasoning (if any) and the reply. A prompt sent again with the Island 101 open is the next file with the same tag (`_2`, `_3`) |
@@ -241,4 +247,5 @@ All in the run directory, `runs/<timestamp>_<scenario>_s<seed>/` or `--run-dir`.
 | `traits_divergence.png`, `traits_profile.png` | analysis, with reflection on | how far apart villagers drift, and their recent profiles |
 
 Outside the run directory, `.cache/llm/` keeps every LLM reply, keyed on the prompt and seed,
-so rerunning the same seed replays for free.
+so rerunning the same seed replays for free. `.cache/embed/` keeps every embedding vector, keyed
+on the model and the text (prompt version 20).

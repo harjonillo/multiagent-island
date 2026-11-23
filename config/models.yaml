@@ -80,3 +80,46 @@ backends:
     model: llama3.2:3b
 
 # `mock` is always available and needs no entry here.
+
+# Embeddings: text -> vector, for retrieving villagers' memories (prompt version 20 on). All of these
+# run on this machine: no key, no quota, and nothing a villager lived through leaves it.
+# `--embeddings <name>` on the command line picks one; `default` is used otherwise. Every vector is kept in
+# .cache/embed, so a text is only ever embedded once. Changing the model mid-run is logged as an intervention.
+#
+# `kind: fastembed` runs the model inside the simulation's own process (the `fastembed` package, ONNX):
+# nothing to start before a run. The model file is downloaded once into .cache/fastembed (bge-small is
+# about 70 MB). Any model `fastembed` lists works.
+# Without `kind`, an entry is a local server with an OpenAI-compatible /embeddings endpoint, which has to
+# be running during the run. (A hosted endpoint works the same way, with `api_key_env`.)
+#
+# `hash` needs no entry: no model at all, it compares texts by the words they share. It finds names, items
+# and places and misses paraphrases. `--backend mock` runs and the tests use it.
+# docs/recall_examples.md shows what each of these brings to mind for the same real situations.
+embeddings:
+  default: local
+
+  backends:
+    local:
+      kind: fastembed
+      model: BAAI/bge-small-en-v1.5
+
+    # A larger model: slower, about 210 MB.
+    local-base:
+      kind: fastembed
+      model: BAAI/bge-base-en-v1.5
+
+    # Servers. Not tried here: check the port and the model name against the one you run.
+    # `ollama pull nomic-embed-text` first.
+    ollama:
+      base_url: http://localhost:11434/v1
+      model: nomic-embed-text
+
+    # LM Studio: load an embedding model and start its local server.
+    lmstudio:
+      base_url: http://localhost:1234/v1
+      model: text-embedding-nomic-embed-text-v1.5
+
+    # llama.cpp: `llama-server --embeddings -m <model>.gguf`.
+    llamacpp:
+      base_url: http://localhost:8080/v1
+      model: local

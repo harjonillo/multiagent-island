@@ -14,7 +14,7 @@ import yaml
 from .island import IslandSimulation, load_island_scenario
 from .island.analysis import analyze_island
 from .island.sim import RunAborted
-from .llm import LLMError, load_backends
+from .llm import LLMError, load_backends, load_embedder
 
 
 def load_dotenv(path: Path = Path(".env")) -> None:
@@ -27,6 +27,25 @@ def load_dotenv(path: Path = Path(".env")) -> None:
             os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
 
+EMBED_CACHE = Path(".cache/embed")
+
+
+def _embedder(args):
+    """The embedder for retrieving memories (prompt version 20 on). `--embeddings` names one from the
+    models file; without it the file's `embeddings.default` is used, except that an all-mock run stays
+    offline with the built-in word-hashing embedder. Returns (embedder, error)."""
+    name = args.embeddings or ("hash" if args.backend == "mock" else None)
+    try:
+        emb = load_embedder(args.config, EMBED_CACHE, name)
+    except LLMError as e:
+        return None, str(e)
+    env = getattr(emb, "api_key_env", None)
+    if env and not os.environ.get(env):
+        return None, (f"embeddings backend '{emb.name}' needs {env}; add it to .env or your environment, or pass "
+                      "--embeddings local, which needs no key")
+    return emb, None
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="llmabm", description="LLM agent-based model of an island")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -37,6 +56,8 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--steps", "--days", dest="steps", type=int, help="override the scenario's days")
     r.add_argument("--backend", help="use this backend for every agent (e.g. mock, groq)")
     r.add_argument("--config", type=Path, default=Path("config/models.yaml"))
+    r.add_argument("--embeddings", help="embeddings backend for retrieving memories (see `embeddings:` in the models "
+                                        "file; the default is a local model), or 'hash' to compare by shared words with no model")
     r.add_argument("--concurrency", type=int, default=1, help="parallel LLM calls within an hour")
     r.add_argument("--no-cache", action="store_true",
                    help="make every call afresh; the new replies replace the cached ones")
@@ -53,6 +74,8 @@ def main(argv: list[str] | None = None) -> int:
     rs.add_argument("--days", type=int, default=1, help="how many more days to run (default 1)")
     rs.add_argument("--backend", help="switch every villager (and Isabelle) to this backend")
     rs.add_argument("--config", type=Path, default=Path("config/models.yaml"))
+    rs.add_argument("--embeddings", help="embeddings backend for retrieving memories, or 'hash' (see `run`). "
+                                         "Changing it mid-run is logged as an intervention")
     rs.add_argument("--concurrency", type=int)
     rs.add_argument("--no-cache", action="store_true",
                     help="make every call afresh (redoing an unfinished day instead of replaying it); the new "
@@ -93,6 +116,10 @@ def main(argv: list[str] | None = None) -> int:
             if env and not os.environ.get(env):
                 print(f"error: backend '{name}' needs {env}; add it to .env or your environment", file=sys.stderr)
                 return 2
+        embedder, problem = _embedder(args)
+        if problem:
+            print(f"error: {problem}", file=sys.stderr)
+            return 2
         stamp = time.strftime("%Y%m%d-%H%M%S")
         run_dir = args.run_dir or args.out / f"{stamp}_{args.scenario.stem}_s{args.seed}"
         if (run_dir / "checkpoint.pkl").exists():
@@ -101,7 +128,7 @@ def main(argv: list[str] | None = None) -> int:
         common = dict(seed=args.seed, backend_override=args.backend, concurrency=args.concurrency, log_prompts=args.log_prompts)
         print(f"{sc.name}: {len(sc.villagers)} villagers, {args.steps or sc.days} days -> {run_dir}")
         try:
-            IslandSimulation(sc, backends, run_dir, **common).run(args.steps)
+            IslandSimulation(sc, backends, run_dir, embedder=embedder, **common).run(args.steps)
         except RunAborted as e:
             print(f"stopped: {e}", file=sys.stderr)
             return 3
@@ -113,9 +140,14 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         seed = json.loads((args.run_dir / "manifest.json").read_text())["seed"]
         backends = load_backends(args.config, Path(".cache/llm"), salt=str(seed), refresh=args.no_cache)
+        embedder, problem = _embedder(args)
+        if problem:
+            print(f"error: {problem}", file=sys.stderr)
+            return 2
         try:
             IslandSimulation.resume(args.run_dir, backends, days=args.days, backend_override=args.backend,
-                                    concurrency=args.concurrency, prompt_version=args.prompt_version)
+                                    concurrency=args.concurrency, prompt_version=args.prompt_version,
+                                    embedder=embedder)
         except ValueError as e:
             print(f"error: {e}", file=sys.stderr)
             return 2

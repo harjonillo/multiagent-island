@@ -553,10 +553,18 @@ def memory_summary(run: Run, names: list[str]) -> list[str]:
     for e in run.of("memory"):
         gone[e["agent"]] += len(e.get("forgotten") or [])
         kept[e["agent"]] = e.get("kept", 0)
-    return ["", f"Long-term memory: {sum(new.values())} held on to, {sum(again.values())} times coming back to one, "
-                f"{sum(gone.values())} forgotten",
-            "  per villager (new/again/forgotten, kept at the end): "
-            + ", ".join(f"{n} {new[n]}/{again[n]}/{gone[n]} ({kept.get(n, 0)})" for n in names)]
+    out = ["", f"Long-term memory: {sum(new.values())} held on to, {sum(again.values())} times coming back to one, "
+               f"{sum(gone.values())} forgotten",
+           "  per villager (new/again/forgotten, kept at the end): "
+           + ", ".join(f"{n} {new[n]}/{again[n]}/{gone[n]} ({kept.get(n, 0)})" for n in names)]
+    lived = {e["agent"]: e["lived"] for e in run.of("memory") if e.get("lived") is not None}
+    if lived:  # prompt version 20: everything lived through is kept and retrieved; nothing is forgotten
+        recalls = run.of("recall")
+        got = [len(e["got"]) for e in recalls]
+        out += [f"  retrieval (from prompt version 20): nothing is forgotten; {len(recalls)} prompts drew on memory, "
+                f"{sum(got) / max(1, len(got)):.1f} records each on average",
+                "  records kept per villager at the end: " + ", ".join(f"{n} {lived.get(n, 0)}" for n in names)]
+    return out
 
 
 def _reason(text: str) -> str:

@@ -13,6 +13,10 @@ conda env create -f environment.yml     # Python 3.12, the package (editable) an
 conda activate multiagent_island_env
 ```
 
+In an environment made before `fastembed` was added, run `pip install -e .` once. The first run
+on a real backend downloads a small embedding model (about 70 MB) into `.cache/fastembed/`, for
+villagers' memory; after that nothing about memory needs the network.
+
 **Check that everything runs (offline, no keys).** The mock backend gives random but valid
 replies, so this tests the plumbing and shows you the outputs, not real behaviour.
 
@@ -71,7 +75,7 @@ LLM calls. More under [Outputs](#outputs).
 | command | what it does |
 |---|---|
 | `llmabm run <scenario>` | run a scenario. `--seed`, `--days` (or `--steps`), `--backend`, `--concurrency N`, `--no-cache`, `--no-log-prompts`, `--run-dir`, `--no-analyze` |
-| `llmabm resume <run_dir>` | continue an island run from its last checkpoint. `--days`, `--backend`, `--prompt-version`, `--no-analyze` |
+| `llmabm resume <run_dir>` | continue an island run from its last checkpoint. `--days`, `--backend`, `--prompt-version`, `--embeddings`, `--no-analyze` |
 | `llmabm analyze <run_dir>` | rebuild the summary, plots and logs, for example after you edit the analysis code |
 | `llmabm site <run_dir>` | build the run's explorer page, `<run_dir>/site/index.html`, from `site_data.json`. That file is written again first if it's missing or older than `events.jsonl`, so you don't need `analyze` before it |
 | `llmabm site runs/` | build every run's page and the Experiments page, `runs/site/index.html`: one door per run (numbered from 00; mock runs left out), each card opening to the run's initial conditions. `--out _site` builds the whole site in one folder to publish instead |
@@ -138,8 +142,15 @@ request crawlers can ignore, not a lock.
 - **Body** (`body.py`, one per villager, no LLM): position, tools and walking. It turns an
   intent into a trip to a specific place, decides who gets there first within an hour, and
   takes the villager home for free time and sleep.
-- **World** (`world.py`): resources, shops, NPCs, and the rules that resolve an action once
+- **World** (`world.py`): resources, shops, and the rules that resolve an action once
   the body is there.
+- **Villager** (`villager.py`, one per villager): the one object for everything that is theirs.
+  It holds what they own and know, and links to the rest of them: `vil.spec` (persona, traits,
+  model), `vil.body`, `vil.memory` and `vil.energy` (their share of the day's mental energy).
+- **NPCs** (`npc.py`): one class each for Tom Nook, Isabelle, Blathers, Timmy and Tommy, the Able
+  Sisters and the Rescue Service. They are rules, not LLM agents: each answers `ask` with fixed
+  text from the island's state. Isabelle is the one that also calls an LLM, for the nightly
+  report and the optional announcement. Villagers and NPCs share no parent class.
 - **Space** (`space.py`, `grid.py`): where things are and how far apart they are. `GridSpace`
   is the tile island; `Space` is the interface bodies rely on.
 
@@ -832,7 +843,8 @@ form, at most 150 words (`reflection.max_words`; a length cap only). They see wh
 day, their notes, and what they wrote the night before. From prompt version 8 it also shows
 facts the sim keeps, without saying what to make of them: what changed hands today, their bells,
 pockets and recipes, what changed since the morning, and their open requests and recent trade
-offers. Before that, nothing at night said what they had, and pages carried goals forward that
+offers (from version 20 without the list of what changed hands, which the day's lines already
+hold). Before that, nothing at night said what they had, and pages carried goals forward that
 were already done (buying a recipe they knew, crafting a tool they carried). The prompt gives no topics, questions or
 format, and doesn't frame the page as a self-description, so whatever they choose to write about
 is part of what emerges. The new page replaces the old one, and from the next day it sits in
@@ -860,6 +872,20 @@ that is still on their mind. That is the only way anything from the day lasts be
   energy, keeps nothing new from the day.
 - **What prompts show.** Up to 10 memories still above the threshold, strongest first, then in
   the order they happened. Notes written during the day last 2 days unless held on to.
+
+**From prompt version 20, memory is retrieved.** Everything a villager lived through is kept
+(each line of each day, each note, each night's page) and nothing is deleted. Each prompt shows
+the few records closest to the situation in it, by text embedding, weighed by how recent they
+are; what the villager chose to hold on to at night counts double and fades more slowly each
+time they come back to it. The situation is built only from text already in that prompt. At
+night the numbered list can include things not yet held on to, and naming one by its number
+holds on to it. The embedding model runs on this machine: see "Models, free tiers and caching"
+below, and [docs/recall_examples.md](docs/recall_examples.md) for what real situations bring to
+mind and with what scores. A running
+run can be switched with `llmabm resume <run> --prompt-version 20`; its earlier days are filled
+in from its own saved prompts. Runs before and after the switch aren't directly comparable on
+anything memory touches. More in
+[docs/memory.md](docs/memory.md#5-from-prompt-version-20-memory-by-retrieval).
 
 Memories, what was revisited and what was forgotten overnight are in each day log and in
 `events.jsonl` (`reflection` and `memory` events), and `summary.txt` counts them per villager.
@@ -1007,7 +1033,19 @@ Cerebras, Mistral, NVIDIA, OpenRouter and Ollama. Keys go in `.env` (for example
 `GROQ_API_KEY=...`) or your environment; the run stops early if one is missing. `mock` is
 always available.
 
-The only truly free option is a local model through Ollama: no key, no rate limit, no data
+**Embeddings** (prompt version 20 on) are set apart from the chat backends, under `embeddings:`
+in the same file, and all run on this machine: no key, no quota, and nothing leaves it. The
+default, `local`, is a small embedding model (`BAAI/bge-small-en-v1.5`) run inside the
+simulation's own process by the `fastembed` package; its file (about 70 MB) is downloaded once
+into `.cache/fastembed/`. The other entries are local servers with an OpenAI-compatible
+`/embeddings` endpoint (Ollama, LM Studio, llama.cpp). `--embeddings <name>` picks one for a run
+or a resume. `hash` is built in and needs no model: it compares texts by the words they share
+(good at names, items and places, blind to paraphrase), and is what `--backend mock` runs and
+the tests use. Vectors are cached in `.cache/embed/`.
+[docs/recall_examples.md](docs/recall_examples.md) shows, for real situations from a run, what
+comes to mind and with what scores; `python scripts/recall_doc.py <run_dir>` rewrites it.
+
+For the chat models, the only truly free option is a local model through Ollama: no key, no rate limit, no data
 leaving your machine. You pay with hardware time instead. An 8B model runs on a recent laptop
 with 16 GB of RAM, slowly.
 
@@ -1059,25 +1097,29 @@ reading anything into a run.
 
 ```
 docs/                   day_flow.md (flowcharts of a run), memory.md (flowcharts of what villagers keep and for how long), token_design.md (why the token budget works as it does),
-                        world.md and island_grid.png (generated), the grid spec
+                        recall_examples.md (generated: what retrieval brings to mind, with scores), world.md and island_grid.png (generated), the grid spec
 scenarios/              island scenarios
 villagers/              island villager templates and casts
 data/island_world.yaml  island rules: calendar, weather, resources, species, recipes, shops, houses
-config/models.yaml      LLM backends (all OpenAI-compatible)
+config/models.yaml      LLM backends (OpenAI-compatible) and the embedding models for memory (local)
 scripts/daily.sh        start or resume an island run by one day
 scripts/world_doc.py    regenerate docs/world.md and docs/island_grid.png
 scripts/actions_doc.py  regenerate docs/actions.md (every action: what it takes, what comes of it)
+scripts/recall_doc.py   regenerate docs/recall_examples.md from a run
 src/llmabm/
   cli.py                run, resume, analyze
   agent.py              villager file format (frontmatter + persona)
-  llm.py                backends, rate limiting, retries, disk cache, mock
+  llm.py                backends, rate limiting, retries, disk cache, mock; embedders (local model, local server, word hashing) and their cache
   analysis.py           loading a run back from disk
   island/
     world.py            island state and the rules for every action
+    villager.py         a villager: what they own and know, and their spec, body, memory and energy
+    npc.py              the NPCs, one class each, and what they say when asked
     sim.py              the day loop: plans, hours, encounters, visits, plaza, Isabelle, checkpoints
     prompts.py          what villagers are told, and the action menu (and list, from version 16)
     options.py          version 16: each villager's numbered list of what they can do, and reading picks
-    body.py             position, tools, walking, who arrives first
+    body.py             a villager's body (position, tools, walking, acting) and who arrives first
+    memory.py           long-term memory: picks and fading; from version 20, everything kept and retrieved
     space.py            the Space interface
     grid.py             the tile island: generation, pathfinding, sight, building
     energy.py           mental energy

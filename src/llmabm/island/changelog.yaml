@@ -2,6 +2,18 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-22 12:00
+  what: Prompt version 20, memory by retrieval; villagers and NPCs as classes
+  when: new runs from now on, or a run resumed with --prompt-version 20
+  details:
+    - "what is kept: everything a villager lived through (each line of each day, each note, each night's page), and nothing is deleted. Before, only up to three things picked at night were kept, and they were forgotten for good once they faded"
+    - "what a prompt shows: the few records closest to the situation in that prompt (where they are, who is there, what was just said), by text embedding, weighed by how recent they are. What a villager chose to hold on to at night counts double and fades more slowly each time they come back to it. Before, every prompt showed the same ten strongest picks"
+    - "what the search is built from: only text already in that prompt. Nothing is added about what to want or do"
+    - "at night: the numbered list can include things not yet held on to; naming one by its number holds on to it. The page is asked for in the same words as before"
+    - "at night: \"Things that changed hands today\" is no longer listed under its own heading, and is not part of what memories are searched with. Each gift and trade is still a line of \"What happened today\"; listed a second time, trades had more room at night than anything else in the day. What they have, what changed since the morning and open requests are shown as before"
+    - "switching a running run: its earlier days are filled in from its own saved prompts (yesterday's list in each morning's plan), notes and pages, and the switch is recorded with what was filled in"
+    - "embeddings: run on this machine, with no key and no quota. The default (`local` under `embeddings:` in config/models.yaml) is a small model run inside the simulation by the fastembed package, downloaded once; local servers (Ollama, LM Studio, llama.cpp) can be named there too. Every vector is cached in .cache/embed. Mock runs and tests use a built-in word-hashing embedder that needs no model. docs/recall_examples.md shows the scores real situations get"
+    - "code: a villager is one object (villager.py) that owns their spec, body, memory and share of mental energy; each NPC is a class (npc.py). No behaviour changed with this: runs on versions 1 to 19 replay exactly as before"
 - time: 2026-11-14 19:40
   what: Prompt version 19, the Island 101
   when: new runs from now on, or a run resumed with --prompt-version 19

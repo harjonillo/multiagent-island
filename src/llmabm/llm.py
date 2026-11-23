@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import random
 import re
@@ -126,26 +127,41 @@ class OpenAICompatible:
         self.model_id = f"{self.base_url}|{model}" + (f"|{json.dumps(self.params, sort_keys=True)}" if self.params else "")
 
     def complete(self, messages: list[dict], temperature: float = 0.7, max_tokens: int = 600) -> Completion:
-        key = os.environ.get(self.api_key_env, "") if self.api_key_env else ""
-        if self.api_key_env and not key:
-            raise LLMError(f"backend '{self.name}': set {self.api_key_env} in your environment or .env")
-
+        headers = self._headers()
         body = {"model": self.model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens,
                 **self.params}
         if self.json_mode:
             body["response_format"] = {"type": "json_object"}
+        t0 = time.monotonic()
+        budget = len(json.dumps(messages)) / 4 + max_tokens  # rough tokens, before the provider counts them
+
+        def read(data: dict) -> tuple[Completion, int]:
+            usage = data.get("usage") or {}
+            text, reasoning, n_reason = split_reasoning(data["choices"][0]["message"], usage)
+            used = int(usage.get("total_tokens") or budget)
+            return Completion(text, latency=time.monotonic() - t0, tokens=used, reasoning=reasoning,
+                              reasoning_tokens=n_reason), used
+
+        return self._post("/chat/completions", body, headers, budget, read)
+
+    def _headers(self) -> dict:
+        key = os.environ.get(self.api_key_env, "") if self.api_key_env else ""
+        if self.api_key_env and not key:
+            raise LLMError(f"backend '{self.name}': set {self.api_key_env} in your environment or .env")
         # Some providers sit behind Cloudflare, which rejects Python's default User-Agent with
         # "error code: 1010" before the request ever reaches the API.
         headers = {"Content-Type": "application/json", "User-Agent": "llm-abm", **self.headers}
         if key:
             headers["Authorization"] = f"Bearer {key}"
+        return headers
 
-        t0 = time.monotonic()
-        budget = len(json.dumps(messages)) / 4 + max_tokens  # rough tokens, before the provider counts them
+    def _post(self, path: str, body: dict, headers: dict, budget: float, read):
+        """One request, with the rate limiter and the retries. `read(data)` turns the provider's JSON into
+        (result, tokens used); a reply it can't read counts as a failed try."""
         for attempt in range(self.max_retries + 1):
             slot = self.limiter.wait(budget)
             req = urllib.request.Request(
-                self.base_url + "/chat/completions",
+                self.base_url + path,
                 data=json.dumps(body).encode(),
                 headers=headers,
                 method="POST",
@@ -153,12 +169,9 @@ class OpenAICompatible:
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as r:
                     data = json.loads(r.read())
-                usage = data.get("usage") or {}
-                text, reasoning, n_reason = split_reasoning(data["choices"][0]["message"], usage)
-                used = int(usage.get("total_tokens") or budget)
+                result, used = read(data)
                 self.limiter.settle(slot, used)
-                return Completion(text, latency=time.monotonic() - t0, tokens=used, reasoning=reasoning,
-                                  reasoning_tokens=n_reason)
+                return result
             except urllib.error.HTTPError as e:
                 detail = e.read().decode(errors="replace")[:500]
                 self.limiter.settle(slot, 0)
@@ -179,7 +192,7 @@ class OpenAICompatible:
                     time.sleep(delay)
                     continue
                 raise LLMError(f"backend '{self.name}': HTTP {e.code}: {detail}") from e
-            except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError) as e:
+            except (urllib.error.URLError, TimeoutError, KeyError, IndexError, TypeError, json.JSONDecodeError) as e:
                 if attempt < self.max_retries:
                     time.sleep(min(60.0, 2**attempt))
                     continue
@@ -257,3 +270,167 @@ def load_backends(config_path: Path | None, cache_dir: Path | None = None, salt:
         raise LLMError(f"default backend '{default}' is not defined in {config_path}")
     backends["default"] = backends[default]
     return backends
+
+
+# --- embeddings ------------------------------------------------------------
+# Text -> vector, for retrieving memories by what they are about (island/memory.py). An embedder is
+# never a chat backend and is configured apart from them, under `embeddings:` in the models file.
+
+def _unit(vec: list[float]) -> list[float]:
+    """The vector at length 1, rounded: the same numbers whether it is fresh or read back from the cache."""
+    norm = math.sqrt(math.fsum(x * x for x in vec))
+    return [round(x / norm, 6) if norm else 0.0 for x in vec]
+
+
+class Embeddings(OpenAICompatible):
+    """An OpenAI-compatible `/embeddings` endpoint: a local server (Ollama, LM Studio, llama.cpp) or a
+    hosted one (Groq has none). Some models embed a question differently from the text it is matched against:
+    `query_params` and `passage_params` are sent with each kind (NVIDIA's `input_type`, for one)."""
+
+    def __init__(self, name: str, base_url: str, model: str, api_key_env: str | None = None,
+                 rpm: float | None = None, tpm: float | None = None, timeout: float = 90, max_retries: int = 5,
+                 headers: dict | None = None, params: dict | None = None, batch: int = 64,
+                 query_params: dict | None = None, passage_params: dict | None = None):
+        super().__init__(name, base_url, model, api_key_env=api_key_env, rpm=rpm, tpm=tpm, timeout=timeout,
+                         max_retries=max_retries, headers=headers, params=params)
+        self.batch = max(1, int(batch))
+        self.role_params = {"query": query_params or {}, "passage": passage_params or {}}
+        if query_params or passage_params:
+            self.model_id += "|" + json.dumps(self.role_params, sort_keys=True)
+
+    def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+        headers = self._headers()
+        out: list[list[float]] = []
+        for i in range(0, len(texts), self.batch):
+            chunk = texts[i:i + self.batch]
+            body = {"model": self.model, "input": chunk, **self.params, **self.role_params.get(role, {})}
+            budget = sum(len(t) for t in chunk) / 4
+
+            def read(data: dict, n=len(chunk), budget=budget):
+                rows = sorted(data["data"], key=lambda r: r.get("index", 0))
+                if len(rows) != n:
+                    raise KeyError(f"{len(rows)} embeddings for {n} texts")
+                return [_unit([float(x) for x in r["embedding"]]) for r in rows], int((data.get("usage") or {}).get("total_tokens") or budget)
+
+            out += self._post("/embeddings", body, headers, budget, read)
+        return out
+
+
+_WORD = re.compile(r"[a-z0-9']+")
+
+
+class HashEmbeddings:
+    """An embedder that needs no model and no network: each word and each pair of neighbouring words is
+    hashed into one of `dims` buckets, so two texts are close when they share words. It is what tests and
+    `mock` runs use, and a fallback when no embedding model is set up. It matches names, items and places
+    well and misses paraphrases. The same text gives the same vector on every machine."""
+
+    name = "hash"
+
+    def __init__(self, dims: int = 256):
+        self.dims = int(dims)
+        self.model_id = f"hash-{self.dims}"
+
+    def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+        out = []
+        for text in texts:
+            words = _WORD.findall(text.lower())
+            vec = [0.0] * self.dims
+            for term in words + [f"{a} {b}" for a, b in zip(words, words[1:])]:
+                h = hashlib.sha256(term.encode()).digest()
+                vec[int.from_bytes(h[:4], "big") % self.dims] += 1.0 if h[4] & 1 else -1.0
+            out.append(_unit(vec))
+        return out
+
+
+class LocalEmbeddings:
+    """An embedding model run on this machine, in this process, with the `fastembed` package (ONNX, no
+    PyTorch): no server, no key, nothing leaves the machine. The model file is downloaded once into
+    `model_dir`. It is only loaded when a text has to be embedded that isn't in the cache yet.
+    `query_prefix` is put before a situation (some models want a short instruction there); none by default."""
+
+    def __init__(self, name: str = "local", model: str = "BAAI/bge-small-en-v1.5", model_dir: str = ".cache/fastembed",
+                 batch: int = 64, threads: int | None = None, query_prefix: str = ""):
+        self.name, self.model, self.model_dir = name, model, model_dir
+        self.batch, self.threads, self.query_prefix = max(1, int(batch)), threads, query_prefix
+        self.model_id = f"fastembed:{model}" + (f"|{query_prefix}" if query_prefix else "")
+        self._model = None
+
+    def _load(self):
+        if self._model is None:
+            try:
+                from fastembed import TextEmbedding
+            except ImportError as e:
+                raise LLMError("the local embedding model needs the `fastembed` package: pip install fastembed") from e
+            try:
+                self._model = TextEmbedding(model_name=self.model, cache_dir=self.model_dir, threads=self.threads)
+            except Exception as e:  # not a model fastembed knows, or its first download failed
+                raise LLMError(f"couldn't load the local embedding model '{self.model}': {e}") from e
+        return self._model
+
+    def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+        if not texts:
+            return []
+        model = self._load()
+        if role == "query":
+            got = model.query_embed([self.query_prefix + t for t in texts], batch_size=self.batch)
+        else:
+            got = model.passage_embed(texts, batch_size=self.batch)
+        return [_unit([float(x) for x in v]) for v in got]
+
+
+class CachedEmbeddings:
+    """Keeps every vector on disk, keyed on (model, role, text). A text is embedded once: later runs, and a
+    resume that replays a day, read the same vector back. There is no seed in the key, because an embedding
+    depends only on the text."""
+
+    def __init__(self, inner, cache_dir: Path):
+        self.inner = inner
+        self.name = inner.name
+        self.model_id = inner.model_id
+        self.api_key_env = getattr(inner, "api_key_env", None)
+        self.dir = Path(cache_dir)
+
+    def _path(self, role: str, text: str) -> Path:
+        key = hashlib.sha256(json.dumps([self.model_id, role, text]).encode()).hexdigest()
+        return self.dir / key[:2] / f"{key}.json"
+
+    def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+        found: dict[str, list[float]] = {}
+        missing: list[str] = []
+        for t in texts:
+            if t in found or t in missing:
+                continue
+            path = self._path(role, t)
+            if path.exists():
+                found[t] = json.loads(path.read_text())
+            else:
+                missing.append(t)
+        if missing:
+            for t, vec in zip(missing, self.inner.embed(missing, role)):
+                path = self._path(role, t)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(json.dumps(vec))
+                found[t] = json.loads(json.dumps(vec))  # exactly what a later read gives
+        return [found[t] for t in texts]
+
+
+def load_embedder(config_path: Path | None, cache_dir: Path | None = None, name: str | None = None):
+    """The embedder named `name`, or the models file's `embeddings.default`, or the hash embedder when
+    nothing is configured. `hash` and `mock` always mean the hash embedder."""
+    cfg = {}
+    if config_path and Path(config_path).exists():
+        cfg = (yaml.safe_load(Path(config_path).read_text()) or {}).get("embeddings") or {}
+    name = name or cfg.get("default") or "hash"
+    if name in ("hash", "mock"):
+        return HashEmbeddings()
+    spec = (cfg.get("backends") or {}).get(name)
+    if spec is None:
+        raise LLMError(f"embeddings backend '{name}' is not defined under `embeddings:` in {config_path}")
+    spec = dict(spec)
+    kind = spec.pop("kind", "api")
+    if kind not in ("api", "fastembed"):
+        raise LLMError(f"embeddings backend '{name}' has kind '{kind}'; it can be 'fastembed' (a model run in this "
+                       "process) or left out (an OpenAI-compatible /embeddings endpoint)")
+    inner = LocalEmbeddings(name=name, **spec) if kind == "fastembed" else Embeddings(name=name, **spec)
+    return CachedEmbeddings(inner, cache_dir) if cache_dir is not None else inner

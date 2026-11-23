@@ -1,6 +1,8 @@
 """Island world rules and an end-to-end mock run. Works with pytest or plain python."""
 
+import pickle
 import random
+import re
 from collections import Counter
 import tempfile
 from pathlib import Path
@@ -1090,10 +1092,12 @@ def test_runs_keep_their_prompt_wording_unless_switched_on_purpose():
             IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False,
                                     prompt_version="latest")
             run = load_run(run_dir)
-            (iv,) = run.of("intervention")
+            iv, filled = run.of("intervention")
             assert iv["from_day"] == 2 and iv["what"] == f"prompt version 1 -> {PROMPT_VERSION}"
             assert len(iv["details"]) == PROMPT_VERSION - 1  # every change between the two
-            assert [i["from_day"] for i in run.manifest["interventions"]] == [2]
+            # Version 20 retrieves memories, so the days already lived are filled in, and that is recorded too.
+            assert filled["from_day"] == 2 and filled["what"].startswith("memory filled in")
+            assert [i["from_day"] for i in run.manifest["interventions"]] == [2, 2]
             assert f"intervention from day 2: prompt version 1 -> {PROMPT_VERSION}" in summary(run)
             assert "provider_tokens" in run.of("run_end")[-1]
             if attempt == 0:  # as if day 2 had stopped at a daily limit: the next resume replays it
@@ -2546,3 +2550,270 @@ def test_walks_on_the_map_follow_the_ground_and_match_what_was_walked():
                     walked = at[hour]["walked_today"] - (at[before]["walked_today"] if before is not None else 0)
                     legs, exact = legs + 1, exact + (abs(walked - length) < 1)
         assert legs > 20 and exact / legs > 0.6  # most hours are one walk; some have a detour that isn't located
+
+
+def test_npcs_are_classes_and_answer_as_before():
+    from llmabm.island.npc import ROSTER, RESCUE, NPC, find
+    from llmabm.island.villager import Villager
+    from llmabm.island.world import NPCS
+
+    assert [n.name for n in ROSTER] == ["Tom Nook", "Isabelle", "Blathers", "Timmy and Tommy", "Able Sisters"]
+    assert list(NPCS) == ["tom nook", "isabelle", "blathers", "timmy", "tommy", "timmy and tommy", "able sisters",
+                          "the able sisters"]
+    assert NPCS["tommy"] == ("Nook's Cranny", "cranny") and find(" Timmy ") is find("timmy and tommy")
+    assert find("Bo") is None and find(None) is None
+    assert not RESCUE.listed and find("rescue service") is None  # called with an action, not asked
+    assert not issubclass(Villager, NPC) and Villager.__mro__[1] is object  # the two share no parent
+    isl = _island(("A", "B"))
+    for npc in ROSTER:
+        ok, text = isl.act("A", {"do": "ask", "who": npc.name}, 10)
+        assert ok and text.startswith(f"asked {'The ' if npc.name == 'Able Sisters' else ''}{npc.name}: ")
+    # Tom Nook and Isabelle hand out the island map once; the others never do.
+    assert isl.v["A"].inventory["island map"] == 1
+    assert "island map" not in isl.act("B", {"do": "ask", "who": "Blathers"}, 10)[1]
+    assert isl.act("A", {"do": "ask", "who": "B"}, 10)[0] is False
+
+
+def test_a_villager_owns_their_spec_body_energy_and_what_the_sim_used_to_keep():
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=11)
+    with tempfile.TemporaryDirectory() as d:
+        run_dir = Path(d) / "run"
+        sim = IslandSimulation(sc, load_backends(None), run_dir, seed=11, backend_override="mock", verbose=False)
+        sim.run(1)
+        for n, vil in sim.isl.v.items():
+            assert vil.body is sim.bodies.b[n] and vil.body.world is sim.bodies and vil.isl is sim.isl
+            assert vil.spec is sc.villagers[n] and vil.persona == sc.villagers[n].persona
+            assert vil.energy.left == sim.energy.left[n] and vil.page() == vil.self_doc
+            assert vil.is_awake(10) == sim.isl.is_awake(n, 10) and vil.capacity() == sim.isl.capacity(vil)
+            # The old spelling, by name on the simulation, reads and writes the same thing.
+            assert sim.choices[n] is vil.choices and sim.yesterday[n] is vil.yesterday and sim.systems[n] == vil.system
+        sim.noticed = {n: ["x"] for n in sim.isl.v}
+        assert sim.isl.v["Ari"].noticed == ["x"] and dict(sim.arrival_hour) == {n: 5 for n in sim.isl.v}
+        # A body's actions are its own; the set of bodies passes a name on to it.
+        ari = sim.isl.v["Ari"].body
+        assert ari.at_home() == sim.bodies.at_home("Ari") and ari.tools() == sim.bodies.tools_of("Ari")
+        # A checkpoint from before this, with those things in dicts on the simulation, loads the same.
+        ck = run_dir / "checkpoint.pkl"
+        old = pickle.loads(ck.read_bytes())
+        legacy = {"choices": {n: {"plaza": False, "write": False, "next": "plan"} for n in old.isl.v},
+                  "yesterday": {n: [f"08:00 {n} did something"] for n in old.isl.v},
+                  "noticed": {n: [] for n in old.isl.v}, "arrival_hour": {n: 5 for n in old.isl.v},
+                  "systems": {n: "stale" for n in old.isl.v}}
+        for vil in old.isl.v.values():
+            for k in ("choices", "yesterday", "noticed", "arrival_hour", "experience"):
+                del vil.__dict__[k]
+        old.__dict__.update(legacy)
+        ck.write_bytes(pickle.dumps(old))
+        back = pickle.loads(ck.read_bytes())
+        assert "choices" not in back.__dict__ and "systems" not in back.__dict__
+        assert back.isl.v["Bo"].choices["write"] is False and back.isl.v["Bo"].yesterday == ["08:00 Bo did something"]
+        assert back.isl.v["Bo"].experience == [] and back.isl.v["Bo"].isl is back.isl
+        IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False)
+        assert load_run(run_dir).manifest["days_completed"] == 2
+
+
+def test_embeddings_are_the_same_every_time_and_kept_on_disk():
+    from llmabm.llm import CachedEmbeddings, Embeddings, HashEmbeddings, LLMError, LocalEmbeddings, load_embedder
+
+    h = HashEmbeddings()
+    a, b, c = h.embed(["Bo gave you a shovel at the river", "you met Bo by the river and got a shovel",
+                       "Isabelle set the night owl ordinance"])
+    dot = lambda x, y: sum(i * j for i, j in zip(x, y))  # noqa: E731
+    assert abs(dot(a, a) - 1) < 1e-4 and dot(a, b) > 0.3 > dot(a, c)  # shared words bring texts close
+    assert HashEmbeddings().embed(["Bo gave you a shovel at the river"]) == [a]
+    assert len(a) == 256
+    with tempfile.TemporaryDirectory() as d:
+        calls = []
+
+        class Counting(HashEmbeddings):
+            def embed(self, texts, role="passage"):
+                calls.append(list(texts))
+                return super().embed(texts, role)
+
+        cached = CachedEmbeddings(Counting(), Path(d))
+        first = cached.embed(["one two", "three", "one two"])
+        again = cached.embed(["three", "one two", "four"])
+        assert first[0] == first[2] == again[1] and first[1] == again[0]  # fresh and read back are identical
+        assert calls == [["one two", "three"], ["four"]]  # each text is embedded once
+        # A question and the text it is matched against are kept apart (some models embed them differently).
+        cached.embed(["three"], role="query")
+        assert calls[-1] == ["three"]
+        cfg = Path(d) / "models.yaml"
+        cfg.write_text("embeddings:\n  default: local\n  backends:\n    local: {base_url: 'http://x/v1', model: m, "
+                       "query_params: {input_type: query}}\n")
+        emb = load_embedder(cfg, Path(d) / "c")
+        assert isinstance(emb, CachedEmbeddings) and isinstance(emb.inner, Embeddings) and "input_type" in emb.model_id
+        assert isinstance(load_embedder(cfg, None, "hash"), HashEmbeddings)
+        assert isinstance(load_embedder(None), HashEmbeddings)  # nothing configured: the offline one
+        # A model run in this process is an entry with `kind: fastembed`; it is only loaded when first needed,
+        # so naming one costs nothing (and this test downloads nothing).
+        cfg.write_text("embeddings:\n  default: here\n  backends:\n    here: {kind: fastembed, model: some/model}\n"
+                       "    odd: {kind: other, model: m}\n")
+        here = load_embedder(cfg, Path(d) / "c")
+        assert isinstance(here.inner, LocalEmbeddings) and here.model_id == "fastembed:some/model"
+        assert here.inner._model is None and here.embed([]) == [] and here.api_key_env is None
+        try:
+            load_embedder(cfg, None, "odd")
+            raise AssertionError("a kind that isn't known should be refused")
+        except LLMError as e:
+            assert "kind" in str(e)
+        cfg.write_text("embeddings:\n  backends:\n    local: {base_url: 'http://x/v1', model: m}\n")
+        try:
+            load_embedder(cfg, None, "nope")
+            raise AssertionError("an embedder that isn't in the file should be refused")
+        except LLMError as e:
+            assert "not defined" in str(e)
+
+
+def test_everything_lived_is_kept_and_what_comes_to_mind_fits_the_situation():
+    from llmabm.island.memory import (MemoryStore, chunks, consolidate_recalled, recall, record_key, score_records,
+                                      settings)
+    from llmabm.island.villager import Villager
+    from llmabm.llm import HashEmbeddings
+
+    cfg = settings({"mode": "consolidate"})
+    # A long conversation is kept as pieces, each saying when and with whom.
+    talk = ('11:00 ran into Gus at the river: you said "' + "wood " * 30 + '"; Gus said "' + "bait " * 30
+            + '"; you said "ok"')
+    pieces = chunks(talk, 240)
+    assert len(pieces) == 2 and all(p.startswith("11:00 ran into Gus at the river: ") and len(p) <= 240 for p in pieces)
+    assert chunks("08:00 fished", 240) == ["08:00 fished"] and chunks("", 240) == []
+    vil = Villager("Ari")
+    store = vil.memory
+    assert isinstance(store, MemoryStore)
+    assert store.add_day(0, ["08:00 fished in the river: caught a kalo fish", talk], ["sell fish tomorrow"], cfg) == 4
+    assert store.add_day(0, ["08:00 again"], [], cfg) == 0  # a day is kept once
+    assert store.add_page(0, "The river is good. Gus wants bait.", cfg) == 1
+    assert [(r["kind"], r["at"], r["src"]) for r in vil.experience] == [
+        ("event", "08:00", None), ("chat", "11:00", None), ("chat", "11:00", 2), ("note", None, None), ("page", None, None)]
+    # What a prompt already shows in full isn't retrieved: today, recent notes, the latest page, and for a
+    # plan, yesterday.
+    kinds = lambda day, **k: [r["kind"] for r in store.candidates(day, cfg, **k)]  # noqa: E731
+    assert kinds(0) == [] and kinds(1) == ["event", "chat", "chat"] and kinds(1, skip_yesterday=True) == []
+    assert kinds(2) == ["event", "chat", "chat"] and kinds(3) == ["event", "chat", "chat", "note"]
+    assert kinds(2, night=True) == ["event", "chat", "chat", "note"]
+    store.add_page(1, "Second page.", cfg)
+    assert kinds(3).count("page") == 1  # the earlier page can come back; the latest is in the system prompt
+    # Scoring: relevance x recency x picks. With nothing to compare, the newest comes first.
+    old, new = {"id": 1, "day": 0, "seq": 0, "kind": "event", "text": "a", "stability": 4.0, "last": 0, "times": 0}, \
+               {"id": 2, "day": 5, "seq": 0, "kind": "event", "text": "b", "stability": 4.0, "last": 5, "times": 0}
+    pick = {"id": 1, "day": 0, "text": "c", "stability": 4.0, "last": 5, "times": 1}
+    assert [record_key(r) for _, r in score_records([old, new, pick], None, 6, cfg)] == ["m1", "e2", "e1"]
+    # Old things never reach zero (the floor), and relevance can bring one back ahead of a recent one.
+    scores = dict((record_key(r), s) for s, r in score_records([old, new], [1.0, 0.0], 30, cfg))
+    assert scores["e1"] == cfg["recency_floor"] and scores["e1"] > scores["e2"] > 0
+    # Equal scores: the later record first, the same on every run.
+    twin = {**new, "id": 3, "seq": 1}
+    assert [r["id"] for _, r in score_records([new, twin], [0.5, 0.5], 6, cfg)] == [3, 2]
+    # One long line can't fill a prompt, and the result reads in the order things happened.
+    emb = HashEmbeddings()
+    cands = store.candidates(3, cfg)
+    vecs = dict(zip([r["text"] for r in cands], emb.embed([r["text"] for r in cands])))
+    top = recall(cands, emb.embed(["Gus is here at the river"], "query")[0], vecs, 3, {**cfg, "per_line": 1}, 3)
+    assert [r["kind"] for _, r in top].count("chat") == 1 and [r["id"] for _, r in top] == sorted(r["id"] for _, r in top)
+    # At night a number names something in tonight's list: an unpicked record becomes a pick, a pick is rehearsed.
+    shown = [vil.experience[0]]
+    new_, again = consolidate_recalled(vil, ["1", "something new"], 3, cfg, shown)
+    assert [m["text"] for m in new_] == ["08:00 fished in the river: caught a kalo fish", "something new"] and not again
+    assert vil.experience[0]["promoted"] == new_[0]["id"] and vil.experience[0] not in store.corpus()
+    new_, again = consolidate_recalled(vil, ["1"], 4, cfg, [vil.memories[0]])
+    assert not new_ and again[0]["stability"] == 8 and again[0]["last"] == 4
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=7)
+    with tempfile.TemporaryDirectory() as d:
+        run_dir = Path(d) / "run"
+        sim = IslandSimulation(sc, load_backends(None), run_dir, seed=7, backend_override="mock", verbose=False,
+                               log_prompts=True)
+        sim.run(6)
+        run = load_run(run_dir)
+        assert run.manifest["prompt_version"] >= 20 and run.manifest["embeddings"] == "hash-256"
+        # Nothing is forgotten, and what is kept only grows.
+        mem = run.of("memory")
+        assert all(e["forgotten"] == [] for e in mem)
+        lived = [e["lived"] for e in mem if e["agent"] == "Ari"]
+        assert lived == sorted(lived) and lived[-1] == len(sim.isl.v["Ari"].experience) > 20
+        assert all(vil.recalled is None for vil in sim.isl.v.values())  # nothing is carried between prompts
+        recalls = run.of("recall")
+        assert {e["during"] for e in recalls} >= {"plan", "reflect"}
+        # At night, what changed hands is no longer listed a second time under its own heading (each gift
+        # and trade is a line of the day already); what they have and their open requests still are.
+        from llmabm.island.prompts import night_facts
+        nights = [_seen(f) for f in _prompts(run_dir, "d004_reflect") if "villagers" in f.parts]
+        assert nights and all("changed hands today" not in t and "What you have tonight:" in t
+                              and "Open requests:" in t and "What happened today:" in t for t in nights)
+        ari = sim.isl.v["Ari"]
+        assert "changed hands" not in night_facts(sim.isl, ari, [])
+        sim.isl.prompt_version = 19
+        assert night_facts(sim.isl, ari, []).startswith("Things that changed hands today:\n")
+        sim.isl.prompt_version = sim.prompt_version
+        seen_old = 0
+        for n, vil in sim.isl.v.items():
+            own = {r["text"] for r in vil.experience} | {m["text"] for m in vil.memories}
+            keys = {record_key(r) for r in vil.experience} | {record_key(m) for m in vil.memories}
+            assert all(k in keys for e in recalls if e["agent"] == n for k, _ in e["got"])
+            for f in _prompts(run_dir, "d005_p0", n):
+                text = _seen(f)
+                block = text.split("Things you remember right now (other things may come to mind at other times):\n", 1)[1]
+                lines = [ln for ln in block.split("\nYour notes from the last", 1)[0].splitlines() if ln.startswith("- ")]
+                # Every line is the villager's own, from an earlier day, and none of what happened is
+                # yesterday's (a plan shows yesterday in full). What they chose to hold on to last night
+                # can be there, as it always could.
+                for ln in lines:
+                    day = int(re.match(r"- \(day (\d+)", ln).group(1))
+                    assert ln.split(") ", 1)[1] in own and (day < 4 or (day == 4 and "held on to" in ln)), ln
+                    seen_old += 1
+                assert len(lines) <= sim.isl.memory["k"]
+        assert seen_old > 10
+
+        # A run pinned to version 19 keeps the old rule and the old words, and keeps nothing more.
+        sim19 = IslandSimulation(sc, load_backends(None), Path(d) / "v19", seed=7, backend_override="mock",
+                                 verbose=False, log_prompts=True)
+        sim19.prompt_version = sim19.isl.prompt_version = 19
+        sim19._build_systems()
+        sim19.run(3)
+        run19 = load_run(Path(d) / "v19")
+        assert not run19.of("recall") and all(not vil.experience for vil in sim19.isl.v.values())
+        assert any("Things you remember (anything you don't hold on to at night fades):" in _seen(f)
+                   for f in _prompts(Path(d) / "v19", "d002_p0"))
+
+
+def test_switching_a_run_to_retrieval_fills_in_the_days_it_already_lived():
+    from llmabm.island.memory import chunks
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=12)
+    with tempfile.TemporaryDirectory() as d:
+        run_dir = Path(d) / "run"
+        sim = IslandSimulation(sc, load_backends(None), run_dir, seed=12, backend_override="mock", verbose=False,
+                               log_prompts=True)
+        sim.prompt_version = sim.isl.prompt_version = 19
+        sim._build_systems()
+        sim.run(3)
+        lived = {n: list(vil.yesterday) for n, vil in sim.isl.v.items()}  # day 2, as each villager saw it
+        picks = {n: [dict(m) for m in vil.memories] for n, vil in sim.isl.v.items()}
+        ck = (run_dir / "checkpoint.pkl").read_bytes()
+        for attempt in range(2):  # the second time replays the same day from the same checkpoint
+            (run_dir / "checkpoint.pkl").write_bytes(ck)
+            IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False,
+                                    prompt_version=20)
+            run = load_run(run_dir)
+            switch, filled = run.of("intervention")
+            assert switch["what"] == "prompt version 19 -> 20" and filled["what"].startswith("memory filled in")
+            assert "days 0 to 2, 10 villagers" in filled["details"][0]
+            back = pickle.loads((run_dir / "checkpoint.pkl").read_bytes())
+            for n, vil in back.isl.v.items():
+                by_day = lambda day, kinds: [r["text"] for r in vil.experience  # noqa: E731
+                                             if r["day"] == day and r["kind"] in kinds]
+                # The last day comes from the checkpoint, word for word.
+                assert by_day(2, ("event", "chat")) == [c for line in lived[n] for c in chunks(line, 240)]
+                # Earlier days come from the next morning's plan, which shows the day as the villager saw it.
+                for day in (0, 1):
+                    plan = next(iter(_prompts(run_dir, f"d{day + 1:03d}_p0", n)), None)
+                    if plan:
+                        shown = _seen(plan).split("\nYesterday you:\n", 1)[1].split("\n\n", 1)[0]
+                        assert "\n".join(f"- {t}" for t in by_day(day, ("event", "chat")))[:200] in shown or not shown
+                # What they had picked is still there, and day 3 was kept as it happened.
+                assert [m["text"] for m in vil.memories][: len(picks[n])] == [m["text"] for m in picks[n]]
+                assert by_day(3, ("event", "chat")) and len({(r["day"], r["id"]) for r in vil.experience}) == len(vil.experience)
+        # Resuming again fills nothing in: every day is already kept.
+        IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False)
+        assert len(load_run(run_dir).of("intervention")) == 2

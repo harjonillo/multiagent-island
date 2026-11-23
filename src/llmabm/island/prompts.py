@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import Counter
 
 from ..agent import AgentSpec
-from .memory import memory_lines
+from .memory import memory_lines, recall_lines, retrieval
 from .world import CARD, LATEST_PROMPT_VERSION, MAP, ORDINANCE_TEXT, Island, Villager, _fmt, clock, fmt_window, tool_uses
 
 # Prompt wording has versions so that a resumed run keeps the wording it started with, unless
@@ -107,6 +107,15 @@ PROMPT_CHANGES = {
         "turn at the plaza and a turn in a conversation say how many facts are in it, closed, and a reply of only "
         "{\"open\": \"island 101\"} gets the same prompt again with it open. Opening it takes no time, no action and "
         "no mental energy",
+    20: "memory is retrieved: everything a villager lived through is kept (each line of each day, each note, each "
+        "night's page) and nothing is deleted. A prompt's \"Things you remember\" is no longer the same ten strongest "
+        "picks everywhere: it is the few records closest to the situation in that prompt (where they are, who is "
+        "there, what was just said), weighed by how recent they are, with what they chose to hold on to at night "
+        "counting double. Each line says what it is (a note, from a page, held on to). At night the numbered list "
+        "can include things not yet held on to, and naming one by its number holds on to it. The heading and the "
+        "night's last sentence say so; the page itself is asked for in the same words as before. The night no longer "
+        "lists what changed hands today under a heading of its own: each gift and trade is already among the day's "
+        "lines, once",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -1422,15 +1431,19 @@ def offer_line(o, me: str) -> str:
 
 def night_facts(isl: Island, vil: Villager, offers: list | None) -> str:
     """Prompt version 8, for the nightly page: facts the island keeps, without telling anyone what to make
-    of them. What changed hands today, what they have now, and their open requests and offers."""
+    of them. What changed hands today, what they have now, and their open requests and offers.
+    From version 20 the list of what changed hands is left out: each gift and trade is already a line of
+    "What happened today", and listing them a second time under their own heading gave trades more room
+    at night than anything else in the day."""
     d, me = isl.day, vil.name
     today = [e for e in getattr(isl, "exchanges", []) if e["day"] == d and me in (e["from"], e["to"])]
     mine = [o for o in (offers or []) if me in (o.sender, o.recipient)
             and (o.status == "pending" or o.day >= d - 1)]
     v12 = _v(isl) >= 12
     requests = request_lines(isl, me) if v12 else isl.favor_lines(me)
-    return ("Things that changed hands today:\n"
-            + ("\n".join(f"- {exchange_line(e, me, _v(isl) >= 18)}" for e in today) or "(nothing)") + "\n\n"
+    hands = ("" if _v(isl) >= 20 else "Things that changed hands today:\n"
+             + ("\n".join(f"- {exchange_line(e, me, _v(isl) >= 18)}" for e in today) or "(nothing)") + "\n\n")
+    return (hands
             + f"What you have tonight:\nBells: {vil.bells}{' in your wallet' if v12 else ''}\n{pockets_text(isl, vil)}\n"
             + f"Recipes you know: {', '.join(sorted(vil.recipes)) or 'none'}\n"
             + since_morning(isl, vil) + "\n"
@@ -1458,6 +1471,10 @@ def memory_block(isl: Island, vil: Villager, notes_limit: int | None = None, mem
     cfg = getattr(isl, "memory", None)
     if not cfg:
         return (f"Your notes, oldest first:\n{lines}" if notes_limit is None else f"Your notes:\n{lines}")
+    if retrieval(isl):  # version 20: what the situation brings to mind (the simulation sets `vil.recalled`)
+        return (f"Things you remember right now (other things may come to mind at other times):\n"
+                f"{recall_lines(vil.recalled)}\n"
+                f"Your notes from the last {cfg['notes_days']} days:\n{lines}")
     return (f"Things you remember (anything you don't hold on to at night fades):\n"
             f"{memory_lines(vil.memories, isl.day, cfg, memories_limit)}\n"
             f"Your notes from the last {cfg['notes_days']} days:\n{lines}")
@@ -1523,6 +1540,13 @@ def reflect_prompt(isl: Island, vil: Villager, max_words: int, memory: dict | No
             f"{max_words} words. It replaces what you wrote last night, and you will see it again tomorrow.")
     if not memory:
         return head + f"What you wrote last night:\n{last}\n\n" + page
+    if retrieval(isl):  # version 20: tonight's list is what today brings to mind, picked or not
+        return (head + f"Things you remember right now, numbered:\n{recall_lines(vil.recalled, numbered=True)}\n\n"
+                f"What you wrote last night:\n{last}\n\n" + page
+                + f"\n\nAfter the page, if you want to hold on to anything, add a line \"Remember:\" and then up to "
+                f"{memory['picks']} short lines, each something from today in your own words or the number of something "
+                "in the list above that is still on your mind. Nothing is lost, but what you don't hold on to comes "
+                "to mind less easily as days pass; what you come back to comes to mind longer.")
     return (head + f"Things you remember, numbered:\n{memory_lines(vil.memories, isl.day, memory, numbered=True)}\n\n"
             f"What you wrote last night:\n{last}\n\n" + page
             + f"\n\nAfter the page, if you want to hold on to anything, add a line \"Remember:\" and then up to "

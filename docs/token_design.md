@@ -141,6 +141,17 @@ The current memory is a basic model, loosely after how human memory works:
   villager keeps coming back to last longer and longer, a nod to the spacing and testing effects.
 - **Bounded.** Prompts show at most 10 memories, plus notes from the last 2 days.
 
+**From prompt version 20, retrieval.** The model above loses information for good, and shows the
+same ten picks whatever the villager is doing. Version 20 keeps everything a villager lived
+through and shows each prompt the few records closest to its situation, scored as relevance x
+recency x picks (the generative-agents recipe, with the villager's own nightly picks standing in
+for an importance rating we would otherwise have to ask the model for). The forgetting curve
+stays, as recency with a floor: harder to recall, never gone. The situation a prompt is compared
+with is only text already in that prompt, so nothing is suggested to the villager. The block is
+sized to cost the same to read (8 pieces of 240 characters against 10 picks of 200). The
+embedding is extra work, not tokens: it runs on this machine by default, once per text, with every vector cached.
+Details and a chart are in [memory.md](memory.md#5-from-prompt-version-20-memory-by-retrieval).
+
 This is not a validated model of memory, and it doesn't save many tokens: it keeps memory
 meaningful and bounded as runs get long. The biggest memory cost is still the full list of
 yesterday's events, about 355 tokens of a 2,200-token plan prompt (*real*, day 1).
@@ -186,6 +197,9 @@ so every token counts.
   the current situation, as in generative-agent work. Emotional salience is the hard part without
   asking the model to rate things, which we have avoided.
 - Relevance: show the memories that relate to what the villager is doing, not just the strongest.
+  (Done in prompt version 20, together with recency and the villager's own picks as importance.
+  Still open: whether the weights are right, whether one conversation should count as one memory
+  or several, and how much the embedding model changes what comes to mind.)
 - Gist: compress yesterday's events ("hit rocks x4") instead of listing every action.
 
 **Energy**

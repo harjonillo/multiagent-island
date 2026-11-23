@@ -200,3 +200,28 @@ class MentalEnergy:
                 f"Typical costs: a plan {self.typical('plan')}, noticing someone {self.typical('notice')}, "
                 f"one thing you say in a conversation {self.typical('chat')}, an evening at the plaza "
                 f"{self.typical('evening')}, writing at night {self.typical('reflect')}; longer replies cost more.")
+
+
+class EnergyAccount:
+    """One villager's share of the pool: the same questions and charges, without passing their name.
+    The numbers stay in `MentalEnergy` (costs are averaged over everyone, and calls made in parallel are
+    settled together), so this holds nothing of its own and is never saved."""
+
+    def __init__(self, pool: MentalEnergy, name: str):
+        self.pool, self.name = pool, name
+
+    @property
+    def left(self) -> float:
+        return self.pool.left.get(self.name, 0)
+
+    def can(self, need: float) -> bool:
+        return self.pool.can(self.name, need)
+
+    def skip(self, kind: str) -> None:
+        self.pool.skip(self.name, kind)
+
+    def set_plan(self, plan) -> dict | None:
+        return self.pool.set_plan(self.name, plan)
+
+    def record(self, kind, what: str, read: float, written: float, thought: float, immediate: bool, **more) -> None:
+        self.pool.record(self.name, kind, what, read, written, thought, immediate, **more)

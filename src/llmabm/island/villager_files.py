@@ -18,9 +18,10 @@ from __future__ import annotations
 
 import math
 import pickle
+from collections import Counter
 from pathlib import Path
 
-from .memory import strength
+from .memory import retrieval, strength
 from .world import clock
 
 
@@ -148,6 +149,27 @@ def memory_text(run, name: str, sim=None) -> str:
         out += ["## Things they remember", ""]
         if not cfg:
             out += ["Long-term memory is off in this run: they keep their latest notes and nothing else.", ""]
+        elif retrieval(isl):  # prompt version 20: nothing is forgotten; each prompt retrieves what fits it
+            kinds = Counter(r["kind"] for r in vil.experience if not r.get("promoted"))
+            days = sorted({r["day"] for r in vil.experience})
+            out += [f"From prompt version 20 nothing is forgotten. Everything they lived through is kept, and each "
+                    f"prompt shows the few records closest to the situation in it (up to {cfg['k']} in plans, the "
+                    f"plaza and conversations, {cfg['k_quick']} in quick decisions, {cfg['shown']} at night), weighed "
+                    f"by how recent they are. What they chose to hold on to at night counts {cfg['pick_weight']:g} "
+                    "times as much, and fades more slowly each time they come back to it. So there is no fixed list "
+                    "here: the `recall` events in events.jsonl say what came to mind for each prompt.", "",
+                    f"Kept so far: {kinds['event']} things that happened, {kinds['chat']} pieces of conversations, "
+                    f"{kinds['note']} notes and {kinds['page']} pieces of nightly pages"
+                    + (f", from days {days[0]} to {days[-1]}." if days else "."), ""]
+            out += ["### What they chose to hold on to", ""]
+            if not vil.memories:
+                out += ["(nothing)", ""]
+            else:
+                out += ["| from day | memory | times held | recency now |", "|---|---|---|---|"]
+                for m in sorted(vil.memories, key=lambda m: (m["day"], m["id"])):
+                    out.append(f"| {m['day']} | {m['text'].replace('|', chr(92) + '|')} | {m['times']} "
+                               f"| {max(cfg['recency_floor'], strength(m, wake)):.2f} |")
+                out.append("")
         else:
             alive = sorted((m for m in vil.memories if strength(m, wake) >= cfg["threshold"]),
                            key=lambda m: (-strength(m, wake), -m["day"]))

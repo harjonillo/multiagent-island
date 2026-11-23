@@ -15,6 +15,9 @@ from pathlib import Path
 
 import yaml
 
+from .npc import ROSTER, find as find_npc
+from .villager import Villager  # noqa: F401  (checkpoints and other modules find it here)
+
 CATEGORIES = ("fish", "bugs", "fossils")
 FOSSIL = "fossil"  # a fossil nobody has assessed yet; Blathers says which species it is
 
@@ -138,7 +141,7 @@ ORDINANCE_TEXT = {
 TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_clam": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 19  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+LATEST_PROMPT_VERSION = 20  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
 AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
 CLAM, BAIT = "manila clam", "fishing bait"  # dug on the beach (dig_clam); one clam crafts one bait
@@ -211,11 +214,9 @@ def resolve_item(name, pool) -> str:
     return name
 
 
-# Who you can ask, and where to find them.
-NPCS = {"tom nook": ("Resident Services", "resident_services"), "isabelle": ("Resident Services", "resident_services"),
-        "blathers": ("museum", "museum"), "timmy": ("Nook's Cranny", "cranny"), "tommy": ("Nook's Cranny", "cranny"),
-        "timmy and tommy": ("Nook's Cranny", "cranny"), "able sisters": ("Able Sisters", "able"),
-        "the able sisters": ("Able Sisters", "able")}
+# Who you can ask, and where to find them: every name `ask` accepts -> (building, opening-hours key).
+# The NPCs themselves are in npc.py; this is the lookup the rest of the rules use.
+NPCS = {alias: (npc.building, npc.place) for npc in ROSTER for alias in npc.aliases}
 
 
 def npc_of(action: dict) -> str | None:
@@ -230,42 +231,6 @@ def category_of(w: dict, item: str) -> str | None:
 
 
 # --- state -----------------------------------------------------------------
-
-@dataclass
-class Villager:
-    name: str
-    bells: int = 1000
-    loan: int = 0
-    house: int = 0
-    inventory: Counter = field(default_factory=Counter)
-    recipes: set[str] = field(default_factory=set)
-    prices_seen: dict[str, int] = field(default_factory=dict)
-    notes: list[tuple[int, str]] = field(default_factory=list)
-    inbox: list[str] = field(default_factory=list)
-    today: list[str] = field(default_factory=list)  # results of today's actions, in order
-    wakes: int = 6        # clock hour the villager usually gets up
-    sleeps: int = 24      # clock hour they go to bed; values past 24 or below `wakes` mean after midnight
-    self_doc: str = ""    # private free-form page, rewritten nightly when reflection is on
-    memories: list = field(default_factory=list)  # what they chose to hold on to at night (see memory.py)
-    wearing: dict = field(default_factory=dict)  # slot -> clothing item; others can see it
-    wear: dict = field(default_factory=dict)  # tool -> uses so far of each one they carry, in-use first
-    interior: list = field(default_factory=list)  # furniture inside their home; visitors see it
-    # From prompt version 12, `inventory` is only what is in their pockets; what they keep at home is
-    # here, and is only reachable when they are at home.
-    home_items: Counter = field(default_factory=Counter)
-    home_bells: int = 0
-    home_wear: dict = field(default_factory=dict)  # tool -> uses so far of each one kept at home
-
-    def __setstate__(self, state):  # checkpoints from before a field existed get its default
-        fresh = Villager(state.get("name", ""))
-        self.__dict__.update({**fresh.__dict__, **state})
-
-    def items(self) -> int:
-        return sum(self.inventory.values())
-
-    def home_count(self) -> int:
-        return sum(self.home_items.values())
-
 
 @dataclass
 class Tree:
@@ -303,7 +268,7 @@ class Island:
         self.cranny_recipe: str | None = None
         self.able_stock: dict[str, int] = {}
         self.day = -1
-        self.v: dict[str, Villager] = {n: Villager(n, bells=start_bells) for n in villager_names}
+        self.v: dict[str, Villager] = {n: Villager(n, bells=start_bells, isl=self) for n in villager_names}
         starters = set(world.get("starter_recipes", []))
         pool = [r for r in world["recipes"] if r not in starters and r not in self.tool_recipes()]
         for vil in self.v.values():
@@ -327,6 +292,11 @@ class Island:
         self.sites: dict = {}  # homesite id -> {area, at}; filled in from the tile island
         self.home: dict[str, str | None] = {n: None for n in villager_names}       # homesite id
         self.arrived: dict[str, int | None] = {n: None for n in villager_names}    # game hour of arrival (day 0)
+
+    def __setstate__(self, state):  # a villager's link to their island is not saved, so it is made again on load
+        self.__dict__.update(state)
+        for vil in self.v.values():
+            vil.isl = self
 
     # --- map ---------------------------------------------------------------
     def free_sites(self) -> list[str]:
@@ -761,11 +731,12 @@ class Island:
             return False, ("there's no felling on its own: chopping wood with an axe (not a stone axe) brings the tree "
                            "down when it takes the tree's last wood")
         if do == "ask":
-            if npc_of(action) not in NPCS:
+            npc = find_npc(npc_of(action))
+            if npc is None:
                 if getattr(self, "prompt_version", 1) >= 2:
                     return False, self.not_an_npc(str(action.get("who", "")))
                 return False, f"nobody called '{action.get('who', '')}' to ask; try Tom Nook, Isabelle, Blathers, Timmy and Tommy or the Able Sisters"
-            place = NPCS[npc_of(action)][1]
+            place = npc.place
         if place and not self.is_open(place, hour):
             names = {"cranny": "Nook's Cranny", "able": "the Able Sisters", "resident_services": "Resident Services", "museum": "the museum"}
             return False, f"{names[place]} is closed at {clock(hour)} (open {fmt_window(self.shop_hours(place))})"
@@ -1600,72 +1571,7 @@ class Island:
 
     def _do_ask(self, vil, a, hour):
         """Talk to an island NPC: what they do, and what it costs. Takes the hour, costs nothing else."""
-        who = npc_of(a)
-        w = self.w
-        if who == "tom nook":
-            levels = w["house_levels"]
-            if vil.house + 1 < len(levels):
-                nxt = levels[vil.house + 1]
-                up = (f"I can build you a {nxt['name']} (storage {nxt['storage']}, room for {nxt['interior']} pieces "
-                      f"of furniture inside) right away, on a loan of {nxt['cost']} bells with no interest and no deadline")
-            else:
-                up = "Your house is as big as it gets"
-            if vil.loan:
-                up += f". You still owe {vil.loan} bells, and that needs paying off before the next upgrade"
-            else:
-                up += ". A loan has to be paid off before the next upgrade"
-            free = [s for s in self.free_sites() if s not in self.pending_moves.values()]
-            sites = ", ".join(f"{s} ({self.sites[s]['area']})" for s in free) or "none right now"
-            br = w["bridge"]
-            bridge = ("The bridge is built." if self.bridge_built else
-                      f"The {br['name']} costs {br['cost']} bells, {self.bridge_fund} raised so far; anyone can chip in, "
-                      + ("and it opens more rocks and trees to everyone." if getattr(self, "prompt_version", 1) < 15 else
-                         "and once built it crosses the river by Resident Services, so nobody needs a vaulting pole "
-                         "there, and it opens more rocks and trees to everyone." if getattr(self, "prompt_version", 1) < 17
-                         else "and once built it crosses the river by Resident Services, so nobody needs a vaulting "
-                              "pole there."))
-            if getattr(self, "prompt_version", 1) >= 17:
-                cfg = structures_cfg(w)
-                proposed = "; ".join(p["name"] + (", built" if p["built"] else f", {p['fund']} raised")
-                                     for p in self.projects)
-                bridge += (f" Anyone can also propose another bridge, or stairs up a cliff that anyone can climb without "
-                           f"a ladder, right where they stand; each is built once {cfg['cost']} bells are donated here. "
-                           f"The island can have {cfg['max']} in all, built or proposed, and has {len(self.structures())}"
-                           + (f": the {w['bridge']['name']}; {proposed}" if proposed else "") + ".")
-            text = (f"Tom Nook: {up}. I can also move your home to a free homesite overnight for "
-                    f"{w.get('move_house_cost', 10000)} bells. Free homesites: {sites}. {bridge}")
-        elif who == "isabelle":
-            ords = w.get("ordinances", {})
-            opts = "; ".join(f"{k.replace('_', ' ')}: {ORDINANCE_TEXT.get(k, k).split(': ', 1)[-1]}"
-                             for k in ords.get("types", {}) if k != "none")
-            text = (f"Isabelle: The ordinance now is {ORDINANCE_TEXT.get(self.ordinance, self.ordinance).split(':')[0].lower()}. "
-                    f"Anyone can pay me {ords.get('cost', 0)} bells to set one for the whole island from the next "
-                    f"morning, or to lift it (none). Options: {opts}.")
-        elif who == "blathers":
-            text = ("Blathers: I take the first of each kind of fish, bug and fossil for the museum. It stays there for "
-                    "everyone to see, with the donor's name, and I don't pay for donations. Bring me any fossils you dig "
-                    "up and I'll assess them for free: until then nobody knows what they are, and Timmy and Tommy pay "
-                    f"{self.sell_price(FOSSIL)} bells for an unassessed one. So far: {self.museum_line()}.")
-        elif who in ("timmy", "tommy", "timmy and tommy"):
-            mine = {k: self.sell_price(k) for k in sorted(vil.inventory) if vil.inventory[k] > 0 and k in self.prices}
-            vil.prices_seen.update(mine)
-            offer = ", ".join(f"{k} {p}" for k, p in mine.items()) or "nothing, your pockets are empty"
-            tools = ", ".join(self.tool_recipes())
-            ready = (", and so are the tools themselves, ready to use, for more. A recipe card teaches you to make "
-                     "the thing as often as you like." if self.w["shops"]["cranny"].get("tool_markup") else ".")
-            text = (f"Timmy and Tommy: We buy almost anything at a fixed price, and sell a small stock that changes "
-                    f"every day, plus one recipe card. Recipe cards for tools ({tools}) are always in stock{ready} "
-                    f"For what you're carrying we'd pay: {offer}.")
-        else:
-            text = "The Able Sisters: We sell clothes, a few different ones every day. Others see what you wear."
-        if who in ("tom nook", "isabelle") and getattr(self, "prompt_version", 1) >= 3 and vil.inventory[MAP] < 1:
-            if self.space(vil) < 1:
-                text += " I'd give you a map of the island, but your pockets are full."
-            else:
-                vil.inventory[MAP] += 1
-                text += (" And here's a map of the island; keep it with you and you'll always know where things are. "
-                         "(You got an island map.)")
-        return True, f"asked {text}"
+        return find_npc(npc_of(a)).ask(self, vil, hour)
 
     def _build_bridge(self):
         """Before prompt version 17 the first bridge also added rocks and trees somewhere on the island (`unlocks`).

@@ -851,11 +851,12 @@ class GridSpace(Space):
             b = "Able Sisters" if str(action.get("shop", "")).lower() == "able" else "Nook's Cranny"
             return self._to_building(b, start, tools, island)
         if do == "ask":
-            from .world import NPCS, npc_of
+            from .npc import find
 
-            if npc_of(action) not in NPCS:
+            npc = find(action.get("who"))
+            if npc is None:
                 return "around the island", None, {}, None  # the world explains who can be asked
-            return self._to_building(NPCS[npc_of(action)][0], start, tools, island)
+            return self._to_building(npc.building, start, tools, island)
         if do in self._BUILDING_FOR:
             return self._to_building(self._BUILDING_FOR[do], start, tools, island)
         if do in ("propose_bridge", "propose_stairs") and getattr(island, "prompt_version", 1) >= 17:
