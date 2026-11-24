@@ -1,4 +1,4 @@
-# Ari's memory, waking on day 14
+# Ari's memory, waking on day 15
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -14,56 +14,57 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 9 | Got selit fish at 08:00 | 2 | 0.88 | day 24 |
-| 9 | Ike dropped a selzalne fish after wood offer | 1 | 0.29 | day 14 |
-| 9 | Still no fishing bait, 200 bells, 7 wood, 12 hardwood, 8 softwood. | 1 | 0.29 | day 14 |
-| 13 | 4 woods left, still no bait | 1 | 0.78 | day 18 |
-| 13 | Ike offered wood for bait, I declined【150 words】 | 1 | 0.78 | day 18 |
+| 9 | Got selit fish at 08:00 | 2 | 0.78 | day 24 |
+| 13 | 4 woods left, still no bait | 1 | 0.61 | day 18 |
+| 13 | Ike offered wood for bait, I declined【150 words】 | 1 | 0.61 | day 18 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 12) Got a trade, hope Gus has bait. Keep an eye on inventory.
-- (day 12) Need bait tomorrow, keep offering wood
-- (day 12) Keep looking for rocks near the river and maybe try to trade with Jo or Dax tomorrow.
-- (day 12) Keep track of Gus's patience; maybe he'll give me bait next time if I keep offering wood.
-- (day 12) Remember to stock up on bait tomorrow, maybe trade with Dax or buy from Cranny when I get a ladder.
 - (day 13) Need to find bait before next meeting.
 - (day 13) Need to find bait before next trade.
 - (day 13) Try to get bait from Bo tomorrow if he has it.
 - (day 13) Keep trying to get a bait, maybe from Jo or Dax tomorrow.
+- (day 14) Ask Gus for bait, offer 1 wood. Then Bo, offer 3 wood. If Bo still no, maybe try Ike again.
+- (day 14) If he says no, keep offering wood tomorrow.
+- (day 14) If he says no, try tomorrow.
+- (day 14) Remember to ask Bo again tomorrow if he still has bait. Keep wood inventory low.
 
-## Yesterday (day 13)
+## Yesterday (day 14)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 hit rock 6: gold nugget x1 (pockets full, left some) (also nearby: Ike)
-- 07:00 ran into Ike at the rocks: you said "Hey Ike, any chance you have some fishing bait?"; Ike said "Sure, here's a wood for bait." [Ike's offer: Ike gives you 1 wood, you give Ike 1 fishing bait]; you said "Sorry, no bait right now." [then you went your ways]
-- 07:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 08:00 instead of fish (where: river)
-- 08:00 tried to fish: pockets full
-- 08:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 09:00 instead of visit (who: Gus)
-- 09:00 tried to fish: pockets full
-- 09:00 spotted a large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 10:00 instead of ask (who: Tom Nook)
-- 10:00 tried to fish: pockets full
+- 08:00 walked over to Gus's home (also nearby: Dax, Jo)
+- 08:00 knocked at Gus's home, but nobody answered
+- 08:00 ran into Jo at Gus's home: you said "Hey Jo, got a wood for you? Need bait for fishing."; Jo said "" [just nodded (too tired to talk)]
+- 09:00 walked over to Bo's home
+- 09:00 inside Bo's home: not much furniture yet
+- 09:00 visited Bo at home: you said "Hey Bo, I’ve got a wood for you—any bait you can spare?" [your offer: you give Bo 1 wood, Bo gives you 1 fishing bait]; Bo said "Thanks, Ari." [then you went your ways]
+- 10:00 walked over to Ike's home
+- 10:00 inside Ike's home: not much furniture yet
+- 10:00 visited Ike at home: you said "Hey Ike, got a wood for you. Need some bait." [your offer: you give Ike 1 wood, Ike gives you 1 fishing bait]; Ike said "Hey Ari, could you hook me up with some fishing bait?" [Ike asked you for 1 fishing bait]; you said "Hey Ike, I’ve got a wood for you—any bait you can spare?" [your offer: you give Ike 1 wood, Ike gives you 1 fishing bait]; Ike said "" [just nodded (too tired to talk)]
 - 11:00 rested
-- 11:00 Bo visited you at home: Bo said "Hey Ari, got any bait? I can spare a few woods." [Bo's offer: Bo gives you 3 wood, you give Bo 1 fishing bait]; you said "Sorry, I don’t have bait right now."; Bo said "Sorry, I'll come back later."; you said "Sorry, I still don’t have any bait. Do you have one I could take?" [you asked Bo for 1 fishing bait]; Bo said "" [Bo's offer: Bo gives you 3 wood, you give Bo 1 fishing bait]; you said "Sorry, I still don’t have any bait. Can I borrow one?"; Bo said "" [just nodded (too tired to talk)]
-- 12:00 too tired to plan, so you planned nothing new
+- 12:00 walked over to Fen's home; your ladder broke after 30 uses and is gone from your pockets
+- 12:00 knocked at Fen's home, but nobody answered
+- 13:00 walked over to Bo's home
+- 13:00 knocked at Bo's home, but nobody answered
+- 14:00 rested
+- 15:00 rested
+- 16:00 spotted a medium fish shadow in the river (lower ground, southwest) and went after it at 17:00
+- 17:00 fished for a medium shadow in the river: it got away
+- 17:00 spotted a small fish shadow in the river (lower ground, southwest) and went after it at 18:00
+- 18:00 fished for a small shadow in the river: caught an ashpimi fish
 - 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
 
 Shown to them when they meet that villager again (the latest lines; "you" is Ari).
 
-### Bo (day 13, 11:00, at Ari's home)
+### Bo (day 14, 09:00, at Bo's home)
 
-- **Bo:** Hey Ari, got any bait? I can spare a few woods. [Bo's offer: Bo gives you 3 wood, you give Bo 1 fishing bait]
-- **Ari:** Sorry, I don’t have bait right now.
-- **Bo:** Sorry, I'll come back later.
-- **Ari:** Sorry, I still don’t have any bait. Do you have one I could take? [you asked Bo for 1 fishing bait]
-- **Bo:**  [Bo's offer: Bo gives you 3 wood, you give Bo 1 fishing bait]
-- **Ari:** Sorry, I still don’t have any bait. Can I borrow one?
-- **Bo:**  [just nodded (too tired to talk)]
+- **Ari:** Hey Bo, I’ve got a wood for you—any bait you can spare? [your offer: you give Bo 1 wood, Bo gives you 1 fishing bait]
+- **Bo:** Thanks, Ari. [then you went your ways]
 
 ### Dax (day 10, 16:00, at Dax's home)
 
@@ -73,21 +74,16 @@ Shown to them when they meet that villager again (the latest lines; "you" is Ari
 
 - **Gus:**  [just nodded (too tired to talk)]
 
-### Ike (day 13, 07:00, at the rocks)
+### Ike (day 14, 10:00, at Ike's home)
 
-- **Ari:** Hey Ike, any chance you have some fishing bait?
-- **Ike:** Sure, here's a wood for bait. [Ike's offer: Ike gives you 1 wood, you give Ike 1 fishing bait]
-- **Ari:** Sorry, no bait right now. [then you went your ways]
+- **Ari:** Hey Ike, got a wood for you. Need some bait. [your offer: you give Ike 1 wood, Ike gives you 1 fishing bait]
+- **Ike:** Hey Ari, could you hook me up with some fishing bait? [Ike asked you for 1 fishing bait]
+- **Ari:** Hey Ike, I’ve got a wood for you—any bait you can spare? [your offer: you give Ike 1 wood, Ike gives you 1 fishing bait]
+- **Ike:**  [just nodded (too tired to talk)]
 
-### Jo (day 11, 08:00, at Dax's home)
+### Jo (day 14, 08:00, at Gus's home)
 
-- **Ari:** Thanks, Jo! Do you have any fishing bait I could trade for a wood? [you asked Jo for 1 fishing bait]
-- **Jo:** Hey Ari, I’ve got this selzalne fish for you, can you swing by with a rock sometime? [Jo handed you 1 selzalne fish; Jo asked you for 1 rock, but there's nothing called rock on this island]
-- **Ari:** Sure, Ari! I’ll bring a rock if I find one. Do you have any fishing bait to trade for a wood? [you asked Jo for 1 fishing bait]
-- **Jo:** Hey Ari, I’ll trade you a selit fish for a rock, if you can swing one over. [Jo proposed a trade, but there's nothing called rock on this island]
-- **Ari:** Thanks! Here’s a selit fish, can you trade me a fishing bait? [you handed Jo 1 selit fish; you asked Jo for 1 fishing bait]
-- **Jo:**  [Jo's offer: Jo gives you 1 selit fish, you give Jo 1 fishing bait]
-- **Ari:** Hey Jo, I still need that fishing bait. Can you give me one? [you asked Jo for 1 fishing bait]
+- **Ari:** Hey Jo, got a wood for you? Need bait for fishing.
 - **Jo:**  [just nodded (too tired to talk)]
 
 ## What has changed hands with each villager
@@ -150,3 +146,4 @@ Shown to them when they meet that villager ("you" is Ari).
 - Day 11: Didn't write (no energy left).
 - Day 12: Didn't write (no energy left).
 - Day 13: Wrote the page. Held on to: "4 woods left, still no bait"; "Ike offered wood for bait, I declined【150 words】". Came back to: "Got selit fish at 08:00".
+- Day 14: Didn't write (no energy left). Forgot: "Ike dropped a selzalne fish after wood offer"; "Still no fishing bait, 200 bells, 7 wood, 12 hardwood, 8 softwood.".

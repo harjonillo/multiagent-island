@@ -1,0 +1,50 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 14 (May 5, spring, cloudy), 16:00. You are Fen, out on a walk.
+You just spotted:
+1. a sello beetle on the flowers (lower ground, centre, near Resident Services)
+Earlier today:
+- 08:00 ran into Cal at Fen's home: Cal said "Morning, Fen! Need a bit of softwood for the bridge."; you said "Sure thing, Cal! I’ll swap one softwood for a selzalne, if you’re up for it." [your offer: you give Cal 1 softwood, Cal gives you 1 selzalne fish]; Cal said "Got it, thanks!" [Cal accepted: you gave Cal 1 softwood, Cal gave you 1 selzalne fish]; you said "Hey Cal, could I trade you one selzalne for a selit fish?" [your offer: you give Cal 1 selzalne fish, Cal gives you 1 selit fish]; Cal said "Sure, here's the selit fish." [Cal accepted: you gave Cal 1 selzalne fish, Cal gave you 1 selit fish; Cal's offer: Cal gives you 1 selit fish, you give Cal 1 selzalne fish, but Cal had no selit fish, so there was no offer]; you said "Hey Cal, could you spare a ladder for the cliffs?" [you asked Cal for 1 ladder; then you went your ways]
+- 10:00 walked over to Dax's home (also nearby: Dax)
+- 10:00 knocked at Dax's home, but nobody answered
+- 11:00 walked over to Kit's home; your ladder broke after 30 uses and is gone from your pockets
+- 11:00 knocked at Kit's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 13) Get the map from Dax tomorrow. Keep the selit fish handy for future trades.
+- (day 13) Remember to keep the selit fish handy for future trades.
+- (day 14) Remember to ask Cal for selit fish tomorrow if he’s willing; I need it for future trades.
+- (day 14) Keep the selzalne handy for later trades.
+- (day 14) Remember to keep selit fish for later bait trades.
+- (day 14) Ask for ladder tomorrow, see if he has one. Keep selit fish for future trades.
+At 17:00 you have nothing planned.
+Actions left today: 7 of 10. Mental energy left today: 21.
+
+You can go after one of them at 17:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (56 tokens, hidden from everyone) ===
+Need to pick one to go after: options: Cal, Dax, Kit. Ladder broken. Likely go to Cal to ask for selit fish and ladder? But ladder already broken. Maybe ask for ladder again? But he might have. So go to Cal.
+
+=== REPLY ===
+{"thoughts":"Need selit fish for future trades, Cal has them and I already traded selzalne for selit. Ask again tomorrow. Ladder broken, but maybe he has spare. I'll go to Cal now to secure a ladder and confirm selit fish.", "go":1}

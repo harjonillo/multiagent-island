@@ -59,3 +59,8 @@ Morning was quiet, only the wind rattling the fence.  I managed to buy a simple 
 
 Day 13.  
 The sun was high when I left for Gus and Fen, but both were gone. I spent most of the day by the river—got a gormo, a tugorpi, a selzalne, and a selit. My ladder finally gave out after 30 uses, so I’ll need to replace it soon. I suggested stairs to Tom Nook; maybe we can chip in. No one answered at Dax’s place either—he’s still tired. I kept the selit fish handy for tomorrow’s trade, hoping Fen will finally respond. Bells are still tight; I have 100 in my wallet, nothing at home. The island feels quiet but steady.
+
+## Day 14
+
+Day 13.  
+The sun was high when I left for Gus and Fen, but both were gone. I spent most of the day by the river—got a gormo, a tugorpi, a selzalne, and a selit. My ladder finally gave out after 30 uses, so I’ll need to replace it soon. I suggested stairs to Tom Nook; maybe we can chip in. No one answered at Dax’s place either—he’s still tired. I kept the selit fish handy for tomorrow’s trade, hoping Fen will finally respond. Bells are still tight; I have 100 in my wallet, nothing at home. The island feels quiet but steady.

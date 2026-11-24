@@ -3,7 +3,7 @@
 - Model: default
 - Usually up from 07:00 to 00:00
 - Arrived at 05:00 on day 0
-- Home at the end of day 13: a tent in lower ground, centre
+- Home at the end of day 14: a tent in lower ground, centre
 - Persona from: villagers/blank.md
 
 ## Persona

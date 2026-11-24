@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, 23 h.  
+Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 14 (May 5, spring, cloudy), 09:00. You are Cal, at the sea.
+You just spotted:
+1. a small fish shadow in the sea (lower ground, west)
+Earlier today:
+- 07:00 knocked at Dax's home, but nobody answered
+- 08:00 walked over to Fen's home (also nearby: Fen)
+- 08:00 knocked at Fen's home, but nobody answered
+- 08:00 ran into Fen at Fen's home: you said "Morning, Fen! Need a bit of softwood for the bridge."; Fen said "Sure thing, Cal! I’ll swap one softwood for a selzalne, if you’re up for it." [Fen's offer: Fen gives you 1 softwood, you give Fen 1 selzalne fish]; you said "Got it, thanks!" [you accepted: Fen gave you 1 softwood, you gave Fen 1 selzalne fish]; Fen said "Hey Cal, could I trade you one selzalne for a selit fish?" [Fen's offer: Fen gives you 1 selzalne fish, you give Fen 1 selit fish]; you said "Sure, here's the selit fish." [you accepted: Fen gave you 1 selzalne fish, you gave Fen 1 selit fish; your offer: you give Fen 1 selit fish, Fen gives you 1 selzalne fish, but you had no selit fish, so there was no offer]; Fen said "Hey Cal, could you spare a ladder for the cliffs?" [Fen asked you for 1 ladder; then you went your ways]
+- 09:00 fished for a small shadow in the sea: caught a tubas fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 11) Dax unresponsive today.
+- (day 11) Got an ashrumo moth; trade for softwood.
+- (day 11) Need more softwood for bridge and future trades.
+Your notes from the last 2 days:
+- (day 13) Got one more softwood, keep trading selzalne if needed. Remember to ask Dax for wood tomorrow if he has any.
+- (day 13) Remember to check Jo tomorrow for more softwood.
+- (day 13) Keep trading selzalne for softwood until I hit the bridge fund goal.
+- (day 14) Remember to ask Dax for wood and trade selzalne. Also keep an eye on bridge fund tomorrow.
+- (day 14) Trade in progress, got softwood.
+- (day 14) Got another selzalne, good for softwood later.
+At 10:00 you planned: rest.
+Actions left today: 5 of 10. Mental energy left today: 68.
+
+You can go after one of them at 10:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (44 tokens, hidden from everyone) ===
+We choose to go after Dax? We have 5 actions left. Let's go at 10: ask Dax for wood. So go 1 (assuming action 1 is Dax). Return JSON.
+
+=== REPLY ===
+{"thoughts":"Need wood for bridge. Dax might have some. Go to his place at 10:00.","go":1}

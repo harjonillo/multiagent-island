@@ -1,4 +1,4 @@
-# Fen's memory, waking on day 14
+# Fen's memory, waking on day 15
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -26,56 +26,46 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 12) Check if Gus has ladder or vaulting pole tomorrow. Maybe ask Jo for more selit fish if needed.
-- (day 12) Remember to ask Dax about any map or ladder. Good luck.
-- (day 12) Need to get selzalne soon; maybe from Gus or Dax.
-- (day 12) Keep an eye on Cal for more bait later.
-- (day 12) Keep an eye on Cal’s willingness; maybe offer selit fish if he wants it.
 - (day 13) Try to get a vaulting pole from Dax tomorrow. Keep selit fish handy for Cal trade.
 - (day 13) Got ladder by trading a selit fish. Remember to keep an eye on Cal for bait later.
 - (day 13) Remember to check if Dax actually has a map before tomorrow. If not, keep trading selit fish elsewhere.
 - (day 13) Get the map from Dax tomorrow. Keep the selit fish handy for future trades.
 - (day 13) Remember to keep the selit fish handy for future trades.
+- (day 14) Remember to ask Cal for selit fish tomorrow if he’s willing; I need it for future trades.
+- (day 14) Keep the selzalne handy for later trades.
+- (day 14) Remember to keep selit fish for later bait trades.
+- (day 14) Ask for ladder tomorrow, see if he has one. Keep selit fish for future trades.
 
-## Yesterday (day 13)
+## Yesterday (day 14)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 walked over to Dax's home (also nearby: Dax)
-- 07:00 knocked at Dax's home, but nobody answered
-- 07:00 ran into Dax at Dax's home: you said "Morning Dax, got a minute? I could use a map or a ladder if you have one."; Dax said "Sure thing, here's the ladder." [Dax tried to hand you 1 ladder but you had no room]; you said "Thanks, Dax! I’ll swap a selit fish for that ladder." [your offer: you give Dax 1 selit fish, Dax gives you 1 ladder]; Dax said "Thanks, Fen! Deal." [Dax accepted: you gave Dax 1 selit fish, Dax gave you 1 ladder; Dax's offer: Dax gives you 1 ladder, you give Dax 1 selit fish, but Dax had no ladder, so there was no offer]; you said "Thanks, Dax. I can trade a selit fish for a map if you have one." [your offer: you give Dax 1 selit fish, Dax gives you 1 island map]; Dax said "Sure thing, Fen. Keep the fish." [then you went your ways]
-- 08:00 walked over to Gus's home
-- 08:00 knocked at Gus's home, but nobody answered
-- 09:00 rested
-- 10:00 walked over to Jo's home
-- 10:00 knocked at Jo's home, but nobody answered
-- 11:00 rested
-- 12:00 walked over to Dax's home
-- 12:00 inside Dax's home: not much furniture yet
-- 12:00 visited Dax at home: you said "Hey Dax, any chance you’ll find a map soon? I’d love to see the island better." [you asked Dax for 1 island map; then you went your ways]
-- 13:00 walked over to Cal's home (also nearby: Jo, Cal)
-- 13:00 knocked at Cal's home, but nobody answered
-- 13:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 6) and went after it at 14:00 instead of rest
-- 14:00 tried to fish: pockets full
-- 14:00 spotted a large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 15:00 instead of rest
-- 15:00 tried to fish: pockets full
-- 16:00 rested
+- 07:00 rested
+- 08:00 ran into Cal at Fen's home: Cal said "Morning, Fen! Need a bit of softwood for the bridge."; you said "Sure thing, Cal! I’ll swap one softwood for a selzalne, if you’re up for it." [your offer: you give Cal 1 softwood, Cal gives you 1 selzalne fish]; Cal said "Got it, thanks!" [Cal accepted: you gave Cal 1 softwood, Cal gave you 1 selzalne fish]; you said "Hey Cal, could I trade you one selzalne for a selit fish?" [your offer: you give Cal 1 selzalne fish, Cal gives you 1 selit fish]; Cal said "Sure, here's the selit fish." [Cal accepted: you gave Cal 1 selzalne fish, Cal gave you 1 selit fish; Cal's offer: Cal gives you 1 selit fish, you give Cal 1 selzalne fish, but Cal had no selit fish, so there was no offer]; you said "Hey Cal, could you spare a ladder for the cliffs?" [you asked Cal for 1 ladder; then you went your ways]
+- 10:00 walked over to Dax's home (also nearby: Dax)
+- 10:00 knocked at Dax's home, but nobody answered
+- 11:00 walked over to Kit's home; your ladder broke after 30 uses and is gone from your pockets
+- 11:00 knocked at Kit's home, but nobody answered
+- 16:00 spotted a sello beetle on the flowers (lower ground, centre, near Resident Services) and went after it at 17:00
+- 17:00 went bug catching among the flowers: caught a sello beetle
+- 17:00 spotted a large fish shadow in the river (lower ground, south, near the plaza) and went after it at 18:00
+- 18:00 tried to fish: pockets full
+- 18:00 spotted a small fish shadow in the river (lower ground, south, near the plaza) and went after it at 19:00
 - 19:00 too tired to plan, so you planned nothing new
+- 19:00 looked for fish in the river, but there were no fish shadows in sight
 
 ## The last conversation with each villager
 
 Shown to them when they meet that villager again (the latest lines; "you" is Fen).
 
-### Cal (day 12, 14:00, at Jo's home)
+### Cal (day 14, 08:00, at Fen's home)
 
-- **Cal:** Hey Fen, could I borrow a bit of your wood? I could trade a selzalne for softwood.
-- **Fen:** Thanks, Cal! [you asked Cal for 1 selzalne fish]
-- **Cal:** Sure thing, Fen. Here’s a selzalne for your softwood. [Cal's offer: Cal gives you 1 selzalne fish, you give Cal 1 softwood]
-- **Fen:** Got it, thanks! [you accepted: Cal gave you 1 selzalne fish, you gave Cal 1 softwood]
-- **Cal:** Hey Fen, could I snag another softwood if you have one spare? [Cal asked you for 1 softwood]
-- **Fen:** Sure, can you give me another selzalne? [you asked Cal for 1 selzalne fish]
-- **Cal:** Sure thing, another one! [Cal tried to hand you 1 selzalne fish but you had no room]
-- **Fen:**  [just nodded (too tired to talk)]
+- **Cal:** Morning, Fen! Need a bit of softwood for the bridge.
+- **Fen:** Sure thing, Cal! I’ll swap one softwood for a selzalne, if you’re up for it. [your offer: you give Cal 1 softwood, Cal gives you 1 selzalne fish]
+- **Cal:** Got it, thanks! [Cal accepted: you gave Cal 1 softwood, Cal gave you 1 selzalne fish]
+- **Fen:** Hey Cal, could I trade you one selzalne for a selit fish? [your offer: you give Cal 1 selzalne fish, Cal gives you 1 selit fish]
+- **Cal:** Sure, here's the selit fish. [Cal accepted: you gave Cal 1 selzalne fish, Cal gave you 1 selit fish; Cal's offer: Cal gives you 1 selit fish, you give Cal 1 selzalne fish, but Cal had no selit fish, so there was no offer]
+- **Fen:** Hey Cal, could you spare a ladder for the cliffs? [you asked Cal for 1 ladder; then you went your ways]
 
 ### Dax (day 13, 12:00, at Dax's home)
 
@@ -115,6 +105,8 @@ Shown to them when they meet that villager ("you" is Fen).
 
 - day 1: Cal gave you 1 island map
 - day 12: you gave Cal 1 softwood and Cal gave you 1 selzalne fish (which you had asked for), in a trade
+- day 14: you gave Cal 1 softwood (which Cal had asked for) and Cal gave you 1 selzalne fish (which you had asked for), in a trade
+- day 14: you gave Cal 1 selzalne fish and Cal gave you 1 selit fish, in a trade
 
 ### Dax
 
@@ -166,3 +158,4 @@ axe 230, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, s
 - Day 11: Didn't write (no energy left).
 - Day 12: Didn't write (no energy left).
 - Day 13: Didn't write (no energy left). Forgot: "Need apple before rock break"; "Gus traded selzalne for bait, but gave me none"; "Still only 1 map in hand, still no path to plaza".
+- Day 14: Didn't write (no energy left).

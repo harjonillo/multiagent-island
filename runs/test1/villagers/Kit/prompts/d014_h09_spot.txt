@@ -1,0 +1,44 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 13.  
+The sun was high when I left for Gus and Fen, but both were gone. I spent most of the day by the river—got a gormo, a tugorpi, a selzalne, and a selit. My ladder finally gave out after 30 uses, so I’ll need to replace it soon. I suggested stairs to Tom Nook; maybe we can chip in. No one answered at Dax’s place either—he’s still tired. I kept the selit fish handy for tomorrow’s trade, hoping Fen will finally respond. Bells are still tight; I have 100 in my wallet, nothing at home. The island feels quiet but steady.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 14 (May 5, spring, cloudy), 09:00. You are Kit, at the museum.
+You just spotted:
+1. a selashren moth on a stump (lower ground, centre, near the museum)
+Earlier today:
+- 05:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- 07:00 fished for a small shadow in the river: caught an ashpimi fish
+- 09:00 donated a selit fish to the museum
+Things you remember (anything you don't hold on to at night fades):
+- (day 10) 200 bells, no home stash
+- (day 13) Ladder gone, need a new one.
+- (day 13) Propose stairs to Tom Nook.
+- (day 13) Keep selit fish for tomorrow.
+Your notes from the last 2 days:
+- (day 12) Ask Dax for a small log; hope he says yes.
+- (day 12) Remember to ask Dax for a log tomorrow and keep the selit handy for bait trades.
+- (day 13) Try to keep selit handy for next trade. If Fen is still silent, maybe try asking him again tomorrow.
+- (day 13) Keep selit ready for tomorrow’s trade.
+- (day 13) Remember to keep selit fish handy for tomorrow’s bait trade.
+- (day 14) Keep an eye on Fen tomorrow, maybe try asking him again for the selit trade. Also remember to bring the ladder next time I need it.
+At 10:00 you planned: visit (who: Dax).
+Actions left today: 7 of 10. Mental energy left today: 122.
+
+You can go after one of them at 10:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (15 tokens, hidden from everyone) ===
+Need to choose go to Dax or not. Likely go.
+
+=== REPLY ===
+{"thoughts":"I want a log from Dax and maybe trade selit. Also need a new ladder soon. Going to Dax at 10:00 seems useful.","go":1}

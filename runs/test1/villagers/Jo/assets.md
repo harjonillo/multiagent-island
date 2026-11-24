@@ -1,18 +1,18 @@
 # Jo's assets
 
-## At the end of day 13
+## At the end of day 14
 
 - Bells with them: 6,800
 - Bells at home: 0
 - Loan from Tom Nook: 0
 - Home: a tent in lower ground, west (storage for 0 items)
-- Pockets (40 of 40 slots, worth 24,520 at Nook's Cranny): axe x1, clay x6, fishing rod x1, fossil x2, gorpika fish x1, iron nugget x10, ladder x1, loka fish x1, miruru fish x2, moitbas fish x3, net x1, nevin moth x1, selit fish x1, shovel x1, stone x5, tugorpi fish x2, wood x1
+- Pockets (39 of 40 slots, worth 24,550 at Nook's Cranny): axe x1, clay x6, fishing rod x1, fossil x2, gorpika fish x1, iron nugget x10, ladder x1, loka fish x1, miruru fish x3, moitbas fish x3, net x1, nevin moth x1, selit fish x1, shovel x1, stone x4, tugorpi fish x2
 - Kept at home (worth 0): nothing
-- Tools, uses so far: axe 0, fishing rod 19, ladder 18, net 1, shovel 6
+- Tools, uses so far: axe 0, fishing rod 21, ladder 20, net 1, shovel 6
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: iron fence, shell table, simple wooden fence, street lamp
-- Net worth (bells and things at Cranny prices, less the loan): 31,320
+- Net worth (bells and things at Cranny prices, less the loan): 31,350
 
 ## Day by day
 
@@ -34,3 +34,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 11 | 50 | 0 | 16 | 14,630 | 0 | tent | 0 | 14,680 |
 | 12 | 50 | 0 | 19 | 18,110 | 0 | tent | 0 | 18,160 |
 | 13 | 6,800 | 0 | 40 | 24,520 | 0 | tent | 0 | 31,320 |
+| 14 | 6,800 | 0 | 39 | 24,550 | 0 | tent | 0 | 31,350 |

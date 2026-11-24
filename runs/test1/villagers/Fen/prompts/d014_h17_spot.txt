@@ -1,0 +1,50 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 8, night.  
+No apples, no bait, no map.  
+Gus still silent on the plaza route.  
+I traded a selzalne for a bait and got nothing back.  
+Still only hardwood 1, wood 2, softwood 7, fence 4, map 1, selzalne 1, tubas 1.  
+Tools: shovel 2, axe, rod, net, ladder.  
+No bells, no progress on the bridge.  
+Tomorrow: ask Kit for a map, try the bridge rock, keep the selzalne handy for bait trades.  
+Hope the plaza is closer than it feels.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 14 (May 5, spring, cloudy), 17:00. You are Fen, at the flowers.
+You just spotted:
+1. a large fish shadow in the river (lower ground, south, near the plaza)
+Earlier today:
+- 10:00 knocked at Dax's home, but nobody answered
+- 11:00 walked over to Kit's home; your ladder broke after 30 uses and is gone from your pockets
+- 11:00 knocked at Kit's home, but nobody answered
+- 16:00 spotted a sello beetle on the flowers (lower ground, centre, near Resident Services) and went after it at 17:00
+- 17:00 went bug catching among the flowers: caught a sello beetle
+Things you remember (anything you don't hold on to at night fades):
+(nothing yet)
+Your notes from the last 2 days:
+- (day 13) Get the map from Dax tomorrow. Keep the selit fish handy for future trades.
+- (day 13) Remember to keep the selit fish handy for future trades.
+- (day 14) Remember to ask Cal for selit fish tomorrow if he’s willing; I need it for future trades.
+- (day 14) Keep the selzalne handy for later trades.
+- (day 14) Remember to keep selit fish for later bait trades.
+- (day 14) Ask for ladder tomorrow, see if he has one. Keep selit fish for future trades.
+At 18:00 you have nothing planned.
+Actions left today: 6 of 10. Mental energy left today: 14.
+
+You can go after one of them at 18:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (71 tokens, hidden from everyone) ===
+We need to pick one target: options? We have fish shadow, sello beetle, maybe Dax? He didn't answer. Maybe go after fish? We have ladder broken, need ladder. Could ask Cal for selit fish. But action: go after fish takes 1 action. We have 6 actions left. I'd go after fish.
+
+=== REPLY ===
+{"thoughts":"Need selit fish for trades, and ladder. Fish seems promising. No urgent tasks today. I'll chase the fish shadow.","go":1}

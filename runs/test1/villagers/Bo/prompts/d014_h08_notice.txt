@@ -1,0 +1,48 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Still no bait, no fish, no bells.  
+Ari didn’t answer, but I finally got 1 wood from him for the trade—still 7 wood left.  
+Gus is still silent, but I’m not giving up.  
+I dug a stump, cleared a spot, but pockets full when I tried to fish.  
+Shovels 28/30 uses, ladder 10 uses.  
+Plan: tomorrow bring 3 wood to Dax or Kit, maybe try Gus again.  
+Watch the river, maybe a fish will appear.  
+Sleep is thin, but I’ll keep pushing.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 14 (May 5, spring, cloudy), 08:00. You are Bo, at the Ari's home.
+Nearby: Ike.
+Earlier today:
+- 07:00 ran into Ike out on a walk: you said "Hey Ike, got any spare wood? I could trade some for a better shovel or ladder."; Ike said "Hey Bo, give me a ladder for three woods?" [Ike's offer: Ike gives you 3 wood, you give Ike 1 ladder]; you said "Sorry, no room for the ladder right now."; Ike said "Thanks, Bo. I’ll see you later." [then you went your ways]
+- 08:00 walked over to Ari's home (also nearby: Ike)
+- 08:00 knocked at Ari's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ladder 22 uses left, need more wood
+- (day 10) Shovel uses 29 left.
+- (day 11) 28 shovel uses left
+- (day 11) Gus wants 1 bait from me tomorrow
+Your notes from the last 2 days:
+- (day 13) Got wood, keep 3 wood for bait trade tomorrow.
+- (day 13) Keep 2 wood left, 5-6 wood reserve.
+- (day 13) Remember to keep at least 4 wood in pocket for next bait trade.
+- (day 13) Keep 2 wood for next day, maybe try Dax or Gus again.
+- (day 14) Keep 4 wood for future bait trade.
+- (day 14) Remember to keep at least 4 wood in pocket for future bait trade.
+Mental energy left today: 101 (about 17 for each thing you say). Your plan for today: inward 120 (spent 29), outward 30 (spent 20), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (39 tokens, hidden from everyone) ===
+Need to decide. Nearby: Ike. Approach Ike? He offers ladder for 3 wood; we have 4 wood. We could trade. Good to get ladder. So approach Ike.
+
+=== REPLY ===
+{"thoughts":"Need ladder, have 4 wood. Ike offers 3 wood for ladder. Trade now.", "approach":"Ike", "say":"Hey Ike, I’ve got 4 wood—can we trade 3 for your ladder?"}

@@ -132,3 +132,8 @@ Sun rose over the river, and I chased the ashrumo moth like a kid in a forest. I
 
 Day 11, night.  
 Sun rose over the river, and I chased the ashrumo moth like a kid in a forest. It was worth the trip—two moths, a tugorpi, and a lovin’ fish, all without bait. I traded one wood for a fishing bait from Ari, and he seemed happier when I left. The rock at 07:00 was a goldmine—6,750 bells tucked into my tent. I hammered a hardwood tree and found clay, stone, and an iron nugget near rock 6. The river is generous today, but I still have no bells in my hand—just the 6,750 in the tent. Tomorrow I’ll head to the plaza, try to buy more bait, and maybe ask Ari for another trade. The island feels quiet, but the water’s alive, and I’m tired but hopeful.
+
+## Day 14
+
+Day 14, night.  
+Sun slipped behind the cliffs, leaving the river humming. I trailed Bo around the edge of my plot, trading a fishing rod for a single wood—small but steady. Ari dropped by with a wood and a half‑baked bait, but I’m still short of the full set. I’m running low on wood, but the ladder’s still solid; maybe I’ll swap it later for more. I’ll keep an eye on the river for that vaulting pole rumor. The night is quiet, my tent warm with 6,750 bells, and my tools feel heavy but useful. I’m tired, but the island’s rhythm steadies my thoughts.

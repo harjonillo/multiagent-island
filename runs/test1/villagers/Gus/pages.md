@@ -69,3 +69,8 @@ Sunset came early, but I still got a couple of hardwoods and a chunk of softwood
 
 Day 13, night.  
 Morning was a scramble—no room in my tent, so I had to swing by Ari and then Jo. Got a selzalne from Jo but she still needs wood, so I swapped a piece of my hardwood stash. The river was quiet; I chased a small shadow at 13 and 14, but nothing landed. Finally, I chopped a hardwood and a softwood, ending the day with a stack of wood and a few fish. Bells are still tight; I’ll need to buy bait tomorrow. Remember to keep at least three wood in my pockets for Dax, and don’t forget that fishing rod—maybe trade it later. The sky’s darkening, but I’m ready to sleep and plan tomorrow.
+
+## Day 14
+
+Day 14, night.  
+The morning was a mess—apple, rock, moth, another rock. I chased a moth again, but the rock I broke at 7:00 already showed a crack. I’m stuck without a ladder; I can’t chop hardwood or visit Ari. The river is dead, no fish shadows, so I’ll have to trade for bait tomorrow. I’ve lost my ladder after 30 uses, and I only have 5 wood left in pockets—three for Dax, two spare. I still have a selzalne, an ashrumo moth, and a fossil. I’m running low on apples too; I need to eat one tomorrow or trade. The tent is full of bells only, so I’ll stash my items elsewhere.

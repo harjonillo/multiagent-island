@@ -8,6 +8,7 @@ backend lets the whole pipeline run offline with no keys.
 from __future__ import annotations
 
 import hashlib
+import http.client
 import json
 import math
 import os
@@ -192,7 +193,9 @@ class OpenAICompatible:
                     time.sleep(delay)
                     continue
                 raise LLMError(f"backend '{self.name}': HTTP {e.code}: {detail}") from e
-            except (urllib.error.URLError, TimeoutError, KeyError, IndexError, TypeError, json.JSONDecodeError) as e:
+            # OSError and HTTPException cover a connection dropped while waiting for or reading the reply
+            # (RemoteDisconnected, ConnectionResetError, IncompleteRead), which urllib does not wrap in URLError.
+            except (OSError, http.client.HTTPException, KeyError, IndexError, TypeError, json.JSONDecodeError) as e:
                 if attempt < self.max_retries:
                     time.sleep(min(60.0, 2**attempt))
                     continue

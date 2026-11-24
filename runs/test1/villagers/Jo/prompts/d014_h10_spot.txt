@@ -1,0 +1,47 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 12, 23:30.  
+The river stayed empty; the pond kept giving. I chased a big shadow and ended up with a gorpika, then a moitbas at 11. I kept going for fish, trading nothing, but the day was steady. Cal’s house was silent again, but I finally saw him at the walk—he just nodded, too tired to talk. No trades happened, but I kept my softwood and the extra moitbas. Ari still wants a bait; I’ll offer one tomorrow. I’m still short on rocks for the bridge, and Dax is still missing. I’ll ask Eli about the donation and maybe ask Cal for a fish next time. The bridge feels farther each day, but the fish keep coming.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 14 (May 5, spring, cloudy), 10:00. You are Jo, at the pond.
+You just spotted:
+1. a large fish shadow in the pond (lower ground, southeast, near rock 6)
+2. a tiny fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 08:00 ran into Ari at Gus's home: Ari said "Hey Jo, got a wood for you? Need bait for fishing."; you said "" [just nodded (too tired to talk)]
+- 09:00 walked over to Cal's home
+- 09:00 knocked at Cal's home, but nobody answered
+- 09:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 10:00 instead of propose_bridge
+- 10:00 fished for a small shadow in the pond: it got away
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Cal gave 2 softwood, I traded 1 selzalne.
+- (day 12) Cal only nodded, no talk.
+- (day 12) I caught a gorpika and extra moitbas.
+- (day 12) Ari needs bait tomorrow.
+Your notes from the last 2 days:
+- (day 14) Remember to keep wood handy for Dax and keep looking for rocks for the bridge.
+- (day 14) Wait for Dax to find rock.
+- (day 14) Remember to check with Dax tomorrow if he finds a rock; keep stones handy for bridge.
+- (day 14) Keep an eye on Dax for a rock tomorrow.
+- (day 14) Remember to ask for a rock tomorrow if he finds one.
+- (day 14) Remember to keep stones handy for bridge and keep talking to Dax about any real rocks he might find.
+At 11:00 you planned: rest.
+Actions left today: 5 of 10. Mental energy left today: 8.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (42 tokens, hidden from everyone) ===
+We need to choose to chase fish or not. Probably chase small fish 1? He already tried. Maybe chase large fish 1. He has 5 actions left. Probably go after large fish.
+
+=== REPLY ===
+{"thoughts":"I’ll try the big shadow. It might bring more fish, and I still have actions left. If it’s gone, I’ll just rest.","go":1}

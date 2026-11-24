@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 13.  
+The river sang all morning.  I snagged an ashpimo, a selzalne, and two ashpimi before lunch.  A gormo slipped past at 14:00, but I caught another at 15:00.  By dusk a selit drifted near the plaza—happy to add it to the haul.  I kept looking for that bridge spot; still no suitable stretch within 8 steps.  The log remains elusive, and Jo is as silent as ever.  My tools are still solid, but the fishing rod is close to breaking—only six uses left.  I’ll ask Jo face‑to‑face tomorrow for the log or vaulting pole.  The island feels calm, but the river keeps moving.  I’ll rest now, hoping tomorrow brings answers.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 14 (May 5, spring, cloudy), 09:00. You are Eli, at the river.
+You just spotted:
+1. a small fish shadow in the river (lower ground, south, near Nook's Cranny)
+Earlier today:
+- 07:00 looked for fish in the river, but there were no fish shadows in sight
+- 08:00 fished for a medium shadow in the river: caught a selzalne fish
+- 08:00 spotted a medium fish shadow in the river (lower ground, south, near Nook's Cranny) and went after it at 09:00 instead of fish (where: river)
+- 09:00 fished for a small shadow in the river: caught an ashpimi fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) No trades today
+- (day 10) Still need Jo’s log or vaulting pole.
+- (day 13) No bridge found
+- (day 13) Jo’s silence continues
+Your notes from the last 2 days:
+- (day 12) If he says no, maybe I'll try again tomorrow.
+- (day 12) Remember to ask Jo about the vaulting pole tomorrow.
+- (day 13) Remember to ask Jo face‑to‑face tomorrow for log or vaulting pole.
+- (day 13) Keep an eye on Jo tomorrow for the log.
+- (day 13) Ask Jo face‑to‑face tomorrow. Stay alert for her log. Sleep well.
+- (day 14) Check Jo again tomorrow. Keep an eye on the river for vaulting pole spots.
+At 10:00 you planned: fish (where: river).
+Actions left today: 5 of 10. Mental energy left today: 116.
+
+You can go after one of them at 10:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (85 tokens, hidden from everyone) ===
+We need to choose one to go after at 10:00. Options: small fish shadow at 09:00 we already caught ashpimi. The note: small fish shadow at 09:00 caught ashpimi. So nothing left? Maybe we can go after the small fish shadow again? But we already caught it. Maybe there is still small fish shadow? Could try. I'll go 0.
+
+=== REPLY ===
+{"thoughts":"No new fish to chase; river calm. Stay and rest.","go":0}

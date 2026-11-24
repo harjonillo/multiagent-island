@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 13, night.  
+Morning was a scramble—no room in my tent, so I had to swing by Ari and then Jo. Got a selzalne from Jo but she still needs wood, so I swapped a piece of my hardwood stash. The river was quiet; I chased a small shadow at 13 and 14, but nothing landed. Finally, I chopped a hardwood and a softwood, ending the day with a stack of wood and a few fish. Bells are still tight; I’ll need to buy bait tomorrow. Remember to keep at least three wood in my pockets for Dax, and don’t forget that fishing rod—maybe trade it later. The sky’s darkening, but I’m ready to sleep and plan tomorrow.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 14 (May 5, spring, cloudy), 07:00. You are Gus, at the rocks.
+You just spotted:
+1. an ashrumo moth on a rock (lower ground, centre, near the museum)
+Earlier today:
+- 07:00 ate an apple and broke rock 4; a rock will turn up somewhere in 3 days
+Things you remember (anything you don't hold on to at night fades):
+- (day 10) Dax says he wants bait first, so I’ll bring wood tomorrow.
+- (day 13) Trade wood ↔ selzalne with Jo
+- (day 13) Keep 3 wood for Dax
+- (day 13) Need bait for tomorrow’s trade with Ari
+Your notes from the last 2 days:
+- (day 12) Remember to get bait tomorrow, maybe buy from Nook or trade with Dax.
+- (day 12) Remember to bring extra wood tomorrow for Dax if he still wants bait.
+- (day 13) Remember to keep 3 wood in pockets for tomorrow's Dax trade. Also, keep the fishing bait for later.
+- (day 13) Remember to keep 3 wood for Dax tomorrow.
+- (day 13) Remember to keep 3 wood for tomorrow's Dax trade.
+- (day 14) Remember to bring wood for Dax tomorrow and try to get bait from Ari or fish.
+At 08:00 you planned: break_rock (rock: 1).
+Actions left today: 5 of 10. Mental energy left today: 119.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (58 tokens, hidden from everyone) ===
+We need to choose action. At 08:00, we can go after a target. Options: ashrumo moth at rock. We have actions left 5. We could go after it to get loot. Likely want to. So go=1. Provide JSON.
+
+=== REPLY ===
+{"thoughts":"I’ll head for the ashrumo moth to snag a loot. It’s safe and useful for tomorrow’s trade. No rush on the rock break yet.","go":1}

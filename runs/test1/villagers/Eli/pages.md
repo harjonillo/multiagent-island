@@ -64,3 +64,8 @@ Fished early, got a kalo and a tubas, then the sea went quiet. Switched to the r
 
 Day 13.  
 The river sang all morning.  I snagged an ashpimo, a selzalne, and two ashpimi before lunch.  A gormo slipped past at 14:00, but I caught another at 15:00.  By dusk a selit drifted near the plaza—happy to add it to the haul.  I kept looking for that bridge spot; still no suitable stretch within 8 steps.  The log remains elusive, and Jo is as silent as ever.  My tools are still solid, but the fishing rod is close to breaking—only six uses left.  I’ll ask Jo face‑to‑face tomorrow for the log or vaulting pole.  The island feels calm, but the river keeps moving.  I’ll rest now, hoping tomorrow brings answers.
+
+## Day 14
+
+Day 14.  
+Morning was quiet, no fish shadows until the first bite: a selzalne, then a couple of ashpimi.  The river feels empty now, maybe the season shifts.  No trades, no new tools, but the fishing rod is almost dead—just three uses left.  I still need Jo’s log or a vaulting pole.  I’ll keep an eye on her and the river for a good spot.  Bells are fine, food stock steady.  Rest tonight, hope the next day brings something.
