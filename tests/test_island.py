@@ -2229,8 +2229,147 @@ def test_version_16_mock_run_has_no_malformed_actions():
         plans = run.of("plan")
         assert any(p["scheduled"] for p in plans)
         prompt = _seen(_prompts(Path(d) / "run", "d001_p0")[0])
-        assert "by picking numbers from the list" in prompt and '"pick": <number>' in prompt
+        assert "each written as a pick" in prompt and '"pick": {"action": "<action>"' in prompt  # version 21
         assert "Write each as JSON" not in prompt  # the old menu's instructions are gone
+        # Version 21: nothing is dropped for how it was written (the mock's path ends aside), and selling works.
+        whys = [x["why"] for p in plans for x in p["dropped"]]
+        assert all(w.startswith(("no actions left", "no free hour", "asleep", "this plan could use", "lay_path: "))
+                   for w in whys), whys
+        assert any(a["action"]["do"] == "sell" and a["ok"] and "sold " in a["result"] for a in acts)
+        # Sending is written one way everywhere: on the plan's list, at the plaza and in a conversation.
+        assert any(a["action"]["do"] == "send" and a["ok"] for a in acts)
+        chat = next(_seen(x) for x in _prompts(Path(d) / "run", "*_chat*"))
+        assert '"send": {} or {"action": "send", "items": ' in chat and '"give": {}' not in chat
+
+
+def test_version_21_picks_by_name():
+    """Prompt version 21: a plan names each action with what it takes, in the parts docs/actions.md's charts
+    have: "items" from the pockets, "at" where, "what" which one. The list is the same actions as version 16's,
+    a line per kind; only what is in the pockets can be named, and only a part with a choice has to be."""
+    from llmabm.island.options import KINDS, Items, menu_text, plan_options, read_actions, unread_line
+
+    isl, g, bodies = _grid_island()
+    assert isl.prompt_version >= 21
+    vil = _stocked(isl)
+    opts = plan_options(isl, bodies, g, "A", list(range(8, 20)))
+    lines = menu_text(opts, isl, "A", g).splitlines()
+    assert lines[0].startswith('In your pockets (the only things that can go in "items"): ')
+    assert "sea bass x1" in lines[0] and "wood x4" in lines[0] and lines[0].endswith("30000 bells in your wallet")
+    heads = [ln[2:].split(".")[0].split(" (")[0] for ln in lines if ln.startswith("- ")]
+    assert set(heads) == {o.kind for o in opts} <= set(KINDS)
+    assert sorted(heads) == sorted([*set(heads), "buy"])  # one line per kind; buying has one per shop
+    sell = next(ln for ln in lines if ln.startswith("- sell. "))
+    assert "items: any of " in sell and "wood x4" in sell and sell.endswith("at: Nook's Cranny")
+    assert any(ln.startswith("- donate. items: ") and "sea bass" in ln and ln.endswith("at: museum") for ln in lines)
+    assert any(ln.startswith("- fish. items: fishing rod, and if you like fishing bait x2. at: ") for ln in lines)
+    assert any(ln.startswith("- chop_wood. items: one of stone axe x1, axe x1. at: hardwood tree | fruit tree") for ln in lines)
+    assert lines[-1].startswith("Places: home, ")
+
+    def read(pick):
+        acts, bad = read_actions(opts, [{"hour": 9, "pick": pick}], vil.inventory)
+        return (acts[0] if acts else None), (bad[0]["why"] if bad else None)
+
+    def only(pick, **want):
+        act, why = read(pick)
+        assert why is None and all(act[k] == v for k, v in want.items()), (pick, act, why)
+
+    # Selling: what and how many, from the pockets, never more than is there.
+    only({"action": "sell", "items": {"wood": 3, "sea bass": 9}, "at": "Nook's Cranny"},
+         do="sell", shop="cranny", items={"wood": 3, "sea bass": 1}, hour=9)
+    assert read({"action": "sell"})[1].startswith('sell: say what and how many, "items": {"<thing>": <how many>} from ')
+    assert read({"action": "sell", "items": {}, "at": "Nook's Cranny"})[1].startswith("sell: say what and how many")
+    why = read({"action": "sell", "items": {"dace": 1}})[1]
+    assert why.startswith("sell: you have no dace in your pockets; for this you carry ") and "wood x4" in why
+    assert unread_line(8, {"why": why}).startswith("08:00 in your plan, sell: you have no dace") \
+        and unread_line(8, {"why": why}).endswith(", so it wasn't planned")
+    # One thing an hour where that was the rule; "what" for it is read as meant.
+    only({"action": "donate", "items": {"sea bass": 1}}, do="donate", item="sea bass")
+    only({"action": "donate", "what": "sea bass", "at": "the museum"}, do="donate", item="sea bass")
+    assert read({"action": "donate", "items": {"dace": 1}})[1].startswith("donate: you have no dace in your pockets")
+    assert read({"action": "donate", "items": {"wood": 1}})[1].startswith("donate: it doesn't use wood")
+    # What has no choice is filled in; what has one must be said.
+    rocks = [o.at for o in opts if o.kind == "mine_rock"]
+    assert len(rocks) > 1
+    assert read({"action": "mine_rock"})[1].startswith('mine_rock: say where, "at": rock ')
+    only({"action": "Mine Rock", "at": rocks[1]}, do="mine_rock", rock=int(rocks[1].split()[1]))
+    only({"action": "mine_rock", "items": {"shovel": 1}, "at": rocks[1].split()[1]}, rock=int(rocks[1].split()[1]))
+    assert read({"action": "mine_rock", "at": "rock 99"})[1].startswith('mine_rock: "rock 99" isn\'t one of "at": ')
+    assert read({"action": "chop_wood", "at": "fruit tree"})[1] == 'chop_wood: say which, "items": one of stone axe x1, axe x1'
+    only({"action": "chop_wood", "items": {"stone axe": 1}, "at": "fruit"}, kind="fruit", axe="stone axe")
+    act, _ = read({"action": "fish", "at": "the sea"})
+    assert act["where"] == "sea" and not act.get("bait")
+    only({"action": "fish", "items": {"fishing rod": 1}, "at": "sea"}, where="sea")
+    only({"action": "fish", "items": {"bait": 1}, "at": "sea"}, where="sea", bait=True)
+    only({"action": "place", "items": {"simple wooden fence": 2}, "at": "home"}, item="simple wooden fence", count=2,
+         near="home")
+    only({"action": "place", "items": {"log stool": 1}}, item="log stool", near="home")
+    only({"action": "craft", "what": "log stool"}, do="craft", recipe="log stool")
+    only({"action": "wear", "items": ["straw hat"]}, item="straw hat")
+    # Buying: the thing is "what" (or read as meant from "items"); bells are taken as before.
+    buy = next(o for o in opts if o.kind == "buy" and "count" in o.fields)
+    only({"action": "buy", "what": {buy.what: 2}}, item=buy.action["item"], shop="cranny", count=2)
+    only({"action": "buy", "items": {buy.what: 1}, "at": "Nook's Cranny"}, item=buy.action["item"], count=1)
+    assert read({"action": "buy"})[1].startswith('buy: say which one, "what": ')
+    assert read({"action": "buy", "what": "a yacht"})[1].startswith('buy: "a yacht" isn\'t one of "what": ')
+    # Bells from the wallet are "bells" in "items".
+    fund = next(o for o in opts if o.kind == "contribute_bridge")
+    only({"action": "contribute_bridge", "items": {"bells": 500}, "what": fund.what}, do="contribute_bridge", bells=500)
+    assert read({"action": "contribute_bridge"})[1].startswith('contribute_bridge: say how many bells, "items": {"bells": <1 to ')
+    # Sending: a note, things from the pockets (bells too), or both, to another villager.
+    send = next(ln for ln in lines if ln.startswith("- send "))
+    assert "items: any of bells x30000, " in send and ". at: B. " in send and 'also "note": what you write' in send
+    only({"action": "send", "at": "B", "note": "see you at the plaza"}, do="send", to="B", note="see you at the plaza")
+    act, _ = read({"action": "send", "at": "B's home", "items": {"wood": 9, "bells": 50}, "note": "for the fence"})
+    assert act["items"] == {"wood": 4, "bells": 50} and act["note"] == "for the fence"
+    assert read({"action": "send", "at": "B"})[1] == 'send: say what you send: "items" from your pockets, a "note", or both'
+    assert read({"action": "send", "at": "B", "items": {"dace": 1}})[1].startswith("send: you have no dace in your pockets")
+    ok, msg = isl.act("A", act, 9)
+    assert ok and msg.startswith("sent B a parcel: 4 wood, 50 bells") and vil.inventory["wood"] == 0 and vil.bells == 29950
+    assert isl.mail[-1]["to"] == "B" and isl.mail[-1]["parcel"]["items"] == {"wood": 4, "bells": 50}
+    assert isl.act("A", {"do": "send", "to": "B", "note": "hello"}, 9) == (True, 'sent B a letter: "hello"; it arrives tomorrow morning')
+    assert not isl.act("A", {"do": "send", "to": "B", "items": {"wood": 1}}, 9)[0]  # none left
+    vil.inventory["wood"], vil.bells = 4, 30000
+    isl.mail.clear()
+    # Not an action on the list, and the old ways of writing a pick.
+    assert read({"action": "fly"})[1].startswith('there is no action called "fly"; your list has: mine_rock, ')
+    vil.inventory["fishing rod"] = 0
+    fewer = plan_options(isl, bodies, g, "A", list(range(8, 20)))
+    assert read_actions(fewer, [{"hour": 9, "pick": {"action": "fish", "at": "sea"}}], vil.inventory)[1][0]["why"] \
+        .startswith("fish isn't on your list for this plan, which has: ")
+    vil.inventory["fishing rod"] = 1
+    acts, bad = read_actions(opts, [{"hour": 8, "pick": 29}, {"hour": 9, "pick": "rest"}, {"hour": 10, "do": "plaza"},
+                                    {"hour": 11, "action": "rest"}], vil.inventory)
+    assert [a["do"] for a in acts] == ["rest", "plaza", "rest"] and [a["hour"] for a in acts] == [9, 10, 11]
+    assert bad[0]["why"].startswith("a pick names its action, as {") and bad[0]["why"].endswith("there are no numbers")
+
+    # Every option on the version 16 list can be picked by name, and reads back as that same action.
+    for o in opts:
+        pick = {"action": o.kind, "at": o.at, "what": o.what, "items": {k: 1 for k in o.uses}}
+        if isinstance(o.fields.get("items"), Items):
+            pick["items"] = {next(iter(o.fields["items"].have)): 1}
+        if "bells" in o.fields:
+            pick["items"] = {"bells": 1}
+        if "to" in o.fields:
+            pick["to"] = o.fields["to"].values[-1]
+        if "note" in o.fields:
+            pick["note"] = "hello"
+        act, why = read({k: v for k, v in pick.items() if v})
+        assert why is None and all(act[k] == v for k, v in o.action.items()), (o.text, pick, act, why)
+
+
+def test_actions_doc_has_a_chart_for_every_kind_of_action():
+    """docs/actions.md and a plan's list name the same actions, and the doc's example picks are those actions."""
+    import importlib.util
+
+    from llmabm.island.options import KINDS
+
+    spec = importlib.util.spec_from_file_location("actions_doc", ROOT / "scripts/actions_doc.py")
+    doc = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(doc)
+    names = [a[0] for _, group in doc.entries(doc.world_numbers(load_world(WORLD))) for a in group]
+    assert {n.split(" (")[0] for n in names} == set(KINDS)
+    assert set(doc.PLAN) == set(names)
+    assert all(pick["action"] == n.split(" (")[0] for n, (_, pick) in doc.PLAN.items())
 
 
 def test_version_17_bridges_and_stairs():

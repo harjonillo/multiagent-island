@@ -8,6 +8,7 @@ after changing either:
 
 from __future__ import annotations
 
+import json
 import random
 import re
 from pathlib import Path
@@ -225,6 +226,12 @@ def entries(N: dict) -> list:
               "and you can talk (gifts, requests,<br/>trades), free of any action",
               "nobody answers: they hear<br/>later that you came by"],
              "nothing", ""),
+            ("send", "send Jo a letter or things from your pockets", ["anything you carry, bells too<br/>(none for a letter)"],
+             ["wherever you are;<br/>to another villager<br/>one line per villager"], ["there is another villager"],
+             [], ["the things you send<br/>(they leave your pockets now)"],
+             ["tomorrow morning they get it:<br/>the note among their letters,<br/>the things in their pockets<br/>(at home if there's no room)",
+              "things sent count as a gift:<br/>they close a request for them"],
+             "the things are gone from your pockets", "SEND"),
         ]),
         ("Shops and services", [
             ("ask", "ask Tom Nook what they do and what it costs (at Resident Services)", [],
@@ -320,6 +327,83 @@ def entries(N: dict) -> list:
     ]
 
 
+# Version 21: each action's line in a plan's list, and a pick of it. Keyed by the entry's name above.
+PLAN = {
+    "mine_rock": ("mine_rock. items: shovel. at: rock 3 (lower ground, centre) | rock 5 (lower ground, east)",
+                  {"action": "mine_rock", "at": "rock 3"}),
+    "break_rock": ("break_rock. items: shovel and apple. at: rock 3 (lower ground, centre) | rock 5 (lower ground, east). "
+                   "you eat the apple first, to be strong enough", {"action": "break_rock", "at": "rock 3"}),
+    "chop_wood": ("chop_wood. items: one of axe x1, stone axe x1. at: hardwood tree | fruit tree. the axe (not the "
+                  "stone axe) brings the tree down when it takes its last wood, and a fruit tree then drops its fruit",
+                  {"action": "chop_wood", "items": {"axe": 1}, "at": "hardwood tree"}),
+    "shake_tree": ("shake_tree. at: fruit tree", {"action": "shake_tree"}),
+    "fish": ("fish. items: fishing rod, and if you like fishing bait x2. at: sea | river | pond | river up on the cliffs",
+             {"action": "fish", "at": "river"}),
+    "fish (with bait)": ("fish. items: fishing rod, and if you like fishing bait x2. at: sea | river | pond | river up on the cliffs",
+                         {"action": "fish", "items": {"fishing rod": 1, "fishing bait": 1}, "at": "river"}),
+    "catch_bug": ("catch_bug. items: net. at: flowers | trees | stumps | rocks | grass", {"action": "catch_bug", "at": "flowers"}),
+    "beachcomb": ("beachcomb. at: beach", {"action": "beachcomb"}),
+    "dig_fossil": ("dig_fossil. items: shovel. at: open ground", {"action": "dig_fossil"}),
+    "dig_clam": ("dig_clam (dig for manila clams). items: shovel. at: beach", {"action": "dig_clam"}),
+    "dig_stump": ("dig_stump (dig up a stump). items: shovel. at: stump", {"action": "dig_stump"}),
+    "propose_bridge": ("propose_bridge. a bridge across the river, at the nearest spot within 8 steps of where you are "
+                       "then; built once 98000 bells are donated at Resident Services; 2 of 10 on the island so far",
+                       {"action": "propose_bridge"}),
+    "propose_stairs": ("propose_stairs. stairs up a cliff, at the nearest spot within 8 steps of where you are then; "
+                       "built once 98000 bells are donated at Resident Services; 2 of 10 on the island so far",
+                       {"action": "propose_stairs"}),
+    "plant": ("plant. items: one of apple x3, sapling x1. at: a place from the list below (home if left out)",
+              {"action": "plant", "items": {"apple": 1}, "at": "north"}),
+    "place": ("place (put furniture or fencing outside). items: one of log stool x1, simple wooden fence x5. "
+              "at: a place from the list below (home if left out)",
+              {"action": "place", "items": {"simple wooden fence": 3}, "at": "home"}),
+    "fence_off": ("fence_off (fence off around your home). items: simple wooden fence. at: home. one piece per tile, "
+                  "as far as your pieces go", {"action": "fence_off"}),
+    "pick_up": ("pick_up (something you put outside). what: log stool (1 out, lower ground, centre)",
+                {"action": "pick_up", "what": "log stool"}),
+    "lay_path": ('lay_path. also "style": dirt | stone | brick | sand | terracotta (or leave it out for dirt), "from": '
+                 'a place from the list below (or leave it out for home), "to": a place from the list below',
+                 {"action": "lay_path", "style": "stone", "to": "museum"}),
+    "remove_path": ("remove_path (take up path tiles you laid). at: lower ground, centre", {"action": "remove_path"}),
+    "craft": ("craft. at: home. what: log stool | shovel", {"action": "craft", "what": "log stool"}),
+    "decorate": ("decorate (put furniture inside your home). items: log stool. at: home", {"action": "decorate"}),
+    "undecorate": ("undecorate (take furniture out of your home). at: home. what: log stool", {"action": "undecorate"}),
+    "wear": ("wear (put on clothes). items: one of kimono x1, straw hat x1", {"action": "wear", "items": {"straw hat": 1}}),
+    "visit": ("visit. at: Ari's home (lower ground, east) | Jo's home (lower ground, west)", {"action": "visit", "at": "Jo's home"}),
+    "send": ("send (someone a letter or things from your pockets). items: any of bells x300, sea bass x2, wood x4. "
+             'at: Ari | Jo. also "note": what you write (up to 350 characters). a note, things, or both; it arrives '
+             "tomorrow morning", {"action": "send", "items": {"wood": 2}, "at": "Jo", "note": "for your fence"}),
+    "ask": ("ask (what they do and what it costs). at: Tom Nook (Resident Services) | Isabelle (Resident Services) | "
+            "Blathers (museum) | Timmy and Tommy (Nook's Cranny) | Able Sisters", {"action": "ask", "at": "Tom Nook"}),
+    "sell": ("sell. items: any of sea bass x2, shovel x1, wood x4. at: Nook's Cranny",
+             {"action": "sell", "items": {"sea bass": 2, "wood": 1}}),
+    "buy (a thing)": ("buy. at: Nook's Cranny. what: fishing bait (300 bells each, up to 3) | sapling (640 bells) | "
+                      'shovel (new, 800 bells) | shovel recipe (200 bells) (for more than one, {"<thing>": <how many>})',
+                      {"action": "buy", "what": {"fishing bait": 2}}),
+    "buy (a tool)": ("the same line", {"action": "buy", "what": "shovel"}),
+    "buy (a recipe card)": ("the same line", {"action": "buy", "what": "shovel recipe"}),
+    "buy (clothes)": ("buy. at: Able Sisters. what: kimono (4800 bells) | raincoat (1600 bells)",
+                      {"action": "buy", "what": "kimono"}),
+    "assess": ("assess. items: fossil. at: museum. Blathers assesses every fossil you carry", {"action": "assess"}),
+    "donate": ("donate. items: one of dace x1, sea bass x2. at: museum", {"action": "donate", "items": {"sea bass": 1}}),
+    "upgrade_house": ("upgrade_house. at: Resident Services. Tom Nook upgrades your tent", {"action": "upgrade_house"}),
+    "pay_loan": ("pay_loan. items: bells, 1 to 5000 (5000 if left out). at: Resident Services. you owe 98000",
+                 {"action": "pay_loan", "items": {"bells": 2000}}),
+    "contribute_bridge": ("contribute_bridge (put bells toward a bridge or stairs). items: bells, 1 to 5000. "
+                          "at: Resident Services. what: bridge to the north bank (750/98000 raised) | "
+                          "stairs up to the middle cliff (north) (0/98000 raised, Ari's proposal)",
+                          {"action": "contribute_bridge", "items": {"bells": 500}, "what": "bridge to the north bank"}),
+    "set_ordinance": ("set_ordinance. at: Resident Services. what: bell boom | early bird | night owl. "
+                      "you pay Isabelle 20000 bells; it holds from tomorrow", {"action": "set_ordinance", "what": "bell boom"}),
+    "move_house": ("move_house. at: Resident Services. what: site-3 (lower ground, east) | site-7 (lower ground, west). "
+                   "you pay Tom Nook 10000 bells; your home moves overnight", {"action": "move_house", "what": "site-3"}),
+    "rest": ("rest", {"action": "rest"}),
+    "call_rescue": ("call_rescue. the Rescue Service takes you home; once a day", {"action": "call_rescue"}),
+    "plaza": ("plaza. the bulletin board, letters and parcels; it takes the hour but isn't one of your actions",
+              {"action": "plaza"}),
+}
+
+
 STYLE = """    classDef act fill:#e3f4e8,stroke:#2e8b57,color:#0b0b0b
     classDef item fill:#e3edfb,stroke:#3d7bd9,color:#0b0b0b
     classDef place fill:#fde9df,stroke:#d9623d,color:#0b0b0b
@@ -384,6 +468,29 @@ def species_tables(w: dict, kind: str) -> str:
 def extra(w: dict, N: dict, key: str) -> str:
     if key in ("FISH", "BUGS"):
         return species_tables(w, key)
+    if key == "SEND":
+        return """Sending is one thing, written the same way in the three places it can happen. Only the first is an
+action on the plan's list; the other two are part of that turn's reply.
+
+| where | how it's written | to whom | when it gets there | costs |
+|---|---|---|---|---|
+| a plan (new in version 21) | `{"hour": 10, "pick": {"action": "send", "at": "Jo", "items": {"wood": 2}, "note": "for your fence"}}` | any other villager, from wherever they are | the next morning | one of the day's actions and its hour |
+| a turn at the plaza | `"send": [{"action": "send", "at": "Jo", "items": {"wood": 2}, "note": "for your fence"}]`, as many as they like | any other villager | the next morning | nothing more than the hour at the plaza |
+| a turn in a conversation | `"send": {"action": "send", "items": {"wood": 2}}` | the one they're talking to | at once | nothing more than the line they say |
+
+- `"items"` alone is a parcel, a `"note"` alone is a letter (up to 350 characters), both is a parcel with a
+  note (up to 300). Bells go as `"bells"`. A conversation's send has no note: they are already talking.
+- Only what is in their pockets can be sent. A planned send that names something else isn't planned; at the
+  plaza or in a conversation it doesn't go through and they are told why.
+- By mail the things leave their pockets when it is sent. What doesn't fit in the other's pockets in the
+  morning is left at their home if there's room, and waits for them otherwise.
+- Things sent count as a gift either way: they close an open request for them, and both remember who gave
+  what to whom.
+- Before version 21 the plaza wrote `"letters": [{"to", "content"}]` and `"parcels": [{"to", "items", "note"}]`,
+  a conversation wrote `"give": {...}`, and a plan couldn't send at all. When each arrives hasn't changed.
+- In `events.jsonl` a planned send is an `action`, plus the same `parcel` or `message` record the plaza
+  writes; a parcel's arrival is a `gift` with `how: "by mail"`, a conversation's a `gift` with
+  `how: "in person"`."""
     if key == "SHELLS":
         total = sum(v[1] for v in w["shells"].values())
         rows = [f"| {k} | {v[1]} | {pct(v[1] / total)} |" for k, v in sorted(w["shells"].items(), key=lambda kv: -kv[1][1])]
@@ -404,11 +511,11 @@ def extra(w: dict, N: dict, key: str) -> str:
 
 HEAD = """# Every action, what it takes and what comes of it
 
-Prompt version 16 on. Each plan lists, numbered, the actions a villager can do then; this file shows,
-for every action in the game, what puts it on that list and what comes of doing it. How plans fit
-into a day and an hour is in [day_flow.md](day_flow.md); the code is `options.py` (the list) and
-`world.py` (what happens). Generated by `scripts/actions_doc.py` from `data/island_world.yaml`;
-rerun it after changing the world file or the rules.
+Prompt version 21 on. Each plan lists the actions a villager can do then, one line per kind of
+action; this file shows, for every action in the game, what puts it on that list and what comes of
+doing it. How plans fit into a day and an hour is in [day_flow.md](day_flow.md); the code is
+`options.py` (the list) and `world.py` (what happens). Generated by `scripts/actions_doc.py` from
+`data/island_world.yaml`; rerun it after changing the world file or the rules.
 
 Each action is a small graph with the action in the centre, what it takes on the left and what comes
 of it on the right. What it takes, on the left:
@@ -419,15 +526,92 @@ of it on the right. What it takes, on the left:
   holds wherever the plan takes them)
 - **yellow, "only if":** anything else that has to be true when they plan
 
+**A plan's pick has the same parts as the left of a chart.** A villager plans an action by naming
+it and what it takes:
+
+    {{"hour": 9, "pick": {{"action": "sell", "items": {{"sea bass": 2}}, "at": "Nook's Cranny"}}}}
+
+| in the pick | in the chart | what it is |
+|---|---|---|
+| `"action"` | green | the action's name, as in the headings below |
+| `"items"` | blue, "needs in pockets" | what it uses from their pockets, as `{{"<thing>": <how many>}}`; bells from the wallet are `"bells"` |
+| `"at"` | orange, "done at" | where: which rock, water, home, person or place |
+| `"what"` | yellow, the "one line per ..." | which one: the recipe, the thing in stock, the fund, the ordinance, the homesite |
+
+The plan's list starts with everything in their pockets and their wallet, and each action's line
+gives the choices for each part. A part with only one possibility can be left out (the shovel for
+`mine_rock`, the museum for `donate`); one with a choice has to be given (what to sell, which rock).
+What is bought or crafted is `"what"`: the bells and the materials are taken as the chart says.
+Something named in `"items"` that isn't in their pockets isn't planned, and their day says what
+they do carry for that action. Versions 16 to 20 picked from the same actions by number, one
+numbered line per rock, per thing, per villager.
+
+**The list a villager sees** starts with their pockets, then has one line per kind of action they
+can do in that plan, in the order of this file, then the places:
+
+    In your pockets (the only things that can go in "items"): axe x1, sea bass x2, wood x4; 300 bells in your wallet
+    - chop_wood. items: axe. at: hardwood tree | fruit tree
+    - sell. items: any of axe x1, sea bass x2, wood x4. at: Nook's Cranny
+    - donate. items: one of dace x1, sea bass x2. at: museum
+    - rest
+    Places: home, Jo's home, Resident Services, museum, Nook's Cranny, north, ...
+
+In a line, `any of` means any mix of those, `one of` means one kind, a plain name is used without
+being chosen, `and if you like` is something extra the action can use, and `a | b` separates the
+choices for `"at"` and `"what"`. The reply is asked for as
+`"actions": [{{"hour": <hour>, "pick": {{"action": "<action>", "items": {{"<thing>": <how many>}}, "at": "<where>", "what": "<which one>"}}}}, ...]`.
+
+**How a pick is read** (`read_actions` in `options.py`):
+
+| what the pick says | what happens |
+|---|---|
+| an action that isn't on this plan's list | not planned; their day lists the actions that are |
+| something in `"items"` that isn't in their pockets | the whole pick isn't planned; their day says what they carry for that action. For `craft`, what is kept at home counts too |
+| a part with one possibility left out | filled in: the shovel for `mine_rock`, the museum for `donate`, home for `craft` |
+| a part with a choice left out | not planned; their day gives the choices (`say where, "at": rock 1 \\| rock 3`) |
+| `sell` with no `"items"` | not planned; their day says what it takes (`say what and how many, "items": ... from sea bass x2, wood x4`) |
+| `contribute_bridge` with no bells | not planned; their day says how many it can take (`say how many bells, "items": {{"bells": <1 to 300>}}`) |
+| more than they carry, or more bells than allowed | cut down to what there is: selling 9 sea bass with 2 sells 2 |
+| a loose name | read as meant when only one thing fits: "bait" is fishing bait, "3" is rock 3, "Jo" is Jo's home, "Mine Rock" is `mine_rock`; the line's own wording, brackets and all, works too |
+| the thing in the other of `"items"` and `"what"` | read as meant: `donate` with `"what": "sea bass"`, `buy` with the thing under `"items"` |
+| an `"at"` that doesn't fit, for an action done in only one place | ignored |
+| a `"what"` that isn't one of the line's | not planned; their day gives the choices |
+| a bare number, as before version 21 | not planned; their day shows how a pick is written |
+
+Their day's line reads `08:00 in your plan, sell: you have no dace in your pockets; for this you
+carry sea bass x2, wood x4, so it wasn't planned`. It states what they have and what the action
+takes, and never suggests what to pick.
+
+**Where an action bends the shape.** Every action is picked this way; these differ from their
+chart in how:
+
+| action | how |
+|---|---|
+| `lay_path` | takes `"style"`, `"from"` and `"to"` next to `"action"`: two places don't fit in one `"at"` |
+| `craft` | the chart's blue box is the recipe's materials, but the pick names the recipe in `"what"`; the materials are taken from the pockets, then from home, without being named |
+| `buy`, `set_ordinance`, `move_house` | the blue box is bells from the wallet, but the price is fixed, so no `"bells"` in the pick; the thing chosen is `"what"` |
+| `pay_loan`, `contribute_bridge` | the bells are `"items": {{"bells": <how many>}}`; `pay_loan` pays all it can if they're left out |
+| `place`, `pick_up`, `buy` | how many is the number in `"items"` or `"what"` (`"what": {{"fishing bait": 2}}`), not a part of its own |
+| `plant`, `place` | `"at"` is any place from the list's `Places`, home if left out |
+| `ask` | `"at"` is a person (Tom Nook, Blathers), not a place |
+| `send` | also takes a `"note"`, and `"items"` can be left out (a letter); see its chart |
+| `plaza` | on the list and picked by name, with no parts; it takes the hour but isn't one of the day's actions |
+
+Not picked this way, because they aren't actions on the list: the rest of a plan's reply
+(`"home"`: putting things away or taking them out, `"energy"`, `"write"`, `"note"`); asking for
+something, trading and accepting in a conversation; the bulletin board at the plaza; and going
+after a bug or fish the hour it is spotted. Giving in a conversation, and letters and parcels at
+the plaza, are written as a `send`: see its chart.
+
 What comes of it, on the right:
 - **teal, "gives":** what they get, with its chance
 - **pink, "uses up":** what it costs them
 - **grey, "changes":** what changes for them or on the island, recipes learned included
 
 If anything it takes is missing, the action isn't on that plan's list; it shows up at a later plan
-once everything is there. "One line per ..." means the list has a separate numbered line for each
-one (each rock, each villager, each thing in stock). Above each graph is an example of the line the
-villager sees, and below it what can still make it fail when its hour comes: something that changed
+once everything is there. "One line per ..." means the action's line has a choice for each one (each
+rock, each villager, each thing in stock). Above each graph is an example of the line the villager
+sees and of a pick, and below it what can still make it fail when its hour comes: something that changed
 after the plan was made. Any action away from home can also fail if a ladder or vaulting pole broke
 on an earlier trip and the place is now out of reach. Anything that gives things gives only what
 fits in their pockets.
@@ -437,10 +621,10 @@ prices are jittered, and fish move to another water and other hours; the chances
 wood mix, shell, fish and bug weights, the bottle and the catch) stay as here. A tool wears by one use
 each time an action uses it, and breaks at {uses} uses.
 
-The list is in the order of this file. The 40 entries are 35 kinds of action (`fish` has a second
+The list is in the order of this file. The 41 entries are 36 kinds of action (`fish` has a second
 entry for fishing with bait, and `buy` has four: things, tools, recipe cards and clothes) plus the
 plaza, which takes the hour but isn't one of the day's actions. Proposing bridges and stairs, and a
-fund for each, are from prompt version 17; everything else from 16.
+fund for each, are from prompt version 17; everything else from 16. Picking by name, and `send`, are from 21.
 
 One action can fail on where the villager is rather than on the plan: a proposal is made where they
 stand at that hour, so it's on the list whenever a workable spot exists somewhere they can walk to,
@@ -458,9 +642,9 @@ flowchart TD
     classDef file fill:#f1f0ec,stroke:#8a8984,color:#0b0b0b
     classDef gate fill:#fdf3d6,stroke:#eda100,color:#0b0b0b
 
-    plan(["LLM: plan<br/>picks numbers for hours, adding a count,<br/>bells or a place where an option takes one"])
-    readable{"Number on the list,<br/>value allowed?"}
-    told["Dropped; their day says<br/>'in your plan, there is no 7 on your list,<br/>so it wasn't planned'"]
+    plan(["LLM: plan<br/>a pick for each hour:<br/>action, items, at, what"])
+    readable{"Action on the list, items in<br/>their pockets, choices allowed,<br/>nothing with a choice left out?"}
+    told["Dropped; their day says<br/>'in your plan, donate: you have no<br/>sea bass in your pockets,<br/>so it wasn't planned'"]
     hourq{"A free hour? awake, actions left<br/>today and in this plan; a shop or<br/>service pick goes in an hour it's open"}
     dropped["Dropped, with why"]
     sched["Scheduled"]
@@ -496,7 +680,9 @@ def main() -> None:
         for name, line, pockets, where, only, gives, uses, changes, fails, more in actions:
             k += 1
             out.append(f"### {k}. `{name}`\n")
-            out.append(f"On the list: *{line}*\n")
+            menu, pick = PLAN[name]
+            out.append(f"On the list: *{menu}*\n")
+            out.append("In a plan: `" + json.dumps({"hour": 9, "pick": pick}) + "`\n")
             out.append(graph(name, pockets, where, only, gives, uses, changes) + "\n")
             if more:
                 out.append(extra(w, N, more) + "\n")

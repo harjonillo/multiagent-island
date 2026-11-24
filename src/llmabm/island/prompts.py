@@ -116,6 +116,21 @@ PROMPT_CHANGES = {
         "night's last sentence say so; the page itself is asked for in the same words as before. The night no longer "
         "lists what changed hands today under a heading of its own: each gift and trade is already among the day's "
         "lines, once",
+    21: "picks by name, in the parts each chart in docs/actions.md has: a plan no longer picks numbers. Its list has "
+        "one line for each kind of action the villager can do right then (the same actions as before), saying what "
+        "it uses from their pockets (\"items\"), where it is done (\"at\") and which one when there are several "
+        "(\"what\": a recipe, something in stock, a fund), headed by everything in their pockets and their wallet. "
+        "A pick is {\"action\": \"sell\", \"items\": {\"wood\": 3}, \"at\": \"Nook's Cranny\"}; a part "
+        "with only one possibility can be left out (the shovel for mining, the museum for donating), and what is "
+        "bought or crafted is \"what\", its price and materials taken as before. Something named in \"items\" "
+        "that isn't in their pockets isn't planned, and their day says what they do carry for that action. Before, "
+        "selling was the one numbered line that needed \"items\" added, and no reply ever added them: nobody sold "
+        "anything. What can be done, and what each action does, is unchanged. Sending is one thing, written one "
+        "way: \"send\", with \"items\" from the pockets, a \"note\", or both. It is a new action on the plan's list "
+        "(to any villager, from wherever they are; it arrives the next morning, like a letter or parcel from the "
+        "plaza, and the things leave their pockets at once); a turn at the plaza writes its letters and parcels as "
+        "\"send\" (a note alone is a letter) and lists their pockets; and a conversation hands something over with "
+        "\"send\" where it wrote \"give\" (at once, as before). Asking, trading and the board are as they were",
 }
 
 ACTION_MENU = """Actions. Each takes one hour. Write each as JSON with the hour you want, e.g. {"hour": 9, "do": "fish", "where": "river"}. Fields marked ? are optional.
@@ -205,7 +220,13 @@ def action_catalogue(world: dict, version: int = PROMPT_VERSION) -> str:
                       f"built once {cfg['cost']} bells are "
                       f"donated at Resident Services; the island can have {cfg['max']} in all, the {world['bridge']['name']} "
                       "included, and you one proposal still being funded at a time\n")
-    return f"""Actions. Each takes one hour. When you plan, you get a numbered list of the actions you can do then, worked out from what you carry, your bells, where you can get to with the tools you carry, and opening hours; you plan by picking numbers. An action shows up on your list once you have what it needs. Every kind there is, and what it needs:
+    send = ("\n- send another villager a letter, things from your pockets, or both, from wherever you are: it "
+            "arrives the next morning" if version >= 21 else "")
+    how = ("a list of the actions you can do then, worked out from what you carry, your bells, where you can get to "
+           "with the tools you carry, and opening hours; you plan by naming actions from it" if version >= 21 else
+           "a numbered list of the actions you can do then, worked out from what you carry, your bells, where you can "
+           "get to with the tools you carry, and opening hours; you plan by picking numbers")
+    return f"""Actions. Each takes one hour. When you plan, you get {how}. An action shows up on your list once you have what it needs. Every kind there is, and what it needs:
 - mine a rock, dig for fossils, dig for manila clams on the beach, dig up a stump: a shovel
 - break a rock: a shovel, and {_a_word(fruit)} in your pockets, which you eat first
 - chop wood: an axe or a stone axe (the axe brings a tree down when it takes its last wood); shake a fruit tree: one with fruit on it
@@ -213,7 +234,7 @@ def action_catalogue(world: dict, version: int = PROMPT_VERSION) -> str:
 - beachcomb
 - plant: a sapling, {_a_word(fruit)} or flower seeds; put furniture or fencing outside, fence off your home, pick up what you put out; lay or take up a path
 - craft (at home): a recipe you know and what it needs; put furniture inside your home or take it out; put on clothes you carry
-- visit another villager at their home
+- visit another villager at their home{send}
 - Nook's Cranny (Timmy and Tommy): sell, buy things, tools and recipe cards; the Able Sisters: buy clothes; the museum (Blathers): donate, assess fossils; Resident Services (Tom Nook, Isabelle): upgrade your home, pay your loan, put bells toward the bridge, set an island ordinance, move your home; ask any of them what they do and what it costs
 - rest; call the Rescue Service (only when you can't get home with the tools you carry; once a day)
 {structures}Gathering anything needs room in your pockets. Not actions: talking, giving and trading happen when you meet someone (visit them to meet on purpose), and you walk wherever an action takes you. You can also spend a free hour at the plaza, which isn't one of your actions: the bulletin board, letters and parcels are there.
@@ -801,7 +822,18 @@ def plan_prompt(isl: Island, vil: Villager, a: int, b: int, n_actions: int, yest
         else:
             extra += ("\nYou can change today's energy plan if you want: "
                       '"energy": {"inward": <points>, "outward": <points>}.')
-    if v16:
+    if v16 and _v(isl) >= 21:  # the same list, one line per kind of action; picked by name
+        listed = (f"What you can do between {clock(a)} and {clock(b - 1)}, with what you carry and where you can get "
+                  "to (each takes one hour). Each line is an action and what it takes: \"items\" from your pockets, "
+                  f"where it's done (\"at\"), and which one (\"what\"):\n{options}\n\n")
+        ask = (f"Plan up to {n_actions} actions between {clock(a)} and {clock(b - 1)}, one per hour, each written as a "
+               "pick: the action's name, with the \"items\", \"at\" and \"what\" its line lists. A part its line "
+               "doesn't have is left out, and so can one with a single possibility. You may leave hours free and do "
+               "an action more than once. Give each an \"hour\" (0-23); something at a shop or service goes in the "
+               "nearest hour it's open. Things may not go as planned if someone else gets there first. ")
+        shape = ('"actions": [{"hour": <hour>, "pick": {"action": "<action>", "items": {"<thing>": <how many>}, '
+                 '"at": "<where>", "what": "<which one>"}}, ...], ')
+    elif v16:
         listed = (f"What you can do between {clock(a)} and {clock(b - 1)}, with what you carry and where you can get "
                   f"to (each takes one hour):\n{options}\n\n")
         ask = (f"Plan up to {n_actions} actions between {clock(a)} and {clock(b - 1)}, one per hour, by picking "
@@ -918,14 +950,18 @@ def plaza_prompt_v12(isl: Island, vil: Villager, hour: int, board: list) -> str:
         f"write letters (up to {LETTER_CHARS} characters each), and send parcels of things from your pockets. "
         "Letters and parcels arrive tomorrow morning. A post, a letter or a parcel doesn't bind anyone to anything: "
         "a trade only happens when you meet in person and both agree. Doing nothing is fine. Use \"bells\" as an "
-        "item name for money. Respond with one JSON object and nothing else:\n"
+        "item name for money. "
+        + ("Both are written as a \"send\": to whom (\"at\"), with \"items\" from your pockets, a \"note\", or both; "
+           f"a note alone is a letter. In your pockets right now: {pocket_summary(isl, vil)}\n" if _v(isl) >= 21 else "")
+        + "Respond with one JSON object and nothing else:\n"
         "{\n"
         '  "thoughts": "<your private reasoning; nobody else sees it>",\n'
-        '  "letters": [{"to": "<villager>", "content": "..."}],\n'
-        '  "board": "<post for everyone, or empty>",\n'
+        + ('  "send": [{"action": "send", "at": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],\n'
+           if _v(isl) >= 21 else '  "letters": [{"to": "<villager>", "content": "..."}],\n')
+        + '  "board": "<post for everyone, or empty>",\n'
         '  "take_down": ["<number of a post of yours, like b3>"],\n'
-        '  "parcels": [{"to": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],\n'
-        '  "note": "<optional private note to your future self>"\n'
+        + ("" if _v(isl) >= 21 else '  "parcels": [{"to": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],\n')
+        + '  "note": "<optional private note to your future self>"\n'
         "}"
     )
 
@@ -1011,7 +1047,9 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
         tries = TRADE_TRIES - trade_tries(turns) if v13 else None
         pick = "<item or bells>" if v13 else "<item or bells from your pockets>"
         if v18:  # every trade names who gives what to whom
-            options = (f"You can also give {other} something from your pockets now (\"give\"), ask {other} for "
+            giving = (f"give {other} something from your pockets now (\"send\", with its \"items\")" if _v(isl) >= 21
+                      else f"give {other} something from your pockets now (\"give\")")
+            options = (f"You can also {giving}, ask {other} for "
                        f"something (\"ask\"; open until they give or trade it, up to {REQUEST_DAYS} days)"
                        + (f", or offer a trade (\"trade\": what you give {other} and what {other} gives you; it "
                           f"happens only if {other} accepts, both at once)" if tries > 0 else "")
@@ -1034,7 +1072,9 @@ def encounter_prompt(isl: Island, vil: Villager, other: str, place: str, hour: i
         options += f"In your pockets right now: {pocket_summary(isl, vil)}\n"
         trade_shape = (f'{{"you give {other}": {{"{pick}": <qty>}}, "{other} gives you": {{"<item or bells>": <qty>}}}}'
                        if v18 else f'{{"give": {{"{pick}": <qty>}}, "want": {{"<item or bells>": <qty>}}}}')
-        fields = (f'"give": {{}} or {{"{pick}": <qty>}}, "ask": {{}} or {{"<item or bells>": <qty>}}, '
+        give_shape = (f'"send": {{}} or {{"action": "send", "items": {{"{pick}": <qty>}}}}' if _v(isl) >= 21
+                      else f'"give": {{}} or {{"{pick}": <qty>}}')
+        fields = (f'{give_shape}, "ask": {{}} or {{"<item or bells>": <qty>}}, '
                   + (f'"trade": {{}} or {trade_shape}, ' if tries is None or tries > 0 else "")
                   + ('"accept": true | false, ' if table and table["proposer"] == other
                      and (tries is None or not isl.accept_problem(vil.name, table)) else ""))

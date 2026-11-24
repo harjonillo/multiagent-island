@@ -141,7 +141,7 @@ ORDINANCE_TEXT = {
 TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_clam": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
             "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 20  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+LATEST_PROMPT_VERSION = 21  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
 AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
 CLAM, BAIT = "manila clam", "fishing bait"  # dug on the beach (dig_clam); one clam crafts one bait
@@ -1334,6 +1334,27 @@ class Island:
         if problems:
             msg += " (" + "; ".join(problems) + ")"
         return bool(sold), msg
+
+    def _do_send(self, vil, a, hour):
+        """Prompt version 21: a letter, things from the pockets, or both, to another villager. Like a letter or
+        parcel from the plaza: the things leave now and it all arrives the next morning."""
+        to = next((n for n in self.v if n.lower() == str(a.get("to", "")).strip().lower()), None)
+        note = str(a.get("note") or "").strip()
+        items = {str(k).lower(): int(n) for k, n in (a.get("items") or {}).items() if int(n) > 0}
+        if to is None or to == vil.name:
+            return False, "there's no one called that to send it to"
+        if items:
+            parcel = self.take_items(vil, items)
+            if parcel is None:
+                return False, f"you don't have all of that in your pockets any more ({_fmt(Counter(items))})"
+            self.mail.append({"kind": "parcel", "from": vil.name, "to": to, "sent_day": self.day, "parcel": parcel,
+                              "note": note[:300]})
+            return True, (f"sent {to} a parcel: {', '.join(f'{n} {k}' for k, n in items.items())}"
+                          + (f' ("{note[:300]}")' if note else "") + "; it arrives tomorrow morning")
+        if not note:
+            return False, "nothing to send: no items and no note"
+        self.mail.append({"kind": "letter", "from": vil.name, "to": to, "sent_day": self.day, "text": note})
+        return True, f'sent {to} a letter: "{note}"; it arrives tomorrow morning'
 
     def tools_for_sale(self) -> dict[str, int]:
         """Ready-made tools at Nook's Cranny (worlds with `tool_markup`): every tool, always, at its sell value times

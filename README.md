@@ -323,6 +323,32 @@ is moved to the nearest hour it's open. The island rules now list every kind of 
 it needs, so villagers know what exists before it's on their list. Every action, the checks that put it on the list and what comes of it
 are charted in [docs/actions.md](docs/actions.md).
 
+**Picks by name, from prompt version 21.** Through version 20 the one numbered line that needed
+something added to it, `sell` (which things, how many), was never written with it: in `runs/test1`
+all 11 sell picks came back as a bare number and were dropped, so nobody sold anything. Now a plan
+names each action and what it takes, in the three parts each chart in
+[docs/actions.md](docs/actions.md) has on its left:
+`{"hour": 9, "pick": {"action": "sell", "items": {"sea bass": 2}, "at": "Nook's Cranny"}}`.
+`"items"` is what it uses from their pockets (bells from the wallet are `"bells"`), `"at"` where it
+is done (which rock, water, home, person or place), `"what"` which one of several (a recipe,
+something in stock, a fund, an ordinance, a homesite). The list is the same set of actions, worked
+out the same way, as one line per kind of action with the choices for each part, headed by
+everything in their pockets and their wallet:
+`- donate. items: one of dace x1, sea bass x2. at: museum`. A part with only one possibility can be
+left out (the shovel for `mine_rock`, the museum for `donate`); one with a choice has to be given.
+Something named in `"items"` that isn't in their pockets isn't planned, and their day says what
+they do carry for that action. What each action does is unchanged: donating, planting and wearing
+still take one thing an hour, and selling any mix.
+
+**Sending, also from version 21,** is one thing written one way wherever it happens: `"send"`, with
+`"items"` from the pockets, a `"note"`, or both. It is a new action on the plan's list
+(`{"action": "send", "at": "Fen", "items": {"wood": 2}, "note": "for your fence"}`), to any villager
+from wherever they are; the things leave at once and it arrives the next morning, the same as a
+letter or parcel from the plaza, which before was the only way to send one. A turn at the plaza
+writes its letters and parcels as `"send"` (a note alone is a letter), and a conversation hands
+something over with `"send": {"action": "send", "items": {...}}` where it wrote `"give"`; that
+still happens at once. Asking, trading and the board are unchanged.
+
 **More bridges, and stairs, from prompt version 17.** Anyone can propose a bridge across the river
 or stairs up a cliff, right where they stand (`propose_bridge`, `propose_stairs`): free, taking the
 hour. The island picks the nearest workable spot within 8 tiles, at least 6 tiles from any other

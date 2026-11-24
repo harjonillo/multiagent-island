@@ -78,14 +78,52 @@ def _picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
     return out
 
 
+def _named_picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
+    """Prompt version 21: an action from the villager's list for each hour, written by name with the parts its
+    line lists: "items" from the pockets, "at" and "what" where there is a choice."""
+    block = prompt.split("which one (\"what\"):\n", 1)[1].split("\n\n", 1)[0]
+    lines = [ln[2:] for ln in block.splitlines() if ln.startswith("- ")]
+    places = re.findall(r"^Places: (.*)$", block, re.M)
+    places = places[0].split(", ") if places else ["home"]
+    bare = lambda x: re.sub(r"\s*\(.*$", "", x).strip()  # noqa: E731
+    out = []
+    for h in hours:
+        head, *parts = rng.choice(lines).split(". ")
+        pick: dict = {"action": bare(head)}
+        for part in parts:
+            key, _, val = part.partition(": ")
+            if key == "items" and val.startswith("any of "):
+                k, _, c = rng.choice(val[7:].split(", ")).rpartition(" x")
+                pick["items"] = {k: rng.randint(1, int(c))}
+            elif key == "items" and "one of " in val:
+                k, _, c = rng.choice(val.split("one of ", 1)[1].split(", ")).rpartition(" x")
+                pick["items"] = {k: 1}
+            elif key == "items" and (m := re.match(r"bells, 1 to (\d+)", val)):
+                pick["items"] = {"bells": rng.randint(1, int(m.group(1)))}
+            elif key == "at":
+                pick["at"] = rng.choice(places) if val.startswith("a place from") else rng.choice(val.split(" | "))
+            elif key == "what":
+                pick["what"] = rng.choice(re.sub(r" \(for more than one.*$", "", val).split(" | "))
+            elif key.startswith("also") and '"to": a place' in part:
+                pick["to"] = rng.choice(places)
+            elif key.startswith('also "note"'):
+                if rng.random() < 0.5:
+                    pick.pop("items", None)
+                pick["note"] = "thinking of you"
+        out.append({"hour": h, "pick": pick})
+    return out
+
+
 def plan_reply(prompt: str, rng: random.Random) -> str:
     m = re.search(r"Plan up to (\d+) actions between (\d+):00 and (\d+):00", prompt)
     n, a, b = int(m.group(1)), int(m.group(2)), int(m.group(3))
     window = list(range(a, b + 1)) if a <= b else list(range(a, 24)) + list(range(0, b + 1))  # wraps past midnight
     hours = rng.sample(window, min(n, len(window)))
     hours.sort(key=window.index)
-    if "by picking numbers from the list" in prompt:  # prompt version 16
-        out = {"thoughts": "picking from the list", "actions": _picks(prompt, hours, rng),
+    named = "each written as a pick" in prompt  # prompt version 21
+    if named or "by picking numbers from the list" in prompt:  # prompt version 16
+        out = {"thoughts": "picking from the list",
+               "actions": (_named_picks if named else _picks)(prompt, hours, rng),
                "note": "" if rng.random() < 0.8 else "the rocks went fast today"}
         if '"write": true | false' in prompt and rng.random() < 0.2:
             out["write"] = rng.random() < 0.6
@@ -218,6 +256,10 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
         if (spare or inv) and rng.random() < 0.2:
             k = rng.choice(spare or list(inv))
             out["parcels"].append({"to": rng.choice(others), "items": {k: 1}, "note": "thought you could use this"})
+    if '"send": [' in prompt:  # prompt version 21: letters and parcels, both written as a send
+        out["send"] = ([{"action": "send", "at": m["to"], "note": m["content"]} for m in out.pop("letters")]
+                       + [{"action": "send", "at": m["to"], "items": m["items"], "note": m["note"]}
+                          for m in out.pop("parcels")])
     return json.dumps(out)
 
 
@@ -260,6 +302,8 @@ def encounter_reply(prompt: str, rng: random.Random) -> str:
         m = re.search(r'"trade": \{\} or \{"(you give [^"]+)": .*?"([^"]+ gives you)"', prompt)  # prompt version 18
         out["trade"] = {m.group(1): give, m.group(2): want} if m else {"give": give, "want": want}
         out["say"] = "Want to swap?"
+    if '"send": {} or' in prompt and "give" in out:  # prompt version 21: a gift is written as a send
+        out["send"] = {"action": "send", "items": out.pop("give")}
     return json.dumps(out)
 
 

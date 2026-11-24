@@ -46,7 +46,7 @@ from .energy import EnergyAccount, MentalEnergy
 from .villager_files import prompt_dir
 from .memory import (DEFAULTS as MEMORY_DEFAULTS, consolidate, consolidate_recalled, forget, recall, record_key,
                      retrieval, settings as memory_settings, split_picks)
-from .options import options_text, plan_options, read_picks, unread_line
+from .options import menu_text, options_text, plan_options, read_actions, read_picks, unread_line
 from .grid import GridSpace
 from .body import Bodies
 from .npc import ISABELLE
@@ -1183,6 +1183,10 @@ class IslandSimulation:
         if self.v12 and obj.get("accept") is True:
             self._accept_trade(d, speaker, other, open_trade(turns or []), acts, said)
         give = obj.get("give")
+        if self.prompt_version >= 21 and obj.get("send"):  # one way of writing it everywhere: "send", with "items"
+            sent = obj["send"][0] if isinstance(obj["send"], list) else obj["send"]
+            if isinstance(sent, dict):
+                give = sent.get("items") if ("items" in sent or "action" in sent) else sent
         if isinstance(give, dict) and _clean_side(give):
             items = isl.resolve_side(speaker, _clean_side(give))
             ok, what = isl.transfer(speaker, other, items)
@@ -1373,6 +1377,7 @@ class IslandSimulation:
             isl.map_text = self.space.map_text(isl)
         # From version 16 each villager picks from a list of what they can do, made here, before anyone acts.
         v16 = getattr(self, "prompt_version", 1) >= 16
+        v21 = getattr(self, "prompt_version", 1) >= 21  # the same list, picked by name: action, items, at, what
         options = {n: plan_options(isl, self.bodies, self.space, n, slot[n][1]) for n in who} if v16 else {}
 
         # An even share of the actions left, rounded up; fixed windows had no shares.
@@ -1387,7 +1392,8 @@ class IslandSimulation:
             user = plan_prompt(isl, vil, awake[0], awake[-1] + 1, min(shares[name] or left, len(awake)), self.isl.v[name].yesterday,
                                announcement=self.first_plan[name], noticed=self.isl.v[name].noticed[-8:],
                                choices=self.isl.v[name].choices,
-                               options=options_text(options[name], isl, name, self.space) if v16 else None)
+                               options=(menu_text if v21 else options_text)(options[name], isl, name, self.space)
+                               if v16 else None)
             if not self.isl.v[name].can_read(user):
                 return TIRED
             self.first_plan[name] = False
@@ -1433,7 +1439,11 @@ class IslandSimulation:
             reply, obj, err = results[name]
             acts = [x for x in (obj or {}).get("actions", []) if isinstance(x, dict)] if obj else []
             unread = []
-            if v16:  # picks by number, as the actions they stand for
+            if v21:  # picks by name; what they name from their pockets has to be there
+                acts, unread = read_actions(options[name], acts, isl.v[name].inventory,
+                                            isl.v[name].home_items if isl.split_home() else None)
+                isl.v[name].today.extend(unread_line(a, u) for u in unread)
+            elif v16:  # picks by number, as the actions they stand for
                 acts, unread = read_picks(options[name], acts)
                 isl.v[name].today.extend(unread_line(a, u) for u in unread)
             scheduled, dropped = self._assign_hours(name, acts, awake[0], awake[-1] + 1, cap=shares[name])
@@ -1559,6 +1569,13 @@ class IslandSimulation:
             log("action", day=d, agent=name, action=act, location=self.isl.v[name].body.place, ok=ok, result=res,
                 delta=self._delta(vil, before_v), pools_delta=_pools_delta(before_p, isl.pools()),
                 at=list(self.isl.v[name].body.pos) if self.isl.v[name].body.pos else None)
+            if ok and act.get("do") == "send":  # version 21: the same records as a letter or parcel from the plaza
+                if act.get("items"):
+                    log("parcel", day=d, round=None, sender=name, recipient=act["to"], items=act["items"],
+                        note=str(act.get("note") or "")[:300], arrives_day=d + 1)
+                else:
+                    log("message", day=d, round=None, sender=name, recipient=act["to"], content=act.get("note", ""),
+                        arrives_day=d + 1)
         # A free hour set aside for the plaza (version 7): walk there and take a turn.
         plaza_line: dict[str, int] = {}
         if to_plaza:
@@ -1769,6 +1786,16 @@ class IslandSimulation:
                 log("offer_update", **asdict(o))
                 isl.v[o.sender].inbox.append(f"(day {d}) {name} turned down your offer [{o.id}]" + (f': "{note}"' if note else ""))
 
+        if self.prompt_version >= 21:  # "send": things are a parcel (with its note), a note alone is a letter
+            sends = obj.get("send") or []
+            for m in ([sends] if isinstance(sends, dict) else sends if isinstance(sends, list) else []):
+                if not isinstance(m, dict):
+                    continue
+                to, text = m.get("at", m.get("to")), m.get("note", m.get("content"))
+                if isinstance(m.get("items"), dict) and _clean_side(m["items"]):
+                    obj.setdefault("parcels", []).append({"to": to, "items": m["items"], "note": text})
+                else:
+                    obj.setdefault("letters", []).append({"to": to, "content": text})
         for m in obj.get("letters") or obj.get("messages") or []:  # letters arrive tomorrow morning
             if not isinstance(m, dict):
                 continue

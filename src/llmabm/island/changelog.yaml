@@ -2,6 +2,18 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-24 12:00
+  what: Prompt version 21, plans pick actions by name
+  when: new runs from now on, or a run resumed with --prompt-version 21
+  details:
+    - "why: selling was the one numbered line that needed something added (which things, how many), and no reply ever added it. In test1 all 11 sell picks on days 11 to 14 were dropped, so nobody has sold anything"
+    - "a pick names the action and what it takes, in the parts each chart in docs/actions.md has: \"items\" from their pockets (bells from the wallet are \"bells\"), \"at\" where it is done, \"what\" which one of several (a recipe, something in stock, a fund)"
+    - "the plan's list: the same actions as before, one line per kind of action with the choices for each part, headed by everything in their pockets and their wallet"
+    - "a part with only one possibility can be left out (the shovel for mining, the museum for donating). One with a choice has to be given"
+    - "something named in \"items\" that isn't in their pockets isn't planned, and their day says what they do carry for that action"
+    - "what each action does is unchanged: donating, planting and wearing still take one thing an hour"
+    - "sending is one thing, written one way: \"send\", with \"items\" from the pockets, a \"note\", or both. New: it is an action on the plan's list, to any villager from wherever they are, arriving the next morning. Before, a letter or parcel needed an hour at the plaza"
+    - "a turn at the plaza writes letters and parcels as \"send\" (a note alone is a letter), and a conversation hands something over with \"send\" where it wrote \"give\". When they happen is unchanged: at once in person, the next morning by mail"
 - time: 2026-11-22 12:00
   what: Prompt version 20, memory by retrieval; villagers and NPCs as classes
   when: new runs from now on, or a run resumed with --prompt-version 20
