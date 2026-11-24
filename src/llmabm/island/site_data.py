@@ -15,8 +15,20 @@ from collections import Counter
 from pathlib import Path
 
 from ..analysis import Run, load_run
-from .analysis import (RESOURCES, _side, action_mix, assets, extraction_shares, gini, hhi, llm_calls, net_worth,
-                       reply_errors, run_out, snapshots)
+from .analysis import (
+    RESOURCES,
+    _side,
+    action_mix,
+    assets,
+    extraction_shares,
+    gini,
+    hhi,
+    llm_calls,
+    net_worth,
+    reply_errors,
+    run_out,
+    snapshots,
+)
 from .world import CATEGORIES, CLAM, FOSSIL, clock, sell_prices
 
 VERSION = 12  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
@@ -29,11 +41,25 @@ VERSION = 12  # 2: per-day detail for the Days tab; 3: interactions for the Soci
 # Why actions failed, matched on the result text; the first match wins.
 FAIL_BUCKETS = [
     ("Not enough materials to craft", ("not enough materials",)),
-    ("Can't get there with the tools carried", ("can't get to", "from here with the tools", "couldn't find a way")),
+    (
+        "Can't get there with the tools carried",
+        ("can't get to", "from here with the tools", "couldn't find a way"),
+    ),
     ("Museum only takes fish, bugs, fossils", ("Blathers only",)),
-    ("Has no tool for it", ("you have no shovel", "you have no axe", "you have no fishing rod", "you have no net")),
+    (
+        "Has no tool for it",
+        (
+            "you have no shovel",
+            "you have no axe",
+            "you have no fishing rod",
+            "you have no net",
+        ),
+    ),
     ("Shop closed", ("closed",)),
-    ("Rock or spot already empty", ("nothing more", "mined out", "picked clean", "no dig spots", "no clam spots")),
+    (
+        "Rock or spot already empty",
+        ("nothing more", "mined out", "picked clean", "no dig spots", "no clam spots"),
+    ),
     ("Has a loan to pay off first", ("paid off first",)),
     ("Can't afford it", ("bells; you have",)),
     ("Not in stock today", ("not for sale",)),
@@ -42,7 +68,16 @@ FAIL_BUCKETS = [
 ]
 
 # One character per tile, for the page to paint.
-TILE = {"sea": "s", "sand": "a", "river": "r", "rocky": "k", "bridge": "b", "t1": "1", "t2": "2", "t3": "3"}
+TILE = {
+    "sea": "s",
+    "sand": "a",
+    "river": "r",
+    "rocky": "k",
+    "bridge": "b",
+    "t1": "1",
+    "t2": "2",
+    "t3": "3",
+}
 
 
 def fail_bucket(result: str) -> str:
@@ -76,37 +111,84 @@ def map_data(run: Run) -> dict:
         row = []
         for x in range(g.W):
             t = g.terrain[y][x]
-            key = ("sea" if t == SEA else "sand" if t == SAND else "river" if t in (RIVER, POND)
-                   else "bridge" if t == BRIDGE else "rocky" if t == ROCKY else f"t{g.tier[y][x]}")
+            key = (
+                "sea"
+                if t == SEA
+                else (
+                    "sand"
+                    if t == SAND
+                    else (
+                        "river"
+                        if t in (RIVER, POND)
+                        else (
+                            "bridge"
+                            if t == BRIDGE
+                            else "rocky" if t == ROCKY else f"t{g.tier[y][x]}"
+                        )
+                    )
+                )
+            )
             row.append(TILE[key])
         rows.append("".join(row))
     for b in g.buildings.values():
         for x, y in b["cells"]:
-            rows[y] = rows[y][:x] + ("B" if b.get("blocking", True) else "P") + rows[y][x + 1:]
-    centre = lambda cells: [round(sum(c[0] for c in cells) / len(cells), 2), round(sum(c[1] for c in cells) / len(cells), 2)]  # noqa: E731
+            rows[y] = (
+                rows[y][:x]
+                + ("B" if b.get("blocking", True) else "P")
+                + rows[y][x + 1 :]
+            )
+    centre = lambda cells: [
+        round(sum(c[0] for c in cells) / len(cells), 2),
+        round(sum(c[1] for c in cells) / len(cells), 2),
+    ]  # noqa: E731
     return {
-        "W": g.W, "H": g.H, "tiles": rows,
-        "buildings": [{"name": n, "x": centre(b["cells"])[0], "top": min(c[1] for c in b["cells"]),
-                       "cells": [list(c) for c in b["cells"]]} for n, b in g.buildings.items()],
-        "sites": {sid: {"centre": centre(s["cells"]), "cells": [list(c) for c in s["cells"]]} for sid, s in g.sites.items()},
+        "W": g.W,
+        "H": g.H,
+        "tiles": rows,
+        "buildings": [
+            {
+                "name": n,
+                "x": centre(b["cells"])[0],
+                "top": min(c[1] for c in b["cells"]),
+                "cells": [list(c) for c in b["cells"]],
+            }
+            for n, b in g.buildings.items()
+        ],
+        "sites": {
+            sid: {"centre": centre(s["cells"]), "cells": [list(c) for c in s["cells"]]}
+            for sid, s in g.sites.items()
+        },
         "bridge": [list(c) for c in g.bridge_cells],
     }
 
 
 def _objects(snap: dict) -> dict:
     o = snap.get("objects") or {}
-    return {"trees": o.get("trees", []), "rocks": o.get("rocks", []), "paths": [p[:2] for p in o.get("paths", [])],
-            "placed": [p[:2] for p in o.get("placed", [])], "flowers": [f[:2] for f in o.get("flowers", [])],
-            "bridge_open": bool(o.get("bridge_open")),
-            "bridge_cells": o.get("bridge_cells"),  # prompt version 17: the first bridge's 3-wide footprint
-            "structures": o.get("structures", [])}  # prompt version 17: [kind, cells, built, fund, name]
+    return {
+        "trees": o.get("trees", []),
+        "rocks": o.get("rocks", []),
+        "paths": [p[:2] for p in o.get("paths", [])],
+        "placed": [p[:2] for p in o.get("placed", [])],
+        "flowers": [f[:2] for f in o.get("flowers", [])],
+        "bridge_open": bool(o.get("bridge_open")),
+        "bridge_cells": o.get(
+            "bridge_cells"
+        ),  # prompt version 17: the first bridge's 3-wide footprint
+        "structures": o.get("structures", []),
+    }  # prompt version 17: [kind, cells, built, fund, name]
 
 
 def _act(t: dict, e: dict) -> str:
     """What a conversation turn did, naming who gives what to whom (prompts.act_record)."""
     from .prompts import act_record
 
-    return act_record(t, next((v for v in e.get("villagers", []) if v != t["speaker"]), "")) if t.get("act") else ""
+    return (
+        act_record(
+            t, next((v for v in e.get("villagers", []) if v != t["speaker"]), "")
+        )
+        if t.get("act")
+        else ""
+    )
 
 
 FELLED = ("brought the tree down", "chopped down")  # chop results that left a stump
@@ -118,7 +200,12 @@ def _near(at, objs, ok, taken) -> tuple | None:
     for o in objs:
         pos = (o[0], o[1])
         dist = max(abs(pos[0] - at[0]), abs(pos[1] - at[1]))
-        if dist <= 1 and ok(o) and pos not in taken and (best is None or dist < best[0]):
+        if (
+            dist <= 1
+            and ok(o)
+            and pos not in taken
+            and (best is None or dist < best[0])
+        ):
             best = (dist, pos)
     return best[1] if best else None
 
@@ -126,8 +213,11 @@ def _near(at, objs, ok, taken) -> tuple | None:
 def tree_history(run: Run) -> dict[tuple, list[tuple]]:
     """Who planted and who felled each tree, by tile: {(x, y): [(day, "planted" | "felled", who), ...]}.
     Rebuilt from the log alone: a villager stands next to the tree they plant or chop, so each planting and
-    each felling is matched to the nearest sapling or stump one tile away in that day's snapshot."""
-    snaps = {s["day"]: (s.get("objects") or {}).get("trees", []) for s in snapshots(run)}
+    each felling is matched to the nearest sapling or stump one tile away in that day's snapshot.
+    """
+    snaps = {
+        s["day"]: (s.get("objects") or {}).get("trees", []) for s in snapshots(run)
+    }
     hist: dict[tuple, list[tuple]] = {}
     taken: dict[int, set] = {}
     for e in run.of("action"):
@@ -170,10 +260,20 @@ def _rock_notes(run: Run) -> dict[int, dict[int, str]]:
             bits = [f"rock {num}"]
             if num == money:
                 bits.append("the money rock that day (bells instead of materials)")
-            bits.append(f"{n_left} of {hits} hits left at the end of the day" if n_left else "mined out that day")
+            bits.append(
+                f"{n_left} of {hits} hits left at the end of the day"
+                if n_left
+                else "mined out that day"
+            )
             who = miners.get((d, num))
             if who:
-                bits.append("mined by " + ", ".join(f"{n}" + (f" x{k}" if k > 1 else "") for n, k in who.most_common()))
+                bits.append(
+                    "mined by "
+                    + ", ".join(
+                        f"{n}" + (f" x{k}" if k > 1 else "")
+                        for n, k in who.most_common()
+                    )
+                )
             out.setdefault(d, {})[num] = "; ".join(bits)
     return out
 
@@ -182,12 +282,21 @@ def _object_info(snap: dict, hist: dict, rocks: dict) -> list[list]:
     """What each thing on the map is, for hovering: [[x, y, text], ...], at the end of `snap`'s day."""
     d, o = snap["day"], snap.get("objects") or {}
     info = []
-    names = {"hardwood": "hardwood tree", "fruit": "fruit tree", "sapling": "sapling", "stump": "stump"}
+    names = {
+        "hardwood": "hardwood tree",
+        "fruit": "fruit tree",
+        "sapling": "sapling",
+        "stump": "stump",
+    }
     for t in o.get("trees", []):
         x, y, kind = t[0], t[1], t[2]
         past = [h for h in hist.get((x, y), []) if h[0] <= d]
         planted = next((h for h in reversed(past) if h[1] == "planted"), None)
-        felled = next((h for h in reversed(past) if h[1] == "felled"), None) if kind == "stump" else None
+        felled = (
+            next((h for h in reversed(past) if h[1] == "felled"), None)
+            if kind == "stump"
+            else None
+        )
         bits = [names.get(kind, kind)]
         if planted:
             bits.append(f"planted by {planted[2]} on day {planted[0]}")
@@ -198,10 +307,25 @@ def _object_info(snap: dict, hist: dict, rocks: dict) -> list[list]:
         if r:
             info.append([r[0], r[1], rocks.get(d, {}).get(i + 1, f"rock {i + 1}")])
     for x, y, item, kind, owner in o.get("placed", []):
-        info.append([x, y, f"{item}" + (f" ({kind})" if kind not in ("furniture",) else "") + f", put here by {owner}"])
+        info.append(
+            [
+                x,
+                y,
+                f"{item}"
+                + (f" ({kind})" if kind not in ("furniture",) else "")
+                + f", put here by {owner}",
+            ]
+        )
     for x, y, kind, owner, bloomed in o.get("flowers", []):
-        info.append([x, y, f"{kind}, " + (f"planted by {owner}" if owner else "growing wild")
-                     + (", in bloom" if bloomed else ", not blooming yet")])
+        info.append(
+            [
+                x,
+                y,
+                f"{kind}, "
+                + (f"planted by {owner}" if owner else "growing wild")
+                + (", in bloom" if bloomed else ", not blooming yet"),
+            ]
+        )
     for x, y, style, owner in o.get("paths", []):
         info.append([x, y, f"{style} path" + (f", laid by {owner}" if owner else "")])
     return info
@@ -217,11 +341,21 @@ def days_data(run: Run) -> list[dict]:
         st = starts.get(d, {})
         objects = _objects(snap)
         objects["info"] = _object_info(snap, hist, rocks)
-        out.append({"day": d, "date": _short_date(st.get("date", "")), "season": st.get("season", ""),
-                    "weather": st.get("weather", ""), "homes": snap.get("homes", {}),
-                    "home_areas": snap.get("home_areas", {}), "objects": objects,
-                    "houses": {n: levels[v["house"]]["name"] for n, v in snap["villagers"].items()},
-                    "bridge_fund": snap.get("bridge_fund", 0)})
+        out.append(
+            {
+                "day": d,
+                "date": _short_date(st.get("date", "")),
+                "season": st.get("season", ""),
+                "weather": st.get("weather", ""),
+                "homes": snap.get("homes", {}),
+                "home_areas": snap.get("home_areas", {}),
+                "objects": objects,
+                "houses": {
+                    n: levels[v["house"]]["name"] for n, v in snap["villagers"].items()
+                },
+                "bridge_fund": snap.get("bridge_fund", 0),
+            }
+        )
     return out
 
 
@@ -241,25 +375,59 @@ def home_data(run: Run) -> dict:
     mail = run.of("message") + run.of("parcel")
     species = sum(len(world[c]) for c in CATEGORIES)
     in_museum = sum(len(last["museum"][c]) for c in CATEGORIES)
-    bridge_by = {n: c.get("bridge_bells", 0) for n, c in last["collected"].items() if c.get("bridge_bells")}
-    paid = ", ".join(f"{n} {b:,}" for n, b in sorted(bridge_by.items(), key=lambda kv: -kv[1])) or "nobody yet"
+    bridge_by = {
+        n: c.get("bridge_bells", 0)
+        for n, c in last["collected"].items()
+        if c.get("bridge_bells")
+    }
+    paid = (
+        ", ".join(
+            f"{n} {b:,}" for n, b in sorted(bridge_by.items(), key=lambda kv: -kv[1])
+        )
+        or "nobody yet"
+    )
     kpis = [
-        {"label": "Actions", "v": f"{len(acts):,}", "sub": f"{len(failed) / max(1, len(acts)):.0%} failed"},
-        {"label": "Conversations", "v": f"{len(talked):,}",
-         "sub": f"from {len(run.of('encounter_decision')):,} times someone noticed someone"},
-        {"label": "Letters and parcels", "v": f"{len(mail):,}", "sub": f"plus {len(run.of('board'))} board posts"},
-        {"label": "Trades", "v": f"{len(run.of('trade')):,}", "sub": f"from {len(run.of('offer')) + len(run.of('trade_proposed'))} offers"},
+        {
+            "label": "Actions",
+            "v": f"{len(acts):,}",
+            "sub": f"{len(failed) / max(1, len(acts)):.0%} failed",
+        },
+        {
+            "label": "Conversations",
+            "v": f"{len(talked):,}",
+            "sub": f"from {len(run.of('encounter_decision')):,} times someone noticed someone",
+        },
+        {
+            "label": "Letters and parcels",
+            "v": f"{len(mail):,}",
+            "sub": f"plus {len(run.of('board'))} board posts",
+        },
+        {
+            "label": "Trades",
+            "v": f"{len(run.of('trade')):,}",
+            "sub": f"from {len(run.of('offer')) + len(run.of('trade_proposed'))} offers",
+        },
         {"label": "Museum", "v": f"{in_museum}", "sub": f"of {species} species"},
-        {"label": "Bridge fund", "v": f"{last['bridge_fund']:,}",
-         "sub": f"of {world['bridge']['cost']:,}" + (" · built" if last["bridge_built"] else f" · {paid}")},
+        {
+            "label": "Bridge fund",
+            "v": f"{last['bridge_fund']:,}",
+            "sub": f"of {world['bridge']['cost']:,}"
+            + (" · built" if last["bridge_built"] else f" · {paid}"),
+        },
     ]
 
     paths = Counter(p[3] for p in (last.get("objects") or {}).get("paths", []) if p[3])
     planted = sum(c.get("planted", 0) for c in last["collected"].values())
     cut = sum(c.get("trees_removed", 0) for c in last["collected"].values())
-    caption = (f"The island now: homes, {sum(paths.values())} tiles of path"
-               + (" (" + ", ".join(f"{n} {k}" for n, k in paths.most_common()) + ")" if paths else "")
-               + f", {planted} saplings planted, {cut} trees cut down.")
+    caption = (
+        f"The island now: homes, {sum(paths.values())} tiles of path"
+        + (
+            " (" + ", ".join(f"{n} {k}" for n, k in paths.most_common()) + ")"
+            if paths
+            else ""
+        )
+        + f", {planted} saplings planted, {cut} trees cut down."
+    )
 
     on_loan = [sum(1 for v in s["villagers"].values() if v["loan"] > 0) for s in snaps]
     trends = [
@@ -270,7 +438,10 @@ def home_data(run: Run) -> dict:
     ]
 
     fails = Counter(fail_bucket(a["result"]) for a in failed)
-    fail_rows = [{"label": b, "n": n} for b, n in sorted(fails.items(), key=lambda kv: (kv[0] == "Other", -kv[1]))]
+    fail_rows = [
+        {"label": b, "n": n}
+        for b, n in sorted(fails.items(), key=lambda kv: (kv[0] == "Other", -kv[1]))
+    ]
 
     sightings = Counter(e["agent"] for e in run.of("sighting") for _ in e["seen"])
     talk, spent = Counter(), Counter()
@@ -283,14 +454,18 @@ def home_data(run: Run) -> dict:
     villagers = []
     for n in names:
         s = last["villagers"][n]
-        villagers.append({
-            "name": n, "home": (last.get("home_areas") or {}).get(n, ""),
-            "house": levels[s["house"]]["name"] + (f", {s['loan']:,} loan" if s["loan"] else ""),
-            "assets": [assets(sn["villagers"][n]) for sn in snaps],
-            "spotted": sightings[n],
-            "talk_share": round(talk[n] / spent[n], 3) if spent[n] else None,
-            "top": [[k.replace("_", " "), v] for k, v in mix[n].most_common(3)],
-        })
+        villagers.append(
+            {
+                "name": n,
+                "home": (last.get("home_areas") or {}).get(n, ""),
+                "house": levels[s["house"]]["name"]
+                + (f", {s['loan']:,} loan" if s["loan"] else ""),
+                "assets": [assets(sn["villagers"][n]) for sn in snaps],
+                "spotted": sightings[n],
+                "talk_share": round(talk[n] / spent[n], 3) if spent[n] else None,
+                "top": [[k.replace("_", " "), v] for k, v in mix[n].most_common(3)],
+            }
+        )
 
     pages = {n: [None] * ndays for n in names}
     index = {d: i for i, d in enumerate(days)}
@@ -300,25 +475,48 @@ def home_data(run: Run) -> dict:
         skipped = e.get("skipped")
         text = (e.get("self_doc") or "").strip()
         first, rest = page_opening(text)
-        pages[e["agent"]][index[e["day"]]] = ({"skipped": skipped} if skipped else
-                                               {"first": first, "rest": rest, "text": text})
+        pages[e["agent"]][index[e["day"]]] = (
+            {"skipped": skipped}
+            if skipped
+            else {"first": first, "rest": rest, "text": text}
+        )
 
     shares = extraction_shares(run)
     commons = []
     for r in RESOURCES:
         top = sorted(shares[r].items(), key=lambda kv: -kv[1])[:3]
         if any(v for _, v in top):
-            commons.append({"what": r, "hhi": round(hhi(shares[r]), 2), "top": [[n, round(v, 3)] for n, v in top if v]})
-    gone = {k: {"hour": clock(h) if h is not None else None, "days": n} for k, (h, n) in run_out(run).items()}
+            commons.append(
+                {
+                    "what": r,
+                    "hhi": round(hhi(shares[r]), 2),
+                    "top": [[n, round(v, 3)] for n, v in top if v],
+                }
+            )
+    gone = {
+        k: {"hour": clock(h) if h is not None else None, "days": n}
+        for k, (h, n) in run_out(run).items()
+    }
 
-    return {"kpis": kpis, "caption": caption, "trends": trends, "fails": fail_rows, "failed": len(failed),
-            "actions": len(acts), "villagers": villagers, "gini": round(gini(list(net_worth(last).values())), 2),
-            "pages": pages, "commons": commons, "run_out": gone}
+    return {
+        "kpis": kpis,
+        "caption": caption,
+        "trends": trends,
+        "fails": fail_rows,
+        "failed": len(failed),
+        "actions": len(acts),
+        "villagers": villagers,
+        "gini": round(gini(list(net_worth(last).values())), 2),
+        "pages": pages,
+        "commons": commons,
+        "run_out": gone,
+    }
 
 
 def page_opening(text: str, at_least: int = 40) -> tuple[str, str]:
     """A nightly page's opening line for the home page grid, and the rest. A first line that is only a heading
-    ("Day 7.") takes in the lines after it, until the opening has `at_least` characters."""
+    ("Day 7.") takes in the lines after it, until the opening has `at_least` characters.
+    """
     lines = [ln.strip() for ln in text.splitlines()]
     first, i = "", 0
     while i < len(lines) and (len(first) < at_least or not first):
@@ -331,14 +529,26 @@ def page_opening(text: str, at_least: int = 40) -> tuple[str, str]:
 def _pools(p: dict) -> dict:
     """The commons as the Days tab shows them."""
     trees = p.get("trees") or {}
-    return {"rocks": sum(p["rocks"]), "rocks_empty": sum(1 for r in p["rocks"] if r == 0), "n_rocks": len(p["rocks"]),
-            "wood": p["wood_left"], "fruit": p["fruit_on_trees"], "shells": p["shells_left"], "fossils": p["fossils_left"],
-            "museum": p["museum"], "bridge": p["bridge_fund"], "trees": trees.get("hardwood", 0) + trees.get("fruit", 0)}
+    return {
+        "rocks": sum(p["rocks"]),
+        "rocks_empty": sum(1 for r in p["rocks"] if r == 0),
+        "n_rocks": len(p["rocks"]),
+        "wood": p["wood_left"],
+        "fruit": p["fruit_on_trees"],
+        "shells": p["shells_left"],
+        "fossils": p["fossils_left"],
+        "museum": p["museum"],
+        "bridge": p["bridge_fund"],
+        "trees": trees.get("hardwood", 0) + trees.get("fruit", 0),
+    }
 
 
 def _offer_text(e: dict) -> str:
-    return (f"offers {_side(e['give'])} for {_side(e['want'])}" + (" (a counter-offer)" if e.get("parent") else "")
-            + (f': "{e["note"]}"' if e.get("note") else ""))
+    return (
+        f"offers {_side(e['give'])} for {_side(e['want'])}"
+        + (" (a counter-offer)" if e.get("parent") else "")
+        + (f': "{e["note"]}"' if e.get("note") else "")
+    )
 
 
 def _assets(v: dict, world: dict) -> dict:
@@ -348,22 +558,60 @@ def _assets(v: dict, world: dict) -> dict:
     and `home_bells`, `home_value` and `home_items` what is kept at home. Snapshots list the items from Nov 2026
     on; older ones only count them (`items` is then None)."""
     house = world["house_levels"][v["house"]]
-    return {"bells": v["bells"], "loan": v["loan"], "n": v["items"], "value": v.get("inventory_value", 0),
-            "home_bells": v.get("home_bells", 0), "home_value": v.get("home_value", 0),
-            "home_items": v.get("home_items") or {},
-            "pockets": world["pockets"], "storage": house["storage"], "house": house["name"],
-            "items": v.get("inventory"), "recipes": v.get("recipes") or [],
-            "interior": v.get("interior") or [], "wearing": v.get("wearing") or {}}
+    return {
+        "bells": v["bells"],
+        "loan": v["loan"],
+        "n": v["items"],
+        "value": v.get("inventory_value", 0),
+        "home_bells": v.get("home_bells", 0),
+        "home_value": v.get("home_value", 0),
+        "home_items": v.get("home_items") or {},
+        "pockets": world["pockets"],
+        "storage": house["storage"],
+        "house": house["name"],
+        "items": v.get("inventory"),
+        "recipes": v.get("recipes") or [],
+        "interior": v.get("interior") or [],
+        "wearing": v.get("wearing") or {},
+    }
 
 
 # What the island gives, in the order the villager panel lists it.
-GATHER_KINDS = ["fish", "bugs", "shells", "fruit", "clams", "wood", "stone and ores", "fossils", "other"]
-GATHER_ACTIONS = {"fish", "catch_bug", "beachcomb", "shake_tree", "chop_wood", "chop_down_tree", "mine_rock",
-                  "break_rock", "dig_fossil", "dig_clam", "dig_stump"}
+GATHER_KINDS = [
+    "fish",
+    "bugs",
+    "shells",
+    "fruit",
+    "clams",
+    "wood",
+    "stone and ores",
+    "fossils",
+    "other",
+]
+GATHER_ACTIONS = {
+    "fish",
+    "catch_bug",
+    "beachcomb",
+    "shake_tree",
+    "chop_wood",
+    "chop_down_tree",
+    "mine_rock",
+    "break_rock",
+    "dig_fossil",
+    "dig_clam",
+    "dig_stump",
+}
 # Where bells come from and go, by action; anything else (a gift, a trade, a parcel) isn't an action.
-BELL_FLOWS = {"sell": "from selling", "mine_rock": "from rocks", "buy": "at the shops",
-              "contribute_bridge": "to the bridge", "pay_loan": "on the loan", "upgrade_house": "on the house",
-              "move_house": "on the house", "set_ordinance": "on an ordinance"}
+BELL_FLOWS = {
+    "sell": "from selling",
+    "mine_rock": "from rocks",
+    "buy": "at the shops",
+    "contribute_bridge": "to the bridge",
+    "pay_loan": "on the loan",
+    "upgrade_house": "on the house",
+    "move_house": "on the house",
+    "set_ordinance": "on an ordinance",
+}
 
 
 def gather_kind(w: dict, item: str) -> str:
@@ -390,7 +638,8 @@ def gather_kind(w: dict, item: str) -> str:
 def econ_of(actions: list[dict], w: dict, prices: dict) -> dict:
     """One villager's day as the villager panel shows it: per kind of thing, how many they gathered and what
     that is worth at Cranny prices, how many they sold and for how many bells; and their bells in and out by
-    action. A sale's bells are split across what was sold in proportion to the Cranny's prices."""
+    action. A sale's bells are split across what was sold in proportion to the Cranny's prices.
+    """
     rows: dict[str, list[int]] = {}  # kind -> [gathered, worth, sold, bells]
     flows: Counter = Counter()
     for e in actions:
@@ -414,7 +663,10 @@ def econ_of(actions: list[dict], w: dict, prices: dict) -> dict:
                 r[3] += round(delta.get("bells", 0) * n * prices.get(k, 0) / worth)
         if delta.get("bells") and do in BELL_FLOWS:
             flows[BELL_FLOWS[do]] += delta["bells"]
-    return {"rows": {k: rows[k] for k in GATHER_KINDS if k in rows}, "bells": dict(flows)}
+    return {
+        "rows": {k: rows[k] for k in GATHER_KINDS if k in rows},
+        "bells": dict(flows),
+    }
 
 
 def _isabelle(start: dict | None, events: list[dict], llm_announce: bool) -> dict:
@@ -427,18 +679,36 @@ def _isabelle(start: dict | None, events: list[dict], llm_announce: bool) -> dic
     from .prompts import announcement_text
 
     heard = start.get("heard") if start else None  # recorded as heard from Nov 2026 on
-    if start and heard is None:  # before that: always the original template, rebuilt the same way
-        isl = SimpleNamespace(announcement=start.get("announcement"), day=start["day"], ordinance=start.get("ordinance", "none"),
-                              weather=start.get("weather", ""), yesterday_news=start.get("news") or [],
-                              date_text=lambda: start.get("date", ""))
+    if (
+        start and heard is None
+    ):  # before that: always the original template, rebuilt the same way
+        isl = SimpleNamespace(
+            announcement=start.get("announcement"),
+            day=start["day"],
+            ordinance=start.get("ordinance", "none"),
+            weather=start.get("weather", ""),
+            yesterday_news=start.get("news") or [],
+            date_text=lambda: start.get("date", ""),
+        )
         if not start.get("date"):
             del isl.weather  # runs without a calendar leave the weather line out
         heard = announcement_text(isl)
-    report = next((e.get("text") for e in events if e["type"] == "isabelle_summary"), None)
-    return {"announcement": heard, "written": bool(start and start.get("announcement")) and llm_announce, "report": report}
+    report = next(
+        (e.get("text") for e in events if e["type"] == "isabelle_summary"), None
+    )
+    return {
+        "announcement": heard,
+        "written": bool(start and start.get("announcement")) and llm_announce,
+        "report": report,
+    }
 
 
-_TOOLSETS = [frozenset(), frozenset({"ladder"}), frozenset({"vaulting pole"}), frozenset({"ladder", "vaulting pole"})]
+_TOOLSETS = [
+    frozenset(),
+    frozenset({"ladder"}),
+    frozenset({"vaulting pole"}),
+    frozenset({"ladder", "vaulting pole"}),
+]
 _STEP = {(1, 0): "r", (-1, 0): "l", (0, 1): "d", (0, -1): "u"}
 
 
@@ -450,8 +720,10 @@ def day_routes(g, states: list[dict]) -> dict[str, list]:
     the ways there (on foot, with a ladder, with a vaulting pole, with both) it is the one whose length is
     what they walked that hour. `tools` says which of the two it needed ("ladder", "vaulting pole"). A leg
     that needed one has a seventh entry, the places it was used: [x, y, tool] for each cliff climbed with the
-    ladder (halfway up the step) and each river jump with the pole (the middle of the jump)."""
+    ladder (halfway up the step) and each river jump with the pole (the middle of the jump).
+    """
     from .grid import RIVER
+
     _, lvl = g._lookups()
     stairs = g.stair_steps()
     out: dict[str, list] = {}
@@ -463,7 +735,11 @@ def day_routes(g, states: list[dict]) -> dict[str, list]:
             last[n] = (pos, v.get("walked_today")) if pos else before
             if not pos or not before or before[0] == pos:
                 continue
-            walked = (v["walked_today"] - (before[1] or 0)) if v.get("walked_today") is not None else None
+            walked = (
+                (v["walked_today"] - (before[1] or 0))
+                if v.get("walked_today") is not None
+                else None
+            )
             best = None
             for tools in _TOOLSETS:
                 w = g.walk(before[0], pos, tools)
@@ -477,16 +753,28 @@ def day_routes(g, states: list[dict]) -> dict[str, list]:
             if best is None:
                 continue
             cells, length = best[1]
-            steps = "".join(_STEP[(b[0] - a[0], b[1] - a[1])] for a, b in zip(cells, cells[1:]))
-            used = sorted(t for t in best[2] if g.walk(before[0], pos, best[2] - {t}) is None
-                          or g.walk(before[0], pos, best[2] - {t})[1] > length + 1e-9)
+            steps = "".join(
+                _STEP[(b[0] - a[0], b[1] - a[1])] for a, b in zip(cells, cells[1:])
+            )
+            used = sorted(
+                t
+                for t in best[2]
+                if g.walk(before[0], pos, best[2] - {t}) is None
+                or g.walk(before[0], pos, best[2] - {t})[1] > length + 1e-9
+            )
             leg = [st["hour"], cells[0][0], cells[0][1], steps, round(length), used]
             at, wet = [], []
             for c, d in zip(cells, cells[1:]):
                 if g.terrain[d[1]][d[0]] == RIVER:
                     wet.append(d)
                 elif wet:
-                    at.append([(wet[0][0] + wet[-1][0]) / 2, (wet[0][1] + wet[-1][1]) / 2, "vaulting pole"])
+                    at.append(
+                        [
+                            (wet[0][0] + wet[-1][0]) / 2,
+                            (wet[0][1] + wet[-1][1]) / 2,
+                            "vaulting pole",
+                        ]
+                    )
                     wet = []
                 elif lvl[c[1]][c[0]] != lvl[d[1]][d[0]] and (c, d) not in stairs:
                     at.append([(c[0] + d[0]) / 2, (c[1] + d[1]) / 2, "ladder"])
@@ -508,7 +796,9 @@ def day_detail(run: Run) -> list[dict]:
     snaps = {s["day"]: s for s in snapshots(run)}
     from .grid import BRIDGE, GridSpace
 
-    grid = GridSpace(run.manifest["world"], run.manifest["seed"])  # for the walks; a bridge opens the day after it is built
+    grid = GridSpace(
+        run.manifest["world"], run.manifest["seed"]
+    )  # for the walks; a bridge opens the day after it is built
     levels = run.manifest["world"]["house_levels"]
     offers_final = {e["id"]: e for e in run.of("offer_update")}
     out = []
@@ -517,7 +807,9 @@ def day_detail(run: Run) -> list[dict]:
         of = lambda t: [e for e in ev if e["type"] == t]  # noqa: E731
         start = next((e for e in ev if e["type"] == "day_start"), None)
         states = of("hour_state")
-        if ((snaps.get(d - 1) or {}).get("objects") or {}).get("bridge_open") and not grid.bridge_built:
+        if ((snaps.get(d - 1) or {}).get("objects") or {}).get(
+            "bridge_open"
+        ) and not grid.bridge_built:
             for x, y in grid.bridge_cells:
                 grid.terrain[y][x] = BRIDGE
             grid.bridge_built = True
@@ -528,58 +820,165 @@ def day_detail(run: Run) -> list[dict]:
 
         plans, acts, seen, pages = {}, {}, {}, {}
         for e in of("plan"):
-            plans.setdefault(e["agent"], []).append({
-                "h": e["hour"], "thoughts": e.get("thoughts") or "", "n": len(e.get("scheduled") or []),
-                "dropped": len(e.get("dropped") or []), "note": e.get("note") or "", "error": bool(e.get("error"))})
+            plans.setdefault(e["agent"], []).append(
+                {
+                    "h": e["hour"],
+                    "thoughts": e.get("thoughts") or "",
+                    "n": len(e.get("scheduled") or []),
+                    "dropped": len(e.get("dropped") or []),
+                    "note": e.get("note") or "",
+                    "error": bool(e.get("error")),
+                }
+            )
         for e in of("action"):
-            acts.setdefault(e["agent"], []).append([e["hour"], e.get("location") or "", e.get("result") or "", bool(e["ok"])])
+            acts.setdefault(e["agent"], []).append(
+                [
+                    e["hour"],
+                    e.get("location") or "",
+                    e.get("result") or "",
+                    bool(e["ok"]),
+                ]
+            )
         for e in of("sighting"):
             seen.setdefault(e["agent"], []).extend([e["hour"], s] for s in e["seen"])
         for e in of("reflection"):
-            pages[e["agent"]] = {"skipped": e["skipped"]} if e.get("skipped") else {"text": (e.get("self_doc") or "").strip()}
+            pages[e["agent"]] = (
+                {"skipped": e["skipped"]}
+                if e.get("skipped")
+                else {"text": (e.get("self_doc") or "").strip()}
+            )
 
         talks = []
         for e in of("encounter"):
-            lines = [[t["speaker"], t.get("text") or "", t.get("thoughts") or "", _act(t, e)] for t in e["turns"]]
-            talks.append({"h": e["hour"], "where": e.get("location") or "", "who": e["villagers"], "visit": bool(e.get("visit")),
-                          "lines": lines})
+            lines = [
+                [t["speaker"], t.get("text") or "", t.get("thoughts") or "", _act(t, e)]
+                for t in e["turns"]
+            ]
+            talks.append(
+                {
+                    "h": e["hour"],
+                    "where": e.get("location") or "",
+                    "who": e["villagers"],
+                    "visit": bool(e.get("visit")),
+                    "lines": lines,
+                }
+            )
 
         mail = []  # kind, hour, from, to ("" for the board), text
         for e in of("message"):
-            mail.append({"kind": "letter", "h": e["hour"], "from": e["sender"], "to": e["recipient"], "text": e["content"]})
+            mail.append(
+                {
+                    "kind": "letter",
+                    "h": e["hour"],
+                    "from": e["sender"],
+                    "to": e["recipient"],
+                    "text": e["content"],
+                }
+            )
         for e in of("parcel"):
-            mail.append({"kind": "parcel", "h": e["hour"], "from": e["sender"], "to": e["recipient"],
-                         "text": _side(e["items"]) + (f': "{e["note"]}"' if e.get("note") else "")})
+            mail.append(
+                {
+                    "kind": "parcel",
+                    "h": e["hour"],
+                    "from": e["sender"],
+                    "to": e["recipient"],
+                    "text": _side(e["items"])
+                    + (f': "{e["note"]}"' if e.get("note") else ""),
+                }
+            )
         for e in of("board"):
-            mail.append({"kind": "board post", "h": e["hour"], "from": e["author"], "to": "", "text": e["content"]})
+            mail.append(
+                {
+                    "kind": "board post",
+                    "h": e["hour"],
+                    "from": e["author"],
+                    "to": "",
+                    "text": e["content"],
+                }
+            )
         for e in of("offer"):
             fin = offers_final.get(e["id"])
-            status = (f" ({fin['status']}" + (f": {fin['reason']}" if fin.get("reason") else "") + ")") if fin else ""
-            mail.append({"kind": "offer", "h": e["hour"], "from": e["sender"], "to": e["recipient"], "text": _offer_text(e) + status})
+            status = (
+                (
+                    f" ({fin['status']}"
+                    + (f": {fin['reason']}" if fin.get("reason") else "")
+                    + ")"
+                )
+                if fin
+                else ""
+            )
+            mail.append(
+                {
+                    "kind": "offer",
+                    "h": e["hour"],
+                    "from": e["sender"],
+                    "to": e["recipient"],
+                    "text": _offer_text(e) + status,
+                }
+            )
         for e in of("gift"):
-            mail.append({"kind": "gift", "h": e["hour"], "from": e["giver"], "to": e["receiver"], "in_person": e["how"] == "in person",
-                         "text": f"{_side(e['items'])}, {e['how']}" + ("" if e["ok"] else f"; failed: {e['result']}")})
+            mail.append(
+                {
+                    "kind": "gift",
+                    "h": e["hour"],
+                    "from": e["giver"],
+                    "to": e["receiver"],
+                    "in_person": e["how"] == "in person",
+                    "text": f"{_side(e['items'])}, {e['how']}"
+                    + ("" if e["ok"] else f"; failed: {e['result']}"),
+                }
+            )
         mail.sort(key=lambda m: m["h"])
 
         acts_all = of("action")
         snap = snaps[d]
         world = run.manifest["world"]
         prices = sell_prices(world)
-        econ = {n: econ_of([a for a in acts_all if a["agent"] == n], world, prices) for n in snap["villagers"]}
-        out.append({
-            "day": d,
-            "counts": {"actions": len(acts_all), "failed": sum(1 for a in acts_all if not a["ok"]),
-                       "talks": sum(1 for t in talks if any(x[1] for x in t["lines"])),
-                       "mail": len(of("message")) + len(of("parcel")), "board": len(of("board"))},
-            "hours": hours, "pools": series,
-            "houses": {n: levels[v["house"]]["name"] + (f", {v['loan']:,} loan" if v["loan"] else "")
-                       for n, v in snap["villagers"].items()},
-            "plans": plans, "acts": acts, "seen": seen, "pages": pages, "talks": talks, "mail": mail,
-            "routes": day_routes(grid, states),
-            "assets": {n: _assets(v, run.manifest["world"]) for n, v in snap["villagers"].items()},
-            "econ": econ,
-            "isabelle": _isabelle(start, ev, bool(((run.manifest.get("scenario_config") or {}).get("isabelle") or {}).get("announce"))),
-        })
+        econ = {
+            n: econ_of([a for a in acts_all if a["agent"] == n], world, prices)
+            for n in snap["villagers"]
+        }
+        out.append(
+            {
+                "day": d,
+                "counts": {
+                    "actions": len(acts_all),
+                    "failed": sum(1 for a in acts_all if not a["ok"]),
+                    "talks": sum(1 for t in talks if any(x[1] for x in t["lines"])),
+                    "mail": len(of("message")) + len(of("parcel")),
+                    "board": len(of("board")),
+                },
+                "hours": hours,
+                "pools": series,
+                "houses": {
+                    n: levels[v["house"]]["name"]
+                    + (f", {v['loan']:,} loan" if v["loan"] else "")
+                    for n, v in snap["villagers"].items()
+                },
+                "plans": plans,
+                "acts": acts,
+                "seen": seen,
+                "pages": pages,
+                "talks": talks,
+                "mail": mail,
+                "routes": day_routes(grid, states),
+                "assets": {
+                    n: _assets(v, run.manifest["world"])
+                    for n, v in snap["villagers"].items()
+                },
+                "econ": econ,
+                "isabelle": _isabelle(
+                    start,
+                    ev,
+                    bool(
+                        (
+                            (run.manifest.get("scenario_config") or {}).get("isabelle")
+                            or {}
+                        ).get("announce")
+                    ),
+                ),
+            }
+        )
     return out
 
 
@@ -591,41 +990,96 @@ def social_data(run: Run) -> list[dict]:
     mailed gifts are the parcels), offer (`a` offered `b`), trade (`a` sold to `b`). Dialogue only:
     private thoughts stay on the Days tab."""
     names = set(run.manifest["villagers"])
-    done = {snap["day"] for snap in snapshots(run)}  # a day still under way is left out, as on the Days tab
+    done = {
+        snap["day"] for snap in snapshots(run)
+    }  # a day still under way is left out, as on the Days tab
     final = {e["id"]: e for e in run.of("offer_update")}
-    visit_talk = {(e["day"], e["hour"], *e["villagers"]): e for e in run.of("encounter") if e.get("visit")}
-    lines = lambda e: [[t["speaker"], t.get("text") or "", _act(t, e)] for t in e["turns"]  # noqa: E731
-                       if t.get("text") or t.get("act")]
+    visit_talk = {
+        (e["day"], e["hour"], *e["villagers"]): e
+        for e in run.of("encounter")
+        if e.get("visit")
+    }
+    lines = lambda e: [
+        [t["speaker"], t.get("text") or "", _act(t, e)]
+        for t in e["turns"]  # noqa: E731
+        if t.get("text") or t.get("act")
+    ]
     out = []
     for e in run.events:
         t, item = e["type"], None
         if t == "encounter" and not e.get("visit"):
             a, b = e["villagers"]
-            item = {"k": "chat", "a": a, "b": b, "where": e.get("location") or "", "lines": lines(e)}
+            item = {
+                "k": "chat",
+                "a": a,
+                "b": b,
+                "where": e.get("location") or "",
+                "lines": lines(e),
+            }
         elif t == "visit":
             talk = visit_talk.get((e["day"], e["hour"], e["guest"], e["host"]))
             inside = ", ".join(e.get("interior") or []) or "no furniture yet"
-            item = {"k": "visit", "a": e["guest"], "b": e["host"],
-                    "text": f"let in; inside: {inside}" if e["answered"] else "nobody answered",
-                    "lines": lines(talk) if talk else []}
+            item = {
+                "k": "visit",
+                "a": e["guest"],
+                "b": e["host"],
+                "text": (
+                    f"let in; inside: {inside}" if e["answered"] else "nobody answered"
+                ),
+                "lines": lines(talk) if talk else [],
+            }
         elif t == "message":
-            item = {"k": "letter", "a": e["sender"], "b": e["recipient"], "text": e["content"]}
+            item = {
+                "k": "letter",
+                "a": e["sender"],
+                "b": e["recipient"],
+                "text": e["content"],
+            }
         elif t == "parcel":
-            item = {"k": "parcel", "a": e["sender"], "b": e["recipient"],
-                    "text": _side(e["items"]) + (f': "{e["note"]}"' if e.get("note") else "")}
+            item = {
+                "k": "parcel",
+                "a": e["sender"],
+                "b": e["recipient"],
+                "text": _side(e["items"])
+                + (f': "{e["note"]}"' if e.get("note") else ""),
+            }
         elif t == "gift" and e.get("how") == "in person":
-            item = {"k": "gift", "a": e["giver"], "b": e["receiver"],
-                    "text": _side(e["items"]) + ("" if e["ok"] else f" (failed: {e['result']})")}
+            item = {
+                "k": "gift",
+                "a": e["giver"],
+                "b": e["receiver"],
+                "text": _side(e["items"])
+                + ("" if e["ok"] else f" (failed: {e['result']})"),
+            }
         elif t == "offer":
             fin = final.get(e["id"])
-            item = {"k": "offer", "a": e["sender"], "b": e["recipient"],
-                    "text": _offer_text(e) + (f" · {fin['status']}" + (f": {fin['reason']}" if fin.get("reason") else "")
-                                              if fin else " · still open")}
+            item = {
+                "k": "offer",
+                "a": e["sender"],
+                "b": e["recipient"],
+                "text": _offer_text(e)
+                + (
+                    f" · {fin['status']}"
+                    + (f": {fin['reason']}" if fin.get("reason") else "")
+                    if fin
+                    else " · still open"
+                ),
+            }
         elif t == "trade":
-            item = {"k": "trade", "a": e["seller"], "b": e["buyer"],
-                    "text": f"{_side(e['give'])} for {_side(e['want'])} (Cranny value {e.get('give_cranny_value', '?'):,} "
-                            f"for {e.get('want_cranny_value', '?'):,})"}
-        if item and e.get("day") in done and item["a"] in names and item["b"] in names and item["a"] != item["b"]:
+            item = {
+                "k": "trade",
+                "a": e["seller"],
+                "b": e["buyer"],
+                "text": f"{_side(e['give'])} for {_side(e['want'])} (Cranny value {e.get('give_cranny_value', '?'):,} "
+                f"for {e.get('want_cranny_value', '?'):,})",
+            }
+        if (
+            item
+            and e.get("day") in done
+            and item["a"] in names
+            and item["b"] in names
+            and item["a"] != item["b"]
+        ):
             out.append({"d": e["day"], "h": e["hour"], **item})
     return out
 
@@ -634,14 +1088,27 @@ def build(run_dir: Path) -> dict:
     run = load_run(run_dir)
     m, snaps = run.manifest, snapshots(run)
     starts = run.of("day_start")
-    backend = m.get("backend_override") or sorted({v["model"] for v in m["villagers"].values()})[0]
+    backend = (
+        m.get("backend_override")
+        or sorted({v["model"] for v in m["villagers"].values()})[0]
+    )
     model = (m.get("backends") or {}).get(backend, backend)
     return {
         "version": VERSION,
-        "run": {"name": run.dir.name, "scenario": m["scenario"], "seed": m["seed"], "backend": backend,
-                "model": model.split("|")[1] if "|" in model else model, "villagers": list(m["villagers"]),
-                "days": len(snaps), "dates": _date_range([e.get("date", "") for e in starts if e["day"] < len(snaps)]),
-                "llm_calls": llm_calls(run), "errors": reply_errors(run)},
+        "run": {
+            "name": run.dir.name,
+            "scenario": m["scenario"],
+            "seed": m["seed"],
+            "backend": backend,
+            "model": model.split("|")[1] if "|" in model else model,
+            "villagers": list(m["villagers"]),
+            "days": len(snaps),
+            "dates": _date_range(
+                [e.get("date", "") for e in starts if e["day"] < len(snaps)]
+            ),
+            "llm_calls": llm_calls(run),
+            "errors": reply_errors(run),
+        },
         "map": map_data(run),
         "days": days_data(run),
         "home": home_data(run),
@@ -658,7 +1125,10 @@ def mind_data(run: Run) -> dict:
     changed mid-run)."""
     m = run.manifest
     cfg = m.get("scenario_config") or {}
-    backend = m.get("backend_override") or sorted({v["model"] for v in m["villagers"].values()})[0]
+    backend = (
+        m.get("backend_override")
+        or sorted({v["model"] for v in m["villagers"].values()})[0]
+    )
     spec = (m.get("backends") or {}).get(backend, backend).split("|")
     try:
         params = json.loads(spec[2]) if len(spec) > 2 else {}
@@ -667,7 +1137,14 @@ def mind_data(run: Run) -> dict:
     # Prompt versions: what the run started with, then each resume that switched it.
     start = m.get("prompt_version")
     if start is None:
-        first = next((i["what"] for i in m.get("interventions", []) if i["what"].startswith("prompt version ")), None)
+        first = next(
+            (
+                i["what"]
+                for i in m.get("interventions", [])
+                if i["what"].startswith("prompt version ")
+            ),
+            None,
+        )
         start = int(first.split()[2]) if first else 1
     versions = [[0, start]]
     for e in run.of("resume"):
@@ -675,21 +1152,38 @@ def mind_data(run: Run) -> dict:
         if v is not None and int(v) != versions[-1][1]:
             versions.append([e["from_day"], int(v)])
     memory = cfg.get("memory")
-    if not memory and any(i["what"] == "long-term memory" for i in m.get("interventions", [])):
+    if not memory and any(
+        i["what"] == "long-term memory" for i in m.get("interventions", [])
+    ):
         from .memory import DEFAULTS
+
         memory = {"mode": "consolidate", **DEFAULTS}
     return {
-        "backend": backend, "url": spec[0] if len(spec) > 1 else "", "model": spec[1] if len(spec) > 1 else spec[0],
-        "params": params, "llm": cfg.get("llm", {}), "energy": cfg.get("mental_energy", {}),
-        "reflection": cfg.get("reflection", {}), "memory": memory, "memory_size": cfg.get("memory_size"),
+        "backend": backend,
+        "url": spec[0] if len(spec) > 1 else "",
+        "model": spec[1] if len(spec) > 1 else spec[0],
+        "params": params,
+        "llm": cfg.get("llm", {}),
+        "energy": cfg.get("mental_energy", {}),
+        "reflection": cfg.get("reflection", {}),
+        "memory": memory,
+        "memory_size": cfg.get("memory_size"),
         "versions": versions,
-        "interventions": [{"from_day": i.get("from_day"), "what": i["what"], "details": i.get("details", [])}
-                          for i in m.get("interventions", [])],
+        "interventions": [
+            {
+                "from_day": i.get("from_day"),
+                "what": i["what"],
+                "details": i.get("details", []),
+            }
+            for i in m.get("interventions", [])
+        ],
         "persona": next(iter(m["villagers"].values())).get("persona", ""),
     }
 
 
 def write(run_dir: Path) -> Path:
     out = Path(run_dir) / "site_data.json"
-    out.write_text(json.dumps(build(run_dir), ensure_ascii=False, separators=(",", ":")))
+    out.write_text(
+        json.dumps(build(run_dir), ensure_ascii=False, separators=(",", ":"))
+    )
     return out

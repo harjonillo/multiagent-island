@@ -22,7 +22,17 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass, field
 
-_LINKS = ("spec", "body", "energy", "isl", "keeps_page", "system", "talk_system", "light_system", "recalled")
+_LINKS = (
+    "spec",
+    "body",
+    "energy",
+    "isl",
+    "keeps_page",
+    "system",
+    "talk_system",
+    "light_system",
+    "recalled",
+)
 
 
 def _choices() -> dict:
@@ -40,23 +50,45 @@ class Villager:
     prices_seen: dict[str, int] = field(default_factory=dict)
     notes: list[tuple[int, str]] = field(default_factory=list)
     inbox: list[str] = field(default_factory=list)
-    today: list[str] = field(default_factory=list)  # results of today's actions, in order
-    wakes: int = 6        # clock hour the villager usually gets up
-    sleeps: int = 24      # clock hour they go to bed; values past 24 or below `wakes` mean after midnight
-    self_doc: str = ""    # private free-form page, rewritten nightly when reflection is on
-    memories: list = field(default_factory=list)  # what they chose to hold on to at night (see memory.py)
-    wearing: dict = field(default_factory=dict)  # slot -> clothing item; others can see it
-    wear: dict = field(default_factory=dict)  # tool -> uses so far of each one they carry, in-use first
-    interior: list = field(default_factory=list)  # furniture inside their home; visitors see it
+    today: list[str] = field(
+        default_factory=list
+    )  # results of today's actions, in order
+    wakes: int = 6  # clock hour the villager usually gets up
+    sleeps: int = (
+        24  # clock hour they go to bed; values past 24 or below `wakes` mean after midnight
+    )
+    self_doc: str = (
+        ""  # private free-form page, rewritten nightly when reflection is on
+    )
+    memories: list = field(
+        default_factory=list
+    )  # what they chose to hold on to at night (see memory.py)
+    wearing: dict = field(
+        default_factory=dict
+    )  # slot -> clothing item; others can see it
+    wear: dict = field(
+        default_factory=dict
+    )  # tool -> uses so far of each one they carry, in-use first
+    interior: list = field(
+        default_factory=list
+    )  # furniture inside their home; visitors see it
     # From prompt version 12, `inventory` is only what is in their pockets; what they keep at home is
     # here, and is only reachable when they are at home.
     home_items: Counter = field(default_factory=Counter)
     home_bells: int = 0
-    home_wear: dict = field(default_factory=dict)  # tool -> uses so far of each one kept at home
+    home_wear: dict = field(
+        default_factory=dict
+    )  # tool -> uses so far of each one kept at home
     # What the simulation used to keep in its own name-keyed dicts.
-    choices: dict = field(default_factory=_choices)  # where they chose to spend energy next (set in plans)
-    yesterday: list[str] = field(default_factory=list)  # yesterday's `today`, shown in the next day's plans
-    noticed: list[str] = field(default_factory=list)  # things they noticed today without doing anything
+    choices: dict = field(
+        default_factory=_choices
+    )  # where they chose to spend energy next (set in plans)
+    yesterday: list[str] = field(
+        default_factory=list
+    )  # yesterday's `today`, shown in the next day's plans
+    noticed: list[str] = field(
+        default_factory=list
+    )  # things they noticed today without doing anything
     arrival_hour: int | None = None  # the game hour they land on day 0
     # Prompt version 20: everything they lived through, kept for retrieval (see memory.MemoryStore).
     experience: list = field(default_factory=list)
@@ -65,10 +97,18 @@ class Villager:
     body: object = field(default=None, repr=False, compare=False)
     energy: object = field(default=None, repr=False, compare=False)
     isl: object = field(default=None, repr=False, compare=False)
-    keeps_page: bool = field(default=False, repr=False, compare=False)  # whether nightly reflection is on
-    system: str = field(default="", repr=False, compare=False)  # system prompt for plans
-    talk_system: str = field(default="", repr=False, compare=False)  # ... for conversations and the plaza
-    light_system: str = field(default="", repr=False, compare=False)  # ... for quick decisions and the night
+    keeps_page: bool = field(
+        default=False, repr=False, compare=False
+    )  # whether nightly reflection is on
+    system: str = field(
+        default="", repr=False, compare=False
+    )  # system prompt for plans
+    talk_system: str = field(
+        default="", repr=False, compare=False
+    )  # ... for conversations and the plaza
+    light_system: str = field(
+        default="", repr=False, compare=False
+    )  # ... for quick decisions and the night
     # What comes to mind for the prompt being written now (prompt version 20): set by the simulation just
     # before the prompt is built, cleared after. None means nothing was retrieved for this prompt.
     recalled: list | None = field(default=None, repr=False, compare=False)
@@ -76,7 +116,9 @@ class Villager:
     def __getstate__(self):
         return {k: v for k, v in self.__dict__.items() if k not in _LINKS}
 
-    def __setstate__(self, state):  # checkpoints from before a field existed get its default
+    def __setstate__(
+        self, state
+    ):  # checkpoints from before a field existed get its default
         fresh = Villager(state.get("name", ""))
         self.__dict__.update({**fresh.__dict__, **state})
 

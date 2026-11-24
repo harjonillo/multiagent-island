@@ -6,7 +6,16 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
+SERIES = [
+    "#2a78d6",
+    "#eb6834",
+    "#1baf7a",
+    "#eda100",
+    "#e87ba4",
+    "#008300",
+    "#6250d6",
+    "#e34948",
+]
 
 
 @dataclass
@@ -22,5 +31,9 @@ class Run:
 def load_run(run_dir: Path) -> Run:
     run_dir = Path(run_dir)
     manifest = json.loads((run_dir / "manifest.json").read_text())
-    events = [json.loads(line) for line in (run_dir / "events.jsonl").read_text().splitlines() if line.strip()]
+    events = [
+        json.loads(line)
+        for line in (run_dir / "events.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
     return Run(run_dir, manifest, events)

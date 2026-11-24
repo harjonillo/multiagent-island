@@ -19,7 +19,9 @@ class Space:
     def coords_of_home(self, site: str) -> Point | None:
         raise NotImplementedError
 
-    def path_length(self, a: Point, b: Point, tools: frozenset[str] = frozenset()) -> float | None:
+    def path_length(
+        self, a: Point, b: Point, tools: frozenset[str] = frozenset()
+    ) -> float | None:
         """Walking distance from a to b with the given tools, or None if b can't be reached."""
         raise NotImplementedError
 

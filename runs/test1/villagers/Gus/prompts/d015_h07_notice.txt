@@ -1,0 +1,39 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 14, night.  
+The morning was a mess—apple, rock, moth, another rock. I chased a moth again, but the rock I broke at 7:00 already showed a crack. I’m stuck without a ladder; I can’t chop hardwood or visit Ari. The river is dead, no fish shadows, so I’ll have to trade for bait tomorrow. I’ve lost my ladder after 30 uses, and I only have 5 wood left in pockets—three for Dax, two spare. I still have a selzalne, an ashrumo moth, and a fossil. I’m running low on apples too; I need to eat one tomorrow or trade. The tent is full of bells only, so I’ll stash my items elsewhere.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 15 (May 6, spring, sunny), 07:00. You are Gus, at the woods.
+Nearby: Dax.
+Earlier today:
+- 07:00 planted an apple; it will be a grown tree in 5 days (also nearby: Dax)
+Things you remember (anything you don't hold on to at night fades):
+- (day 13) Trade wood ↔ selzalne with Jo
+- (day 14) No ladder, no hardwood.
+- (day 14) Need 3 wood for Dax tomorrow.
+- (day 14) Trade bait with Ari.
+Your notes from the last 2 days:
+- (day 13) Remember to keep 3 wood for Dax tomorrow.
+- (day 13) Remember to keep 3 wood for tomorrow's Dax trade.
+- (day 14) Remember to bring wood for Dax tomorrow and try to get bait from Ari or fish.
+- (day 14) Remember to keep 3 wood for Dax tomorrow.
+- (day 14) Plant at home, keep 3 wood for Dax.
+- (day 15) Remember to keep 3 wood for Dax tomorrow. Good luck!
+Mental energy left today: 125 (about 17 for each thing you say). Your plan for today: inward 80 (spent 25), outward 70 (spent 0), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (71 tokens, hidden from everyone) ===
+We are Gus, we have Dax nearby. Need 3 wood for Dax tomorrow. We have 5 wood left. Should talk to Dax to give wood? But Dax might want wood? We can trade? Dax maybe needs wood. Let's approach Dax. Say: "Hey Dax, need to swap some wood."
+
+=== REPLY ===
+{"thoughts":"Need to secure 3 wood for Dax tomorrow. I have 5 wood left, but I should keep 3 and give 2? I can ask Dax to trade something for extra wood if he needs it. Maybe trade a selzalne?","approach":"Dax","say":"Hey Dax, could I swap a bit of wood with you?"}

@@ -25,9 +25,9 @@ import base64
 from pathlib import Path
 
 ART = Path(__file__).with_name("door_art")
-SIZE = 64          # each sprite is 64 x 64 px
-SCALE = 5          # drawn at 5x, every pixel 5 x 5
-FRAMES = 6         # in the sheet: 0 closed, 1..5 opening
+SIZE = 64  # each sprite is 64 x 64 px
+SCALE = 5  # drawn at 5x, every pixel 5 x 5
+FRAMES = 6  # in the sheet: 0 closed, 1..5 opening
 FRAME_MS = 80
 # The art's extent: columns 9..58 (left plant to right plant), rows 8..57 (frame top to step bottom). The
 # transparent margins around it are cropped, so the door is 50 x 50 sprite pixels (250 px at 5x).
@@ -40,23 +40,51 @@ def _pct(a: int, n: int) -> str:
 
 
 # The door leaf (x 20..43, y 11..48) in percent of the cropped box: the hover and focus outline goes round it.
-LEAF = dict(left=_pct(20 - LEFT, RIGHT - LEFT), width=_pct(24, RIGHT - LEFT),
-            top=_pct(11 - TOP, GROUND - TOP), height=_pct(38, GROUND - TOP))
+LEAF = dict(
+    left=_pct(20 - LEFT, RIGHT - LEFT),
+    width=_pct(24, RIGHT - LEFT),
+    top=_pct(11 - TOP, GROUND - TOP),
+    height=_pct(38, GROUND - TOP),
+)
 
 # The empty slot's door: whole-pixel cells, so it is about as wide as the drawn door's frame (30 sprite
 # pixels; 24 cells of 6 px = 144 px at 5x) and stands on the same ground line.
 EMPTY_CELL = round(30 * SCALE / 24)
 
-PANEL = dict(left="8.333%", width="83.333%", top="4.762%", height="90.476%")  # frame cells 2..21 x 2..39
-SIGN = dict(left="10%", width="80%", top="18.42%", height="23.68%")           # door cells 2..17 x 7..15
+PANEL = dict(
+    left="8.333%", width="83.333%", top="4.762%", height="90.476%"
+)  # frame cells 2..21 x 2..39
+SIGN = dict(
+    left="10%", width="80%", top="18.42%", height="23.68%"
+)  # door cells 2..17 x 7..15
 
-FRAME_COLOURS = {"F": "#7A4E2E", "L": "#9A6A44", "I": "#3B2F2A", "i": "#5A4639", "P": "#E6DFCC", "Q": "#D2C0AC"}
-DOOR_COLOURS = {"D": "#5DB08F", "d": "#4A9477", "S": "#E9C29B", "s": "#8A5A2B", "p": "#7A4E2E", "e": "#2F5E4A"}
-EMPTY_DOOR = {"D": "#D2C0AC", "d": "#B59A82", "e": "#9E8670"}  # the faded "next experiment" door
+FRAME_COLOURS = {
+    "F": "#7A4E2E",
+    "L": "#9A6A44",
+    "I": "#3B2F2A",
+    "i": "#5A4639",
+    "P": "#E6DFCC",
+    "Q": "#D2C0AC",
+}
+DOOR_COLOURS = {
+    "D": "#5DB08F",
+    "d": "#4A9477",
+    "S": "#E9C29B",
+    "s": "#8A5A2B",
+    "p": "#7A4E2E",
+    "e": "#2F5E4A",
+}
+EMPTY_DOOR = {
+    "D": "#D2C0AC",
+    "d": "#B59A82",
+    "e": "#9E8670",
+}  # the faded "next experiment" door
 
 
 def _data_uri(name: str) -> str:
-    return "data:image/png;base64," + base64.b64encode((ART / name).read_bytes()).decode("ascii")
+    return "data:image/png;base64," + base64.b64encode(
+        (ART / name).read_bytes()
+    ).decode("ascii")
 
 
 def sprite_css() -> str:
@@ -70,10 +98,14 @@ def sprite_css() -> str:
         f".door:hover:not([data-frame]) .spr, .door:focus-visible:not([data-frame]) .spr {{ "
         f"background-image: url({_data_uri('door_hover.png')}); background-size: {px}px {px}px; }}",
     ]
-    rules += [f'.door[data-frame="{i}"] .spr {{ background-position: -{i * px + left}px -{top}px; }}'
-              for i in range(1, FRAMES)]
-    rules.append(f".door.empty {{ position: absolute; left: {(BOX_W - 24 * EMPTY_CELL) // 2}px; bottom: 0; "
-                 f"width: {24 * EMPTY_CELL}px; height: auto; }}")
+    rules += [
+        f'.door[data-frame="{i}"] .spr {{ background-position: -{i * px + left}px -{top}px; }}'
+        for i in range(1, FRAMES)
+    ]
+    rules.append(
+        f".door.empty {{ position: absolute; left: {(BOX_W - 24 * EMPTY_CELL) // 2}px; bottom: 0; "
+        f"width: {24 * EMPTY_CELL}px; height: auto; }}"
+    )
     return "\n".join(rules)
 
 
@@ -90,10 +122,14 @@ def _svg(grid: list[list[str]], colours: dict) -> str:
             e = c
             while e + 1 < w and row[e + 1] == ch:
                 e += 1
-            rects.append(f'<rect x="{c}" y="{r}" width="{e - c + 1}" height="1" fill="{colours[ch]}"></rect>')
+            rects.append(
+                f'<rect x="{c}" y="{r}" width="{e - c + 1}" height="1" fill="{colours[ch]}"></rect>'
+            )
             c = e + 1
-    return (f'<svg viewBox="0 0 {w} {h}" width="100%" shape-rendering="crispEdges" aria-hidden="true" '
-            f'style="display: block">{"".join(rects)}</svg>')
+    return (
+        f'<svg viewBox="0 0 {w} {h}" width="100%" shape-rendering="crispEdges" aria-hidden="true" '
+        f'style="display: block">{"".join(rects)}</svg>'
+    )
 
 
 def frame_svg() -> str:

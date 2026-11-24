@@ -20,7 +20,9 @@ class AgentSpec:
     docs: list[tuple[str, str]] = field(default_factory=list)  # (filename, text)
     model: str = "default"
     source: str = ""
-    templated: set = field(default_factory=set)  # traits already written into the persona via $name
+    templated: set = field(
+        default_factory=set
+    )  # traits already written into the persona via $name
 
     def extra_traits(self) -> dict:
         return {k: v for k, v in self.traits.items() if k not in self.templated}
@@ -33,7 +35,9 @@ def split_frontmatter(text: str) -> tuple[dict, str]:
     return {}, text.strip()
 
 
-def load_agent_file(path: Path, root: Path, name: str | None = None, overrides: dict | None = None) -> AgentSpec:
+def load_agent_file(
+    path: Path, root: Path, name: str | None = None, overrides: dict | None = None
+) -> AgentSpec:
     meta, body = split_frontmatter(Path(path).read_text())
     meta = {**meta, **(overrides or {})}
     traits = {**(meta.get("traits") or {}), **(meta.pop("trait_values", None) or {})}
@@ -42,7 +46,9 @@ def load_agent_file(path: Path, root: Path, name: str | None = None, overrides: 
     for d in meta.get("docs") or []:
         p = (root / d).resolve()
         docs.append((p.name, p.read_text().strip()))
-    persona = Template(body).safe_substitute({"name": name, **{k: v for k, v in traits.items()}})
+    persona = Template(body).safe_substitute(
+        {"name": name, **{k: v for k, v in traits.items()}}
+    )
     return AgentSpec(
         name=name,
         persona=persona,
@@ -50,5 +56,9 @@ def load_agent_file(path: Path, root: Path, name: str | None = None, overrides: 
         docs=docs,
         model=meta.get("model", "default"),
         source=str(path),
-        templated={k for k in traits if re.search(rf"\$(?:{re.escape(k)}\b|\{{{re.escape(k)}\}})", body)},
+        templated={
+            k
+            for k in traits
+            if re.search(rf"\$(?:{re.escape(k)}\b|\{{{re.escape(k)}\}})", body)
+        },
     )

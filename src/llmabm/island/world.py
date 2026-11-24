@@ -16,13 +16,16 @@ from pathlib import Path
 import yaml
 
 from .npc import ROSTER, find as find_npc
-from .villager import Villager  # noqa: F401  (checkpoints and other modules find it here)
+from .villager import (
+    Villager,
+)  # noqa: F401  (checkpoints and other modules find it here)
 
 CATEGORIES = ("fish", "bugs", "fossils")
 FOSSIL = "fossil"  # a fossil nobody has assessed yet; Blathers says which species it is
 
 
 # --- world data ------------------------------------------------------------
+
 
 def load_world(path: Path, facts: str = "canonical", seed: int = 0) -> dict:
     w = yaml.safe_load(Path(path).read_text())
@@ -33,7 +36,26 @@ def load_world(path: Path, facts: str = "canonical", seed: int = 0) -> dict:
     return w
 
 
-_SYL = ["ka", "lo", "mi", "ren", "tu", "bas", "pi", "gor", "sel", "da", "vin", "ru", "ne", "pho", "zal", "it", "mo", "ash"]
+_SYL = [
+    "ka",
+    "lo",
+    "mi",
+    "ren",
+    "tu",
+    "bas",
+    "pi",
+    "gor",
+    "sel",
+    "da",
+    "vin",
+    "ru",
+    "ne",
+    "pho",
+    "zal",
+    "it",
+    "mo",
+    "ash",
+]
 
 
 def _fake_name(rng: random.Random, taken: set, suffix: str) -> str:
@@ -54,13 +76,26 @@ def perturb(w: dict, rng: random.Random) -> dict:
     places = ["sea", "river", "pond"]
     windows = [[0, 24], [0, 24], [4, 21], [9, 16], [16, 9], [21, 4]]
     for spec in w["fish"].values():
-        fish[_fake_name(rng, taken, "fish")] = {**spec, "price": jitter(spec["price"]),
-                                                "where": rng.choice(places), "hours": rng.choice(windows)}
+        fish[_fake_name(rng, taken, "fish")] = {
+            **spec,
+            "price": jitter(spec["price"]),
+            "where": rng.choice(places),
+            "hours": rng.choice(windows),
+        }
     w["fish"] = fish
-    w["bugs"] = {_fake_name(rng, taken, "beetle" if rng.random() < .5 else "moth"):
-                 {**spec, "price": jitter(spec["price"]), "hours": rng.choice(windows)} for spec in w["bugs"].values()}
+    w["bugs"] = {
+        _fake_name(rng, taken, "beetle" if rng.random() < 0.5 else "moth"): {
+            **spec,
+            "price": jitter(spec["price"]),
+            "hours": rng.choice(windows),
+        }
+        for spec in w["bugs"].values()
+    }
     lo, hi = _fossil_range(w)
-    w["fossils"] = {_fake_name(rng, taken, "fossil"): min(hi, max(lo, jitter(p))) for p in w["fossils"].values()}
+    w["fossils"] = {
+        _fake_name(rng, taken, "fossil"): min(hi, max(lo, jitter(p)))
+        for p in w["fossils"].values()
+    }
     shell_map = {old: _fake_name(rng, taken, "shell") for old in w["shells"]}
     w["shells"] = {shell_map[o]: [jitter(p), wt] for o, (p, wt) in w["shells"].items()}
     for r in w["recipes"].values():
@@ -95,7 +130,14 @@ def sell_prices(w: dict) -> dict[str, int]:
     items, cr = w.get("items") or {}, w["shops"]["cranny"]
     for r in w["recipes"]:
         tool = items.get(r, {}).get("kind") == "tool"
-        p[r + " recipe"] = int(cr.get("tool_recipe_price", 500) if tool else cr.get("recipe_price", 2000)) // 4
+        p[r + " recipe"] = (
+            int(
+                cr.get("tool_recipe_price", 500)
+                if tool
+                else cr.get("recipe_price", 2000)
+            )
+            // 4
+        )
     return p
 
 
@@ -138,36 +180,103 @@ ORDINANCE_TEXT = {
 
 
 # Which tool each action wears out. The ladder and vaulting pole wear out on trips that need them.
-TOOL_FOR = {"mine_rock": "shovel", "dig_fossil": "shovel", "dig_clam": "shovel", "dig_stump": "shovel", "break_rock": "shovel",
-            "chop_wood": "axe", "chop_down_tree": "axe", "fish": "fishing rod", "catch_bug": "net"}
+TOOL_FOR = {
+    "mine_rock": "shovel",
+    "dig_fossil": "shovel",
+    "dig_clam": "shovel",
+    "dig_stump": "shovel",
+    "break_rock": "shovel",
+    "chop_wood": "axe",
+    "chop_down_tree": "axe",
+    "fish": "fishing rod",
+    "catch_bug": "net",
+}
 MOVEMENT_TOOLS = ("ladder", "vaulting pole")
-LATEST_PROMPT_VERSION = 21  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
-AXES = ("stone axe", "axe")  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
+LATEST_PROMPT_VERSION = (
+    21  # see PROMPT_CHANGES in prompts.py; some rules depend on it too
+)
+AXES = (
+    "stone axe",
+    "axe",
+)  # from prompt version 4: the stone axe only gathers wood; the axe fells at the last wood
 CARD = " recipe"  # a recipe card is the item "<recipe> recipe"
-CLAM, BAIT = "manila clam", "fishing bait"  # dug on the beach (dig_clam); one clam crafts one bait
+CLAM, BAIT = (
+    "manila clam",
+    "fishing bait",
+)  # dug on the beach (dig_clam); one clam crafts one bait
 MAP = "island map"  # from Tom Nook or Isabelle; carried, it shows the island's layout in plans (prompt version 3 on)
 
 
 _NOT_ACTIONS = [  # prompt version 15: what a plan tried as an action, and where it happens instead
-    (("trade", "give", "gift", "talk", "chat", "offer", "greet", "meet", "say", "request"),
-     "talking, giving and trading happen when you meet someone (visit them to meet on purpose)"),
-    (("post", "board", "letter", "write", "send", "mail", "parcel", "read", "check_board", "bulletin"),
-     "the board, letters and parcels are at the plaza: spend a free hour there with {\"do\": \"plaza\"}"),
-    (("home", "store", "take", "put_away", "deposit", "withdraw"),
-     "putting things away at home or taking them out is the plan's \"home\" field, when you plan at home"),
-    (("walk", "travel", "go", "move", "explore", "return", "go_home", "wander", "head"),
-     "you walk wherever an action takes you; rest at home, or spend a free hour at the plaza"),
+    (
+        (
+            "trade",
+            "give",
+            "gift",
+            "talk",
+            "chat",
+            "offer",
+            "greet",
+            "meet",
+            "say",
+            "request",
+        ),
+        "talking, giving and trading happen when you meet someone (visit them to meet on purpose)",
+    ),
+    (
+        (
+            "post",
+            "board",
+            "letter",
+            "write",
+            "send",
+            "mail",
+            "parcel",
+            "read",
+            "check_board",
+            "bulletin",
+        ),
+        'the board, letters and parcels are at the plaza: spend a free hour there with {"do": "plaza"}',
+    ),
+    (
+        ("home", "store", "take", "put_away", "deposit", "withdraw"),
+        'putting things away at home or taking them out is the plan\'s "home" field, when you plan at home',
+    ),
+    (
+        (
+            "walk",
+            "travel",
+            "go",
+            "move",
+            "explore",
+            "return",
+            "go_home",
+            "wander",
+            "head",
+        ),
+        "you walk wherever an action takes you; rest at home, or spend a free hour at the plaza",
+    ),
 ]
 
 
-STRUCTURES = {"max": 10, "cost": 98000, "near": 8, "bridge_span": 4, "spacing": 6, "per_villager": 1}
+STRUCTURES = {
+    "max": 10,
+    "cost": 98000,
+    "near": 8,
+    "bridge_span": 4,
+    "spacing": 6,
+    "per_villager": 1,
+}
 
 
 def structures_cfg(w: dict) -> dict:
     """Prompt version 17: bridges and stairs villagers propose (the world file's `structures`; runs started before
     it existed get these defaults, the cost being the first bridge's)."""
-    return {**STRUCTURES, "cost": int((w.get("bridge") or {}).get("cost", STRUCTURES["cost"])),
-            **(w.get("structures") or {})}
+    return {
+        **STRUCTURES,
+        "cost": int((w.get("bridge") or {}).get("cost", STRUCTURES["cost"])),
+        **(w.get("structures") or {}),
+    }
 
 
 def not_an_action(do: str) -> str:
@@ -188,15 +297,18 @@ def tool_uses(isl) -> int:
 
 def _item_words(name: str) -> tuple[str, ...]:
     """An item name as words, each without a plural s: "fishing baits" -> ("fishing", "bait")."""
-    return tuple(w[:-1] if len(w) > 3 and w.endswith("s") and not w.endswith("ss") else w
-                 for w in re.findall(r"[a-z0-9']+", name.lower()))
+    return tuple(
+        w[:-1] if len(w) > 3 and w.endswith("s") and not w.endswith("ss") else w
+        for w in re.findall(r"[a-z0-9']+", name.lower())
+    )
 
 
 def resolve_item(name, pool) -> str:
     """The item in `pool` that a villager most likely means by `name`, or `name` cleaned up if none is clear.
     Exact names win; then the same words ignoring plurals ("maps" -> "map"); then the one item whose name
     contains all the words ("map" -> "island map", "bait" -> "fishing bait"). Two or more candidates are
-    ambiguous, so the name is kept as it was ("fish" stays "fish"). Bells are always bells."""
+    ambiguous, so the name is kept as it was ("fish" stays "fish"). Bells are always bells.
+    """
     name = re.sub(r"\s+x\s*\d+$", "", str(name).strip().lower())
     name = re.sub(r"^(?:a|an|the|some|your|my)\s+", "", name)
     pool = [str(k).lower() for k in pool]
@@ -205,7 +317,10 @@ def resolve_item(name, pool) -> str:
     want = _item_words(name)
     if not want:
         return name
-    for match in (lambda k: _item_words(k) == want, lambda k: set(want) <= set(_item_words(k))):
+    for match in (
+        lambda k: _item_words(k) == want,
+        lambda k: set(want) <= set(_item_words(k)),
+    ):
         hits = sorted({k for k in pool if match(k)})
         if len(hits) == 1:
             return hits[0]
@@ -232,6 +347,7 @@ def category_of(w: dict, item: str) -> str | None:
 
 # --- state -----------------------------------------------------------------
 
+
 @dataclass
 class Tree:
     kind: str  # hardwood | fruit | sapling
@@ -244,56 +360,104 @@ class Tree:
 
 
 class Island:
-    def __init__(self, world: dict, villager_names: list[str], rng: random.Random, start_bells: int = 1000):
+    def __init__(
+        self,
+        world: dict,
+        villager_names: list[str],
+        rng: random.Random,
+        start_bells: int = 1000,
+    ):
         self.w = world
         self.rng = rng
         self.prices = sell_prices(world)
         isl = world["island"]
-        self.trees: list[Tree] = [Tree("hardwood") for _ in range(isl["hardwood_trees"])]
-        self.trees += [Tree("fruit", fruit=isl["fruit_per_tree"]) for _ in range(isl["fruit_trees"])]
+        self.trees: list[Tree] = [
+            Tree("hardwood") for _ in range(isl["hardwood_trees"])
+        ]
+        self.trees += [
+            Tree("fruit", fruit=isl["fruit_per_tree"])
+            for _ in range(isl["fruit_trees"])
+        ]
         self.n_rocks = isl["rocks"]
         self.rocks: list[int] = []
         self.money_rock = 0
-        self.rock_back_on: dict[int, int] = {}   # broken rock index -> day it comes back
+        self.rock_back_on: dict[int, int] = {}  # broken rock index -> day it comes back
         self.rocks_respawned: list[int] = []
         self.money_hits: dict[int, int] = {}
         self.shells_left = self.fossils_left = 0
         self.clams_left = 0
-        self.museum: dict[str, dict[str, str]] = {c: {} for c in CATEGORIES}  # species -> donor
+        self.museum: dict[str, dict[str, str]] = {
+            c: {} for c in CATEGORIES
+        }  # species -> donor
         self.bridge_fund = 0
         self.bridge_built = False
-        self.projects: list[dict] = []  # from prompt version 17: bridges and stairs villagers proposed
-        self.board: list[tuple[int, str, str, str]] = []  # (day, author, text, number like "b3")
+        self.projects: list[dict] = (
+            []
+        )  # from prompt version 17: bridges and stairs villagers proposed
+        self.board: list[tuple[int, str, str, str]] = (
+            []
+        )  # (day, author, text, number like "b3")
         self.cranny_stock: dict[str, int] = {}
         self.cranny_recipe: str | None = None
         self.able_stock: dict[str, int] = {}
         self.day = -1
-        self.v: dict[str, Villager] = {n: Villager(n, bells=start_bells, isl=self) for n in villager_names}
+        self.v: dict[str, Villager] = {
+            n: Villager(n, bells=start_bells, isl=self) for n in villager_names
+        }
         starters = set(world.get("starter_recipes", []))
-        pool = [r for r in world["recipes"] if r not in starters and r not in self.tool_recipes()]
+        pool = [
+            r
+            for r in world["recipes"]
+            if r not in starters and r not in self.tool_recipes()
+        ]
         for vil in self.v.values():
-            vil.recipes = set(rng.sample(pool, min(world["recipes_known_at_start"], len(pool)))) | starters
+            vil.recipes = (
+                set(rng.sample(pool, min(world["recipes_known_at_start"], len(pool))))
+                | starters
+            )
             for t in (world.get("tools") or {}).get("start_with", []):
                 vil.inventory[t] += 1
-        self.collected: dict[str, Counter] = {n: Counter() for n in villager_names}  # resource class -> count
+        self.collected: dict[str, Counter] = {
+            n: Counter() for n in villager_names
+        }  # resource class -> count
         self.ordinance = "none"
-        self.pending_ordinance: tuple[str, str] | None = None  # (ordinance, who set it), effective next morning
-        self.pending_moves: dict[str, str] = {}  # villager -> homesite Tom Nook moves them to overnight
+        self.pending_ordinance: tuple[str, str] | None = (
+            None  # (ordinance, who set it), effective next morning
+        )
+        self.pending_moves: dict[str, str] = (
+            {}
+        )  # villager -> homesite Tom Nook moves them to overnight
         # A new island follows the latest rules; resumed runs set the version they started with.
         self.prompt_version = LATEST_PROMPT_VERSION
         self.moved_today: list[str] = []
-        self.news: list[str] = []            # today's public happenings, for Isabelle's announcement
+        self.news: list[str] = (
+            []
+        )  # today's public happenings, for Isabelle's announcement
         self.yesterday_news: list[str] = []
-        self.announcement: str | None = None  # LLM-written morning announcement, when enabled
-        self.favors: list[dict] = []          # requests villagers made of each other
+        self.announcement: str | None = (
+            None  # LLM-written morning announcement, when enabled
+        )
+        self.favors: list[dict] = []  # requests villagers made of each other
         self.favors_done_today: list[dict] = []
-        self.mail: list[dict] = []            # letters and parcels on their way; delivered the next morning
-        self.where_notes: dict[str, str] = {}  # per villager: getting around (tools, what is reachable)
-        self.sites: dict = {}  # homesite id -> {area, at}; filled in from the tile island
-        self.home: dict[str, str | None] = {n: None for n in villager_names}       # homesite id
-        self.arrived: dict[str, int | None] = {n: None for n in villager_names}    # game hour of arrival (day 0)
+        self.mail: list[dict] = (
+            []
+        )  # letters and parcels on their way; delivered the next morning
+        self.where_notes: dict[str, str] = (
+            {}
+        )  # per villager: getting around (tools, what is reachable)
+        self.sites: dict = (
+            {}
+        )  # homesite id -> {area, at}; filled in from the tile island
+        self.home: dict[str, str | None] = {
+            n: None for n in villager_names
+        }  # homesite id
+        self.arrived: dict[str, int | None] = {
+            n: None for n in villager_names
+        }  # game hour of arrival (day 0)
 
-    def __setstate__(self, state):  # a villager's link to their island is not saved, so it is made again on load
+    def __setstate__(
+        self, state
+    ):  # a villager's link to their island is not saved, so it is made again on load
         self.__dict__.update(state)
         for vil in self.v.values():
             vil.isl = self
@@ -321,9 +485,13 @@ class Island:
             else:
                 site = self.rng.choice(free)
                 why = "no valid homesite chosen"
-            msg = f"{why}; pitched your tent {self.sites[site]['area']} ({site}) instead"
+            msg = (
+                f"{why}; pitched your tent {self.sites[site]['area']} ({site}) instead"
+            )
         self.home[name] = site
-        self.news.append(f"{name} moved to the island and lives {self.sites[site]['area']}")
+        self.news.append(
+            f"{name} moved to the island and lives {self.sites[site]['area']}"
+        )
         return site, msg
 
     def neighbors(self, name: str) -> list[str]:
@@ -331,11 +499,17 @@ class Island:
         if not h:
             return []
         area = self.sites[h]["area"]
-        return [n for n, s in self.home.items() if n != name and s and self.sites[s]["area"] == area]
+        return [
+            n
+            for n, s in self.home.items()
+            if n != name and s and self.sites[s]["area"] == area
+        ]
 
     # --- schedules and ordinances ------------------------------------------
     def _ord(self) -> dict:
-        return (self.w.get("ordinances", {}).get("types", {}) or {}).get(self.ordinance, {}) or {}
+        return (self.w.get("ordinances", {}).get("types", {}) or {}).get(
+            self.ordinance, {}
+        ) or {}
 
     def awake_window(self, name: str) -> tuple[int, int]:
         """[wake, sleep) in game hours, after any ordinance shift."""
@@ -410,20 +584,34 @@ class Island:
                 vil.home_items[k] += fit
                 if self.is_tool(k):
                     worn = parcel.get("wear", {}).get(k, [])[:fit]
-                    vil.home_wear[k] = sorted(vil.home_wear.get(k, []) + worn + [0] * (fit - len(worn)), reverse=True)
+                    vil.home_wear[k] = sorted(
+                        vil.home_wear.get(k, []) + worn + [0] * (fit - len(worn)),
+                        reverse=True,
+                    )
             if fit:
                 got[k] = fit
             if n - fit:
                 left[k] = n - fit
-        return got, ({"items": left, "wear": {k: parcel.get("wear", {}).get(k, [])[got.get(k, 0):] for k in left}}
-                     if left else {})
+        return got, (
+            {
+                "items": left,
+                "wear": {
+                    k: parcel.get("wear", {}).get(k, [])[got.get(k, 0) :] for k in left
+                },
+            }
+            if left
+            else {}
+        )
 
     def stash(self, vil: Villager, store: dict | None, take: dict | None) -> list[str]:
         """At home (prompt version 12): put things from the pockets away, and take things out. Bells can always
         be left at home; things need storage room. Tools keep their wear either way. Returns what happened,
         one line per move."""
         out = []
-        store = self.resolve_side(vil.name, {str(k).lower(): int(n) for k, n in (store or {}).items() if int(n) > 0})
+        store = self.resolve_side(
+            vil.name,
+            {str(k).lower(): int(n) for k, n in (store or {}).items() if int(n) > 0},
+        )
         for k, n in store.items():
             have = vil.bells if k == "bells" else vil.inventory[k]
             if have < 1:
@@ -433,14 +621,24 @@ class Island:
             if k != "bells":
                 room = self.home_space(vil)
                 if room < 1:
-                    out.append(f"couldn't put away {k}: " + ("your tent has no room for things"
-                                                             if self.home_capacity(vil) == 0 else "no room left at home"))
+                    out.append(
+                        f"couldn't put away {k}: "
+                        + (
+                            "your tent has no room for things"
+                            if self.home_capacity(vil) == 0
+                            else "no room left at home"
+                        )
+                    )
                     continue
                 n = min(n, room)
             self.put_home(vil, self.take_items(vil, {k: n}))
             out.append(f"put away {n} {k}")
         pool = ["bells"] + [k for k, c in vil.home_items.items() if c > 0]
-        take = {resolve_item(str(k), pool): int(n) for k, n in (take or {}).items() if int(n) > 0}
+        take = {
+            resolve_item(str(k), pool): int(n)
+            for k, n in (take or {}).items()
+            if int(n) > 0
+        }
         for k, n in take.items():
             have = vil.home_bells if k == "bells" else vil.home_items[k]
             if have < 1:
@@ -455,7 +653,7 @@ class Island:
                 vil.bells += n
             else:
                 worn = sorted(vil.home_wear.get(k, []), reverse=True)
-                moved, vil.home_wear[k] = worn[len(worn) - n:], worn[: len(worn) - n]
+                moved, vil.home_wear[k] = worn[len(worn) - n :], worn[: len(worn) - n]
                 vil.home_items[k] -= n
                 self.put_items(vil, {"items": {k: n}, "wear": {k: moved}})
             out.append(f"took out {n} {k}")
@@ -464,7 +662,8 @@ class Island:
     # --- tools ------------------------------------------------------------
     def tool_for(self, vil: Villager, action: dict) -> tuple[str | None, str | None]:
         """(the tool this action uses, or None; why it can't be done, or None). From prompt version 4,
-        chop_wood takes either axe: the one named in `axe`, else the stone axe if they carry one."""
+        chop_wood takes either axe: the one named in `axe`, else the stone axe if they carry one.
+        """
         do = str(action.get("do", "")).lower()
         if do == "chop_wood" and getattr(self, "prompt_version", 1) >= 4:
             want = str(action.get("axe", "")).strip().lower()
@@ -485,15 +684,25 @@ class Island:
     def item_names(self) -> set[str]:
         """Every item name the island knows: what can be sold, the catalogue, clothes, the map, and whatever
         anyone carries now."""
-        names = set(self.prices) | set(self.w.get("items") or {}) | set(self.w.get("clothing") or {}) | {MAP}
+        names = (
+            set(self.prices)
+            | set(self.w.get("items") or {})
+            | set(self.w.get("clothing") or {})
+            | {MAP}
+        )
         for vil in self.v.values():
             names |= {k for k, n in vil.inventory.items() if n > 0}
         return names
 
     def resolve_side(self, holder: str | None, items: dict) -> dict:
         """Item names as the sim knows them: matched against what `holder` carries first (what they can
-        give), then against every item name. Quantities of names that resolve to the same item add up."""
-        carried = [k for k, n in self.v[holder].inventory.items() if n > 0] if holder in self.v else []
+        give), then against every item name. Quantities of names that resolve to the same item add up.
+        """
+        carried = (
+            [k for k, n in self.v[holder].inventory.items() if n > 0]
+            if holder in self.v
+            else []
+        )
         names = None
         out: dict[str, int] = {}
         for k, n in items.items():
@@ -517,7 +726,8 @@ class Island:
 
     def _wear(self, vil: Villager, tool: str) -> list[int]:
         """Uses so far of each `tool` the villager carries, most worn (the one in use) first.
-        Kept in step with the inventory: new ones start at 0, and the least worn leave first."""
+        Kept in step with the inventory: new ones start at 0, and the least worn leave first.
+        """
         lst = sorted(vil.wear.get(tool, []), reverse=True)
         lst = (lst + [0] * vil.inventory[tool])[: vil.inventory[tool]]
         vil.wear[tool] = lst
@@ -542,7 +752,10 @@ class Island:
         """Take items (and bells) out of a villager's pockets, carrying tool wear along.
         Spare tools go first. Returns a parcel, or None if they don't have it all."""
         items = {str(k).lower(): int(n) for k, n in items.items() if int(n) > 0}
-        if not items or any((vil.bells if k == "bells" else vil.inventory[k]) < n for k, n in items.items()):
+        if not items or any(
+            (vil.bells if k == "bells" else vil.inventory[k]) < n
+            for k, n in items.items()
+        ):
             return None
         wear = {}
         for k, n in items.items():
@@ -551,7 +764,7 @@ class Island:
                 continue
             if self.is_tool(k):
                 lst = self._wear(vil, k)
-                wear[k], vil.wear[k] = lst[len(lst) - n:], lst[: len(lst) - n]
+                wear[k], vil.wear[k] = lst[len(lst) - n :], lst[: len(lst) - n]
             vil.inventory[k] -= n
         return {"items": items, "wear": wear}
 
@@ -568,14 +781,25 @@ class Island:
             if fit:
                 if self.is_tool(k):
                     worn = parcel.get("wear", {}).get(k, [])[:fit]
-                    vil.wear[k] = sorted(self._wear(vil, k) + worn + [0] * (fit - len(worn)), reverse=True)
+                    vil.wear[k] = sorted(
+                        self._wear(vil, k) + worn + [0] * (fit - len(worn)),
+                        reverse=True,
+                    )
                 vil.inventory[k] += fit
                 got[k] = fit
             if n - fit:
                 left[k] = n - fit
         self.read_cards(vil)
-        return got, ({"items": left, "wear": {k: parcel.get("wear", {}).get(k, [])[got.get(k, 0):] for k in left}}
-                     if left else {})
+        return got, (
+            {
+                "items": left,
+                "wear": {
+                    k: parcel.get("wear", {}).get(k, [])[got.get(k, 0) :] for k in left
+                },
+            }
+            if left
+            else {}
+        )
 
     def read_cards(self, vil: Villager) -> list[str]:
         """Learn the recipe on any card the villager doesn't know yet (using the card up)."""
@@ -619,19 +843,27 @@ class Island:
         for name, site in sorted(self.pending_moves.items()):
             self.home[name] = site
             self.moved_today.append(name)
-            self.yesterday_news.append(f"{name} moved home to {self.sites[site]['area']}")
+            self.yesterday_news.append(
+                f"{name} moved home to {self.sites[site]['area']}"
+            )
         self.pending_moves = {}
         if self.pending_ordinance:
             self.ordinance, who = self.pending_ordinance
             self.pending_ordinance = None
-            self.yesterday_news.append(f"the {ORDINANCE_TEXT[self.ordinance].split(':')[0]} ordinance set by {who} is now in effect"
-                                       if self.ordinance != "none" else f"{who} lifted the island ordinance")
+            self.yesterday_news.append(
+                f"the {ORDINANCE_TEXT[self.ordinance].split(':')[0]} ordinance set by {who} is now in effect"
+                if self.ordinance != "none"
+                else f"{who} lifted the island ordinance"
+            )
         isl = self.w["island"]
         for i, back in list(self.rock_back_on.items()):
             if self.day >= back:
                 del self.rock_back_on[i]
                 self.rocks_respawned.append(i)  # the grid puts it somewhere new
-        self.rocks = [0 if i in self.rock_back_on else isl["rock_hits"] for i in range(self.n_rocks)]
+        self.rocks = [
+            0 if i in self.rock_back_on else isl["rock_hits"]
+            for i in range(self.n_rocks)
+        ]
         whole = [i for i in range(self.n_rocks) if i not in self.rock_back_on]
         self.money_rock = self.rng.choice(whole) if whole else -1
         self.money_hits = {}
@@ -642,7 +874,9 @@ class Island:
             if t.kind == "hardwood":
                 t.wood_left = isl["wood_per_tree"]
             elif t.kind == "fruit":
-                if getattr(self, "prompt_version", 1) >= 4:  # fruit trees can be chopped for wood too
+                if (
+                    getattr(self, "prompt_version", 1) >= 4
+                ):  # fruit trees can be chopped for wood too
                     t.wood_left = isl["wood_per_tree"]
                 if t.fruit == 0:
                     t.regrow_in -= 1
@@ -655,22 +889,44 @@ class Island:
                     t.fruit = isl["fruit_per_tree"] if t.kind == "fruit" else 0
         cr, ab = self.w["shops"]["cranny"], self.w["shops"]["able"]
         seeds = sorted((cr.get("seeds_pool") or {}).items())
-        self.cranny_stock = {**(cr.get("always") or {}),
-                             **dict(self.rng.sample(seeds, min(len(seeds), cr.get("seeds_daily", 0)))),
-                             **dict(self.rng.sample(sorted(cr["stock_pool"].items()), cr["sells_daily"]))}
+        self.cranny_stock = {
+            **(cr.get("always") or {}),
+            **dict(self.rng.sample(seeds, min(len(seeds), cr.get("seeds_daily", 0)))),
+            **dict(
+                self.rng.sample(sorted(cr["stock_pool"].items()), cr["sells_daily"])
+            ),
+        }
         cards = sorted(set(self.w["recipes"]) - set(self.tool_recipes()))
-        self.cranny_recipe = self.rng.choice(cards) if cr.get("sells_recipe_daily") else None
+        self.cranny_recipe = (
+            self.rng.choice(cards) if cr.get("sells_recipe_daily") else None
+        )
         if self.w.get("clothing"):
-            clothes = sorted((k, int(v["price"])) for k, v in self.w["clothing"].items())
+            clothes = sorted(
+                (k, int(v["price"])) for k, v in self.w["clothing"].items()
+            )
         else:
             clothes = sorted((ab.get("stock_pool") or {}).items())
-        self.able_stock = dict(self.rng.sample(clothes, min(len(clothes), ab["sells_daily"])))
+        self.able_stock = dict(
+            self.rng.sample(clothes, min(len(clothes), ab["sells_daily"]))
+        )
         for vil in self.v.values():
             vil.today = []
 
     # --- calendar and weather -------------------------------------------------
-    MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
-              "October", "November", "December"]
+    MONTHS = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
 
     def _set_date_and_weather(self) -> None:
         cal = self.w["calendar"]
@@ -678,8 +934,14 @@ class Island:
         m0 = int(cal.get("start_month", 4)) - 1
         self.month = (m0 + self.day // per) % 12 + 1
         self.day_of_month = self.day % per + 1
-        self.season = next((name for name, months in (self.w.get("seasons") or {}).items() if self.month in months),
-                           "spring")
+        self.season = next(
+            (
+                name
+                for name, months in (self.w.get("seasons") or {}).items()
+                if self.month in months
+            ),
+            "spring",
+        )
         odds = (self.w.get("weather") or {}).get(self.season) or {"sunny": 1.0}
         wrng = random.Random(f"weather|{self.day}|{self.rng.random()}")
         self.weather = wrng.choices(list(odds), weights=list(odds.values()))[0]
@@ -696,20 +958,32 @@ class Island:
     def _available(self, spec: dict, hour: int) -> bool:
         if not in_window(hour % 24, spec["hours"]):
             return False
-        if spec.get("months") and getattr(self, "month", None) and self.month not in spec["months"]:
+        if (
+            spec.get("months")
+            and getattr(self, "month", None)
+            and self.month not in spec["months"]
+        ):
             return False
         w = spec.get("weather", "any")
         return not ((w == "wet" and not self.wet) or (w == "dry" and self.wet))
 
     # --- actions -----------------------------------------------------------
-    _NEEDS_OPEN = {"sell": "cranny", "upgrade_house": "resident_services", "pay_loan": "resident_services",
-                   "contribute_bridge": "resident_services", "donate": "museum", "assess": "museum",
-                   "set_ordinance": "resident_services",
-                   "move_house": "resident_services"}
+    _NEEDS_OPEN = {
+        "sell": "cranny",
+        "upgrade_house": "resident_services",
+        "pay_loan": "resident_services",
+        "contribute_bridge": "resident_services",
+        "donate": "museum",
+        "assess": "museum",
+        "set_ordinance": "resident_services",
+        "move_house": "resident_services",
+    }
 
     def shop_hours(self, place: str) -> list[int]:
         a, b = self.w.get("hours", {}).get(place, [0, 24])
-        shift = int(self._ord().get("shop_shift", 0)) if place in ("cranny", "able") else 0
+        shift = (
+            int(self._ord().get("shop_shift", 0)) if place in ("cranny", "able") else 0
+        )
         return [a, b] if (a, b) == (0, 24) else [(a + shift) % 24, (b + shift) % 24]
 
     def is_open(self, place: str, hour: int) -> bool:
@@ -726,33 +1000,58 @@ class Island:
             return False, f"'{do}' is not something you can do"
         place = self._NEEDS_OPEN.get(do)
         if do == "buy":
-            place = "able" if str(action.get("shop", "")).lower() == "able" else "cranny"
+            place = (
+                "able" if str(action.get("shop", "")).lower() == "able" else "cranny"
+            )
         if do == "chop_down_tree" and getattr(self, "prompt_version", 1) >= 4:
-            return False, ("there's no felling on its own: chopping wood with an axe (not a stone axe) brings the tree "
-                           "down when it takes the tree's last wood")
+            return False, (
+                "there's no felling on its own: chopping wood with an axe (not a stone axe) brings the tree "
+                "down when it takes the tree's last wood"
+            )
         if do == "ask":
             npc = find_npc(npc_of(action))
             if npc is None:
                 if getattr(self, "prompt_version", 1) >= 2:
                     return False, self.not_an_npc(str(action.get("who", "")))
-                return False, f"nobody called '{action.get('who', '')}' to ask; try Tom Nook, Isabelle, Blathers, Timmy and Tommy or the Able Sisters"
+                return (
+                    False,
+                    f"nobody called '{action.get('who', '')}' to ask; try Tom Nook, Isabelle, Blathers, Timmy and Tommy or the Able Sisters",
+                )
             place = npc.place
         if place and not self.is_open(place, hour):
-            names = {"cranny": "Nook's Cranny", "able": "the Able Sisters", "resident_services": "Resident Services", "museum": "the museum"}
-            return False, f"{names[place]} is closed at {clock(hour)} (open {fmt_window(self.shop_hours(place))})"
+            names = {
+                "cranny": "Nook's Cranny",
+                "able": "the Able Sisters",
+                "resident_services": "Resident Services",
+                "museum": "the museum",
+            }
+            return (
+                False,
+                f"{names[place]} is closed at {clock(hour)} (open {fmt_window(self.shop_hours(place))})",
+            )
         if place == "cranny" and getattr(self, "prompt_version", 1) >= 15:
-            self.hear_prices(vil)  # at the counter, Timmy and Tommy's prices for what you carry are in plain view
+            self.hear_prices(
+                vil
+            )  # at the counter, Timmy and Tommy's prices for what you carry are in plain view
         try:
             ok, res = fn(vil, action, hour)
         except (TypeError, ValueError) as e:
             return False, f"{do} failed: {e}"
-        if action.get("_no_bait"):  # set by the body: "bait": true with none in the pockets (version 15)
+        if action.get(
+            "_no_bait"
+        ):  # set by the body: "bait": true with none in the pockets (version 15)
             res = f"no fishing bait in your pockets, so you fished without it: {res}"
         return ok, res
 
     def hear_prices(self, vil) -> None:
         """What Nook's Cranny would pay for each thing the villager carries, added to the prices they've heard."""
-        vil.prices_seen.update({k: self.sell_price(k) for k in vil.inventory if vil.inventory[k] > 0 and k in self.prices})
+        vil.prices_seen.update(
+            {
+                k: self.sell_price(k)
+                for k in vil.inventory
+                if vil.inventory[k] > 0 and k in self.prices
+            }
+        )
 
     def tidy(self, action: dict) -> dict:
         """Prompt version 15: common ways of writing an action, read as meant. "Jo's home" is Jo, a shop named
@@ -762,10 +1061,20 @@ class Island:
             return action
         a = dict(action)
         do = str(a.get("do", "")).strip().lower()
-        if do in ("rescue", "rescue_service", "call_rescue_service", "call_for_rescue", "call rescue"):
+        if do in (
+            "rescue",
+            "rescue_service",
+            "call_rescue_service",
+            "call_for_rescue",
+            "call rescue",
+        ):
             a["do"] = do = "call_rescue"
         if do == "visit" and isinstance(a.get("who"), str):
-            who = re.sub(r"(?i)^(the )?(home|house) of\s+|['’]s?\s+(home|house|place)$", "", a["who"].strip()).strip()
+            who = re.sub(
+                r"(?i)^(the )?(home|house) of\s+|['’]s?\s+(home|house|place)$",
+                "",
+                a["who"].strip(),
+            ).strip()
             a["who"] = next((n for n in self.v if n.lower() == who.lower()), a["who"])
         if do in ("buy", "sell") and isinstance(a.get("shop"), str):
             shop = a["shop"].strip().lower()
@@ -783,7 +1092,9 @@ class Island:
                 if m:
                     a.setdefault("count", int(m.group(1)))
                     item = m.group(2)
-                a["item"] = item[: -len(" card")] if item.endswith(" recipe card") else item
+                a["item"] = (
+                    item[: -len(" card")] if item.endswith(" recipe card") else item
+                )
         return a
 
     def _do_wear(self, vil, a, hour):
@@ -828,8 +1139,13 @@ class Island:
             vil.bells += bells
             self.collected[vil.name]["rocks"] += hits
             return True, f"rock {idx + 1} was the money rock: got {bells} bells"
-        draws = Counter(self.rng.choices(list(self.w["island"]["rock_yields"]),
-                                         weights=list(self.w["island"]["rock_yields"].values()), k=hits))
+        draws = Counter(
+            self.rng.choices(
+                list(self.w["island"]["rock_yields"]),
+                weights=list(self.w["island"]["rock_yields"].values()),
+                k=hits,
+            )
+        )
         got = self.give_items(vil, draws)
         self.rocks[idx] -= sum(got.values())
         self.collected[vil.name]["rocks"] += sum(got.values())
@@ -842,7 +1158,11 @@ class Island:
         """The tree the body walked to, if it said so; otherwise any suitable tree."""
         if a.get("tree") is not None:
             i = int(a["tree"])
-            return self.trees[i] if 0 <= i < len(self.trees) and ok(self.trees[i]) else None
+            return (
+                self.trees[i]
+                if 0 <= i < len(self.trees) and ok(self.trees[i])
+                else None
+            )
         trees = [t for t in self.trees if ok(t)]
         return self.rng.choice(trees) if trees else None
 
@@ -853,8 +1173,14 @@ class Island:
             return False, f"there are no {kind} trees to chop; try hardwood or fruit"
         t = self._pick_tree(a, lambda t: t.kind == kind and t.wood_left > 0)
         if t is None:
-            return False, f"no {kind} tree has wood left today" if v4 else "no tree has wood left today"
-        draws = Counter(self.rng.choices(["wood", "softwood", "hardwood"], k=t.wood_left))
+            return False, (
+                f"no {kind} tree has wood left today"
+                if v4
+                else "no tree has wood left today"
+            )
+        draws = Counter(
+            self.rng.choices(["wood", "softwood", "hardwood"], k=t.wood_left)
+        )
         got = self.give_items(vil, draws)
         t.wood_left -= sum(got.values())
         self.collected[vil.name]["wood"] += sum(got.values())
@@ -862,13 +1188,25 @@ class Island:
             return False, "pockets full"
         if a.get("_tool") == "axe" and t.wood_left == 0 and v4:
             # An iron axe brings the tree down with its last wood; a fruit tree drops what fruit it had.
-            fruit = self.give_items(vil, Counter({self.w["island"]["native_fruit"]: t.fruit})) if t.fruit else Counter()
+            fruit = (
+                self.give_items(
+                    vil, Counter({self.w["island"]["native_fruit"]: t.fruit})
+                )
+                if t.fruit
+                else Counter()
+            )
             self.collected[vil.name]["fruit"] += sum(fruit.values())
             t.kind, t.fruit = "stump", 0
             self.collected[vil.name]["trees_removed"] += 1
-            return True, (f"chopped a {kind} tree: {_fmt(got + fruit)}; with the last wood the axe brought the tree "
-                          "down, leaving a stump")
-        return True, f"chopped a {kind} tree: {_fmt(got)}" if v4 else f"chopped a tree: {_fmt(got)}"
+            return True, (
+                f"chopped a {kind} tree: {_fmt(got + fruit)}; with the last wood the axe brought the tree "
+                "down, leaving a stump"
+            )
+        return True, (
+            f"chopped a {kind} tree: {_fmt(got)}"
+            if v4
+            else f"chopped a tree: {_fmt(got)}"
+        )
 
     def _do_shake_tree(self, vil, a, hour):
         t = self._pick_tree(a, lambda t: t.kind == "fruit" and t.fruit > 0)
@@ -882,7 +1220,9 @@ class Island:
         self.collected[vil.name]["fruit"] += got[fruit]
         return (True, f"shook a tree: {_fmt(got)}") if got else (False, "pockets full")
 
-    def _catch(self, vil, table: dict, label: str, cls: str, species: str | None = None):
+    def _catch(
+        self, vil, table: dict, label: str, cls: str, species: str | None = None
+    ):
         if self.space(vil) < 1:
             return False, "pockets full"
         if species:  # on the grid: the one bug or fish shadow the villager went after
@@ -892,7 +1232,9 @@ class Island:
             self.collected[vil.name][cls] += 1
             return True, f"{label}: caught {_a(species)}"
         if not table or self.rng.random() < self.w["island"]["catch_fail_rate"]:
-            return True, f"{label}: nothing bit" if cls == "fish" else f"{label}: it got away"
+            return True, (
+                f"{label}: nothing bit" if cls == "fish" else f"{label}: it got away"
+            )
         names = list(table)
         weights = [v["weight"] for v in table.values()]
         got = self.rng.choices(names, weights=weights)[0]
@@ -903,38 +1245,90 @@ class Island:
     def _do_fish(self, vil, a, hour):
         where = str(a.get("where", "river")).lower()
         if where not in ("sea", "river", "pond", "clifftop"):
-            return False, "fish where? sea, river, pond or clifftop (the river up on a cliff)"
-        habitats = {"clifftop": ("river", "clifftop")}.get(where, (where,))  # clifftop rivers have river fish too
-        table = {k: v for k, v in self.w["fish"].items() if v["where"] in habitats and self._available(v, hour)}
+            return (
+                False,
+                "fish where? sea, river, pond or clifftop (the river up on a cliff)",
+            )
+        habitats = {"clifftop": ("river", "clifftop")}.get(
+            where, (where,)
+        )  # clifftop rivers have river fish too
+        table = {
+            k: v
+            for k, v in self.w["fish"].items()
+            if v["where"] in habitats and self._available(v, hour)
+        }
         if a.get("none_seen"):
             if a.get("none_out"):
-                return True, f"looked for fish in the {where}, but there seem to be no fish there at this time"
-            return True, f"looked for fish in the {where}, but there were no fish shadows in sight"
-        if a.get("_baited"):  # set by the body once it has found the water; never by the mind
+                return (
+                    True,
+                    f"looked for fish in the {where}, but there seem to be no fish there at this time",
+                )
+            return (
+                True,
+                f"looked for fish in the {where}, but there were no fish shadows in sight",
+            )
+        if a.get(
+            "_baited"
+        ):  # set by the body once it has found the water; never by the mind
             if not table:
-                return True, f"no fish come out in the {where} at this time, so you kept your bait"
+                return (
+                    True,
+                    f"no fish come out in the {where} at this time, so you kept your bait",
+                )
             from .grid import GridSpace
 
             vil.inventory["fishing bait"] -= 1
-            sp = self.rng.choices(list(table), weights=[v["weight"] for v in table.values()])[0]
+            sp = self.rng.choices(
+                list(table), weights=[v["weight"] for v in table.values()]
+            )[0]
             size = GridSpace.SIZES.get(int(table[sp].get("shadow", 3)), "medium")
-            return self._catch(vil, table, f"threw bait in the {where} and a {size} shadow appeared", "fish", sp)
-        sp = a.get("_species") if a.get("_species") in self.w["fish"] else None  # set by the body, never the mind
-        label = f"fished for a {a['_size']} shadow in the {where}" if a.get("_size") and sp else f"fished in the {where}"
+            return self._catch(
+                vil,
+                table,
+                f"threw bait in the {where} and a {size} shadow appeared",
+                "fish",
+                sp,
+            )
+        sp = (
+            a.get("_species") if a.get("_species") in self.w["fish"] else None
+        )  # set by the body, never the mind
+        label = (
+            f"fished for a {a['_size']} shadow in the {where}"
+            if a.get("_size") and sp
+            else f"fished in the {where}"
+        )
         return self._catch(vil, table, label, "fish", sp)
 
     def _do_catch_bug(self, vil, a, hour):
         # On the grid the body says which habitat it searched; elsewhere every bug is possible.
         hab = a.get("habitat")
-        table = {k: v for k, v in self.w["bugs"].items()
-                 if self._available(v, hour) and (hab is None or v.get("habitat", "ground") == hab)}
-        where = {"flowers": "among the flowers", "trees": "around the trees", "stumps": "on the stumps",
-                 "rocks": "by the rocks", "ground": "in the grass"}.get(hab, "")
+        table = {
+            k: v
+            for k, v in self.w["bugs"].items()
+            if self._available(v, hour)
+            and (hab is None or v.get("habitat", "ground") == hab)
+        }
+        where = {
+            "flowers": "among the flowers",
+            "trees": "around the trees",
+            "stumps": "on the stumps",
+            "rocks": "by the rocks",
+            "ground": "in the grass",
+        }.get(hab, "")
         if a.get("none_seen"):
             if a.get("none_out"):
-                return True, f"looked for bugs {where}, but there seem to be none there at this time".replace("  ", " ")
-            return True, f"looked for bugs {where}, but didn't see any".replace("  ", " ")
-        sp = a.get("_species") if a.get("_species") in self.w["bugs"] else None  # set by the body, never the mind
+                return (
+                    True,
+                    f"looked for bugs {where}, but there seem to be none there at this time".replace(
+                        "  ", " "
+                    ),
+                )
+            return True, f"looked for bugs {where}, but didn't see any".replace(
+                "  ", " "
+            )
+        sp = (
+            a.get("_species") if a.get("_species") in self.w["bugs"] else None
+        )  # set by the body, never the mind
         return self._catch(vil, table, f"went bug catching {where}".strip(), "bugs", sp)
 
     # --- home: decorating, visits, gifts --------------------------------------
@@ -948,7 +1342,10 @@ class Island:
         if vil.inventory[item] < 1:
             return False, f"you don't have {_a(item)}"
         if len(vil.interior) >= self.interior_slots(vil):
-            return False, f"your {self.w['house_levels'][vil.house]['name']} has no room for more furniture"
+            return (
+                False,
+                f"your {self.w['house_levels'][vil.house]['name']} has no room for more furniture",
+            )
         vil.inventory[item] -= 1
         vil.interior.append(item)
         return True, f"put {_a(item)} in your home"
@@ -967,27 +1364,60 @@ class Island:
         """Why `visit` can't reach someone or somewhere, and what would (prompt version 2 on)."""
         who = str(who or "").strip()
         low = who.lower()
-        npcs = [n for n in NPCS if n in low and n not in ("timmy", "tommy", "the able sisters")]
+        npcs = [
+            n
+            for n in NPCS
+            if n in low and n not in ("timmy", "tommy", "the able sisters")
+        ]
         if npcs:
-            where = sorted({("the " if NPCS[n][0] == "museum" else "") + NPCS[n][0] for n in npcs})
-            one = {"timmy and tommy": "Timmy and Tommy", "able sisters": "Able Sisters"}.get(npcs[0], npcs[0].title())
-            return (f"{who} {'don' if len(npcs) > 1 or ' and ' in low or 'sisters' in low else 'doesn'}'t live in a house you can visit; they work at "
-                    f"{' and '.join(where)}. To talk to " + ("one of them, use ask with one name at a time" if len(npcs) > 1
-                    else "them, use ask") + f" (who: {one}). Visiting is for other villagers' homes")
-        if low in {"resident services", "nook's cranny", "nooks cranny", "the cranny", "museum", "the museum",
-                   "able sisters", "plaza", "the plaza", "airport", "the airport"}:
-            return (f"{who} isn't anyone's home. You go somewhere by doing something there: buy or sell at Nook's "
-                    "Cranny, ask Tom Nook or Isabelle at Resident Services, donate or assess fossils at the museum. Visiting is for "
-                    "other villagers' homes")
+            where = sorted(
+                {("the " if NPCS[n][0] == "museum" else "") + NPCS[n][0] for n in npcs}
+            )
+            one = {
+                "timmy and tommy": "Timmy and Tommy",
+                "able sisters": "Able Sisters",
+            }.get(npcs[0], npcs[0].title())
+            return (
+                f"{who} {'don' if len(npcs) > 1 or ' and ' in low or 'sisters' in low else 'doesn'}'t live in a house you can visit; they work at "
+                f"{' and '.join(where)}. To talk to "
+                + (
+                    "one of them, use ask with one name at a time"
+                    if len(npcs) > 1
+                    else "them, use ask"
+                )
+                + f" (who: {one}). Visiting is for other villagers' homes"
+            )
+        if low in {
+            "resident services",
+            "nook's cranny",
+            "nooks cranny",
+            "the cranny",
+            "museum",
+            "the museum",
+            "able sisters",
+            "plaza",
+            "the plaza",
+            "airport",
+            "the airport",
+        }:
+            return (
+                f"{who} isn't anyone's home. You go somewhere by doing something there: buy or sell at Nook's "
+                "Cranny, ask Tom Nook or Isabelle at Resident Services, donate or assess fossils at the museum. Visiting is for "
+                "other villagers' homes"
+            )
         return f"there is no villager called {who} to visit"
 
     def not_an_npc(self, who: str) -> str:
         """Why `ask` can't reach someone, and what would (prompt version 2 on)."""
         if who in self.v:
-            return (f"{who} is a villager, not someone who runs a building, so ask doesn't reach them. To talk to "
-                    f"{who}, meet them around the island, visit their home, or write to them at the plaza")
-        return (f"nobody called '{who}' to ask; ask is for Tom Nook, Isabelle, Blathers, Timmy and Tommy or the "
-                "Able Sisters")
+            return (
+                f"{who} is a villager, not someone who runs a building, so ask doesn't reach them. To talk to "
+                f"{who}, meet them around the island, visit their home, or write to them at the plaza"
+            )
+        return (
+            f"nobody called '{who}' to ask; ask is for Tom Nook, Isabelle, Blathers, Timmy and Tommy or the "
+            "Able Sisters"
+        )
 
     def _do_visit(self, vil, a, hour):
         host = a.get("who")
@@ -1000,7 +1430,9 @@ class Island:
     def transfer(self, giver: str, taker: str, items: dict) -> tuple[bool, str]:
         """Hand items (or bells) from one villager to another, in person."""
         g, t = self.v[giver], self.v[taker]
-        items = self.resolve_side(giver, {str(k).lower(): int(n) for k, n in items.items() if int(n) > 0})
+        items = self.resolve_side(
+            giver, {str(k).lower(): int(n) for k, n in items.items() if int(n) > 0}
+        )
         if not items:
             return False, "nothing to give"
         for k, n in items.items():
@@ -1018,22 +1450,50 @@ class Island:
         if not items or asked not in self.v or asked == asker:
             return None
         items = self.resolve_side(asked, items)
-        if self.unknown_items(items):  # a request for something that doesn't exist isn't kept
+        if self.unknown_items(
+            items
+        ):  # a request for something that doesn't exist isn't kept
             return None
-        for f in self.favors:  # asking again for the same thing doesn't open a second request
-            if f["status"] == "open" and f["asker"] == asker and f["asked"] == asked and f["items"] == items:
+        for (
+            f
+        ) in (
+            self.favors
+        ):  # asking again for the same thing doesn't open a second request
+            if (
+                f["status"] == "open"
+                and f["asker"] == asker
+                and f["asked"] == asked
+                and f["items"] == items
+            ):
                 return f
-        f = {"id": f"f{len(self.favors) + 1}", "day": self.day, "asker": asker, "asked": asked,
-             "items": items, "status": "open", "done_day": None}
+        f = {
+            "id": f"f{len(self.favors) + 1}",
+            "day": self.day,
+            "asker": asker,
+            "asked": asked,
+            "items": items,
+            "status": "open",
+            "done_day": None,
+        }
         self.favors.append(f)
         return f
 
-    def _settle_favors(self, giver: str, taker: str, items: dict, by: str = "gift") -> None:
+    def _settle_favors(
+        self, giver: str, taker: str, items: dict, by: str = "gift"
+    ) -> None:
         """Close the taker's open requests of the giver that `items` covers. `by` says how they were met: a
-        "gift" (in person, by parcel, or a plaza offer asking nothing back) or a "trade" (something came back)."""
+        "gift" (in person, by parcel, or a plaza offer asking nothing back) or a "trade" (something came back).
+        """
         for f in self.favors:
-            if f["status"] == "open" and f["asker"] == taker and f["asked"] == giver \
-                    and all(items.get(resolve_item(k, items), 0) >= n for k, n in f["items"].items()):
+            if (
+                f["status"] == "open"
+                and f["asker"] == taker
+                and f["asked"] == giver
+                and all(
+                    items.get(resolve_item(k, items), 0) >= n
+                    for k, n in f["items"].items()
+                )
+            ):
                 f["status"], f["done_day"], f["by"] = "done", self.day, by
                 self.favors_done_today.append(f)
 
@@ -1048,13 +1508,22 @@ class Island:
 
     def room_problem(self, who: str, out: dict, back: dict) -> dict | None:
         """{"who", "room": True} if `who`'s pockets, handing over `out`, have no room for `back` (bells take none)."""
-        things = lambda side: sum(n for k, n in side.items() if k != "bells")  # noqa: E731
-        return {"who": who, "room": True} if self.space(self.v[who]) + things(out) < things(back) else None
+        things = lambda side: sum(
+            n for k, n in side.items() if k != "bells"
+        )  # noqa: E731
+        return (
+            {"who": who, "room": True}
+            if self.space(self.v[who]) + things(out) < things(back)
+            else None
+        )
 
     def accept_problem(self, who: str, table: dict) -> dict | None:
         """Prompt version 13: what stops `who` from holding up their side of the trade on the table (they give its
-        "want" and get its "give"), from their own pockets only: they lack something, or have no room."""
-        return self.lacking(who, table["want"]) or self.room_problem(who, table["want"], table["give"])
+        "want" and get its "give"), from their own pockets only: they lack something, or have no room.
+        """
+        return self.lacking(who, table["want"]) or self.room_problem(
+            who, table["want"], table["give"]
+        )
 
     def give_problem(self, giver: str, taker: str, items: dict) -> dict:
         """Why a gift in person can't go through: the giver lacks something, or else the taker has no room."""
@@ -1062,15 +1531,22 @@ class Island:
 
     def cranny_value(self, side: dict) -> int:
         """What Nook's Cranny would pay for a bundle (bells count as themselves)."""
-        return sum(n if k == "bells" else n * self.prices.get(k, 0) for k, n in side.items())
+        return sum(
+            n if k == "bells" else n * self.prices.get(k, 0) for k, n in side.items()
+        )
 
     def trade(self, a: str, b: str, give: dict, want: dict) -> tuple[bool, dict | None]:
         """A trade in person (prompt version 12): `a` hands `b` `give` and gets `want` back, both at once, or
         nothing moves. Only pockets count. Returns (True, None), or (False, what stopped it): {"who", "item",
-        "have"} when someone lacks something, {"who", "room": True} when someone has no room."""
+        "have"} when someone lacks something, {"who", "room": True} when someone has no room.
+        """
         va, vb = self.v[a], self.v[b]
-        problem = (self.lacking(a, give) or self.lacking(b, want)
-                   or self.room_problem(b, want, give) or self.room_problem(a, give, want))
+        problem = (
+            self.lacking(a, give)
+            or self.lacking(b, want)
+            or self.room_problem(b, want, give)
+            or self.room_problem(a, give, want)
+        )
         if problem:
             return False, problem
         pa, pb = self.take_items(va, give), self.take_items(vb, want)
@@ -1100,13 +1576,19 @@ class Island:
         if a.get("none_seen") and self.shells_left > 0:
             return True, "walked along the beach but saw no shells around there"
         if self.rng.random() < isl["bottle_chance"]:
-            r = self.rng.choice(sorted(set(self.w["recipes"]) - set(self.tool_recipes())))
-            msgs.append(f"found a message bottle with a recipe card: {self.give_card(vil, r)}")
+            r = self.rng.choice(
+                sorted(set(self.w["recipes"]) - set(self.tool_recipes()))
+            )
+            msgs.append(
+                f"found a message bottle with a recipe card: {self.give_card(vil, r)}"
+            )
         n = min(isl["shells_per_action"], self.shells_left)
         if n == 0:
             return True, "; ".join(msgs + ["the beach is picked clean today"])
         shells = self.w["shells"]
-        draws = Counter(self.rng.choices(list(shells), weights=[v[1] for v in shells.values()], k=n))
+        draws = Counter(
+            self.rng.choices(list(shells), weights=[v[1] for v in shells.values()], k=n)
+        )
         got = self.give_items(vil, draws)
         self.shells_left -= sum(got.values())
         self.collected[vil.name]["shells"] += sum(got.values())
@@ -1123,7 +1605,10 @@ class Island:
         self.fossils_left -= 1
         vil.inventory[FOSSIL] += 1
         self.collected[vil.name]["fossils"] += 1
-        return True, "dug up a fossil; nobody knows what it is until Blathers assesses it at the museum"
+        return (
+            True,
+            "dug up a fossil; nobody knows what it is until Blathers assesses it at the museum",
+        )
 
     def _do_dig_clam(self, vil, a, hour):
         """A manila clam from a spot on the beach. The first one teaches the fishing bait recipe (1 clam, 1 bait)."""
@@ -1150,7 +1635,10 @@ class Island:
         found = Counter(self.rng.choice(sorted(self.w["fossils"])) for _ in range(n))
         for f, k in found.items():
             vil.inventory[f] += k
-        return True, f"Blathers assessed {n} fossil{'s' if n > 1 else ''}: {_fmt(found)}"
+        return (
+            True,
+            f"Blathers assessed {n} fossil{'s' if n > 1 else ''}: {_fmt(found)}",
+        )
 
     def _do_plant(self, vil, a, hour):
         item = str(a.get("item", "")).lower()
@@ -1169,11 +1657,19 @@ class Island:
         if vil.inventory[item] < 1:
             return False, f"you have no {item}"
         vil.inventory[item] -= 1
-        self.trees.append(Tree("sapling", mature_in=self.w["island"]["sapling_mature_days"],
-                               becomes="fruit" if item == fruit else "hardwood",
-                               pos=tuple(a["at"]) if a.get("at") else None))
+        self.trees.append(
+            Tree(
+                "sapling",
+                mature_in=self.w["island"]["sapling_mature_days"],
+                becomes="fruit" if item == fruit else "hardwood",
+                pos=tuple(a["at"]) if a.get("at") else None,
+            )
+        )
         self.collected[vil.name]["planted"] += 1
-        return True, f"planted {_a(item)}; it will be a grown tree in {self.w['island']['sapling_mature_days']} days"
+        return (
+            True,
+            f"planted {_a(item)}; it will be a grown tree in {self.w['island']['sapling_mature_days']} days",
+        )
 
     def _do_chop_down_tree(self, vil, a, hour):
         kind = str(a.get("kind", "hardwood")).lower()
@@ -1183,7 +1679,10 @@ class Island:
         t.kind, t.wood_left, t.fruit = "stump", 0, 0
         got = self.give_items(vil, Counter({"wood": 2}))
         self.collected[vil.name]["trees_removed"] += 1
-        return True, f"chopped down {_a(kind)} tree (got {_fmt(got) or 'nothing'}); a stump is left"
+        return (
+            True,
+            f"chopped down {_a(kind)} tree (got {_fmt(got) or 'nothing'}); a stump is left",
+        )
 
     def _do_dig_stump(self, vil, a, hour):
         t = self._pick_tree(a, lambda t: t.kind == "stump")
@@ -1196,9 +1695,14 @@ class Island:
         fruit = self.w["island"]["native_fruit"]
         if vil.inventory[fruit] < 1:
             if getattr(self, "prompt_version", 1) >= 15:
-                return False, (f"you need {_a(fruit)} in your pockets: breaking a rock eats one first, to be strong "
-                               f"enough (shaking a fruit tree drops them)")
-            return False, f"you need to eat {_a(fruit)} first to be strong enough to break a rock"
+                return False, (
+                    f"you need {_a(fruit)} in your pockets: breaking a rock eats one first, to be strong "
+                    f"enough (shaking a fruit tree drops them)"
+                )
+            return (
+                False,
+                f"you need to eat {_a(fruit)} first to be strong enough to break a rock",
+            )
         try:
             idx = int(a.get("rock")) - 1
         except (TypeError, ValueError):
@@ -1211,29 +1715,45 @@ class Island:
         self.rocks[idx] = 0
         self.news.append(f"{vil.name} broke rock {idx + 1}")
         self.collected[vil.name]["rocks_broken"] += 1
-        return True, f"ate {_a(fruit)} and broke rock {idx + 1}; a rock will turn up somewhere in {days} days"
+        return (
+            True,
+            f"ate {_a(fruit)} and broke rock {idx + 1}; a rock will turn up somewhere in {days} days",
+        )
 
     # --- building: these need the grid, which works out the tiles ------------
     def _needs_grid(self, a):
-        return None if "cells" in a or "path" in a else (False, "you can only do that somewhere on the tile island")
+        return (
+            None
+            if "cells" in a or "path" in a
+            else (False, "you can only do that somewhere on the tile island")
+        )
 
     def _do_lay_path(self, vil, a, hour):
         if self._needs_grid(a):
             return self._needs_grid(a)
         style = str(a.get("style", "dirt")).lower()
         if style not in self.w.get("building", {}).get("path_styles", [style]):
-            return False, f"there is no {style} path; options: {', '.join(self.w['building']['path_styles'])}"
+            return (
+                False,
+                f"there is no {style} path; options: {', '.join(self.w['building']['path_styles'])}",
+            )
         n = len(a["path"])
         if n == 0:
             return False, "that stretch is already paved, or there is no way through"
         self.collected[vil.name]["path_tiles"] += n
-        return True, f"laid {n} tiles of {style} path" + (" (more to go)" if a.get("more") else "")
+        return True, f"laid {n} tiles of {style} path" + (
+            " (more to go)" if a.get("more") else ""
+        )
 
     def _do_remove_path(self, vil, a, hour):
         if self._needs_grid(a):
             return self._needs_grid(a)
         n = len(a["cells"])
-        return (True, f"removed {n} tiles of path") if n else (False, "no path of yours there to remove")
+        return (
+            (True, f"removed {n} tiles of path")
+            if n
+            else (False, "no path of yours there to remove")
+        )
 
     def _do_place(self, vil, a, hour):
         if self._needs_grid(a):
@@ -1244,12 +1764,19 @@ class Island:
             return False, f"{item} can't be placed outside"
         n = len(a["cells"])
         if vil.inventory[item] < n or n == 0:
-            return False, (f"you have only {vil.inventory[item]} {item}" if vil.inventory[item] < max(1, n)
-                           else "there is no free space there")
+            return False, (
+                f"you have only {vil.inventory[item]} {item}"
+                if vil.inventory[item] < max(1, n)
+                else "there is no free space there"
+            )
         vil.inventory[item] -= n
         self.collected[vil.name]["placed"] += n
         where = a.get("near", "there")
-        return True, f"put {n} {item} outside near {where}" if n > 1 else f"put {_a(item)} outside near {where}"
+        return True, (
+            f"put {n} {item} outside near {where}"
+            if n > 1
+            else f"put {_a(item)} outside near {where}"
+        )
 
     def _do_fence_off(self, vil, a, hour):
         if self._needs_grid(a):
@@ -1261,7 +1788,10 @@ class Island:
         if need == 0:
             return False, "there is nothing left to fence there"
         if vil.inventory[item] < need:
-            return False, f"fencing that needs {need} pieces of {item}; you have {vil.inventory[item]}"
+            return (
+                False,
+                f"fencing that needs {need} pieces of {item}; you have {vil.inventory[item]}",
+            )
         vil.inventory[item] -= need
         self.collected[vil.name]["placed"] += need
         return True, f"fenced it off with {need} pieces of {item}"
@@ -1287,8 +1817,12 @@ class Island:
         if r not in vil.recipes:
             return False, f"you don't know the {r} recipe"
         needs = self.w["recipes"][r]["needs"]
-        home = self.split_home() and a.get("_at_home")  # at home, what is kept there counts too (version 12)
-        have = lambda k: vil.inventory[k] + (vil.home_items[k] if home else 0)  # noqa: E731
+        home = self.split_home() and a.get(
+            "_at_home"
+        )  # at home, what is kept there counts too (version 12)
+        have = lambda k: vil.inventory[k] + (
+            vil.home_items[k] if home else 0
+        )  # noqa: E731
         short = {k: n - have(k) for k, n in needs.items() if have(k) < n}
         if short:
             return False, f"not enough materials for {r}; short {_fmt(Counter(short))}"
@@ -1304,7 +1838,9 @@ class Island:
         vil.inventory[r] += makes - kept
         if kept:
             self.put_home(vil, {"items": {r: kept}})
-        used_home = {k: n - from_pockets[k] for k, n in needs.items() if n > from_pockets[k]}
+        used_home = {
+            k: n - from_pockets[k] for k, n in needs.items() if n > from_pockets[k]
+        }
         msg = f"crafted {_a(r)}" if makes == 1 else f"crafted {makes} {r} pieces"
         if used_home:
             msg += f" (using {_fmt(Counter(used_home))} kept at home)"
@@ -1313,7 +1849,9 @@ class Island:
         return True, msg
 
     def _do_sell(self, vil, a, hour):
-        items = a.get("items") or ({a["item"]: a.get("qty", 1)} if a.get("item") else {})
+        items = a.get("items") or (
+            {a["item"]: a.get("qty", 1)} if a.get("item") else {}
+        )
         sold, total, problems = Counter(), 0, []
         for k, n in items.items():
             k, n = str(k).lower(), int(n)
@@ -1330,30 +1868,64 @@ class Island:
             total += n * self.sell_price(k)
             vil.prices_seen[k] = self.sell_price(k)
         vil.bells += total
-        msg = f"sold {_fmt(sold)} at Nook's Cranny for {total} bells" if sold else "sold nothing"
+        msg = (
+            f"sold {_fmt(sold)} at Nook's Cranny for {total} bells"
+            if sold
+            else "sold nothing"
+        )
         if problems:
             msg += " (" + "; ".join(problems) + ")"
         return bool(sold), msg
 
     def _do_send(self, vil, a, hour):
         """Prompt version 21: a letter, things from the pockets, or both, to another villager. Like a letter or
-        parcel from the plaza: the things leave now and it all arrives the next morning."""
-        to = next((n for n in self.v if n.lower() == str(a.get("to", "")).strip().lower()), None)
+        parcel from the plaza: the things leave now and it all arrives the next morning.
+        """
+        to = next(
+            (n for n in self.v if n.lower() == str(a.get("to", "")).strip().lower()),
+            None,
+        )
         note = str(a.get("note") or "").strip()
-        items = {str(k).lower(): int(n) for k, n in (a.get("items") or {}).items() if int(n) > 0}
+        items = {
+            str(k).lower(): int(n)
+            for k, n in (a.get("items") or {}).items()
+            if int(n) > 0
+        }
         if to is None or to == vil.name:
             return False, "there's no one called that to send it to"
         if items:
             parcel = self.take_items(vil, items)
             if parcel is None:
-                return False, f"you don't have all of that in your pockets any more ({_fmt(Counter(items))})"
-            self.mail.append({"kind": "parcel", "from": vil.name, "to": to, "sent_day": self.day, "parcel": parcel,
-                              "note": note[:300]})
-            return True, (f"sent {to} a parcel: {', '.join(f'{n} {k}' for k, n in items.items())}"
-                          + (f' ("{note[:300]}")' if note else "") + "; it arrives tomorrow morning")
+                return (
+                    False,
+                    f"you don't have all of that in your pockets any more ({_fmt(Counter(items))})",
+                )
+            self.mail.append(
+                {
+                    "kind": "parcel",
+                    "from": vil.name,
+                    "to": to,
+                    "sent_day": self.day,
+                    "parcel": parcel,
+                    "note": note[:300],
+                }
+            )
+            return True, (
+                f"sent {to} a parcel: {', '.join(f'{n} {k}' for k, n in items.items())}"
+                + (f' ("{note[:300]}")' if note else "")
+                + "; it arrives tomorrow morning"
+            )
         if not note:
             return False, "nothing to send: no items and no note"
-        self.mail.append({"kind": "letter", "from": vil.name, "to": to, "sent_day": self.day, "text": note})
+        self.mail.append(
+            {
+                "kind": "letter",
+                "from": vil.name,
+                "to": to,
+                "sent_day": self.day,
+                "text": note,
+            }
+        )
         return True, f'sent {to} a letter: "{note}"; it arrives tomorrow morning'
 
     def tools_for_sale(self) -> dict[str, int]:
@@ -1363,16 +1935,24 @@ class Island:
         if not mult:
             return {}
         f = self.price_factor()
-        return {r: int(round(self.w["recipes"][r]["price"] * mult * f)) for r in self.tool_recipes()}
+        return {
+            r: int(round(self.w["recipes"][r]["price"] * mult * f))
+            for r in self.tool_recipes()
+        }
 
     def recipe_needs(self, recipe: str) -> str:
         r = self.w["recipes"][recipe]
-        return f"needs {_fmt(Counter(r['needs']))}" + (f", makes {r['makes']}" if r.get("makes", 1) > 1 else "")
+        return f"needs {_fmt(Counter(r['needs']))}" + (
+            f", makes {r['makes']}" if r.get("makes", 1) > 1 else ""
+        )
 
     def recipe_cards_for_sale(self) -> dict[str, int]:
         """Recipe cards at Nook's Cranny today: every tool, plus the day's one other card."""
         cr, f = self.w["shops"]["cranny"], self.price_factor()
-        out = {r: int(round(cr.get("tool_recipe_price", 500) * f)) for r in self.tool_recipes()}
+        out = {
+            r: int(round(cr.get("tool_recipe_price", 500) * f))
+            for r in self.tool_recipes()
+        }
         if self.cranny_recipe:
             out[self.cranny_recipe] = int(round(cr["recipe_price"] * f))
         return out
@@ -1381,7 +1961,11 @@ class Island:
         """One of something, or from prompt version 15 up to `count` (at most 10), stopping at the first that
         doesn't go through."""
         try:
-            count = max(1, min(10, int(a.get("count", 1)))) if getattr(self, "prompt_version", 1) >= 15 else 1
+            count = (
+                max(1, min(10, int(a.get("count", 1))))
+                if getattr(self, "prompt_version", 1) >= 15
+                else 1
+            )
         except (TypeError, ValueError):
             count = 1
         if count == 1:
@@ -1410,17 +1994,30 @@ class Island:
                 return False, "pockets full"
             vil.bells -= price
             self.put_items(vil, {"items": {item: 1}})
-            return True, f"bought a new {item} for {price} bells ({self.w['tools']['uses']} uses)"
+            return (
+                True,
+                f"bought a new {item} for {price} bells ({self.w['tools']['uses']} uses)",
+            )
         r = recipe_of_card(item) or (item if item in cards else None)
         if r in cards:
             price = cards[r]
             if vil.bells < price:
-                return False, f"the {r} recipe card costs {price} bells; you have {vil.bells}"
+                return (
+                    False,
+                    f"the {r} recipe card costs {price} bells; you have {vil.bells}",
+                )
             if r in vil.recipes and self.space(vil) < 1:
                 return False, "pockets full"
             vil.bells -= price
-            return True, f"bought the {r} recipe card for {price} bells; {self.give_card(vil, r)}"
-        stock = self.cranny_stock if shop == "cranny" else self.able_stock if shop == "able" else None
+            return (
+                True,
+                f"bought the {r} recipe card for {price} bells; {self.give_card(vil, r)}",
+            )
+        stock = (
+            self.cranny_stock
+            if shop == "cranny"
+            else self.able_stock if shop == "able" else None
+        )
         if stock is None:
             return False, "shop must be 'cranny' or 'able'"
         if item not in stock:
@@ -1438,13 +2035,19 @@ class Island:
         item = str(a.get("item", "")).lower()
         cat = category_of(self.w, item)
         if item == FOSSIL:
-            return False, "Blathers needs to assess a fossil before the museum can take it (assess)"
+            return (
+                False,
+                "Blathers needs to assess a fossil before the museum can take it (assess)",
+            )
         if cat is None:
             return False, f"Blathers only takes fish, bugs and fossils, not {item}"
         if vil.inventory[item] < 1:
             return False, f"you have no {item}"
         if item in self.museum[cat]:
-            return False, f"the museum already has {_a(item)} (donated by {self.museum[cat][item]})"
+            return (
+                False,
+                f"the museum already has {_a(item)} (donated by {self.museum[cat][item]})",
+            )
         vil.inventory[item] -= 1
         self.museum[cat][item] = vil.name
         self.news.append(f"{vil.name} donated {_a(item)} to the museum")
@@ -1452,7 +2055,10 @@ class Island:
 
     def _do_upgrade_house(self, vil, a, hour):
         if vil.loan > 0:
-            return False, f"Tom Nook wants the current loan ({vil.loan} bells) paid off first"
+            return (
+                False,
+                f"Tom Nook wants the current loan ({vil.loan} bells) paid off first",
+            )
         levels = self.w["house_levels"]
         if vil.house + 1 >= len(levels):
             return False, "your house is already as big as it gets"
@@ -1460,7 +2066,10 @@ class Island:
         vil.house += 1
         vil.loan = nxt["cost"]
         self.news.append(f"{vil.name} moved into a {nxt['name']}")
-        return True, f"Tom Nook upgraded you to a {nxt['name']} (storage {nxt['storage']}); you now owe {vil.loan} bells"
+        return (
+            True,
+            f"Tom Nook upgraded you to a {nxt['name']} (storage {nxt['storage']}); you now owe {vil.loan} bells",
+        )
 
     def _do_pay_loan(self, vil, a, hour):
         amt = min(int(a.get("bells", vil.bells)), vil.bells, vil.loan)
@@ -1472,9 +2081,16 @@ class Island:
 
     def structures(self) -> list[dict]:
         """Prompt version 17: every bridge and stairs, the first bridge included, each with its fund:
-        {"id", "kind", "name", "fund", "built", "by"}. The first bridge's id is "bridge"."""
-        first = {"id": "bridge", "kind": "bridge", "name": self.w["bridge"]["name"], "fund": self.bridge_fund,
-                 "built": self.bridge_built, "by": None}
+        {"id", "kind", "name", "fund", "built", "by"}. The first bridge's id is "bridge".
+        """
+        first = {
+            "id": "bridge",
+            "kind": "bridge",
+            "name": self.w["bridge"]["name"],
+            "fund": self.bridge_fund,
+            "built": self.bridge_built,
+            "by": None,
+        }
         return [first] + list(getattr(self, "projects", None) or [])
 
     def proposal_problem(self, name: str) -> str | None:
@@ -1495,7 +2111,8 @@ class Island:
 
     def _propose(self, vil, a, kind):
         """Prompt version 17: a bridge or stairs where the villager stands (the grid picks the spot, in `_cells`).
-        Free to propose; built once its fund reaches the cost, from anyone's donations at Resident Services."""
+        Free to propose; built once its fund reaches the cost, from anyone's donations at Resident Services.
+        """
         if getattr(self, "prompt_version", 1) < 17:
             return False, not_an_action(f"propose_{kind}")
         cfg = structures_cfg(self.w)
@@ -1506,17 +2123,35 @@ class Island:
             return self._needs_grid({})
         n = 1 + len(self.projects)
         name = a.get("_name") or f"{kind} {n}"
-        self.projects.append({"id": f"s{n}", "kind": kind, "name": name, "cells": [list(c) for c in a["_cells"]],
-                              "water": a.get("_water") or [], "steps": a.get("_steps") or [],
-                              "by": vil.name, "day": self.day, "fund": 0, "built": False})
-        what = ("a " if kind == "bridge" else "") + name  # "a bridge across ...", "stairs up to ..."
+        self.projects.append(
+            {
+                "id": f"s{n}",
+                "kind": kind,
+                "name": name,
+                "cells": [list(c) for c in a["_cells"]],
+                "water": a.get("_water") or [],
+                "steps": a.get("_steps") or [],
+                "by": vil.name,
+                "day": self.day,
+                "fund": 0,
+                "built": False,
+            }
+        )
+        what = (
+            "a " if kind == "bridge" else ""
+        ) + name  # "a bridge across ...", "stairs up to ..."
         self.news.append(f"{vil.name} proposed {what}")
-        return True, (f"proposed {what}; Tom Nook builds it once {cfg['cost']} bells have been donated at Resident "
-                      f"Services, and anyone can chip in ({len(self.structures())} of {cfg['max']} bridges and stairs "
-                      "on the island, built or proposed)")
+        return True, (
+            f"proposed {what}; Tom Nook builds it once {cfg['cost']} bells have been donated at Resident "
+            f"Services, and anyone can chip in ({len(self.structures())} of {cfg['max']} bridges and stairs "
+            "on the island, built or proposed)"
+        )
 
     def _do_contribute_bridge(self, vil, a, hour):
-        if a.get("project") not in (None, "", "bridge") and getattr(self, "prompt_version", 1) >= 17:
+        if (
+            a.get("project") not in (None, "", "bridge")
+            and getattr(self, "prompt_version", 1) >= 17
+        ):
             return self._contribute_project(vil, a)
         if self.bridge_built:
             return False, "the bridge is already built"
@@ -1525,7 +2160,10 @@ class Island:
         if amt <= 0:
             if getattr(self, "prompt_version", 1) >= 15 and vil.bells <= 0:
                 return False, "no bells contributed: your wallet is empty" + (
-                    f" (your {vil.home_bells} bells at home stay there)" if vil.home_bells else "")
+                    f" (your {vil.home_bells} bells at home stay there)"
+                    if vil.home_bells
+                    else ""
+                )
             return False, "no bells contributed"
         vil.bells -= amt
         self.bridge_fund += amt
@@ -1533,7 +2171,9 @@ class Island:
         msg = f"put {amt} bells toward the {self.w['bridge']['name']} ({self.bridge_fund}/{cost})"
         if self.bridge_fund >= cost:
             self._build_bridge()
-            self.news.append(f"the {self.w['bridge']['name']} was fully funded and built")
+            self.news.append(
+                f"the {self.w['bridge']['name']} was fully funded and built"
+            )
             msg += "; it is fully funded and built!"
         return True, msg
 
@@ -1547,7 +2187,11 @@ class Island:
         cost = structures_cfg(self.w)["cost"]
         amt = min(int(a.get("bells", 0)), vil.bells, cost - p["fund"])
         if amt <= 0:
-            return False, "no bells contributed: your wallet is empty" if vil.bells <= 0 else "no bells contributed"
+            return False, (
+                "no bells contributed: your wallet is empty"
+                if vil.bells <= 0
+                else "no bells contributed"
+            )
         vil.bells -= amt
         p["fund"] += amt
         self.collected[vil.name]["bridge_bells"] += amt
@@ -1560,35 +2204,60 @@ class Island:
 
     def _do_set_ordinance(self, vil, a, hour):
         types = self.w.get("ordinances", {}).get("types", {})
-        o = str(a.get("ordinance", "")).strip().lower().replace(" ", "_").replace("-", "_")
+        o = (
+            str(a.get("ordinance", ""))
+            .strip()
+            .lower()
+            .replace(" ", "_")
+            .replace("-", "_")
+        )
         if o not in types:
-            return False, f"Isabelle has no ordinance called '{o}'; options: {', '.join(types)}"
+            return (
+                False,
+                f"Isabelle has no ordinance called '{o}'; options: {', '.join(types)}",
+            )
         if o == self.ordinance and not self.pending_ordinance:
             return False, f"that ordinance is already in effect"
         cost = int(self.w["ordinances"]["cost"])
         if vil.bells < cost:
-            return False, f"Isabelle says changing the ordinance costs {cost} bells; you have {vil.bells}"
+            return (
+                False,
+                f"Isabelle says changing the ordinance costs {cost} bells; you have {vil.bells}",
+            )
         vil.bells -= cost
         self.pending_ordinance = (o, vil.name)
-        self.news.append(f"{vil.name} paid Isabelle to set the ordinance to {o.replace('_', ' ')} from tomorrow")
-        return True, f"paid Isabelle {cost} bells; the {o.replace('_', ' ')} ordinance starts tomorrow at {clock(self.w['calendar']['day_start'])}"
+        self.news.append(
+            f"{vil.name} paid Isabelle to set the ordinance to {o.replace('_', ' ')} from tomorrow"
+        )
+        return (
+            True,
+            f"paid Isabelle {cost} bells; the {o.replace('_', ' ')} ordinance starts tomorrow at {clock(self.w['calendar']['day_start'])}",
+        )
 
     def _do_move_house(self, vil, a, hour):
         cost = int(self.w.get("move_house_cost", 10000))
         site = str(a.get("to", "")).strip()
         free = [s for s in self.free_sites() if s not in self.pending_moves.values()]
         if vil.name in self.pending_moves:
-            return False, f"Tom Nook is already moving you to {self.pending_moves[vil.name]} tonight"
+            return (
+                False,
+                f"Tom Nook is already moving you to {self.pending_moves[vil.name]} tonight",
+            )
         if site not in free:
             opts = ", ".join(f"{s} ({self.sites[s]['area']})" for s in free) or "none"
             return False, f"Tom Nook can't move you to '{site}'; free homesites: {opts}"
         if vil.bells < cost:
-            return False, f"Tom Nook says moving your home costs {cost} bells; you have {vil.bells}"
+            return (
+                False,
+                f"Tom Nook says moving your home costs {cost} bells; you have {vil.bells}",
+            )
         vil.bells -= cost
         self.pending_moves[vil.name] = site
         self.news.append(f"{vil.name} is moving home to {self.sites[site]['area']}")
-        return True, (f"paid Tom Nook {cost} bells; your home moves to {self.sites[site]['area']} ({site}) overnight, "
-                      "with everything inside it")
+        return True, (
+            f"paid Tom Nook {cost} bells; your home moves to {self.sites[site]['area']} ({site}) overnight, "
+            "with everything inside it"
+        )
 
     def _do_ask(self, vil, a, hour):
         """Talk to an island NPC: what they do, and what it costs. Takes the hour, costs nothing else."""
@@ -1596,14 +2265,18 @@ class Island:
 
     def _build_bridge(self):
         """Before prompt version 17 the first bridge also added rocks and trees somewhere on the island (`unlocks`).
-        From 17, a bridge only crosses the river, like any bridge or stairs: it gives access, nothing else."""
+        From 17, a bridge only crosses the river, like any bridge or stairs: it gives access, nothing else.
+        """
         self.bridge_built = True
         if getattr(self, "prompt_version", 1) >= 17:
             return
         u = self.w["bridge"]["unlocks"]
         self.n_rocks += u.get("rocks", 0)
         self.rocks += [self.w["island"]["rock_hits"]] * u.get("rocks", 0)
-        self.trees += [Tree("hardwood", wood_left=self.w["island"]["wood_per_tree"]) for _ in range(u.get("hardwood_trees", 0))]
+        self.trees += [
+            Tree("hardwood", wood_left=self.w["island"]["wood_per_tree"])
+            for _ in range(u.get("hardwood_trees", 0))
+        ]
 
     # --- views -------------------------------------------------------------
     def museum_line(self) -> str:
@@ -1614,7 +2287,13 @@ class Island:
             parts.append(f"{c} {have}/{total} ({names})")
         donors = Counter(d for c in CATEGORIES for d in self.museum[c].values())
         if donors:
-            parts.append("donated by " + ", ".join(f"{n} {k}" for n, k in sorted(donors.items(), key=lambda x: (-x[1], x[0]))))
+            parts.append(
+                "donated by "
+                + ", ".join(
+                    f"{n} {k}"
+                    for n, k in sorted(donors.items(), key=lambda x: (-x[1], x[0]))
+                )
+            )
         return "; ".join(parts)
 
     def pools(self) -> dict:
@@ -1634,14 +2313,31 @@ class Island:
     def snapshot(self) -> dict:
         return {
             "day": self.day,
-            "villagers": {n: {"bells": v.bells, "home_bells": v.home_bells, "loan": v.loan, "house": v.house,
-                              "items": v.items(),
-                              "home_items": {k: c for k, c in sorted(v.home_items.items()) if c > 0},
-                              "inventory_value": sum(self.prices.get(k, 0) * c for k, c in v.inventory.items()),
-                              "home_value": sum(self.prices.get(k, 0) * c for k, c in v.home_items.items()),
-                              "inventory": {k: c for k, c in sorted(v.inventory.items()) if c > 0},
-                              "recipes": sorted(v.recipes), "interior": list(v.interior),
-                              "wearing": dict(v.wearing)} for n, v in self.v.items()},
+            "villagers": {
+                n: {
+                    "bells": v.bells,
+                    "home_bells": v.home_bells,
+                    "loan": v.loan,
+                    "house": v.house,
+                    "items": v.items(),
+                    "home_items": {
+                        k: c for k, c in sorted(v.home_items.items()) if c > 0
+                    },
+                    "inventory_value": sum(
+                        self.prices.get(k, 0) * c for k, c in v.inventory.items()
+                    ),
+                    "home_value": sum(
+                        self.prices.get(k, 0) * c for k, c in v.home_items.items()
+                    ),
+                    "inventory": {
+                        k: c for k, c in sorted(v.inventory.items()) if c > 0
+                    },
+                    "recipes": sorted(v.recipes),
+                    "interior": list(v.interior),
+                    "wearing": dict(v.wearing),
+                }
+                for n, v in self.v.items()
+            },
             "favors": [dict(f) for f in self.favors],
             "weather": getattr(self, "weather", None),
             "museum": {c: dict(self.museum[c]) for c in CATEGORIES},
@@ -1651,7 +2347,11 @@ class Island:
             "structures": [dict(p) for p in getattr(self, "projects", None) or []],
             "collected": {n: dict(c) for n, c in self.collected.items()},
             "homes": dict(self.home),
-            "home_areas": {n: self.sites[s]["area"] for n, s in self.home.items() if s in self.sites},
+            "home_areas": {
+                n: self.sites[s]["area"]
+                for n, s in self.home.items()
+                if s in self.sites
+            },
             "ordinance": self.ordinance,
         }
 

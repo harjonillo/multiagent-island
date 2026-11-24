@@ -55,7 +55,9 @@ METRICS = {
 def _profile_metrics(run: Run) -> dict[tuple[int, str], dict]:
     names = list(run.manifest["villagers"])
     days = [s["day"] for s in snapshots(run)]
-    m: dict[tuple[int, str], dict] = {(d, n): defaultdict(float) for d in days for n in names}
+    m: dict[tuple[int, str], dict] = {
+        (d, n): defaultdict(float) for d in days for n in names
+    }
     groups = defaultdict(Counter)
     first = {}
     places = defaultdict(set)
@@ -69,7 +71,11 @@ def _profile_metrics(run: Run) -> dict[tuple[int, str], dict]:
         first[k] = min(first.get(k, 99), e["hour"])
         if e["location"] not in ("home",):
             places[k].add(e["location"])
-        hits = sum(v for v in (e.get("delta", {}).get("items") or {}).values() if v > 0) if e["action"].get("do") == "mine_rock" else 0
+        hits = (
+            sum(v for v in (e.get("delta", {}).get("items") or {}).values() if v > 0)
+            if e["action"].get("do") == "mine_rock"
+            else 0
+        )
         if e["action"].get("do") == "mine_rock" and e["ok"]:
             hits = hits or 8  # the money rock pays bells, not items
             m[k]["_rock_hits"] += hits
@@ -107,7 +113,12 @@ def _profile_metrics(run: Run) -> dict[tuple[int, str], dict]:
     offers = {e["id"]: e for e in run.of("offer")}
     for e in run.of("offer_update"):
         o = offers.get(e["id"])
-        if o and e["status"] == "accepted" and not o["want"] and (o["day"], o["sender"]) in m:
+        if (
+            o
+            and e["status"] == "accepted"
+            and not o["want"]
+            and (o["day"], o["sender"]) in m
+        ):
             m[(o["day"], o["sender"])]["gifts"] += 1
     for e in run.of("gift"):
         if e["ok"] and (e["day"], e["giver"]) in m:
@@ -129,7 +140,9 @@ def _profile_metrics(run: Run) -> dict[tuple[int, str], dict]:
         for n, v in e["villagers"].items():
             if (e["day"], n) in m:
                 tot = sum(v["spent"].values())
-                m[(e["day"], n)]["talk_energy"] = v["spent"].get("talking", 0) / tot if tot else math.nan
+                m[(e["day"], n)]["talk_energy"] = (
+                    v["spent"].get("talking", 0) / tot if tot else math.nan
+                )
                 m[(e["day"], n)]["habit_plans"] = v["skipped"].get("planning", 0)
     for snap in snapshots(run):
         for n, v in snap["villagers"].items():
@@ -163,10 +176,20 @@ def _env(run: Run) -> dict[str, dict]:
 
     names = list(run.manifest["villagers"])
     arr = {e["agent"]: e for e in run.of("arrival")}
-    env = {n: {"homesite": arr.get(n, {}).get("homesite"), "home_area": arr.get(n, {}).get("area")} for n in names}
+    env = {
+        n: {
+            "homesite": arr.get(n, {}).get("homesite"),
+            "home_area": arr.get(n, {}).get("area"),
+        }
+        for n in names
+    }
     g = GridSpace(run.manifest["world"], run.manifest["seed"])
     snaps = snapshots(run)
-    rocks = [tuple(r) for r in (snaps[0].get("objects") or {}).get("rocks", []) if r] if snaps else []
+    rocks = (
+        [tuple(r) for r in (snaps[0].get("objects") or {}).get("rocks", []) if r]
+        if snaps
+        else []
+    )
     rs = g.coords_of_place("Resident Services")
     for n in names:
         site = env[n]["homesite"]
@@ -175,11 +198,15 @@ def _env(run: Run) -> dict[str, dict]:
             continue
         bare = g.distances(door, frozenset())
         # With a pole, everything on the lower ground is reachable: a fair measure of how central home is.
-        env[n]["steps_to_resident_services"] = g.distances(door, frozenset({"vaulting pole"})).get(rs)
+        env[n]["steps_to_resident_services"] = g.distances(
+            door, frozenset({"vaulting pole"})
+        ).get(rs)
         env[n]["buildings_reachable_without_tools"] = sum(
-            1 for b in g.buildings.values() if b["door"] in bare)
+            1 for b in g.buildings.values() if b["door"] in bare
+        )
         env[n]["rocks_reachable_without_tools"] = sum(
-            1 for r in rocks if any(a in bare for a in g.approach_cells(r)))
+            1 for r in rocks if any(a in bare for a in g.approach_cells(r))
+        )
         env[n]["home_x"], env[n]["home_y"] = door
     return env
 
@@ -199,8 +226,14 @@ def _rank(xs: list[float]) -> list[float]:
 
 
 def spearman(a: list[float], b: list[float]) -> float:
-    pairs = [(x, y) for x, y in zip(a, b) if x is not None and y is not None and not (isinstance(x, float) and math.isnan(x))
-             and not (isinstance(y, float) and math.isnan(y))]
+    pairs = [
+        (x, y)
+        for x, y in zip(a, b)
+        if x is not None
+        and y is not None
+        and not (isinstance(x, float) and math.isnan(x))
+        and not (isinstance(y, float) and math.isnan(y))
+    ]
     if len(pairs) < 4:
         return math.nan
     ra, rb = _rank([p[0] for p in pairs]), _rank([p[1] for p in pairs])
@@ -212,12 +245,16 @@ def spearman(a: list[float], b: list[float]) -> float:
 
 
 def _nanmean(xs):
-    xs = [x for x in xs if x is not None and not (isinstance(x, float) and math.isnan(x))]
+    xs = [
+        x for x in xs if x is not None and not (isinstance(x, float) and math.isnan(x))
+    ]
     return sum(xs) / len(xs) if xs else math.nan
 
 
 def _std(xs):
-    xs = [x for x in xs if x is not None and not (isinstance(x, float) and math.isnan(x))]
+    xs = [
+        x for x in xs if x is not None and not (isinstance(x, float) and math.isnan(x))
+    ]
     if len(xs) < 2:
         return math.nan
     mu = sum(xs) / len(xs)
@@ -229,33 +266,56 @@ def recent_profile(run: Run, window: int = 5) -> dict[str, dict]:
     m = _profile_metrics(run)
     days = sorted({d for d, _ in m})
     recent = days[-window:]
-    return {n: {k: _nanmean([_val(m, d, n, k) for d in recent]) for k in METRICS} for n in run.manifest["villagers"]}
+    return {
+        n: {k: _nanmean([_val(m, d, n, k) for d in recent]) for k in METRICS}
+        for n in run.manifest["villagers"]
+    }
 
 
 def summary_lines(run: Run) -> list[str]:
-    if not run.of("reflection") and run.manifest.get("scenario_config", {}).get("reflection", {}).get("enabled") is not True:
+    if (
+        not run.of("reflection")
+        and run.manifest.get("scenario_config", {}).get("reflection", {}).get("enabled")
+        is not True
+    ):
         return []
     prof = recent_profile(run)
     names = list(prof)
     env = _env(run)
-    L = ["", "Emergent traits (last 5 days). Spread across villagers, first day -> last day:"]
+    L = [
+        "",
+        "Emergent traits (last 5 days). Spread across villagers, first day -> last day:",
+    ]
     m = _profile_metrics(run)
     days = sorted({d for d, _ in m})
     for k in METRICS:
         first = _std([_val(m, days[0], n, k) for n in names])
         last = _std([_val(m, days[-1], n, k) for n in names])
         L.append(f"  {k:<14} {first:7.2f} -> {last:7.2f}")
-    feats = [f for f in ("steps_to_resident_services", "buildings_reachable_without_tools",
-                         "rocks_reachable_without_tools") if any(env[n].get(f) is not None for n in names)]
+    feats = [
+        f
+        for f in (
+            "steps_to_resident_services",
+            "buildings_reachable_without_tools",
+            "rocks_reachable_without_tools",
+        )
+        if any(env[n].get(f) is not None for n in names)
+    ]
     if feats:
-        L.append("Does where they landed predict how they behave? Spearman across villagers:")
+        L.append(
+            "Does where they landed predict how they behave? Spearman across villagers:"
+        )
         for f in feats:
             cells = []
             for k in ("rock_share", "fishing", "chats", "donations", "walked"):
-                r = spearman([env[n].get(f) for n in names], [prof[n][k] for n in names])
+                r = spearman(
+                    [env[n].get(f) for n in names], [prof[n][k] for n in names]
+                )
                 cells.append(f"{k} {r:+.2f}")
             L.append(f"  {f}: " + ", ".join(cells))
-    L.append("  (10 villagers per run: treat single-run correlations as hints; pool runs across seeds.)")
+    L.append(
+        "  (10 villagers per run: treat single-run correlations as hints; pool runs across seeds.)"
+    )
     return L
 
 
@@ -307,19 +367,29 @@ def _plots(run, out_dir, m, names, days) -> list[Path]:
     keys = list(METRICS)
     cols = 4
     rows = (len(keys) + cols - 1) // cols
-    fig, axes = plt.subplots(rows, cols, figsize=(3.4 * cols, 2.4 * rows), squeeze=False, sharex=True)
+    fig, axes = plt.subplots(
+        rows, cols, figsize=(3.4 * cols, 2.4 * rows), squeeze=False, sharex=True
+    )
     for ax, k in zip(axes.flat, keys):
         for n in names:
             ys = [_val(m, d, n, k) for d in days]
             ax.plot(days, ys, color="#c9c8c2", lw=0.9)
-        ax.plot(days, [_std([_val(m, d, n, k) for n in names]) for d in days], color=SERIES[0], lw=2)
+        ax.plot(
+            days,
+            [_std([_val(m, d, n, k) for n in names]) for d in days],
+            color=SERIES[0],
+            lw=2,
+        )
         ax.set_title(k, fontsize=9)
         ax.grid(False)
         ax.tick_params(labelsize=7)
         ax.spines[["top", "right"]].set_visible(False)
-    for ax in axes.flat[len(keys):]:
+    for ax in axes.flat[len(keys) :]:
         ax.axis("off")
-    fig.suptitle("Behaviour by villager (gray) and spread across villagers (blue), by day", fontsize=11)
+    fig.suptitle(
+        "Behaviour by villager (gray) and spread across villagers (blue), by day",
+        fontsize=11,
+    )
     fig.supxlabel("day", fontsize=9)
     fig.tight_layout()
     p = Path(out_dir) / "traits_divergence.png"
@@ -328,7 +398,9 @@ def _plots(run, out_dir, m, names, days) -> list[Path]:
     out.append(p)
 
     prof = recent_profile(run)
-    grid = np.array([[prof[n].get(c, math.nan) for c in keys] for n in names], dtype=float)
+    grid = np.array(
+        [[prof[n].get(c, math.nan) for c in keys] for n in names], dtype=float
+    )
     mu, sd = np.nanmean(grid, axis=0), np.nanstd(grid, axis=0)
     sd[sd == 0] = 1
     z = (grid - mu) / sd
@@ -337,7 +409,9 @@ def _plots(run, out_dir, m, names, days) -> list[Path]:
     im = ax.imshow(np.nan_to_num(z), cmap=cmap, vmin=-2, vmax=2, aspect="auto")
     ax.set_xticks(range(len(keys)), keys, rotation=60, ha="right", fontsize=8)
     ax.set_yticks(range(len(names)), names, fontsize=9)
-    ax.set_title("Recent behaviour (last 5 days), z-scored across villagers", fontsize=10)
+    ax.set_title(
+        "Recent behaviour (last 5 days), z-scored across villagers", fontsize=10
+    )
     ax.grid(False)
     fig.colorbar(im, ax=ax, fraction=0.03, label="z")
     fig.tight_layout()

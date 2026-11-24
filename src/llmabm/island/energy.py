@@ -51,14 +51,30 @@ class MentalEnergy:
         self.left = {n: 0.0 for n in names}
         self.spent = {n: defaultdict(float) for n in names}
         self.skipped = {n: defaultdict(int) for n in names}
-        self.tokens = defaultdict(float)       # estimated tokens sent and received per villager today, all of it
-        self.reasoning = {n: defaultdict(float) for n in names}  # hidden reasoning tokens today, by call type
-        self.cost_sum = defaultdict(float)     # call type -> points, for "typical cost" hints
+        self.tokens = defaultdict(
+            float
+        )  # estimated tokens sent and received per villager today, all of it
+        self.reasoning = {
+            n: defaultdict(float) for n in names
+        }  # hidden reasoning tokens today, by call type
+        self.cost_sum = defaultdict(
+            float
+        )  # call type -> points, for "typical cost" hints
         self.cost_n = defaultdict(int)
-        self.estimates = {"plan": 12, "notice": 3, "spot": 3, "chat": 8, "evening": 12, "reflect": 5, **(cfg.get("estimates") or {})}
+        self.estimates = {
+            "plan": 12,
+            "notice": 3,
+            "spot": 3,
+            "chat": 8,
+            "evening": 12,
+            "reflect": 5,
+            **(cfg.get("estimates") or {}),
+        }
         self._pending: list[tuple] = []
         self._lock = threading.Lock()
-        self.plans: dict[str, dict | None] = {n: None for n in names}  # today's split, from version 7
+        self.plans: dict[str, dict | None] = {
+            n: None for n in names
+        }  # today's split, from version 7
 
     def __getstate__(self):
         state = dict(self.__dict__)
@@ -66,9 +82,13 @@ class MentalEnergy:
         return state
 
     def __setstate__(self, state):
-        state.setdefault("charge_reasoning", False)  # checkpoints from before reasoning was tracked
+        state.setdefault(
+            "charge_reasoning", False
+        )  # checkpoints from before reasoning was tracked
         state.setdefault("reasoning", {n: defaultdict(float) for n in state["left"]})
-        state.setdefault("plans", {n: None for n in state["left"]})  # checkpoints from before energy plans
+        state.setdefault(
+            "plans", {n: None for n in state["left"]}
+        )  # checkpoints from before energy plans
         self.__dict__.update(state)
         self._lock = threading.Lock()
 
@@ -83,10 +103,17 @@ class MentalEnergy:
         self.tokens = defaultdict(float)
 
     def day_record(self) -> dict:
-        return {n: {"spent": {k: round(self.spent[n][k], 1) for k in KINDS}, "left": round(self.left[n], 1),
-                    "skipped": dict(self.skipped[n]), "tokens": round(self.tokens[n]),
-                    "reasoning": {k: round(v) for k, v in self.reasoning[n].items()},
-                    **({"plan": self.plans[n]} if self.plans.get(n) else {})} for n in self.left}
+        return {
+            n: {
+                "spent": {k: round(self.spent[n][k], 1) for k in KINDS},
+                "left": round(self.left[n], 1),
+                "skipped": dict(self.skipped[n]),
+                "tokens": round(self.tokens[n]),
+                "reasoning": {k: round(v) for k, v in self.reasoning[n].items()},
+                **({"plan": self.plans[n]} if self.plans.get(n) else {}),
+            }
+            for n in self.left
+        }
 
     # --- the day's plan (prompt version 7) -------------------------------------------
     def set_plan(self, name: str, plan) -> dict | None:
@@ -119,9 +146,15 @@ class MentalEnergy:
         sides = []
         for k, spent in zip(("inward", "outward"), self.inward_outward(name)):
             over = round(spent) - plan[k]
-            sides.append(f"{k} {plan[k]} (spent {round(spent)}"
-                         + (f": {over} more than planned, from your spare" if over > 0 else "") + ")")
-        used = sum(max(0, round(s) - plan[k]) for k, s in zip(("inward", "outward"), self.inward_outward(name)))
+            sides.append(
+                f"{k} {plan[k]} (spent {round(spent)}"
+                + (f": {over} more than planned, from your spare" if over > 0 else "")
+                + ")"
+            )
+        used = sum(
+            max(0, round(s) - plan[k])
+            for k, s in zip(("inward", "outward"), self.inward_outward(name))
+        )
         return f" Your plan for today: {', '.join(sides)}, spare {spare} (used {used})."
 
     # --- costs -----------------------------------------------------------------------
@@ -143,13 +176,25 @@ class MentalEnergy:
         if name in self.skipped:
             self.skipped[name][kind] += 1
 
-    def record(self, name: str, kind: str | None, what: str, read: float, written: float, thought: float,
-               immediate: bool, fixed: float = 0.0, social: float = 0.0, hidden: float = 0.0) -> None:
+    def record(
+        self,
+        name: str,
+        kind: str | None,
+        what: str,
+        read: float,
+        written: float,
+        thought: float,
+        immediate: bool,
+        fixed: float = 0.0,
+        social: float = 0.0,
+        hidden: float = 0.0,
+    ) -> None:
         """Queue (or apply) the charge for one call. `fixed` is the uncharged part of the prompt (rules
         and persona), counted only in `tokens`. `social` is the part of what was read that is other
         villagers' mail, recorded as talking. `hidden` is the model's reasoning, in points: recorded
         always, charged as thinking only with charge_reasoning. Calls made in parallel are queued and
-        applied in a fixed order afterwards, so a resumed run charges exactly the same."""
+        applied in a fixed order afterwards, so a resumed run charges exactly the same.
+        """
         item = (name, kind, what, read, written, thought, fixed, social, hidden)
         if immediate:
             self._apply(item)
@@ -171,7 +216,9 @@ class MentalEnergy:
             return
         self.reasoning[name][what] += hidden * self.tpp
         self.tokens[name] += (read + written + hidden + fixed) * self.tpp
-        if self.charge_reasoning:  # hidden reasoning counts as thinking the villager did
+        if (
+            self.charge_reasoning
+        ):  # hidden reasoning counts as thinking the villager did
             written, thought = written + hidden, thought + hidden
         total = read + written
         self.cost_sum[what] += total
@@ -190,16 +237,23 @@ class MentalEnergy:
             return ""
         if v7:
             fresh = not self.plans.get(name) and self.left[name] >= self.daily - 0.5
-            return ((f"Mental energy today: {round(self.daily)}." if fresh else
-                     f"Mental energy left today: {round(self.left[name])} of {round(self.daily)}.")
-                    + self.plan_text(name)
-                    + f" Typical costs: a plan {self.typical('plan')}, noticing someone {self.typical('notice')}, "
-                    f"one thing you say in a conversation {self.typical('chat')}, a turn at the plaza "
-                    f"{self.typical('evening')}, writing at night {self.typical('reflect')}; longer replies cost more.")
-        return (f"Mental energy left today: {round(self.left[name])} of {round(self.daily)}. "
-                f"Typical costs: a plan {self.typical('plan')}, noticing someone {self.typical('notice')}, "
-                f"one thing you say in a conversation {self.typical('chat')}, an evening at the plaza "
-                f"{self.typical('evening')}, writing at night {self.typical('reflect')}; longer replies cost more.")
+            return (
+                (
+                    f"Mental energy today: {round(self.daily)}."
+                    if fresh
+                    else f"Mental energy left today: {round(self.left[name])} of {round(self.daily)}."
+                )
+                + self.plan_text(name)
+                + f" Typical costs: a plan {self.typical('plan')}, noticing someone {self.typical('notice')}, "
+                f"one thing you say in a conversation {self.typical('chat')}, a turn at the plaza "
+                f"{self.typical('evening')}, writing at night {self.typical('reflect')}; longer replies cost more."
+            )
+        return (
+            f"Mental energy left today: {round(self.left[name])} of {round(self.daily)}. "
+            f"Typical costs: a plan {self.typical('plan')}, noticing someone {self.typical('notice')}, "
+            f"one thing you say in a conversation {self.typical('chat')}, an evening at the plaza "
+            f"{self.typical('evening')}, writing at night {self.typical('reflect')}; longer replies cost more."
+        )
 
 
 class EnergyAccount:
@@ -223,5 +277,16 @@ class EnergyAccount:
     def set_plan(self, plan) -> dict | None:
         return self.pool.set_plan(self.name, plan)
 
-    def record(self, kind, what: str, read: float, written: float, thought: float, immediate: bool, **more) -> None:
-        self.pool.record(self.name, kind, what, read, written, thought, immediate, **more)
+    def record(
+        self,
+        kind,
+        what: str,
+        read: float,
+        written: float,
+        thought: float,
+        immediate: bool,
+        **more,
+    ) -> None:
+        self.pool.record(
+            self.name, kind, what, read, written, thought, immediate, **more
+        )

@@ -1,5 +1,6 @@
 """Offline villager policy for the mock backend. Random but valid-looking, so every
-code path (scarcity, crafting, selling, trades, counters, parcels, tools) gets exercised."""
+code path (scarcity, crafting, selling, trades, counters, parcels, tools) gets exercised.
+"""
 
 from __future__ import annotations
 
@@ -8,30 +9,56 @@ import random
 import re
 
 _ACTIONS = [
-    ({"do": "mine_rock"}, 4), ({"do": "chop_wood"}, 3), ({"do": "shake_tree"}, 2),
-    ({"do": "fish", "where": "sea"}, 2), ({"do": "fish", "where": "river", "size": "large"}, 1),
-    ({"do": "fish", "where": "river"}, 1), ({"do": "beachcomb", "near": "south beach"}, 1), ({"do": "fish", "where": "pond"}, 1),
+    ({"do": "mine_rock"}, 4),
+    ({"do": "chop_wood"}, 3),
+    ({"do": "shake_tree"}, 2),
+    ({"do": "fish", "where": "sea"}, 2),
+    ({"do": "fish", "where": "river", "size": "large"}, 1),
+    ({"do": "fish", "where": "river"}, 1),
+    ({"do": "beachcomb", "near": "south beach"}, 1),
+    ({"do": "fish", "where": "pond"}, 1),
     ({"do": "fish", "where": "clifftop"}, 1),
-    ({"do": "catch_bug"}, 1), ({"do": "catch_bug", "where": "flowers"}, 1), ({"do": "catch_bug", "where": "trees"}, 1),
-    ({"do": "catch_bug", "where": "rocks"}, 1), ({"do": "beachcomb"}, 2), ({"do": "dig_fossil"}, 2), ({"do": "dig_clam"}, 1),
+    ({"do": "catch_bug"}, 1),
+    ({"do": "catch_bug", "where": "flowers"}, 1),
+    ({"do": "catch_bug", "where": "trees"}, 1),
+    ({"do": "catch_bug", "where": "rocks"}, 1),
+    ({"do": "beachcomb"}, 2),
+    ({"do": "dig_fossil"}, 2),
+    ({"do": "dig_clam"}, 1),
 ]
 
 
 def _inventory(prompt: str) -> dict[str, int]:
     m = re.search(r"^Inventory: (.*)$", prompt, re.M)
     if m:
-        return {} if m.group(1) == "nothing" else {k.strip(): int(n) for k, n in re.findall(r"([^,]+?) x(\d+)", m.group(1))}
-    inv = {}  # prompt version 8: tools (a count only when more than one), then everything else
+        return (
+            {}
+            if m.group(1) == "nothing"
+            else {
+                k.strip(): int(n) for k, n in re.findall(r"([^,]+?) x(\d+)", m.group(1))
+            }
+        )
+    inv = (
+        {}
+    )  # prompt version 8: tools (a count only when more than one), then everything else
     for line in re.findall(r"^(?:Tools|Other things) you carry: (.*)$", prompt, re.M):
-        line = re.sub(r"\s*\([^)]*\)", "", line)  # prompt version 12: each tool's uses left, in brackets
+        line = re.sub(
+            r"\s*\([^)]*\)", "", line
+        )  # prompt version 12: each tool's uses left, in brackets
         for part in line.split(", "):
             k, _, n = part.strip().rpartition(" x")
             if k and n.isdigit():
                 inv[k] = int(n)
             elif part.strip() not in ("none", "nothing", ""):
                 inv[part.strip()] = 1
-    if not inv and (m := re.search(r"^In your pockets right now: \d+ bells(?:, (.*))?$", prompt, re.M)):
-        for part in (m.group(1) or "").split(", "):  # prompt version 13: a conversation lists the pockets only here
+    if not inv and (
+        m := re.search(
+            r"^In your pockets right now: \d+ bells(?:, (.*))?$", prompt, re.M
+        )
+    ):
+        for part in (m.group(1) or "").split(
+            ", "
+        ):  # prompt version 13: a conversation lists the pockets only here
             k, _, n = part.strip().rpartition(" x")
             if k and n.isdigit() and part.strip() != "nothing else":
                 inv[k] = int(n)
@@ -40,7 +67,11 @@ def _inventory(prompt: str) -> dict[str, int]:
 
 def _recipes(prompt: str) -> list[str]:
     m = re.search(r"^Recipes you know: (.*)$", prompt, re.M)
-    return [] if not m or m.group(1) == "none" else re.findall(r"(?:^|; )([^;(]+?) \(", m.group(1))
+    return (
+        []
+        if not m or m.group(1) == "none"
+        else re.findall(r"(?:^|; )([^;(]+?) \(", m.group(1))
+    )
 
 
 def _bells(prompt: str) -> int:
@@ -54,7 +85,15 @@ def _neighbors(prompt: str) -> list[str]:
 
 
 _TOOLS = ("shovel", "stone axe", "fishing rod", "net", "ladder", "vaulting pole")
-_FURNITURE = ("log stool", "campfire", "stone stool", "wooden chair", "log bench", "wooden table", "small lamp")
+_FURNITURE = (
+    "log stool",
+    "campfire",
+    "stone stool",
+    "wooden chair",
+    "log bench",
+    "wooden table",
+    "small lamp",
+)
 
 
 def _picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
@@ -67,9 +106,11 @@ def _picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
     for h in hours:
         n = rng.choice(sorted(lines))
         pick, text = {"hour": h, "pick": n}, lines[n]
-        if (m := re.search(r'"bells": 1 to (\d+)(?! \(or)', text)) or (m := re.search(r'"bells": (1)(?! \(or)', text)):
+        if (m := re.search(r'"bells": 1 to (\d+)(?! \(or)', text)) or (
+            m := re.search(r'"bells": (1)(?! \(or)', text)
+        ):
             pick["bells"] = rng.randint(1, int(m.group(1)))
-        if (m := re.search(r'"items": \{"<thing>": <how many>\} from (.*)$', text)):
+        if m := re.search(r'"items": \{"<thing>": <how many>\} from (.*)$', text):
             k, _, c = rng.choice(m.group(1).split(", ")).rpartition(" x")
             pick["items"] = {k: int(c)}
         if '"to": a place' in text:
@@ -81,7 +122,7 @@ def _picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
 def _named_picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
     """Prompt version 21: an action from the villager's list for each hour, written by name with the parts its
     line lists: "items" from the pockets, "at" and "what" where there is a choice."""
-    block = prompt.split("which one (\"what\"):\n", 1)[1].split("\n\n", 1)[0]
+    block = prompt.split('which one ("what"):\n', 1)[1].split("\n\n", 1)[0]
     lines = [ln[2:] for ln in block.splitlines() if ln.startswith("- ")]
     places = re.findall(r"^Places: (.*)$", block, re.M)
     places = places[0].split(", ") if places else ["home"]
@@ -96,14 +137,22 @@ def _named_picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict
                 k, _, c = rng.choice(val[7:].split(", ")).rpartition(" x")
                 pick["items"] = {k: rng.randint(1, int(c))}
             elif key == "items" and "one of " in val:
-                k, _, c = rng.choice(val.split("one of ", 1)[1].split(", ")).rpartition(" x")
+                k, _, c = rng.choice(val.split("one of ", 1)[1].split(", ")).rpartition(
+                    " x"
+                )
                 pick["items"] = {k: 1}
             elif key == "items" and (m := re.match(r"bells, 1 to (\d+)", val)):
                 pick["items"] = {"bells": rng.randint(1, int(m.group(1)))}
             elif key == "at":
-                pick["at"] = rng.choice(places) if val.startswith("a place from") else rng.choice(val.split(" | "))
+                pick["at"] = (
+                    rng.choice(places)
+                    if val.startswith("a place from")
+                    else rng.choice(val.split(" | "))
+                )
             elif key == "what":
-                pick["what"] = rng.choice(re.sub(r" \(for more than one.*$", "", val).split(" | "))
+                pick["what"] = rng.choice(
+                    re.sub(r" \(for more than one.*$", "", val).split(" | ")
+                )
             elif key.startswith("also") and '"to": a place' in part:
                 pick["to"] = rng.choice(places)
             elif key.startswith('also "note"'):
@@ -117,27 +166,43 @@ def _named_picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict
 def plan_reply(prompt: str, rng: random.Random) -> str:
     m = re.search(r"Plan up to (\d+) actions between (\d+):00 and (\d+):00", prompt)
     n, a, b = int(m.group(1)), int(m.group(2)), int(m.group(3))
-    window = list(range(a, b + 1)) if a <= b else list(range(a, 24)) + list(range(0, b + 1))  # wraps past midnight
+    window = (
+        list(range(a, b + 1)) if a <= b else list(range(a, 24)) + list(range(0, b + 1))
+    )  # wraps past midnight
     hours = rng.sample(window, min(n, len(window)))
     hours.sort(key=window.index)
     named = "each written as a pick" in prompt  # prompt version 21
     if named or "by picking numbers from the list" in prompt:  # prompt version 16
-        out = {"thoughts": "picking from the list",
-               "actions": (_named_picks if named else _picks)(prompt, hours, rng),
-               "note": "" if rng.random() < 0.8 else "the rocks went fast today"}
+        out = {
+            "thoughts": "picking from the list",
+            "actions": (_named_picks if named else _picks)(prompt, hours, rng),
+            "note": "" if rng.random() < 0.8 else "the rocks went fast today",
+        }
         if '"write": true | false' in prompt and rng.random() < 0.2:
             out["write"] = rng.random() < 0.6
         if '"energy": {"inward"' in prompt and rng.random() < 0.8:
-            out["energy"] = {"inward": rng.randint(20, 80), "outward": rng.randint(20, 80)}
+            out["energy"] = {
+                "inward": rng.randint(20, 80),
+                "outward": rng.randint(20, 80),
+            }
         return json.dumps(out)
     inv, recipes, bells = _inventory(prompt), _recipes(prompt), _bells(prompt)
     acts = []
     missing = [t for t in _TOOLS if t not in inv]
-    for t in missing[:1]:  # replace a broken tool: craft it if you know how, else buy the tool or its recipe card
-        ready = "tools, ready to use" in prompt and bells >= 3000  # no rng draw: keeps seeded runs as they were
-        acts.append({"do": "craft", "recipe": t} if t in recipes else
-                    {"do": "buy", "shop": "cranny", "item": t if ready else f"{t} recipe"})
-    if inv.get("fossil") and rng.random() < 0.6:  # usually take new fossils to Blathers first
+    for t in missing[
+        :1
+    ]:  # replace a broken tool: craft it if you know how, else buy the tool or its recipe card
+        ready = (
+            "tools, ready to use" in prompt and bells >= 3000
+        )  # no rng draw: keeps seeded runs as they were
+        acts.append(
+            {"do": "craft", "recipe": t}
+            if t in recipes
+            else {"do": "buy", "shop": "cranny", "item": t if ready else f"{t} recipe"}
+        )
+    if (
+        inv.get("fossil") and rng.random() < 0.6
+    ):  # usually take new fossils to Blathers first
         acts.append({"do": "assess"})
     for _ in range(n - len(acts)):
         r = rng.random()
@@ -149,51 +214,150 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
         elif r < 0.27 and recipes:
             acts.append({"do": "craft", "recipe": rng.choice(recipes)})
         elif r < 0.30 and bells > 2000:
-            acts.append({"do": "contribute_bridge", "bells": rng.randint(500, bells // 2)})
+            acts.append(
+                {"do": "contribute_bridge", "bells": rng.randint(500, bells // 2)}
+            )
         elif r < 0.32:
             acts.append({"do": "upgrade_house"})
-        elif r < 0.35 and bells > 1000 and re.search(r"Loan owed to Tom Nook: [1-9]", prompt):  # none: no line (v13)
+        elif (
+            r < 0.35
+            and bells > 1000
+            and re.search(r"Loan owed to Tom Nook: [1-9]", prompt)
+        ):  # none: no line (v13)
             acts.append({"do": "pay_loan", "bells": bells // 2})
         elif r < 0.45 and r >= 0.39:
-            acts.append(rng.choice([
-                {"do": "lay_path", "style": rng.choice(["dirt", "stone", "brick"]), "from": "home", "to": "Resident Services"},
-                {"do": "chop_wood", "axe": "axe"},
-                {"do": "chop_wood", "kind": "fruit", "axe": "axe"},
-                {"do": "dig_stump", "near": "home"},
-                {"do": "buy", "shop": "cranny", "item": rng.choice(["tulip seeds", "cosmos seeds", "pansy seeds", "hyacinth seeds",
-                                                                    "fishing bait"])},
-            ]))
+            acts.append(
+                rng.choice(
+                    [
+                        {
+                            "do": "lay_path",
+                            "style": rng.choice(["dirt", "stone", "brick"]),
+                            "from": "home",
+                            "to": "Resident Services",
+                        },
+                        {"do": "chop_wood", "axe": "axe"},
+                        {"do": "chop_wood", "kind": "fruit", "axe": "axe"},
+                        {"do": "dig_stump", "near": "home"},
+                        {
+                            "do": "buy",
+                            "shop": "cranny",
+                            "item": rng.choice(
+                                [
+                                    "tulip seeds",
+                                    "cosmos seeds",
+                                    "pansy seeds",
+                                    "hyacinth seeds",
+                                    "fishing bait",
+                                ]
+                            ),
+                        },
+                    ]
+                )
+            )
         elif r < 0.48 and r >= 0.45 and any(k.endswith("seeds") for k in inv):
-            acts.append({"do": "plant", "item": next(k for k in inv if k.endswith("seeds")), "near": "home"})
-        elif r < 0.51 and r >= 0.48 and any(k in inv for k in ("log stool", "campfire", "stone stool", "wooden chair", "log bench")):
-            item = next(k for k in ("log stool", "campfire", "stone stool", "wooden chair", "log bench") if k in inv)
+            acts.append(
+                {
+                    "do": "plant",
+                    "item": next(k for k in inv if k.endswith("seeds")),
+                    "near": "home",
+                }
+            )
+        elif (
+            r < 0.51
+            and r >= 0.48
+            and any(
+                k in inv
+                for k in (
+                    "log stool",
+                    "campfire",
+                    "stone stool",
+                    "wooden chair",
+                    "log bench",
+                )
+            )
+        ):
+            item = next(
+                k
+                for k in (
+                    "log stool",
+                    "campfire",
+                    "stone stool",
+                    "wooden chair",
+                    "log bench",
+                )
+                if k in inv
+            )
             acts.append({"do": "place", "item": item, "near": "home"})
         elif r < 0.54 and r >= 0.51 and inv.get("simple wooden fence", 0) >= 5:
-            acts.append({"do": rng.choice(["fence_off", "place"]), "item": "simple wooden fence", "around": "home",
-                         "near": "home", "count": 5})
+            acts.append(
+                {
+                    "do": rng.choice(["fence_off", "place"]),
+                    "item": "simple wooden fence",
+                    "around": "home",
+                    "near": "home",
+                    "count": 5,
+                }
+            )
         elif r < 0.55 and r >= 0.54 and "apple" in inv:
             acts.append({"do": "break_rock", "rock": rng.randint(1, 6)})
         elif 0.55 <= r < 0.60 and _neighbors(prompt):
             acts.append({"do": "visit", "who": rng.choice(_neighbors(prompt))})
         elif 0.60 <= r < 0.62 and any(k in inv for k in _FURNITURE):
-            acts.append({"do": "decorate", "item": next(k for k in _FURNITURE if k in inv)})
+            acts.append(
+                {"do": "decorate", "item": next(k for k in _FURNITURE if k in inv)}
+            )
         elif 0.62 <= r < 0.66:
-            acts.append({"do": "ask", "who": rng.choice(["Tom Nook", "Isabelle", "Blathers", "Timmy and Tommy",
-                                                         "Able Sisters", "Mabel"])})
+            acts.append(
+                {
+                    "do": "ask",
+                    "who": rng.choice(
+                        [
+                            "Tom Nook",
+                            "Isabelle",
+                            "Blathers",
+                            "Timmy and Tommy",
+                            "Able Sisters",
+                            "Mabel",
+                        ]
+                    ),
+                }
+            )
         elif 0.66 <= r < 0.68 and bells > 10000:
             sites = re.findall(r"\b(site-\d+) \(", prompt)
-            acts.append({"do": "move_house", "to": rng.choice(sites) if sites else "site-1"})
+            acts.append(
+                {"do": "move_house", "to": rng.choice(sites) if sites else "site-1"}
+            )
         elif r < 0.375 and bells > 25000:
-            acts.append({"do": "set_ordinance", "ordinance": rng.choice(["early_bird", "night_owl", "bell_boom", "none"])})
+            acts.append(
+                {
+                    "do": "set_ordinance",
+                    "ordinance": rng.choice(
+                        ["early_bird", "night_owl", "bell_boom", "none"]
+                    ),
+                }
+            )
         elif r < 0.385 and "fishing bait" in inv:
-            acts.append({"do": "fish", "where": rng.choice(["sea", "river", "pond"]), "bait": True})
+            acts.append(
+                {
+                    "do": "fish",
+                    "where": rng.choice(["sea", "river", "pond"]),
+                    "bait": True,
+                }
+            )
         elif r < 0.39 and "apple" in inv:
             acts.append({"do": "plant", "item": "apple"})
         else:
-            acts.append(rng.choices([a for a, _ in _ACTIONS], weights=[w for _, w in _ACTIONS])[0])
+            acts.append(
+                rng.choices([a for a, _ in _ACTIONS], weights=[w for _, w in _ACTIONS])[
+                    0
+                ]
+            )
     acts = [{"hour": h, **act} for h, act in zip(hours, acts)]
-    out = {"thoughts": "rocks first, then fishing", "actions": acts,
-           "note": "" if rng.random() < 0.8 else "the rocks went fast today"}
+    out = {
+        "thoughts": "rocks first, then fishing",
+        "actions": acts,
+        "note": "" if rng.random() < 0.8 else "the rocks went fast today",
+    }
     if '"plaza": true | false' in prompt:
         if rng.random() < 0.2:
             out["plaza"] = rng.random() < 0.5
@@ -208,16 +372,29 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
         if '"write": true | false' in prompt and rng.random() < 0.2:
             out["write"] = rng.random() < 0.6
         if '"energy": {"inward"' in prompt and rng.random() < 0.8:
-            out["energy"] = {"inward": rng.randint(20, 80), "outward": rng.randint(20, 80)}
-    if '"home": {"store"' in prompt and rng.random() < 0.3:  # prompt version 12: at home, put things away or take them out
-        kept = re.search(r"^(?:Kept at home|At home)(?: \([^)]*\))?: (\d+) bells(?:, (.*))?$", prompt, re.M)
-        home_items = re.findall(r"([^,]+?) x(\d+)", (kept.group(2) or "") if kept else "")
+            out["energy"] = {
+                "inward": rng.randint(20, 80),
+                "outward": rng.randint(20, 80),
+            }
+    if (
+        '"home": {"store"' in prompt and rng.random() < 0.3
+    ):  # prompt version 12: at home, put things away or take them out
+        kept = re.search(
+            r"^(?:Kept at home|At home)(?: \([^)]*\))?: (\d+) bells(?:, (.*))?$",
+            prompt,
+            re.M,
+        )
+        home_items = re.findall(
+            r"([^,]+?) x(\d+)", (kept.group(2) or "") if kept else ""
+        )
         if home_items and rng.random() < 0.5:
             k, n = rng.choice(home_items)
             out["home"] = {"take": {k.strip(): int(n)}}
         elif inv:
             k = rng.choice(list(inv))
-            out["home"] = {"store": {k: 1, **({"bells": bells // 3} if bells > 300 else {})}}
+            out["home"] = {
+                "store": {k: 1, **({"bells": bells // 3} if bells > 300 else {})}
+            }
     return json.dumps(out)
 
 
@@ -225,12 +402,23 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
     others = re.search(r"^Other villagers: (.*)$", prompt, re.M).group(1).split(", ")
     inv, recipes = _inventory(prompt), _recipes(prompt)
     offer_ids = re.findall(r"^\[(o\d+)\]", prompt, re.M)
-    out = {"letters": [], "board": "", "offers": [], "responses": [], "parcels": [], "note": ""}
+    out = {
+        "letters": [],
+        "board": "",
+        "offers": [],
+        "responses": [],
+        "parcels": [],
+        "note": "",
+    }
     for oid in offer_ids:
         dec = rng.choice(["accept", "accept", "reject", "counter"])
         resp = {"offer": oid, "decision": dec, "note": ""}
         if dec == "counter":
-            resp.update(give={"bells": rng.choice([200, 500, 1000])}, want={}, note="how about this instead?")
+            resp.update(
+                give={"bells": rng.choice([200, 500, 1000])},
+                want={},
+                note="how about this instead?",
+            )
             if inv:
                 k = rng.choice(list(inv))
                 resp["want"] = {}
@@ -239,27 +427,66 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
         out["responses"].append(resp)
     if "round 0" in prompt or prompt.startswith("PHASE: plaza"):
         if rng.random() < 0.5:
-            out["letters"].append({"to": rng.choice(others), "content": rng.choice(
-                ["the rocks were empty by the time I got there", "caught something nice in the river today",
-                 "does anyone know which rock gives bells?", "want to trade?"])})
+            out["letters"].append(
+                {
+                    "to": rng.choice(others),
+                    "content": rng.choice(
+                        [
+                            "the rocks were empty by the time I got there",
+                            "caught something nice in the river today",
+                            "does anyone know which rock gives bells?",
+                            "want to trade?",
+                        ]
+                    ),
+                }
+            )
         if rng.random() < 0.15:
-            out["board"] = rng.choice(["Selling materials, ask me!", "Who is funding the bridge?", "Lost: my net"])
+            out["board"] = rng.choice(
+                [
+                    "Selling materials, ask me!",
+                    "Who is funding the bridge?",
+                    "Lost: my net",
+                ]
+            )
         mine = re.findall(r"^- \[(b\d+)\] \(day \d+\) you:", prompt, re.M)
-        if '"take_down"' in prompt:  # prompt version 12: no plaza offers; posts can come down
+        if (
+            '"take_down"' in prompt
+        ):  # prompt version 12: no plaza offers; posts can come down
             out.pop("offers"), out.pop("responses")
             if mine and rng.random() < 0.3:
                 out["take_down"] = [rng.choice(mine)]
         elif inv and rng.random() < 0.4:
             k = rng.choice(list(inv))
-            out["offers"].append({"to": rng.choice(others), "give": {k: 1}, "want": {"bells": rng.choice([100, 400, 900, 2000])}, "note": "fair price?"})
-        spare = [k for k in inv if k.endswith(" recipe") or (inv[k] > 1 and k in _TOOLS)]
+            out["offers"].append(
+                {
+                    "to": rng.choice(others),
+                    "give": {k: 1},
+                    "want": {"bells": rng.choice([100, 400, 900, 2000])},
+                    "note": "fair price?",
+                }
+            )
+        spare = [
+            k for k in inv if k.endswith(" recipe") or (inv[k] > 1 and k in _TOOLS)
+        ]
         if (spare or inv) and rng.random() < 0.2:
             k = rng.choice(spare or list(inv))
-            out["parcels"].append({"to": rng.choice(others), "items": {k: 1}, "note": "thought you could use this"})
-    if '"send": [' in prompt:  # prompt version 21: letters and parcels, both written as a send
-        out["send"] = ([{"action": "send", "at": m["to"], "note": m["content"]} for m in out.pop("letters")]
-                       + [{"action": "send", "at": m["to"], "items": m["items"], "note": m["note"]}
-                          for m in out.pop("parcels")])
+            out["parcels"].append(
+                {
+                    "to": rng.choice(others),
+                    "items": {k: 1},
+                    "note": "thought you could use this",
+                }
+            )
+    if (
+        '"send": [' in prompt
+    ):  # prompt version 21: letters and parcels, both written as a send
+        out["send"] = [
+            {"action": "send", "at": m["to"], "note": m["content"]}
+            for m in out.pop("letters")
+        ] + [
+            {"action": "send", "at": m["to"], "items": m["items"], "note": m["note"]}
+            for m in out.pop("parcels")
+        ]
     return json.dumps(out)
 
 
@@ -267,42 +494,88 @@ def isabelle_reply(prompt: str, rng: random.Random) -> str:
     if "announce" in prompt.split("\n")[0]:
         return "Good morning, everyone! Another lovely day on the island. (mock announcement)"
     n_actions = prompt.count(" @")
-    return (f"(mock report) It was a busy day on the island, with about {n_actions} recorded actions. "
-            "Villagers gathered, fished and traded, and the shared resources were used up by midday.")
+    return (
+        f"(mock report) It was a busy day on the island, with about {n_actions} recorded actions. "
+        "Villagers gathered, fished and traded, and the shared resources were used up by midday."
+    )
 
 
 def encounter_reply(prompt: str, rng: random.Random) -> str:
     if rng.random() < 0.2:
         return json.dumps({"thoughts": "not in the mood", "say": ""})
-    line = rng.choice(["Morning! The rocks went fast today.", "Caught anything good?", "Have you seen who takes the money rock?",
-                       "Nice weather for fishing.", "I'm saving up for a bigger house.", "Ha, same here."])
+    line = rng.choice(
+        [
+            "Morning! The rocks went fast today.",
+            "Caught anything good?",
+            "Have you seen who takes the money rock?",
+            "Nice weather for fishing.",
+            "I'm saving up for a bigger house.",
+            "Ha, same here.",
+        ]
+    )
     out = {"thoughts": "keep it friendly", "say": line}
-    m = re.search(r"You ran into (.+?) (?:at |out on |around )|You are visiting (.+?) at their home|"
-                  r"^(.+?) has come to visit you", prompt, re.M)
+    m = re.search(
+        r"You ran into (.+?) (?:at |out on |around )|You are visiting (.+?) at their home|"
+        r"^(.+?) has come to visit you",
+        prompt,
+        re.M,
+    )
     other = next((g for g in m.groups() if g), "") if m else ""
     inv = _inventory(prompt)
-    asked = re.findall(rf"{re.escape(other)} asked you for (\d+) ([^(;]+?) \(day", prompt) if other else []
-    asked += re.findall(rf"{re.escape(other)} wants (\d+) ([^(;]+?) from you \((?:asked|until)", prompt) if other else []
-    table = re.search(r"^On the table(: .+? offers you| from (?!you:))", prompt, re.M)  # versions 12 and 13
+    asked = (
+        re.findall(rf"{re.escape(other)} asked you for (\d+) ([^(;]+?) \(day", prompt)
+        if other
+        else []
+    )
+    asked += (
+        re.findall(
+            rf"{re.escape(other)} wants (\d+) ([^(;]+?) from you \((?:asked|until)",
+            prompt,
+        )
+        if other
+        else []
+    )
+    table = re.search(
+        r"^On the table(: .+? offers you| from (?!you:))", prompt, re.M
+    )  # versions 12 and 13
     if table and '"accept": true | false' in prompt and rng.random() < 0.6:
         out["accept"] = True
         out["say"] = "Deal."
-    elif asked and inv.get(asked[0][1].strip(), 0) >= int(asked[0][0]) and rng.random() < 0.7:
+    elif (
+        asked
+        and inv.get(asked[0][1].strip(), 0) >= int(asked[0][0])
+        and rng.random() < 0.7
+    ):
         out["give"] = {asked[0][1].strip(): int(asked[0][0])}
         out["say"] = "Here, this is what you asked for."
     elif inv and rng.random() < 0.12:
         out["give"] = {rng.choice(list(inv)): 1}
         out["say"] = "Here, have this."
     elif rng.random() < 0.12:
-        out["ask"] = {rng.choice(["wood", "stone", "iron nugget", "apple"]): rng.randint(1, 3)}
+        out["ask"] = {
+            rng.choice(["wood", "stone", "iron nugget", "apple"]): rng.randint(1, 3)
+        }
         out["say"] = "Could you spare me some of those, if you get any?"
-    elif '"trade": {} or' in prompt and inv and rng.random() < 0.15:  # prompt version 12: trades in person
-        want = rng.choice([{"bells": rng.choice([100, 300, 600])}, {rng.choice(["wood", "stone", "apple"]): 2}])
+    elif (
+        '"trade": {} or' in prompt and inv and rng.random() < 0.15
+    ):  # prompt version 12: trades in person
+        want = rng.choice(
+            [
+                {"bells": rng.choice([100, 300, 600])},
+                {rng.choice(["wood", "stone", "apple"]): 2},
+            ]
+        )
         give = {rng.choice(list(inv)): 1}
-        m = re.search(r'"trade": \{\} or \{"(you give [^"]+)": .*?"([^"]+ gives you)"', prompt)  # prompt version 18
-        out["trade"] = {m.group(1): give, m.group(2): want} if m else {"give": give, "want": want}
+        m = re.search(
+            r'"trade": \{\} or \{"(you give [^"]+)": .*?"([^"]+ gives you)"', prompt
+        )  # prompt version 18
+        out["trade"] = (
+            {m.group(1): give, m.group(2): want} if m else {"give": give, "want": want}
+        )
         out["say"] = "Want to swap?"
-    if '"send": {} or' in prompt and "give" in out:  # prompt version 21: a gift is written as a send
+    if (
+        '"send": {} or' in prompt and "give" in out
+    ):  # prompt version 21: a gift is written as a send
         out["send"] = {"action": "send", "items": out.pop("give")}
     return json.dumps(out)
 
@@ -318,21 +591,38 @@ def notice_reply(prompt: str, rng: random.Random) -> str:
     near = re.search(r"^Nearby: (.*)\.$", prompt, re.M).group(1).split(", ")
     if rng.random() < 0.4:
         return json.dumps({"thoughts": "not now", "approach": "", "say": ""})
-    return json.dumps({"thoughts": "might as well say hi", "approach": rng.choice(near),
-                       "say": rng.choice(["Hey! Out early too?", "Any luck today?", "Hi there."])})
+    return json.dumps(
+        {
+            "thoughts": "might as well say hi",
+            "approach": rng.choice(near),
+            "say": rng.choice(["Hey! Out early too?", "Any luck today?", "Hi there."]),
+        }
+    )
 
 
 def reflect_reply(prompt: str, rng: random.Random) -> str:
     busy = prompt.count("\n- ") > 8
-    me = rng.choice(["I keep busy and like getting things done.", "I take things slowly and enjoy quiet days.",
-                     "I like chatting with whoever I run into.", "I mostly look after myself for now."])
+    me = rng.choice(
+        [
+            "I keep busy and like getting things done.",
+            "I take things slowly and enjoy quiet days.",
+            "I like chatting with whoever I run into.",
+            "I mostly look after myself for now.",
+        ]
+    )
     page = me + (" Today was a full day." if busy else "")
     if '"Remember:"' not in prompt:
         return page
     today = re.search(r"What happened today:\n(.*?)\n\n", prompt, re.S)
-    events = [ln[2:].split(" ", 1)[-1] for ln in (today.group(1).splitlines() if today else []) if ln.startswith("- ")]
+    events = [
+        ln[2:].split(" ", 1)[-1]
+        for ln in (today.group(1).splitlines() if today else [])
+        if ln.startswith("- ")
+    ]
     known = re.findall(r"^(\d+)\. ", prompt, re.M)
     picks = rng.sample(events, min(len(events), rng.randint(0, 2)))
     if known and rng.random() < 0.5:
         picks.append(rng.choice(known))
-    return page + ("\n\nRemember:\n" + "\n".join(f"- {p}" for p in picks) if picks else "")
+    return page + (
+        "\n\nRemember:\n" + "\n".join(f"- {p}" for p in picks) if picks else ""
+    )

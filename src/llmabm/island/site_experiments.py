@@ -16,7 +16,17 @@ import time
 from pathlib import Path
 from urllib.parse import urlparse
 
-from .site_doors import EMPTY_DOOR, FRAME_MS, FRAMES, LEAF, PANEL, SIGN, door_svg, frame_svg, sprite_css
+from .site_doors import (
+    EMPTY_DOOR,
+    FRAME_MS,
+    FRAMES,
+    LEAF,
+    PANEL,
+    SIGN,
+    door_svg,
+    frame_svg,
+    sprite_css,
+)
 
 TEMPLATE = Path(__file__).with_name("site_experiments.html")
 TOKENS = Path(__file__).with_name("site_tokens.css")
@@ -46,14 +56,22 @@ def _first_events(run_dir: Path) -> tuple[dict, dict]:
 def is_mock(run_dir: Path) -> bool:
     """A run whose villagers all used the mock backend (scripted replies, for testing the code)."""
     m = json.loads((Path(run_dir) / "manifest.json").read_text())
-    names = [m["backend_override"]] if m.get("backend_override") else {v["model"] for v in m["villagers"].values()}
+    names = (
+        [m["backend_override"]]
+        if m.get("backend_override")
+        else {v["model"] for v in m["villagers"].values()}
+    )
     return all(n == "mock" or (m.get("backends") or {}).get(n) == "mock" for n in names)
 
 
 def experiment_order(runs_dir: Path) -> list[Path]:
     """Run directories in a runs folder, oldest first (by the run_start time, else the folder's).
     Mock runs are left out: they test the code, they aren't experiments."""
-    runs = [p for p in Path(runs_dir).iterdir() if p.is_dir() and is_run(p) and not is_mock(p)]
+    runs = [
+        p
+        for p in Path(runs_dir).iterdir()
+        if p.is_dir() and is_run(p) and not is_mock(p)
+    ]
 
     def started(p: Path) -> float:
         return _first_events(p)[0].get("time") or p.stat().st_mtime
@@ -63,7 +81,11 @@ def experiment_order(runs_dir: Path) -> list[Path]:
 
 def agents_label(m: dict) -> str:
     """Backend and model the villagers use, e.g. `groq · openai/gpt-oss-20b`, or `mock backend`."""
-    names = [m["backend_override"]] if m.get("backend_override") else sorted({v["model"] for v in m["villagers"].values()})
+    names = (
+        [m["backend_override"]]
+        if m.get("backend_override")
+        else sorted({v["model"] for v in m["villagers"].values()})
+    )
     parts = []
     for name in names:
         spec = (m.get("backends") or {}).get(name, name)
@@ -86,34 +108,68 @@ def _list(items: list[str]) -> str:
 def conditions(m: dict, day0: dict) -> dict:
     """What each villager starts with, and the island's shared resources on day 0."""
     w, sc = m["world"], m.get("scenario_config") or {}
-    tools = (w.get("tools") or {})
+    tools = w.get("tools") or {}
     uses = tools.get("uses")
     starters = list(w.get("starter_recipes") or [])
     n_random = int(w.get("recipes_known_at_start") or 0)
-    recipes = " + ".join(x for x in [_list(starters) if starters else "", f"{n_random} at random" if n_random else ""] if x)
+    recipes = " + ".join(
+        x
+        for x in [
+            _list(starters) if starters else "",
+            f"{n_random} at random" if n_random else "",
+        ]
+        if x
+    )
     villager = [
         ["bells", f"{int(sc.get('start_bells', 1000)):,}"],
-        ["tools", _list(tools.get("start_with") or []) + (f" ({uses} uses each)" if uses and tools.get("start_with") else "")],
+        [
+            "tools",
+            _list(tools.get("start_with") or [])
+            + (f" ({uses} uses each)" if uses and tools.get("start_with") else ""),
+        ],
         ["recipes", recipes or "none"],
     ]
 
     isl, pools = w["island"], day0.get("pools") or {}
-    trees = pools.get("trees") or {"hardwood": isl["hardwood_trees"], "fruit": isl["fruit_trees"]}
+    trees = pools.get("trees") or {
+        "hardwood": isl["hardwood_trees"],
+        "fruit": isl["fruit_trees"],
+    }
     rocks = pools.get("rocks")
     n_rocks = len(rocks) if rocks is not None else isl["rocks"]
     hits = max(rocks) if rocks else isl["rock_hits"]
     fruit = isl.get("native_fruit", "fruit")
     island = [
-        ["trees", f"{trees.get('hardwood', 0)} hardwood, {trees.get('fruit', 0)} {fruit}"],
-        ["wood", f"{pools.get('wood_left', trees.get('hardwood', 0) * isl['wood_per_tree'])} a day ({isl['wood_per_tree']} a tree)"],
-        ["fruit", f"{pools.get('fruit_on_trees', trees.get('fruit', 0) * isl['fruit_per_tree'])} {fruit}s, back "
-                  f"{isl['fruit_regrow_days']} days after picking"],
+        [
+            "trees",
+            f"{trees.get('hardwood', 0)} hardwood, {trees.get('fruit', 0)} {fruit}",
+        ],
+        [
+            "wood",
+            f"{pools.get('wood_left', trees.get('hardwood', 0) * isl['wood_per_tree'])} a day ({isl['wood_per_tree']} a tree)",
+        ],
+        [
+            "fruit",
+            f"{pools.get('fruit_on_trees', trees.get('fruit', 0) * isl['fruit_per_tree'])} {fruit}s, back "
+            f"{isl['fruit_regrow_days']} days after picking",
+        ],
         ["rocks", f"{n_rocks}, {hits} hits each a day"],
-        ["shells", f"{pools.get('shells_left', isl['shells_per_day'])} a day on the beach"],
-        ["fossils", f"{pools.get('fossils_left', isl['fossils_per_day'])} a day to dig up"],
+        [
+            "shells",
+            f"{pools.get('shells_left', isl['shells_per_day'])} a day on the beach",
+        ],
+        [
+            "fossils",
+            f"{pools.get('fossils_left', isl['fossils_per_day'])} a day to dig up",
+        ],
     ]
     if m.get("space") == "grid":
-        island.append(["flowers", f"{(w.get('grid') or {}).get('wild_flower_patches', 6)} wild patches"])
+        island.append(
+            [
+                "flowers",
+                f"{(w.get('grid') or {}).get('wild_flower_patches', 6)} wild patches",
+            ]
+        )
     return {"villager": villager, "island": island}
 
 
@@ -124,11 +180,18 @@ def experiment(run_dir: Path, number: int) -> dict:
     lt = time.localtime(start.get("time") or run_dir.stat().st_mtime)
     total = (m.get("scenario_config") or {}).get("days") or m.get("days")
     return {
-        "number": number, "dir": run_dir.name, "scenario": m["scenario"], "seed": m["seed"],
-        "agents": agents_label(m), "days_done": m.get("days_completed", 0), "days_total": total,
+        "number": number,
+        "dir": run_dir.name,
+        "scenario": m["scenario"],
+        "seed": m["seed"],
+        "agents": agents_label(m),
+        "days_done": m.get("days_completed", 0),
+        "days_total": total,
         "started": f"{time.strftime('%b', lt)} {lt.tm_mday}, {lt.tm_year}",
         "villagers": len(m["villagers"]),
-        "temperature": ((m.get("scenario_config") or {}).get("llm") or {}).get("temperature", 0.8),  # the scenario default
+        "temperature": ((m.get("scenario_config") or {}).get("llm") or {}).get(
+            "temperature", 0.8
+        ),  # the scenario default
         "conditions": conditions(m, day0),
     }
 
@@ -145,7 +208,8 @@ def _real_date(t: float) -> str:
 def changes(run_dir: Path, e: dict) -> list[dict]:
     """The changelog entries for one experiment: when it started, then every deliberate change mid-run
     (`intervention` events, such as a switch of prompt version on resume), each from the island day it
-    applies. `time` is when it happened in the real world, for ordering the whole changelog."""
+    applies. `time` is when it happened in the real world, for ordering the whole changelog.
+    """
     run_dir = Path(run_dir)
     m = json.loads((run_dir / "manifest.json").read_text())
     dates, start_time, out = {}, None, []
@@ -153,26 +217,54 @@ def changes(run_dir: Path, e: dict) -> list[dict]:
     events = [json.loads(line) for line in p.open()] if p.exists() else []
     for ev in events:
         if ev.get("type") == "day_start":
-            dates[ev["day"]] = (ev.get("date") or "").split(",")[0]  # "April 1, spring, rain" -> "April 1"
+            dates[ev["day"]] = (ev.get("date") or "").split(",")[
+                0
+            ]  # "April 1, spring, rain" -> "April 1"
         elif ev.get("type") == "run_start" and start_time is None:
             start_time = ev.get("time")
-    v = m.get("prompt_version", 1)  # runs from before prompt versions used the original wording
+    v = m.get(
+        "prompt_version", 1
+    )  # runs from before prompt versions used the original wording
     t0 = start_time or run_dir.stat().st_mtime
-    out.append({"time": t0, "date": _real_date(t0), "number": e["number"], "href": e.get("href"),
-                "what": "Started", "when": _day(0, dates),
-                "details": [{"title": "", "text": f"{m['scenario']}, seed {m['seed']}, {len(m['villagers'])} villagers, "
-                             f"{e['agents']}, prompt version {v}" + (" (the original wording)" if v == 1 else "")}]})
+    out.append(
+        {
+            "time": t0,
+            "date": _real_date(t0),
+            "number": e["number"],
+            "href": e.get("href"),
+            "what": "Started",
+            "when": _day(0, dates),
+            "details": [
+                {
+                    "title": "",
+                    "text": f"{m['scenario']}, seed {m['seed']}, {len(m['villagers'])} villagers, "
+                    f"{e['agents']}, prompt version {v}"
+                    + (" (the original wording)" if v == 1 else ""),
+                }
+            ],
+        }
+    )
     for ev in events:
         if ev.get("type") != "intervention":
             continue
         details = []
         for d in ev.get("details") or []:
             title, sep, rest = d.partition(": ")
-            details.append({"title": title, "text": rest} if sep else {"title": "", "text": d})
+            details.append(
+                {"title": title, "text": rest} if sep else {"title": "", "text": d}
+            )
         t = ev.get("time") or t0
-        out.append({"time": t, "date": _real_date(t), "number": e["number"], "href": e.get("href"),
-                    "what": ev["what"].replace(" -> ", " → "), "when": "from " + _day(ev["from_day"], dates),
-                    "details": details})
+        out.append(
+            {
+                "time": t,
+                "date": _real_date(t),
+                "number": e["number"],
+                "href": e.get("href"),
+                "what": ev["what"].replace(" -> ", " → "),
+                "when": "from " + _day(ev["from_day"], dates),
+                "details": details,
+            }
+        )
     return out
 
 
@@ -189,14 +281,30 @@ def sim_changes(path: Path = SIM_CHANGES) -> list[dict]:
         return []
     out = []
     for c in yaml.safe_load(Path(path).read_text()) or []:
-        t = c["time"] if isinstance(c["time"], datetime.datetime) else datetime.datetime.fromisoformat(str(c["time"]))
+        t = (
+            c["time"]
+            if isinstance(c["time"], datetime.datetime)
+            else datetime.datetime.fromisoformat(str(c["time"]))
+        )
         ts = t.timestamp()
         details = []
         for d in c.get("details") or []:
             title, sep, rest = str(d).partition(": ")
-            details.append({"title": title, "text": rest} if sep else {"title": "", "text": str(d)})
-        out.append({"time": ts, "date": _real_date(ts), "number": None, "label": "SIM", "href": None,
-                    "what": c["what"], "when": c.get("when", ""), "details": details})
+            details.append(
+                {"title": title, "text": rest} if sep else {"title": "", "text": str(d)}
+            )
+        out.append(
+            {
+                "time": ts,
+                "date": _real_date(ts),
+                "number": None,
+                "label": "SIM",
+                "href": None,
+                "what": c["what"],
+                "when": c.get("when", ""),
+                "details": details,
+            }
+        )
     return out
 
 
@@ -206,12 +314,17 @@ def _pos(d: dict) -> str:
 
 
 def _rows(rows: list[list[str]]) -> str:
-    return "".join(f'<div class="row"><div class="k">{html.escape(k)}</div><div>{html.escape(v)}</div></div>' for k, v in rows)
+    return "".join(
+        f'<div class="row"><div class="k">{html.escape(k)}</div><div>{html.escape(v)}</div></div>'
+        for k, v in rows
+    )
 
 
 def _sign(number: int, line: str) -> str:
-    return (f'<div class="sign" style="{_pos(SIGN)}"><span class="exp">EXP {number:02d}</span>'
-            f'<span class="scn">{html.escape(line)}</span></div>')
+    return (
+        f'<div class="sign" style="{_pos(SIGN)}"><span class="exp">EXP {number:02d}</span>'
+        f'<span class="scn">{html.escape(line)}</span></div>'
+    )
 
 
 def door_html(e: dict) -> str:
@@ -275,12 +388,20 @@ def changelog_html(entries: list[dict]) -> str:
         exp = f'<a href="{html.escape(c["href"])}">{exp}</a>' if c.get("href") else exp
         details = ""
         for d in c["details"]:
-            title = f"<b>{html.escape(_sentence(d['title']))}</b> " if d["title"] else ""
+            title = (
+                f"<b>{html.escape(_sentence(d['title']))}</b> " if d["title"] else ""
+            )
             details += f"<li>{title}{html.escape(_sentence(d['text']))}</li>"
-        items.append(f'<li><div class="when">{html.escape(c["date"])}</div>'
-                     f'<div class="what"><span class="exp">{exp}</span> {html.escape(c["what"][:1].upper() + c["what"][1:])}</div>'
-                     + (f'<div class="when">{html.escape(c["when"][:1].upper() + c["when"][1:])}</div>' if c["when"] else "")
-                     + f'<ul>{details}</ul></li>')
+        items.append(
+            f'<li><div class="when">{html.escape(c["date"])}</div>'
+            f'<div class="what"><span class="exp">{exp}</span> {html.escape(c["what"][:1].upper() + c["what"][1:])}</div>'
+            + (
+                f'<div class="when">{html.escape(c["when"][:1].upper() + c["when"][1:])}</div>'
+                if c["when"]
+                else ""
+            )
+            + f"<ul>{details}</ul></li>"
+        )
     n = len(entries)
     return f"""<aside class="clog" id="clog">
   <button class="tab" type="button" data-log="open" aria-expanded="false" aria-controls="clog-panel" title="Show the changelog">
@@ -304,21 +425,37 @@ def build_experiments(runs_dir: Path, out_dir: Path | None = None) -> Path:
     exps = [experiment(p, i) for i, p in enumerate(experiment_order(runs_dir))]
     for e in exps:
         if out_dir:
-            e["href"], page = f"{e['dir']}/index.html", Path(out_dir) / e["dir"] / "index.html"
+            e["href"], page = (
+                f"{e['dir']}/index.html",
+                Path(out_dir) / e["dir"] / "index.html",
+            )
         else:
-            e["href"], page = f"../{e['dir']}/site/index.html", runs_dir / e["dir"] / "site" / "index.html"
+            e["href"], page = (
+                f"../{e['dir']}/site/index.html",
+                runs_dir / e["dir"] / "site" / "index.html",
+            )
         e["has_site"] = page.exists()
     out_dir = Path(out_dir) if out_dir else runs_dir / "site"
     out_dir.mkdir(parents=True, exist_ok=True)
     doors = "".join(door_html(e) for e in exps) + empty_html(len(exps), runs_dir)
-    page = (TEMPLATE.read_text().replace("__TOKENS__", TOKENS.read_text())
-            .replace("__COUNT__", f"{len(exps)} experiment" + ("" if len(exps) == 1 else "s"))
-            .replace("__DOORS__", doors)
-            .replace("__CHANGELOG__", changelog_html([c for e in exps for c in changes(runs_dir / e["dir"], e)]
-                                                     + sim_changes()))
-            .replace("__SPRITES__", sprite_css())
-            .replace("__FRAMES__", str(FRAMES - 1))
-            .replace("__FRAME_MS__", str(FRAME_MS)))
+    page = (
+        TEMPLATE.read_text()
+        .replace("__TOKENS__", TOKENS.read_text())
+        .replace(
+            "__COUNT__", f"{len(exps)} experiment" + ("" if len(exps) == 1 else "s")
+        )
+        .replace("__DOORS__", doors)
+        .replace(
+            "__CHANGELOG__",
+            changelog_html(
+                [c for e in exps for c in changes(runs_dir / e["dir"], e)]
+                + sim_changes()
+            ),
+        )
+        .replace("__SPRITES__", sprite_css())
+        .replace("__FRAMES__", str(FRAMES - 1))
+        .replace("__FRAME_MS__", str(FRAME_MS))
+    )
     out = out_dir / "index.html"
     out.write_text(page)
     return out

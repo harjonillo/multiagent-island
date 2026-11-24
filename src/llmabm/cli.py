@@ -41,68 +41,138 @@ def _embedder(args):
         return None, str(e)
     env = getattr(emb, "api_key_env", None)
     if env and not os.environ.get(env):
-        return None, (f"embeddings backend '{emb.name}' needs {env}; add it to .env or your environment, or pass "
-                      "--embeddings local, which needs no key")
+        return None, (
+            f"embeddings backend '{emb.name}' needs {env}; add it to .env or your environment, or pass "
+            "--embeddings local, which needs no key"
+        )
     return emb, None
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="llmabm", description="LLM agent-based model of an island")
+    ap = argparse.ArgumentParser(
+        prog="llmabm", description="LLM agent-based model of an island"
+    )
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     r = sub.add_parser("run", help="run a scenario")
     r.add_argument("scenario", type=Path)
-    r.add_argument("--seed", type=int, default=0, help="controls the island, traits, scheduling and the cache key")
-    r.add_argument("--steps", "--days", dest="steps", type=int, help="override the scenario's days")
-    r.add_argument("--backend", help="use this backend for every agent (e.g. mock, groq)")
+    r.add_argument(
+        "--seed",
+        type=int,
+        default=0,
+        help="controls the island, traits, scheduling and the cache key",
+    )
+    r.add_argument(
+        "--steps", "--days", dest="steps", type=int, help="override the scenario's days"
+    )
+    r.add_argument(
+        "--backend", help="use this backend for every agent (e.g. mock, groq)"
+    )
     r.add_argument("--config", type=Path, default=Path("config/models.yaml"))
-    r.add_argument("--embeddings", help="embeddings backend for retrieving memories (see `embeddings:` in the models "
-                                        "file; the default is a local model), or 'hash' to compare by shared words with no model")
-    r.add_argument("--concurrency", type=int, default=1, help="parallel LLM calls within an hour")
-    r.add_argument("--no-cache", action="store_true",
-                   help="make every call afresh; the new replies replace the cached ones")
-    r.add_argument("--log-prompts", action="store_true", default=True,
-                   help="save every full prompt, reasoning and reply under <run_dir>/villagers/<name>/prompts/ (the default; the "
-                        "explorer shows them)")
-    r.add_argument("--no-log-prompts", dest="log_prompts", action="store_false", help="don't save the prompts")
+    r.add_argument(
+        "--embeddings",
+        help="embeddings backend for retrieving memories (see `embeddings:` in the models "
+        "file; the default is a local model), or 'hash' to compare by shared words with no model",
+    )
+    r.add_argument(
+        "--concurrency", type=int, default=1, help="parallel LLM calls within an hour"
+    )
+    r.add_argument(
+        "--no-cache",
+        action="store_true",
+        help="make every call afresh; the new replies replace the cached ones",
+    )
+    r.add_argument(
+        "--log-prompts",
+        action="store_true",
+        default=True,
+        help="save every full prompt, reasoning and reply under <run_dir>/villagers/<name>/prompts/ (the default; the "
+        "explorer shows them)",
+    )
+    r.add_argument(
+        "--no-log-prompts",
+        dest="log_prompts",
+        action="store_false",
+        help="don't save the prompts",
+    )
     r.add_argument("--out", type=Path, default=Path("runs"))
-    r.add_argument("--run-dir", type=Path, help="exact run directory (default: runs/<timestamp>_<scenario>_s<seed>)")
+    r.add_argument(
+        "--run-dir",
+        type=Path,
+        help="exact run directory (default: runs/<timestamp>_<scenario>_s<seed>)",
+    )
     r.add_argument("--no-analyze", action="store_true")
 
-    rs = sub.add_parser("resume", help="continue an island run from its last checkpoint")
+    rs = sub.add_parser(
+        "resume", help="continue an island run from its last checkpoint"
+    )
     rs.add_argument("run_dir", type=Path)
-    rs.add_argument("--days", type=int, default=1, help="how many more days to run (default 1)")
-    rs.add_argument("--backend", help="switch every villager (and Isabelle) to this backend")
+    rs.add_argument(
+        "--days", type=int, default=1, help="how many more days to run (default 1)"
+    )
+    rs.add_argument(
+        "--backend", help="switch every villager (and Isabelle) to this backend"
+    )
     rs.add_argument("--config", type=Path, default=Path("config/models.yaml"))
-    rs.add_argument("--embeddings", help="embeddings backend for retrieving memories, or 'hash' (see `run`). "
-                                         "Changing it mid-run is logged as an intervention")
+    rs.add_argument(
+        "--embeddings",
+        help="embeddings backend for retrieving memories, or 'hash' (see `run`). "
+        "Changing it mid-run is logged as an intervention",
+    )
     rs.add_argument("--concurrency", type=int)
-    rs.add_argument("--no-cache", action="store_true",
-                    help="make every call afresh (redoing an unfinished day instead of replaying it); the new "
-                         "replies replace the cached ones, so a later resume without this replays them")
+    rs.add_argument(
+        "--no-cache",
+        action="store_true",
+        help="make every call afresh (redoing an unfinished day instead of replaying it); the new "
+        "replies replace the cached ones, so a later resume without this replays them",
+    )
     rs.add_argument("--no-analyze", action="store_true")
-    rs.add_argument("--prompt-version", help="switch the run's prompt wording from the next day on ('latest' or a "
-                                             "number); logged as an intervention. By default a run keeps its wording")
+    rs.add_argument(
+        "--prompt-version",
+        help="switch the run's prompt wording from the next day on ('latest' or a "
+        "number); logged as an intervention. By default a run keeps its wording",
+    )
 
-    a = sub.add_parser("analyze", help="summary, plots, logs and the site data for a run")
+    a = sub.add_parser(
+        "analyze", help="summary, plots, logs and the site data for a run"
+    )
     a.add_argument("run_dir", type=Path)
 
-    st = sub.add_parser("site", help="build the static explorer: a run's page, or every run's plus the Experiments page")
-    st.add_argument("run_dir", type=Path, help="a run directory, or a runs folder (e.g. runs/) for all of them")
-    st.add_argument("--out", type=Path, help="for a run: folder for its index.html (default <run_dir>/site); for a runs "
-                                            "folder: build the whole site there, ready to publish (e.g. _site)")
+    st = sub.add_parser(
+        "site",
+        help="build the static explorer: a run's page, or every run's plus the Experiments page",
+    )
+    st.add_argument(
+        "run_dir",
+        type=Path,
+        help="a run directory, or a runs folder (e.g. runs/) for all of them",
+    )
+    st.add_argument(
+        "--out",
+        type=Path,
+        help="for a run: folder for its index.html (default <run_dir>/site); for a runs "
+        "folder: build the whole site there, ready to publish (e.g. _site)",
+    )
 
     args = ap.parse_args(argv)
     load_dotenv()
 
     if args.cmd == "run":
         if (yaml.safe_load(args.scenario.read_text()) or {}).get("type") != "island":
-            print(f"error: {args.scenario} is not an island scenario (missing `type: island`)", file=sys.stderr)
+            print(
+                f"error: {args.scenario} is not an island scenario (missing `type: island`)",
+                file=sys.stderr,
+            )
             return 2
         sc = load_island_scenario(args.scenario, seed=args.seed)
         models = {a.model for a in sc.villagers.values()}
         try:
-            backends = load_backends(args.config, Path(".cache/llm"), salt=str(args.seed), refresh=args.no_cache)
+            backends = load_backends(
+                args.config,
+                Path(".cache/llm"),
+                salt=str(args.seed),
+                refresh=args.no_cache,
+            )
         except LLMError as e:
             print(f"error: {e}", file=sys.stderr)
             return 2
@@ -110,25 +180,45 @@ def main(argv: list[str] | None = None) -> int:
         for name in {args.backend} if args.backend else models:
             b = backends.get(name)
             if b is None:
-                print(f"error: backend '{name}' is not defined in {args.config}", file=sys.stderr)
+                print(
+                    f"error: backend '{name}' is not defined in {args.config}",
+                    file=sys.stderr,
+                )
                 return 2
             env = getattr(getattr(b, "inner", b), "api_key_env", None)
             if env and not os.environ.get(env):
-                print(f"error: backend '{name}' needs {env}; add it to .env or your environment", file=sys.stderr)
+                print(
+                    f"error: backend '{name}' needs {env}; add it to .env or your environment",
+                    file=sys.stderr,
+                )
                 return 2
         embedder, problem = _embedder(args)
         if problem:
             print(f"error: {problem}", file=sys.stderr)
             return 2
         stamp = time.strftime("%Y%m%d-%H%M%S")
-        run_dir = args.run_dir or args.out / f"{stamp}_{args.scenario.stem}_s{args.seed}"
+        run_dir = (
+            args.run_dir or args.out / f"{stamp}_{args.scenario.stem}_s{args.seed}"
+        )
         if (run_dir / "checkpoint.pkl").exists():
-            print(f"error: {run_dir} already has a run; use `llmabm resume {run_dir}`", file=sys.stderr)
+            print(
+                f"error: {run_dir} already has a run; use `llmabm resume {run_dir}`",
+                file=sys.stderr,
+            )
             return 2
-        common = dict(seed=args.seed, backend_override=args.backend, concurrency=args.concurrency, log_prompts=args.log_prompts)
-        print(f"{sc.name}: {len(sc.villagers)} villagers, {args.steps or sc.days} days -> {run_dir}")
+        common = dict(
+            seed=args.seed,
+            backend_override=args.backend,
+            concurrency=args.concurrency,
+            log_prompts=args.log_prompts,
+        )
+        print(
+            f"{sc.name}: {len(sc.villagers)} villagers, {args.steps or sc.days} days -> {run_dir}"
+        )
         try:
-            IslandSimulation(sc, backends, run_dir, embedder=embedder, **common).run(args.steps)
+            IslandSimulation(sc, backends, run_dir, embedder=embedder, **common).run(
+                args.steps
+            )
         except RunAborted as e:
             print(f"stopped: {e}", file=sys.stderr)
             return 3
@@ -139,15 +229,23 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: no checkpoint in {args.run_dir}", file=sys.stderr)
             return 2
         seed = json.loads((args.run_dir / "manifest.json").read_text())["seed"]
-        backends = load_backends(args.config, Path(".cache/llm"), salt=str(seed), refresh=args.no_cache)
+        backends = load_backends(
+            args.config, Path(".cache/llm"), salt=str(seed), refresh=args.no_cache
+        )
         embedder, problem = _embedder(args)
         if problem:
             print(f"error: {problem}", file=sys.stderr)
             return 2
         try:
-            IslandSimulation.resume(args.run_dir, backends, days=args.days, backend_override=args.backend,
-                                    concurrency=args.concurrency, prompt_version=args.prompt_version,
-                                    embedder=embedder)
+            IslandSimulation.resume(
+                args.run_dir,
+                backends,
+                days=args.days,
+                backend_override=args.backend,
+                concurrency=args.concurrency,
+                prompt_version=args.prompt_version,
+                embedder=embedder,
+            )
         except ValueError as e:
             print(f"error: {e}", file=sys.stderr)
             return 2
@@ -165,7 +263,10 @@ def main(argv: list[str] | None = None) -> int:
             if is_run(args.run_dir):
                 print(f"wrote {build_site(args.run_dir, args.out)}")
             elif not args.run_dir.is_dir():
-                print(f"error: {args.run_dir} is not a run directory or a runs folder", file=sys.stderr)
+                print(
+                    f"error: {args.run_dir} is not a run directory or a runs folder",
+                    file=sys.stderr,
+                )
                 return 2
             else:
                 for out in build_all(args.run_dir, args.out):
