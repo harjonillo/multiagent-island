@@ -1,18 +1,18 @@
 # Gus's assets
 
-## At the end of day 14
+## At the end of day 15
 
 - Bells with them: 60
 - Bells at home: 0
 - Loan from Tom Nook: 0
 - Home: a tent in lower ground, west (storage for 0 items)
-- Pockets (40 of 40 slots, worth 10,800 at Nook's Cranny): apple x1, ashpimi fish x1, ashrumo moth x1, axe x1, cosmos seeds x1, fishing rod x1, fossil x1, gormo fish x1, hardwood x8, loka fish x3, net x1, nevin moth x1, selit fish x1, selzalne fish x2, shovel x1, simple wooden fence x1, softwood x7, tubas fish x2, wood x5
+- Pockets (39 of 40 slots, worth 10,740 at Nook's Cranny): ashpimi fish x1, ashrumo moth x1, axe x1, fishing rod x1, fossil x1, gormo fish x1, hardwood x8, loka fish x3, net x1, nevin moth x1, selit fish x1, selzalne fish x2, shovel x1, simple wooden fence x1, softwood x7, tubas fish x2, wood x6
 - Kept at home (worth 0): nothing
 - Tools, uses so far: axe 8, fishing rod 9, net 2, shovel 3
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: campfire, fruit basket, golden candlestick, simple wooden fence
-- Net worth (bells and things at Cranny prices, less the loan): 10,860
+- Net worth (bells and things at Cranny prices, less the loan): 10,800
 
 ## Day by day
 
@@ -35,3 +35,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 12 | 60 | 0 | 36 | 10,180 | 0 | tent | 0 | 10,240 |
 | 13 | 60 | 0 | 40 | 11,120 | 0 | tent | 0 | 11,180 |
 | 14 | 60 | 0 | 40 | 10,800 | 0 | tent | 0 | 10,860 |
+| 15 | 60 | 0 | 39 | 10,740 | 0 | tent | 0 | 10,800 |

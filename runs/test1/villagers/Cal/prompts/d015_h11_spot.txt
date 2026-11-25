@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, 23 h.  
+Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 15 (May 6, spring, sunny), 11:00. You are Cal, at the river.
+You just spotted:
+1. a large fish shadow in the river (lower ground, centre)
+2. a very large fish shadow in the river (lower ground, centre)
+Earlier today:
+- 08:00 walked over to Kit's home
+- 08:00 knocked at Kit's home, but nobody answered
+- 09:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 750 raised so far; anyone can chip in, and once built it crosses the river by Resident Services, so nobody needs a vaulting pole there. Anyone can also propose another bridge, or stairs up a cliff that anyone can climb without a ladder, right where they stand; each is built once 98000 bells are donated here. The island can have 10 in all, built or proposed, and has 2: the bridge to the north bank; stairs up to the top cliff (north), 0 raised.
+- 10:00 spotted a small fish shadow in the river (lower ground, south, near the plaza) and went after it at 11:00 instead of rest
+- 11:00 tried to fish: pockets full
+Things you remember (anything you don't hold on to at night fades):
+- (day 11) Dax unresponsive today.
+- (day 11) Got an ashrumo moth; trade for softwood.
+- (day 11) Need more softwood for bridge and future trades.
+Your notes from the last 2 days:
+- (day 13) Keep trading selzalne for softwood until I hit the bridge fund goal.
+- (day 14) Remember to ask Dax for wood and trade selzalne. Also keep an eye on bridge fund tomorrow.
+- (day 14) Trade in progress, got softwood.
+- (day 14) Got another selzalne, good for softwood later.
+- (day 14) Remember to ask Dax tomorrow for wood and trade selzalne for softwood.
+- (day 15) Keep an eye on Dax tomorrow for wood. Remember the ladder request from Fen.
+At 12:00 you have nothing planned.
+Actions left today: 6 of 10. Mental energy left today: 105.
+
+You can go after one of them at 12:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (30 tokens, hidden from everyone) ===
+Need to decide which fish to go after. We have two large fish shadows. Probably go after one. Use action. I'll choose 1.
+
+=== REPLY ===
+{"thoughts":"I’ll try to catch the large fish shadow first; it’s probably a good catch for the bridge fund. If I miss it, I can try again later.","go":1}

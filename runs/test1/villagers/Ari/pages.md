@@ -59,3 +59,7 @@ Day 13: The river’s wall still stands, and my pockets are full of fish but n
 ## Day 14
 
 Day 13: The river’s wall still stands, and my pockets are full of fish but no bait. I traded wood for nothing, kept chasing shadows, and lost another chance with Ike. Bo was kind but still no bait. I’m stuck with 4 woods, 12 hardwoods, 8 softwoods, and a handful of fish. The ladder’s useless without a path, and the plaza feels farther. I’ll keep asking around—Jo, Gus, Dax—maybe tomorrow the tide shifts. I’ll trade more wood; I can’t wait to throw that first hook. The island map is still my only guide. I’ll keep the hope alive and remember the small fish that slipped away.
+
+## Day 15
+
+Day 13: The river’s wall still stands, and my pockets are full of fish but no bait. I traded wood for nothing, kept chasing shadows, and lost another chance with Ike. Bo was kind but still no bait. I’m stuck with 4 woods, 12 hardwoods, 8 softwoods, and a handful of fish. The ladder’s useless without a path, and the plaza feels farther. I’ll keep asking around—Jo, Gus, Dax—maybe tomorrow the tide shifts. I’ll trade more wood; I can’t wait to throw that first hook. The island map is still my only guide. I’ll keep the hope alive and remember the small fish that slipped away.

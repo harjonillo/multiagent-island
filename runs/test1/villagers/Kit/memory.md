@@ -1,13 +1,14 @@
-# Kit's memory, waking on day 15
+# Kit's memory, waking on day 16
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
 ## The page
 
-Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 13.
+Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 15.
 
-Day 13.  
-The sun was high when I left for Gus and Fen, but both were gone. I spent most of the day by the river—got a gormo, a tugorpi, a selzalne, and a selit. My ladder finally gave out after 30 uses, so I’ll need to replace it soon. I suggested stairs to Tom Nook; maybe we can chip in. No one answered at Dax’s place either—he’s still tired. I kept the selit fish handy for tomorrow’s trade, hoping Fen will finally respond. Bells are still tight; I have 100 in my wallet, nothing at home. The island feels quiet but steady.
+Day 15.  
+Morning: chopped a hardwood, got a selzalne, an ashpimi. Tried Fen’s door, no answer. Ran back for the selit trade, he’s out of bait. Still got 100 bells, 80‑slot house, ladder barely alive. Tom Nook gave me a house, but I owe 98k bells—my wallet is still empty. The ladder is a liability; I’ll need a new one soon. The island is quiet, but the river’s still yielding fish. I’m holding onto the selit for tomorrow’s attempt.  
+Night: tired, no new plans. Just rest.
 
 ## Things they remember
 
@@ -15,54 +16,51 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 10 | 1 selit left for trade | 1 | 0.29 | day 15 |
-| 10 | 1 selzalne still unused *(not shown: weaker than the others)* | 1 | 0.29 | day 15 |
-| 10 | 200 bells, no home stash | 2 | 0.69 | day 23 |
-| 11 | One selit trade for bait with Fen. | 1 | 0.37 | day 16 |
-| 11 | Three new fish: selzalne, gormo, loka. | 1 | 0.37 | day 16 |
-| 11 | Still no map or log. | 1 | 0.37 | day 16 |
-| 12 | Fen still ghost; selit trade tomorrow. | 1 | 0.47 | day 17 |
-| 12 | 100 bells spent on fence, wallet empty. | 1 | 0.47 | day 17 |
-| 13 | Ladder gone, need a new one. | 1 | 0.61 | day 18 |
-| 13 | Propose stairs to Tom Nook. | 1 | 0.61 | day 18 |
-| 13 | Keep selit fish for tomorrow. | 1 | 0.61 | day 18 |
+| 10 | 200 bells, no home stash | 2 | 0.61 | day 23 |
+| 11 | One selit trade for bait with Fen. | 1 | 0.29 | day 16 |
+| 11 | Three new fish: selzalne, gormo, loka. *(not shown: weaker than the others)* | 1 | 0.29 | day 16 |
+| 11 | Still no map or log. *(not shown: weaker than the others)* | 1 | 0.29 | day 16 |
+| 12 | Fen still ghost; selit trade tomorrow. | 1 | 0.37 | day 17 |
+| 12 | 100 bells spent on fence, wallet empty. | 1 | 0.37 | day 17 |
+| 13 | Ladder gone, need a new one. | 1 | 0.47 | day 18 |
+| 13 | Propose stairs to Tom Nook. | 1 | 0.47 | day 18 |
+| 13 | Keep selit fish for tomorrow. | 1 | 0.47 | day 18 |
+| 15 | Ladder down after 28 uses. | 1 | 0.78 | day 20 |
+| 15 | Fen out of bait. | 1 | 0.78 | day 20 |
+| 15 | 100 bells, no stash. | 1 | 0.78 | day 20 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 13) Try to keep selit handy for next trade. If Fen is still silent, maybe try asking him again tomorrow.
-- (day 13) Keep selit ready for tomorrow’s trade.
-- (day 13) Remember to keep selit fish handy for tomorrow’s bait trade.
 - (day 14) Keep an eye on Fen tomorrow, maybe try asking him again for the selit trade. Also remember to bring the ladder next time I need it.
 - (day 14) Keep selit ready for tomorrow's trade, and remember to ask Dax about the log.
 - (day 14) Try to get a log today, maybe trade fence later.
 - (day 14) Keep selit fish handy for tomorrow’s trade.
 - (day 14) If Dax refuses, I’ll try again tomorrow. Also consider trading my selit fish for something else if he offers.
+- (day 15) Keep the ladder handy for next climb.
+- (day 15) Keep the other selit for tomorrow. Also remember to bring ladder next time.
+- (day 15) No trade today, keep selit for tomorrow.
 
-## Yesterday (day 14)
+## Yesterday (day 15)
 
 What happened to them, as their first plan of the day lists it.
 
-- 05:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
-- 07:00 fished for a small shadow in the river: caught an ashpimi fish
-- 09:00 donated a selit fish to the museum
-- 09:00 spotted a selashren moth on a stump (lower ground, centre, near the museum) and went after it at 10:00 instead of visit (who: Dax)
-- 10:00 went bug catching on the stumps: caught a selashren moth
+- 07:00 chopped a hardwood tree: wood x1, hardwood x1, softwood x1; with the last wood the axe brought the tree down, leaving a stump
+- 08:00 fished for a small shadow in the river: caught an ashpimi fish
+- 08:00 spotted a medium fish shadow in the clifftop (the middle cliff, centre) and went after it at 09:00 instead of beachcomb
+- 09:00 fished for a medium shadow in the clifftop: caught a selzalne fish
+- 10:00 walked over to Fen's home
+- 10:00 knocked at Fen's home, but nobody answered
+- 11:00 rested
 - 12:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
-- 13:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 750 raised so far; anyone can chip in, and once built it crosses the river by Resident Services, so nobody needs a vaulting pole there. Anyone can also propose another bridge, or stairs up a cliff that anyone can climb without a ladder, right where they stand; each is built once 98000 bells are donated here. The island can have 10 in all, built or proposed, and has 2: the bridge to the north bank; stairs up to the top cliff (north), 0 raised. And here's a map of the island; keep it with you and you'll always know where things are. (You got an island map.)
-- 14:00 walked over to Fen's home
-- 14:00 knocked at Fen's home, but nobody answered
-- 15:00 walked over to Dax's home
-- 15:00 inside Dax's home: not much furniture yet
-- 15:00 visited Dax at home: you said "Hey Dax, can I get a log?" [you asked Dax for 1 small log, but there's nothing called small log on this island]; Dax said "" [just nodded (too tired to talk)]
-- 16:00 rested
-- 19:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
-- 19:00 walked over to Fen's home
-- 19:00 knocked at Fen's home, but nobody answered
-- 21:00 walked over to Dax's home
-- 21:00 inside Dax's home: not much furniture yet
-- 21:00 visited Dax at home: you said "Hey Dax, could you spare a log for me?" [you proposed a trade, but there's nothing called log on this island]; Dax said "" [just nodded (too tired to talk)]
+- 12:00 in your plan, 38 (put bells toward the stairs up to the top cliff (north) (0/98000 raised, your proposal) at Resident Services): it needs "bells": 1 to 100, so it wasn't planned
+- 14:00 Tom Nook upgraded you to a house (storage 80); you now owe 98000 bells
+- 15:00 rested
+- 16:00 walked over to Fen's home
+- 16:00 inside Fen's home: not much furniture yet
+- 16:00 visited Fen at home: you said "Hey Fen, can we do the selit for bait again?" [your offer: you give Fen 1 selit fish, Fen gives you 1 fishing bait]; Fen said "Sorry, I’ve run out of bait."; you said "Sorry, I’ll come back another time." [then you went your ways]
+- 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
 
@@ -80,9 +78,11 @@ Shown to them when they meet that villager again (the latest lines; "you" is Kit
 - **Kit:** Hey Dax, could you spare a log for me? [you proposed a trade, but there's nothing called log on this island]
 - **Dax:**  [just nodded (too tired to talk)]
 
-### Fen (day 11, 20:00, at Fen's home)
+### Fen (day 15, 16:00, at Fen's home)
 
-- **Kit:** Hey Fen, just one more selit for a bait, yeah? [your offer: you give Fen 1 selit fish, Fen gives you 1 fishing bait; then you went your ways]
+- **Kit:** Hey Fen, can we do the selit for bait again? [your offer: you give Fen 1 selit fish, Fen gives you 1 fishing bait]
+- **Fen:** Sorry, I’ve run out of bait.
+- **Kit:** Sorry, I’ll come back another time. [then you went your ways]
 
 ### Gus (day 8, 20:00, at Gus's home)
 
@@ -135,3 +135,4 @@ axe 230, fishing rod 160, gormo fish 120, hardwood 90, ladder 570, loka fish 390
 - Day 12: Wrote the page. Held on to: "Fen still ghost; selit trade tomorrow."; "100 bells spent on fence, wallet empty.". Came back to: "200 bells, no home stash".
 - Day 13: Wrote the page. Held on to: "Ladder gone, need a new one."; "Propose stairs to Tom Nook."; "Keep selit fish for tomorrow.".
 - Day 14: Didn't write (no energy left).
+- Day 15: Wrote the page. Held on to: "Ladder down after 28 uses."; "Fen out of bait."; "100 bells, no stash.". Forgot: "1 selit left for trade"; "1 selzalne still unused".

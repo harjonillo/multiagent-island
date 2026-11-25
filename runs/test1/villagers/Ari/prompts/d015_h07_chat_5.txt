@@ -102,3 +102,9 @@ On the table from you: you give Ike 1 wood, Ike gives you 1 selzalne fish, if Ik
 In your pockets right now: 200 bells, shovel x1, axe x1, fishing rod x1, net x1, wood x3, hardwood x12, softwood x8, gormo fish x1, fossil x1, loka fish x1, island map x1, selzalne fish x5, selit fish x1, ashpimi fish x2, gold nugget x1
 Respond with one JSON object and nothing else:
 {"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "give": {} or {"<item or bells>": <qty>}, "ask": {} or {"<item or bells>": <qty>}, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (96 tokens, hidden from everyone) ===
+We need to decide. We have 51 energy left. We can give wood? Ike wants bait. We have no bait. We can offer 1 wood for bait? Ike already offered wood for bait but we don't have. We can ask Ike for bait? He wants bait. We could trade: offer 1 wood for bait. That matches his request. So "ask": {"fishing bait":1}. We don't give. We say nothing. leave false.
+
+=== REPLY ===
+{"thoughts":"I have no bait, but Ike wants one. I can offer a wood for it, matching his request. No need to say anything, just ask for bait.", "say":"", "give": {}, "ask": {"fishing bait":1}, "leave": false, "note":"Ask for bait today; hope he has some."}

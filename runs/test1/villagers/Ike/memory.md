@@ -1,4 +1,4 @@
-# Ike's memory, waking on day 15
+# Ike's memory, waking on day 16
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -15,45 +15,40 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 8 | Still no fishing bait. | 2 | 0.61 | day 22 |
-| 10 | Ari keeps offering wood, but no bait. | 1 | 0.29 | day 15 |
-| 10 | I caught three fish today. | 1 | 0.29 | day 15 |
-| 10 | I still have no bells. | 1 | 0.29 | day 15 |
-| 11 | 6,750 bells in the tent. | 1 | 0.37 | day 16 |
-| 11 | Ari gave me bait for 1 wood. | 1 | 0.37 | day 16 |
-| 14 | Bo gave me wood for my rod. | 1 | 0.78 | day 19 |
-| 14 | I’m still missing a full set of fishing bait. | 1 | 0.78 | day 19 |
-| 14 | Ladder’s still usable—plan a trade tomorrow. | 1 | 0.78 | day 19 |
+| 8 | Still no fishing bait. | 2 | 0.54 | day 22 |
+| 11 | 6,750 bells in the tent. | 1 | 0.29 | day 16 |
+| 11 | Ari gave me bait for 1 wood. | 1 | 0.29 | day 16 |
+| 14 | Bo gave me wood for my rod. | 1 | 0.61 | day 19 |
+| 14 | I’m still missing a full set of fishing bait. | 1 | 0.61 | day 19 |
+| 14 | Ladder’s still usable—plan a trade tomorrow. | 1 | 0.61 | day 19 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 13) Keep an eye on the river, maybe get a vaulting pole later.
-- (day 13) Remember to bring the bait back tomorrow to trade for more wood.
-- (day 13) Got 11 wood now, keep an eye on the river tomorrow.
-- (day 13) Trade wood for rod to satisfy Bo. Keep an eye on wood inventory for future trades.
-- (day 13) Keep an eye on wood trade tomorrow. Remember to bring the fishing rod back.
-- (day 13) Remember to keep an eye on the river for a vaulting pole later.
 - (day 14) Record that I traded 3 wood for a ladder.
 - (day 14) No trade today. Keep wood for future ladder.
 - (day 14) Keep an eye on wood stock, maybe trade later for fishing rod.
 - (day 14) Got the fishing rod back, keep ladder for cliffs.
 - (day 14) Remember to bring a fishing rod tomorrow and trade 3 wood for a ladder if possible.
+- (day 15) If he declines, I’ll need to find another bait source tomorrow.
+- (day 15) If he says no, I'll try to get bait from someone else or make my own later.
+- (day 15) Trade completed, keep 10 wood. Remember to trade ladder later.
+- (day 15) Remember to trade ladder for wood later if possible.
+- (day 15) Keep wood stock low, try to trade ladder later.
+- (day 15) Try to get bait from someone else tomorrow if Ari declines.
 
-## Yesterday (day 14)
+## Yesterday (day 15)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 walked over to Bo's home (also nearby: Bo)
-- 07:00 knocked at Bo's home, but nobody answered
-- 07:00 ran into Bo out on a walk: Bo said "Hey Ike, got any spare wood? I could trade some for a better shovel or ladder."; you said "Hey Bo, give me a ladder for three woods?" [your offer: you give Bo 3 wood, Bo gives you 1 ladder]; Bo said "Sorry, no room for the ladder right now."; you said "Thanks, Bo. I’ll see you later." [then you went your ways]
-- 08:00 walked over to Ari's home (also nearby: Bo)
-- 08:00 knocked at Ari's home, but nobody answered
-- 08:00 ran into Bo at Ari's home: Bo said "Hey Ike, I’ve got 4 wood—can we trade 3 for your ladder?"; you said "Sure thing, Bo. Here’s the ladder for you." [your offer: you give Bo 1 ladder, Bo gives you 3 wood, but you had no room, so there was no offer]; Bo said "Hey Ike, can I trade you one wood for a fishing rod?" [Bo's offer: Bo gives you 1 wood, you give Bo 1 fishing rod]; you said "Sure thing, Bo." [you accepted: Bo gave you 1 wood, you gave Bo 1 fishing rod]; Bo said "Got it, thanks Ike." [then you went your ways]
+- 07:00 walked over to Ari's home (also nearby: Ari)
+- 07:00 knocked at Ari's home, but nobody answered
+- 07:00 ran into Ari at Ari's home: you said "Morning, Ari! Got a minute?"; Ari said "Hey Ike, here's a wood for bait." [Ari's offer: Ari gives you 1 wood, you give Ari 1 fishing bait]; you said "Hey Ari, how about this? I’ll trade you a selzalne fish for the wood you need." [your offer: you give Ari 1 selzalne fish, Ari gives you 1 wood]; Ari said "Sure thing, Ike! Here’s a wood for that fish." [Ari accepted: you gave Ari 1 selzalne fish, Ari gave you 1 wood; Ari's offer: Ari gives you 1 wood, you give Ari 1 selzalne fish]; you said "Hey Ari, can I swap a wood for a fishing bait?" [you asked Ari for 1 fishing bait]; Ari said "I can swap 1 wood for a fishing bait, if you have one." [Ari asked you for 1 fishing bait]; you said "Hey, I'll trade you a wood for a bait." [you tried to hand Ari 1 wood but Ari had no room; you asked Ari for 1 fishing bait]; Ari said "Hey Ike, any fishing bait you can spare? I’ll trade you a wood if you want." [Ari asked you for 1 fishing bait]; you said "Hey, can you spare a fishing bait for me?" [you asked Ari for 1 fishing bait]; Ari said "" [Ari asked you for 1 fishing bait]; you said "Hey Ari, can I trade you a wood for a fishing bait?" [you asked Ari for 1 fishing bait]; Ari said "I can swap a wood for a fishing bait, if you have one."; you said "Sure, give me a bait if you have one." [you asked Ari for 1 fishing bait]; Ari said "" [just nodded (too tired to talk)]
+- 07:00 spotted an ashrumo moth on a rock (lower ground, southeast, near rock 6) and went after it at 08:00 instead of rest
+- 08:00 tried to catch_bug: pockets full
 - 09:00 rested
 - 10:00 rested
-- 10:00 Ari visited you at home: Ari said "Hey Ike, got a wood for you. Need some bait." [Ari's offer: Ari gives you 1 wood, you give Ari 1 fishing bait]; you said "Hey Ari, could you hook me up with some fishing bait?" [you asked Ari for 1 fishing bait]; Ari said "Hey Ike, I’ve got a wood for you—any bait you can spare?" [Ari's offer: Ari gives you 1 wood, you give Ari 1 fishing bait]; you said "" [just nodded (too tired to talk)]
 - 11:00 rested
 - 12:00 too tired to plan, so you planned nothing new
 - 19:00 too tired to plan, so you planned nothing new
@@ -62,12 +57,16 @@ What happened to them, as their first plan of the day lists it.
 
 Shown to them when they meet that villager again (the latest lines; "you" is Ike).
 
-### Ari (day 14, 10:00, at Ike's home)
+### Ari (day 15, 07:00, at Ari's home)
 
-- **Ari:** Hey Ike, got a wood for you. Need some bait. [Ari's offer: Ari gives you 1 wood, you give Ari 1 fishing bait]
-- **Ike:** Hey Ari, could you hook me up with some fishing bait? [you asked Ari for 1 fishing bait]
-- **Ari:** Hey Ike, I’ve got a wood for you—any bait you can spare? [Ari's offer: Ari gives you 1 wood, you give Ari 1 fishing bait]
-- **Ike:**  [just nodded (too tired to talk)]
+- **Ike:** Hey, I'll trade you a wood for a bait. [you tried to hand Ari 1 wood but Ari had no room; you asked Ari for 1 fishing bait]
+- **Ari:** Hey Ike, any fishing bait you can spare? I’ll trade you a wood if you want. [Ari asked you for 1 fishing bait]
+- **Ike:** Hey, can you spare a fishing bait for me? [you asked Ari for 1 fishing bait]
+- **Ari:**  [Ari asked you for 1 fishing bait]
+- **Ike:** Hey Ari, can I trade you a wood for a fishing bait? [you asked Ari for 1 fishing bait]
+- **Ari:** I can swap a wood for a fishing bait, if you have one.
+- **Ike:** Sure, give me a bait if you have one. [you asked Ari for 1 fishing bait]
+- **Ari:**  [just nodded (too tired to talk)]
 
 ### Bo (day 14, 08:00, at Ari's home)
 
@@ -85,14 +84,14 @@ Shown to them when they meet that villager again (the latest lines; "you" is Ike
 
 Shown to them when they meet that villager ("you" is Ike).
 
-### Ari (the latest 6; 5 earlier)
+### Ari (the latest 6; 6 earlier)
 
-- day 6: Ari gave you 1 selzalne fish
 - day 7: Ari gave you 1 wood, which you had asked for
 - day 7: you gave Ari 1 selzalne fish
 - day 8: Ari gave you 1 wood
 - day 10: Ari gave you 1 wood
 - day 10: Ari gave you 1 wood
+- day 15: you gave Ari 1 selzalne fish and Ari gave you 1 wood, in a trade
 
 ### Bo (the latest 6; 1 earlier)
 
@@ -142,3 +141,4 @@ ashrumo moth 250, axe 230, fishing rod 160, fossil 400, gormo fish 120, ladder 5
 - Day 12: Didn't write (no energy left).
 - Day 13: Didn't write (no energy left). Forgot: "Got 1 wood back from Ari today."; "Gormo fish might sell for bells tomorrow.".
 - Day 14: Wrote the page. Held on to: "Bo gave me wood for my rod."; "I’m still missing a full set of fishing bait."; "Ladder’s still usable—plan a trade tomorrow.". Forgot: "Got miruru fish, ashrumo moth"; "Still 0 bells"; "Still 3 woods, 1 fish, 1 bait needed".
+- Day 15: Didn't write (no energy left). Forgot: "Ari keeps offering wood, but no bait."; "I caught three fish today."; "I still have no bells.".

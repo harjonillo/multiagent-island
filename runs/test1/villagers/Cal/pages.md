@@ -75,3 +75,8 @@ Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas an
 
 Day 11, 23 h.  
 Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+## Day 15
+
+Day 15, 02 h.  
+The bridge still feels like a stone’s throw away; 750/98000 bells is a long way. I tried to stash my catch but my tent is a hole‑in‑the‑wall. Still no word from Dax—maybe he’s busy or the island’s quiet. I knocked at Ike and Kit, but they’re off. I offered Tom a house loan; maybe that’ll get him to help. I’m stuck with 100 bells, no new gear, and a full fishing net. My only plan: ask Dax for wood, trade selzalne for softwood, and see if anyone can swap a ladder for Fen. The island feels smaller each day.

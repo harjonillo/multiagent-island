@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 13: The river’s wall still stands, and my pockets are full of fish but no bait. I traded wood for nothing, kept chasing shadows, and lost another chance with Ike. Bo was kind but still no bait. I’m stuck with 4 woods, 12 hardwoods, 8 softwoods, and a handful of fish. The ladder’s useless without a path, and the plaza feels farther. I’ll keep asking around—Jo, Gus, Dax—maybe tomorrow the tide shifts. I’ll trade more wood; I can’t wait to throw that first hook. The island map is still my only guide. I’ll keep the hope alive and remember the small fish that slipped away.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 15 (May 6, spring, sunny), 07:00. You are Ari, out on a walk.
+You just spotted:
+1. an ashrumo moth on a rock (lower ground, southeast, near rock 6)
+2. a small fish shadow in the river (lower ground, southeast, near rock 6)
+3. a medium fish shadow in the river (lower ground, southeast, near rock 6)
+Earlier today:
+- 07:00 ran into Ike at Ari's home: Ike said "Morning, Ari! Got a minute?"; you said "Hey Ike, here's a wood for bait." [your offer: you give Ike 1 wood, Ike gives you 1 fishing bait]; Ike said "Hey Ari, how about this? I’ll trade you a selzalne fish for the wood you need." [Ike's offer: Ike gives you 1 selzalne fish, you give Ike 1 wood]; you said "Sure thing, Ike! Here’s a wood for that fish." [you accepted: Ike gave you 1 selzalne fish, you gave Ike 1 wood; your offer: you give Ike 1 wood, Ike gives you 1 selzalne fish]; Ike said "Hey Ari, can I swap a wood for a fishing bait?" [Ike asked you for 1 fishing bait]; you said "I can swap 1 wood for a fishing bait, if you have one." [you asked Ike for 1 fishing bait]; Ike said "Hey, I'll trade you a wood for a bait." [Ike tried to hand you 1 wood but you had no room; Ike asked you for 1 fishing bait]; you said "Hey Ike, any fishing bait you can spare? I’ll trade you a wood if you want." [you asked Ike for 1 fishing bait]; Ike said "Hey, can you spare a fishing bait for me?" [Ike asked you for 1 fishing bait]; you said "" [you asked Ike for 1 fishing bait]; Ike said "Hey Ari, can I trade you a wood for a fishing bait?" [Ike asked you for 1 fishing bait]; you said "I can swap a wood for a fishing bait, if you have one."; Ike said "Sure, give me a bait if you have one." [Ike asked you for 1 fishing bait]; you said "" [just nodded (too tired to talk)]
+Things you remember (anything you don't hold on to at night fades):
+- (day 9) Got selit fish at 08:00
+- (day 13) 4 woods left, still no bait
+- (day 13) Ike offered wood for bait, I declined【150 words】
+Your notes from the last 2 days:
+- (day 15) Keep track of wood inventory after trade.
+- (day 15) Trade one wood for selzalne fish. Still need bait. Ask Bo tomorrow.
+- (day 15) Remember to follow up with Bo tomorrow if I still don't get bait.
+- (day 15) Keep wood inventory low, hope Ike has bait.
+- (day 15) Ask for bait today; hope he has some.
+- (day 15) Remember to check Bo tomorrow for bait.
+At 08:00 you have nothing planned.
+Actions left today: 10 of 10. Mental energy left today: 14.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (50 tokens, hidden from everyone) ===
+Need choose target 1,2,3 or 0. Want bait. No bait. Need fish? maybe selzalne fish? Already have? inventory unknown. Probably go after fish shadow medium to get fish. So go 3.
+
+=== REPLY ===
+{"thoughts":"Need bait, no wood left. Can't trade. Going after medium fish shadow might give me a selzalne or other fish. No better option today.", "go":3}

@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Still no bait, no fish, no bells.  
+Ari didn’t answer, but I finally got 1 wood from him for the trade—still 7 wood left.  
+Gus is still silent, but I’m not giving up.  
+I dug a stump, cleared a spot, but pockets full when I tried to fish.  
+Shovels 28/30 uses, ladder 10 uses.  
+Plan: tomorrow bring 3 wood to Dax or Kit, maybe try Gus again.  
+Watch the river, maybe a fish will appear.  
+Sleep is thin, but I’ll keep pushing.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 15 (May 6, spring, sunny), 10:00. You are Bo, at the out for a walk.
+Nearby: Dax.
+Earlier today:
+(nothing yet)
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ladder 22 uses left, need more wood
+- (day 10) Shovel uses 29 left.
+- (day 11) 28 shovel uses left
+- (day 11) Gus wants 1 bait from me tomorrow
+Your notes from the last 2 days:
+- (day 14) Keep 4 wood for future bait trade.
+- (day 14) Remember to keep at least 4 wood in pocket for future bait trade.
+- (day 14) Got a second rod, keep 4 wood for bait
+- (day 14) Keep 4 wood for tomorrow's bait trade.
+- (day 14) No bait yet. Keep 4 wood for next trade.
+- (day 14) Keep an eye on wood count for future trades.
+Mental energy left today: 120 (about 17 for each thing you say).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (6 tokens, hidden from everyone) ===
+Need to output JSON.
+
+=== REPLY ===
+{"thoughts":"Need wood for ladder, want bait. Dax nearby, maybe trade wood for bait?","approach":"Dax","say":"Hey Dax, got a couple of woods. Need some bait for the river. Got anything?"}

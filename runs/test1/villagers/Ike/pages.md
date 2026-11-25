@@ -137,3 +137,8 @@ Sun rose over the river, and I chased the ashrumo moth like a kid in a forest. I
 
 Day 14, night.  
 Sun slipped behind the cliffs, leaving the river humming. I trailed Bo around the edge of my plot, trading a fishing rod for a single wood—small but steady. Ari dropped by with a wood and a half‑baked bait, but I’m still short of the full set. I’m running low on wood, but the ladder’s still solid; maybe I’ll swap it later for more. I’ll keep an eye on the river for that vaulting pole rumor. The night is quiet, my tent warm with 6,750 bells, and my tools feel heavy but useful. I’m tired, but the island’s rhythm steadies my thoughts.
+
+## Day 15
+
+Day 14, night.  
+Sun slipped behind the cliffs, leaving the river humming. I trailed Bo around the edge of my plot, trading a fishing rod for a single wood—small but steady. Ari dropped by with a wood and a half‑baked bait, but I’m still short of the full set. I’m running low on wood, but the ladder’s still solid; maybe I’ll swap it later for more. I’ll keep an eye on the river for that vaulting pole rumor. The night is quiet, my tent warm with 6,750 bells, and my tools feel heavy but useful. I’m tired, but the island’s rhythm steadies my thoughts.

@@ -116,3 +116,15 @@ Shovels 28/30 uses, ladder 10 uses.
 Plan: tomorrow bring 3 wood to Dax or Kit, maybe try Gus again.  
 Watch the river, maybe a fish will appear.  
 Sleep is thin, but I’ll keep pushing.
+
+## Day 15
+
+Day 11, night.  
+Still no bait, no fish, no bells.  
+Ari didn’t answer, but I finally got 1 wood from him for the trade—still 7 wood left.  
+Gus is still silent, but I’m not giving up.  
+I dug a stump, cleared a spot, but pockets full when I tried to fish.  
+Shovels 28/30 uses, ladder 10 uses.  
+Plan: tomorrow bring 3 wood to Dax or Kit, maybe try Gus again.  
+Watch the river, maybe a fish will appear.  
+Sleep is thin, but I’ll keep pushing.

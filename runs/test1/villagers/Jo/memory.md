@@ -1,13 +1,13 @@
-# Jo's memory, waking on day 15
+# Jo's memory, waking on day 16
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
 ## The page
 
-Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 12.
+Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 15.
 
-Day 12, 23:30.  
-The river stayed empty; the pond kept giving. I chased a big shadow and ended up with a gorpika, then a moitbas at 11. I kept going for fish, trading nothing, but the day was steady. Cal’s house was silent again, but I finally saw him at the walk—he just nodded, too tired to talk. No trades happened, but I kept my softwood and the extra moitbas. Ari still wants a bait; I’ll offer one tomorrow. I’m still short on rocks for the bridge, and Dax is still missing. I’ll ask Eli about the donation and maybe ask Cal for a fish next time. The bridge feels farther each day, but the fish keep coming.
+Day 15, 23:45.  
+Morning gold from rock 1 was a good start, but the real haul came from that massive shadow in the pond—lovin fish in my bag now, and still feeling the rush of the catch. The river stayed empty; the pond is my only lifeline. I kept trying to get that bridge spot but the stretch is too wide, so I’ll keep scouting for a narrower section. Dax’s house is still empty, and he’s not answering the door. I left a stone for him, but he had no space. Ari didn’t talk, just nodded—maybe he’s tired. No trades today, so I’m holding onto my softwood and the extra moitbas. I still need more rocks for the bridge, and I’ll keep asking Dax tomorrow.
 
 ## Things they remember
 
@@ -15,19 +15,17 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 12 | Cal only nodded, no talk. | 1 | 0.47 | day 17 |
-| 12 | I caught a gorpika and extra moitbas. | 1 | 0.47 | day 17 |
-| 12 | Ari needs bait tomorrow. | 1 | 0.47 | day 17 |
+| 12 | Cal only nodded, no talk. | 1 | 0.37 | day 17 |
+| 12 | I caught a gorpika and extra moitbas. | 1 | 0.37 | day 17 |
+| 12 | Ari needs bait tomorrow. | 1 | 0.37 | day 17 |
+| 15 | Lovin fish added to my stash. | 1 | 0.78 | day 20 |
+| 15 | No trade with Ari; he just nodded. | 1 | 0.78 | day 20 |
+| 15 | Dax still missing, leave stone, no answer. | 1 | 0.78 | day 20 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 13) Remember to ask Dax about a rock tomorrow. Keep the softwood ready for Cal.
-- (day 13) Keep selzalne handy for future trades. Remember to ask Dax for a rock tomorrow.
-- (day 13) Remember to keep the selzalne handy for future trades.
-- (day 13) Remember to check with Gus tomorrow for the wood he needs.
-- (day 13) Remember to keep selzalne handy for future trades.
 - (day 14) Ask Dax for rock tomorrow, keep softwood ready for Cal.
 - (day 14) Remember to keep wood handy for Dax and keep looking for rocks for the bridge.
 - (day 14) Wait for Dax to find rock.
@@ -35,35 +33,42 @@ What they jotted down in plans, conversations and at the plaza.
 - (day 14) Keep an eye on Dax for a rock tomorrow.
 - (day 14) Remember to ask for a rock tomorrow if he finds one.
 - (day 14) Remember to keep stones handy for bridge and keep talking to Dax about any real rocks he might find.
+- (day 15) Ask Dax for wood, buy bait, rest.
+- (day 15) Offer bait to keep trade going.
+- (day 15) Keep stones for bridge. Ask Dax again tomorrow if he finds a rock.
 
-## Yesterday (day 14)
+## Yesterday (day 15)
 
 What happened to them, as their first plan of the day lists it.
 
-- 05:00 at home: couldn't put away selit fish: your tent has no room for things; couldn't put away loka fish: your tent has no room for things; couldn't put away miruru fish: your tent has no room for things
-- 07:00 walked over to Dax's home (also nearby: Dax, Cal)
-- 07:00 knocked at Dax's home, but nobody answered
-- 07:00 ran into Dax at Dax's home: you said "Hey Dax, could I borrow a rock for the bridge?"; Dax said "Hey Jo, I can trade you some wood for a rock if you have one." [Dax proposed a trade, but there's nothing called rock on this island]; you said "Sure, I’ll bring wood later, and if you find a rock let me know."; Dax said "Sure, I’ll bring a rock when I find one."; you said "Sure, here's my wood for a rock." [you proposed a trade, but there's nothing called rock on this island]; Dax said "Sure, I’ll bring a rock when I find one." [Dax tried to hand you 2 wood but you had no room; Dax asked you for 1 rock, but there's nothing called rock on this island]; you said "Hey Dax, I can trade you my wood for a stone, if you have one." [your offer: you give Dax 1 wood, Dax gives you 1 stone]; Dax said "I’m good, thanks."; you said "Sure, here's the wood." [you handed Dax 1 wood]; Dax said "Sure, I’ll bring a rock when I find one." [Dax asked you for 1 rock, but there's nothing called rock on this island]; you said "Hey Dax, here's a stone for your wood." [you handed Dax 1 stone]; Dax said "Sure, here’s my stone." [Dax handed you 1 stone; Dax accepted, but the trade fell through, nothing changed hands: you had no wood]; you said "Sure, here's a stone." [you handed Dax 1 stone]; Dax said "" [just nodded (too tired to talk)]
-- 08:00 walked over to Gus's home (also nearby: Dax, Ari)
-- 08:00 knocked at Gus's home, but nobody answered
-- 08:00 ran into Ari at Gus's home: Ari said "Hey Jo, got a wood for you? Need bait for fishing."; you said "" [just nodded (too tired to talk)]
-- 09:00 walked over to Cal's home
-- 09:00 knocked at Cal's home, but nobody answered
-- 09:00 spotted a small fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 10:00 instead of propose_bridge
-- 10:00 fished for a small shadow in the pond: it got away
-- 10:00 spotted a large fish shadow in the pond (lower ground, southeast, near rock 6) and went after it at 11:00 instead of rest
-- 11:00 fished for a large shadow in the pond: caught a miruru fish
-- 12:00 too tired to plan, so you planned nothing new
+- 07:00 rock 1 was the money rock: got 6750 bells
+- 07:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 08:00 instead of mine_rock (rock: 5)
+- 08:00 fished for a very large shadow in the pond: caught a lovin fish
+- 09:00 tried to mine_rock: pockets full, could not take anything from rock 6
+- 10:00 walked over to Dax's home (also nearby: Gus, Fen)
+- 10:00 knocked at Dax's home, but nobody answered
+- 11:00 tried to propose_bridge: there's no stretch of river narrow enough for a bridge within 8 steps of here (lower ground, west), away from other bridges and stairs; the nearest you can walk to is about 26 steps away (lower ground, southwest)
+- 12:00 in your plan, 18 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- 12:00 walked over to Dax's home (also nearby: Bo)
+- 12:00 knocked at Dax's home, but nobody answered
+- 13:00 walked over to Ari's home
+- 13:00 inside Ari's home: not much furniture yet
+- 13:00 visited Ari at home: you said "Hey Ari, can I get some bait?" [you tried to hand Ari 1 fishing bait but you had no fishing bait]; Ari said "" [just nodded (too tired to talk)]
+- 15:00 walked over to Dax's home
+- 15:00 inside Dax's home: not much furniture yet
+- 15:00 visited Dax at home: you said "Hey Dax, here's a stone." [you tried to hand Dax 1 stone but Dax had no room; then you went your ways]
+- 16:00 rested
+- 17:00 rested
 - 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
 
 Shown to them when they meet that villager again (the latest lines; "you" is Jo).
 
-### Ari (day 14, 08:00, at Gus's home)
+### Ari (day 15, 13:00, at Ari's home)
 
-- **Ari:** Hey Jo, got a wood for you? Need bait for fishing.
-- **Jo:**  [just nodded (too tired to talk)]
+- **Jo:** Hey Ari, can I get some bait? [you tried to hand Ari 1 fishing bait but you had no fishing bait]
+- **Ari:**  [just nodded (too tired to talk)]
 
 ### Bo (day 8, 09:00, at Dax's home)
 
@@ -80,16 +85,9 @@ Shown to them when they meet that villager again (the latest lines; "you" is Jo)
 - **Jo:** Sure, deal. [you accepted: Cal gave you 1 selzalne fish, you gave Cal 1 softwood; your offer: you give Cal 1 softwood, Cal gives you 1 selzalne fish, but you had no softwood, so there was no offer]
 - **Cal:**  [just nodded (too tired to talk)]
 
-### Dax (day 14, 07:00, at Dax's home)
+### Dax (day 15, 15:00, at Dax's home)
 
-- **Jo:** Hey Dax, I can trade you my wood for a stone, if you have one. [your offer: you give Dax 1 wood, Dax gives you 1 stone]
-- **Dax:** I’m good, thanks.
-- **Jo:** Sure, here's the wood. [you handed Dax 1 wood]
-- **Dax:** Sure, I’ll bring a rock when I find one. [Dax asked you for 1 rock, but there's nothing called rock on this island]
-- **Jo:** Hey Dax, here's a stone for your wood. [you handed Dax 1 stone]
-- **Dax:** Sure, here’s my stone. [Dax handed you 1 stone; Dax accepted, but the trade fell through, nothing changed hands: you had no wood]
-- **Jo:** Sure, here's a stone. [you handed Dax 1 stone]
-- **Dax:**  [just nodded (too tired to talk)]
+- **Jo:** Hey Dax, here's a stone. [you tried to hand Dax 1 stone but Dax had no room; then you went your ways]
 
 ### Fen (day 11, 07:00, at the rocks)
 
@@ -181,3 +179,4 @@ Shown to them when they meet that villager ("you" is Jo).
 - Day 12: Wrote the page. Held on to: "Cal only nodded, no talk."; "I caught a gorpika and extra moitbas."; "Ari needs bait tomorrow.".
 - Day 13: Didn't write (no energy left).
 - Day 14: Didn't write (no energy left). Forgot: "Cal gave 2 softwood, I traded 1 selzalne."; "Dax still wants bait, I owe him one."; "Bridge still 2k.".
+- Day 15: Wrote the page. Held on to: "Lovin fish added to my stash."; "No trade with Ari; he just nodded."; "Dax still missing, leave stone, no answer.".

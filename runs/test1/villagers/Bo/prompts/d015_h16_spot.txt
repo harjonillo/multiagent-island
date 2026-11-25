@@ -1,0 +1,54 @@
+=== SYSTEM ===
+You are Bo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, night.  
+Still no bait, no fish, no bells.  
+Ari didn’t answer, but I finally got 1 wood from him for the trade—still 7 wood left.  
+Gus is still silent, but I’m not giving up.  
+I dug a stump, cleared a spot, but pockets full when I tried to fish.  
+Shovels 28/30 uses, ladder 10 uses.  
+Plan: tomorrow bring 3 wood to Dax or Kit, maybe try Gus again.  
+Watch the river, maybe a fish will appear.  
+Sleep is thin, but I’ll keep pushing.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 15 (May 6, spring, sunny), 16:00. You are Bo, at the river.
+You just spotted:
+1. a small fish shadow in the sea (lower ground, southeast)
+2. a medium fish shadow in the river (lower ground, southeast)
+Earlier today:
+- 14:00 knocked at Ike's home, but nobody answered
+- 15:00 walked over to Ari's home (also nearby: Ari)
+- 15:00 knocked at Ari's home, but nobody answered
+- 15:00 spotted a small fish shadow in the river (lower ground, southeast, near rock 6) and went after it at 16:00 instead of rest
+- 16:00 fished for a small shadow in the river: caught an ashpimi fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 8) Ladder 22 uses left, need more wood
+- (day 10) Shovel uses 29 left.
+- (day 11) 28 shovel uses left
+- (day 11) Gus wants 1 bait from me tomorrow
+Your notes from the last 2 days:
+- (day 14) Got a second rod, keep 4 wood for bait
+- (day 14) Keep 4 wood for tomorrow's bait trade.
+- (day 14) No bait yet. Keep 4 wood for next trade.
+- (day 14) Keep an eye on wood count for future trades.
+- (day 15) Remember to keep 4 wood in pocket for next trade if possible.
+- (day 15) Got 2 wood for bait. Keep 1 wood for next trade.
+At 17:00 you planned: rest.
+Actions left today: 3 of 10. Mental energy left today: 62.
+
+You can go after one of them at 17:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (15 tokens, hidden from everyone) ===
+We choose to go after medium fish shadow in river at 17.
+
+=== REPLY ===
+{"thoughts":"I’ll chase the medium fish in the river now; maybe it’s a bigger catch before it escapes.","go":2}

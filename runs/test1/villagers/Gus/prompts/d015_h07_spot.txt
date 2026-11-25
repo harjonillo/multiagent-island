@@ -1,0 +1,43 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 14, night.  
+The morning was a mess—apple, rock, moth, another rock. I chased a moth again, but the rock I broke at 7:00 already showed a crack. I’m stuck without a ladder; I can’t chop hardwood or visit Ari. The river is dead, no fish shadows, so I’ll have to trade for bait tomorrow. I’ve lost my ladder after 30 uses, and I only have 5 wood left in pockets—three for Dax, two spare. I still have a selzalne, an ashrumo moth, and a fossil. I’m running low on apples too; I need to eat one tomorrow or trade. The tent is full of bells only, so I’ll stash my items elsewhere.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 15 (May 6, spring, sunny), 07:00. You are Gus, at the woods.
+You just spotted:
+1. a nevin moth on a tree (lower ground, west)
+Earlier today:
+- 07:00 planted an apple; it will be a grown tree in 5 days (also nearby: Dax)
+- 07:00 ran into Dax at the woods: you said "Hey Dax, could I swap a bit of wood with you?"; Dax said "Sure, I’ll give you a wood." [Dax's offer: Dax gives you 1 wood, you give Dax 1 fishing bait]; you said "Sure, give me a wood and I'll trade you a bait." [your offer: you give Dax 1 wood, Dax gives you 1 fishing bait]; Dax said "Sure, I could trade you a fishing bait if you have one." [Dax asked you for 1 fishing bait]; you said "Hey Dax, can you swap 1 wood for a bait?" [your offer: you give Dax 1 wood, Dax gives you 1 fishing bait]; Dax said "Sure, give me a bait if you have one, I'll give you a wood." [Dax handed you 1 wood; Dax asked you for 1 fishing bait]; you said "Hey Dax, I’ll give you a wood for a bait." [you handed Dax 1 wood; you asked Dax for 1 fishing bait]; Dax said "Hey Gus, I got some wood, can I trade it for a bait?" [Dax handed you 1 wood; Dax asked you for 1 fishing bait]; you said "Sure thing, Dax. I'll give you a wood for a bait." [you handed Dax 1 wood; you asked Dax for 1 fishing bait]; Dax said "Hey Gus, can I get a fishing bait if you have one?" [Dax asked you for 1 fishing bait]; you said "Hey Dax, I'll trade you a wood for a bait." [you tried to hand Dax 1 wood but Dax had no room]; Dax said "Sure, I’ll give you a wood for a bait." [Dax handed you 1 wood; Dax asked you for 1 fishing bait]; you said "Hey Dax, wood for bait?"; Dax said "" [just nodded (too tired to talk)]
+Things you remember (anything you don't hold on to at night fades):
+- (day 13) Trade wood ↔ selzalne with Jo
+- (day 14) No ladder, no hardwood.
+- (day 14) Need 3 wood for Dax tomorrow.
+- (day 14) Trade bait with Ari.
+Your notes from the last 2 days:
+- (day 15) Got bait, lose one wood. Remember to bring more wood tomorrow for Dax and maybe trade for more bait.
+- (day 15) Remember to keep 3 wood for tomorrow's trade. Keep 1 wood in hand for future.
+- (day 15) Track that Dax now has a wood in his hand.
+- (day 15) Keep track of the wood trade and bait request.
+- (day 15) Got wood out of pockets, keep 4 left. Expect bait tomorrow.
+- (day 15) Keep 3 wood for Dax tomorrow, remember to get more wood
+At 08:00 you planned: plant (item: cosmos seeds, near: home).
+Actions left today: 5 of 10. Mental energy left today: 16.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (152 tokens, hidden from everyone) ===
+Need to decide. We have 5 actions left. Need wood for Dax tomorrow (3). Currently have 4 wood left. So maybe go to collect more wood. But we already have wood for Dax? He has wood in hand. We need 3 wood for tomorrow. We have 4 left, so okay. Maybe gather more. Also need bait tomorrow trade with Ari. We have bait now? We got bait from Dax. Good. Maybe plant cosmos seeds at home. That's one action. We can choose to go after something? Nothing urgent. Maybe go after selzalne? No. Could go after nevin moth? Maybe catch for bait? But we already have bait. Might just stay. So go=0.
+
+=== REPLY ===
+{"thoughts":"I’ve got enough wood for tomorrow’s trade with Dax and a bait from him. I’ll plant cosmos seeds at home and keep the rest of my actions free for later. No urgent target to chase now.","go":0}

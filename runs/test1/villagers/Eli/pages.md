@@ -69,3 +69,8 @@ The river sang all morning.  I snagged an ashpimo, a selzalne, and two ashpimi b
 
 Day 14.  
 Morning was quiet, no fish shadows until the first bite: a selzalne, then a couple of ashpimi.  The river feels empty now, maybe the season shifts.  No trades, no new tools, but the fishing rod is almost dead—just three uses left.  I still need Jo’s log or a vaulting pole.  I’ll keep an eye on her and the river for a good spot.  Bells are fine, food stock steady.  Rest tonight, hope the next day brings something.
+
+## Day 15
+
+Day 15.  
+River’s hungry today. First bite at 07:00, an ashpimo—small but nice. Saw a medium shadow at 08:00, chased it, caught another ashpimi. The big one at 09:00 gave me a loka, but my rod snapped after 30 uses—gone. I dug a fossil at 12:00; hope Blathers knows what it is. Rested a bit, then walked to the plaza at 17:00 and posted my board. Bells are fine, food stock steady. I still need Jo’s log or a vaulting pole; she’s been silent all day. The river feels more open, maybe a new spot for the pole. Tomorrow I’ll keep fishing and keep an eye on her.

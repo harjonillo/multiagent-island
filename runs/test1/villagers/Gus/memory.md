@@ -1,4 +1,4 @@
-# Gus's memory, waking on day 15
+# Gus's memory, waking on day 16
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -15,45 +15,46 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 9 | No bait from Bo or Dax today. | 2 | 0.61 | day 22 |
-| 9 | Still have 1 selit, 1 selzalne, 2 loka, 1 gormo. | 2 | 0.54 | day 21 |
-| 10 | No bait yet; still need wood to trade *(not shown: weaker than the others)* | 1 | 0.29 | day 15 |
-| 10 | Dax says he wants bait first, so I’ll bring wood tomorrow. | 2 | 0.61 | day 22 |
-| 11 | Bo and Dax still want bait, I need wood tomorrow. | 1 | 0.37 | day 16 |
-| 13 | Trade wood ↔ selzalne with Jo | 1 | 0.61 | day 18 |
-| 13 | Keep 3 wood for Dax | 1 | 0.61 | day 18 |
-| 13 | Need bait for tomorrow’s trade with Ari | 1 | 0.61 | day 18 |
-| 14 | No ladder, no hardwood. | 1 | 0.78 | day 19 |
-| 14 | Need 3 wood for Dax tomorrow. | 1 | 0.78 | day 19 |
-| 14 | Trade bait with Ari. | 1 | 0.78 | day 19 |
+| 9 | No bait from Bo or Dax today. | 2 | 0.54 | day 22 |
+| 9 | Still have 1 selit, 1 selzalne, 2 loka, 1 gormo. | 2 | 0.47 | day 21 |
+| 10 | Dax says he wants bait first, so I’ll bring wood tomorrow. | 2 | 0.54 | day 22 |
+| 11 | Bo and Dax still want bait, I need wood tomorrow. | 1 | 0.29 | day 16 |
+| 13 | Trade wood ↔ selzalne with Jo | 1 | 0.47 | day 18 |
+| 13 | Keep 3 wood for Dax | 1 | 0.47 | day 18 |
+| 13 | Need bait for tomorrow’s trade with Ari | 1 | 0.47 | day 18 |
+| 14 | No ladder, no hardwood. | 1 | 0.61 | day 19 |
+| 14 | Need 3 wood for Dax tomorrow. | 1 | 0.61 | day 19 |
+| 14 | Trade bait with Ari. | 1 | 0.61 | day 19 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 13) Remember to keep 3 wood in pockets for tomorrow's Dax trade. Also, keep the fishing bait for later.
-- (day 13) Remember to keep 3 wood for Dax tomorrow.
-- (day 13) Remember to keep 3 wood for tomorrow's Dax trade.
 - (day 14) Remember to bring wood for Dax tomorrow and try to get bait from Ari or fish.
 - (day 14) Remember to keep 3 wood for Dax tomorrow.
 - (day 14) Plant at home, keep 3 wood for Dax.
+- (day 15) Remember to keep 3 wood for Dax tomorrow. Good luck!
+- (day 15) Got bait, lose one wood. Remember to bring more wood tomorrow for Dax and maybe trade for more bait.
+- (day 15) Remember to keep 3 wood for tomorrow's trade. Keep 1 wood in hand for future.
+- (day 15) Track that Dax now has a wood in his hand.
+- (day 15) Keep track of the wood trade and bait request.
+- (day 15) Got wood out of pockets, keep 4 left. Expect bait tomorrow.
+- (day 15) Keep 3 wood for Dax tomorrow, remember to get more wood
 
-## Yesterday (day 14)
+## Yesterday (day 15)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 ate an apple and broke rock 4; a rock will turn up somewhere in 3 days
-- 07:00 spotted an ashrumo moth on a rock (lower ground, centre, near the museum) and went after it at 08:00 instead of break_rock (rock: 1)
-- 08:00 went bug catching by the rocks: caught an ashrumo moth
-- 09:00 ate an apple and broke rock 2; a rock will turn up somewhere in 3 days
-- 10:00 rested
+- 07:00 planted an apple; it will be a grown tree in 5 days (also nearby: Dax)
+- 07:00 ran into Dax at the woods: you said "Hey Dax, could I swap a bit of wood with you?"; Dax said "Sure, I’ll give you a wood." [Dax's offer: Dax gives you 1 wood, you give Dax 1 fishing bait]; you said "Sure, give me a wood and I'll trade you a bait." [your offer: you give Dax 1 wood, Dax gives you 1 fishing bait]; Dax said "Sure, I could trade you a fishing bait if you have one." [Dax asked you for 1 fishing bait]; you said "Hey Dax, can you swap 1 wood for a bait?" [your offer: you give Dax 1 wood, Dax gives you 1 fishing bait]; Dax said "Sure, give me a bait if you have one, I'll give you a wood." [Dax handed you 1 wood; Dax asked you for 1 fishing bait]; you said "Hey Dax, I’ll give you a wood for a bait." [you handed Dax 1 wood; you asked Dax for 1 fishing bait]; Dax said "Hey Gus, I got some wood, can I trade it for a bait?" [Dax handed you 1 wood; Dax asked you for 1 fishing bait]; you said "Sure thing, Dax. I'll give you a wood for a bait." [you handed Dax 1 wood; you asked Dax for 1 fishing bait]; Dax said "Hey Gus, can I get a fishing bait if you have one?" [Dax asked you for 1 fishing bait]; you said "Hey Dax, I'll trade you a wood for a bait." [you tried to hand Dax 1 wood but Dax had no room]; Dax said "Sure, I’ll give you a wood for a bait." [Dax handed you 1 wood; Dax asked you for 1 fishing bait]; you said "Hey Dax, wood for bait?"; Dax said "" [just nodded (too tired to talk)]
+- 08:00 planted cosmos seeds; they should bloom in about 3 days
+- 09:00 tried to propose_bridge: there's no stretch of river narrow enough for a bridge within 8 steps of here (lower ground, west), away from other bridges and stairs; the nearest you can walk to is about 24 steps away (lower ground, southwest)
+- 10:00 walked over to Dax's home (also nearby: Fen, Jo)
+- 10:00 knocked at Dax's home, but nobody answered
+- 10:00 ran into Fen at Dax's home: Fen said "Hey Gus, got a minute? I’m looking for a ladder and maybe some selit fish if you’ve got any spare."; you said "" [just nodded (too tired to talk)]
 - 11:00 rested
-- 12:00 at home: couldn't put away wood: your tent has no room for things
-- 12:00 chopped a hardwood tree: wood x1, hardwood x1; your ladder broke after 30 uses and is gone from your pockets (also nearby: Bo)
-- 13:00 tried to chop_wood: there is no hardwood tree you can reach from here without a ladder (also nearby: Bo)
-- 14:00 tried to visit: you can't get to Ari's home from here without a ladder and a vaulting pole
-- 15:00 looked for fish in the river, but there were no fish shadows in sight
-- 16:00 rested
+- 12:00 too tired to plan, so you planned nothing new
+- 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
 
@@ -68,17 +69,20 @@ Shown to them when they meet that villager again (the latest lines; "you" is Gus
 - **Bo:** Morning, Gus! Can I trade 3 wood for a fishing bait?
 - **Gus:** Sorry, no wood right now. [then you went your ways]
 
-### Dax (day 10, 10:00, at Dax's home)
+### Dax (day 15, 07:00, at the woods)
 
-- **Gus:** Hey Dax, I got a selit fish—let’s swap for your bait. [your offer: you give Dax 1 selit fish, Dax gives you 1 fishing bait]
-- **Dax:** Sure thing, I'll trade my selit fish for your fishing bait. [Dax's offer: Dax gives you 1 selit fish, you give Dax 1 fishing bait]
-- **Gus:** Sure, give me your bait. [your offer: you give Dax 1 selit fish, Dax gives you 1 fishing bait]
-- **Dax:** Sure, but I need bait first. [Dax asked you for 1 fishing bait]
-- **Gus:** Sorry, I don’t have a bait right now. Maybe later. [then you went your ways]
+- **Gus:** Hey Dax, I’ll give you a wood for a bait. [you handed Dax 1 wood; you asked Dax for 1 fishing bait]
+- **Dax:** Hey Gus, I got some wood, can I trade it for a bait? [Dax handed you 1 wood; Dax asked you for 1 fishing bait]
+- **Gus:** Sure thing, Dax. I'll give you a wood for a bait. [you handed Dax 1 wood; you asked Dax for 1 fishing bait]
+- **Dax:** Hey Gus, can I get a fishing bait if you have one? [Dax asked you for 1 fishing bait]
+- **Gus:** Hey Dax, I'll trade you a wood for a bait. [you tried to hand Dax 1 wood but Dax had no room]
+- **Dax:** Sure, I’ll give you a wood for a bait. [Dax handed you 1 wood; Dax asked you for 1 fishing bait]
+- **Gus:** Hey Dax, wood for bait?
+- **Dax:**  [just nodded (too tired to talk)]
 
-### Fen (day 12, 12:00, at Dax's home)
+### Fen (day 15, 10:00, at Dax's home)
 
-- **Fen:** Hey Gus, any ladder or pole for crossing the river?
+- **Fen:** Hey Gus, got a minute? I’m looking for a ladder and maybe some selit fish if you’ve got any spare.
 - **Gus:**  [just nodded (too tired to talk)]
 
 ### Jo (day 13, 12:00, at Ari's home)
@@ -110,10 +114,14 @@ Shown to them when they meet that villager ("you" is Gus).
 
 - day 6: you gave Cal 1 wood, which they had asked for
 
-### Dax
+### Dax (the latest 6; 1 earlier)
 
-- day 2: Dax gave you 1 fishing bait
 - day 3: you gave Dax 1 selzalne fish
+- day 15: Dax gave you 1 wood
+- day 15: you gave Dax 1 wood
+- day 15: Dax gave you 1 wood
+- day 15: you gave Dax 1 wood
+- day 15: Dax gave you 1 wood
 
 ### Fen
 
@@ -155,3 +163,4 @@ apple 90, axe 230, fishing rod 160, fossil 400, gormo fish 120, hardwood 90, lad
 - Day 12: Didn't write (no energy left).
 - Day 13: Wrote the page. Held on to: "Trade wood ↔ selzalne with Jo"; "Keep 3 wood for Dax"; "Need bait for tomorrow’s trade with Ari".
 - Day 14: Wrote the page. Held on to: "No ladder, no hardwood."; "Need 3 wood for Dax tomorrow."; "Trade bait with Ari.". Forgot: "Got a tubas fish.".
+- Day 15: Didn't write (no energy left). Forgot: "No bait yet; still need wood to trade".

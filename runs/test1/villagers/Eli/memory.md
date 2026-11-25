@@ -1,13 +1,13 @@
-# Eli's memory, waking on day 15
+# Eli's memory, waking on day 16
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
 ## The page
 
-Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 14.
+Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 15.
 
-Day 14.  
-Morning was quiet, no fish shadows until the first bite: a selzalne, then a couple of ashpimi.  The river feels empty now, maybe the season shifts.  No trades, no new tools, but the fishing rod is almost dead—just three uses left.  I still need Jo’s log or a vaulting pole.  I’ll keep an eye on her and the river for a good spot.  Bells are fine, food stock steady.  Rest tonight, hope the next day brings something.
+Day 15.  
+River’s hungry today. First bite at 07:00, an ashpimo—small but nice. Saw a medium shadow at 08:00, chased it, caught another ashpimi. The big one at 09:00 gave me a loka, but my rod snapped after 30 uses—gone. I dug a fossil at 12:00; hope Blathers knows what it is. Rested a bit, then walked to the plaza at 17:00 and posted my board. Bells are fine, food stock steady. I still need Jo’s log or a vaulting pole; she’s been silent all day. The river feels more open, maybe a new spot for the pole. Tomorrow I’ll keep fishing and keep an eye on her.
 
 ## Things they remember
 
@@ -15,44 +15,47 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 8 | No trades today | 2 | 0.61 | day 22 |
-| 10 | Got a tubas fish. | 1 | 0.29 | day 15 |
-| 10 | Still need Jo’s log or vaulting pole. | 2 | 0.78 | day 24 |
-| 10 | No trades today. *(not shown: weaker than the others)* | 1 | 0.29 | day 15 |
-| 11 | No log yet, but Jo still a mystery | 1 | 0.37 | day 16 |
-| 11 | Tools: shovel 30, axe 27, rod 17, net 29, ladder 30 | 1 | 0.37 | day 16 |
-| 13 | No bridge found | 1 | 0.61 | day 18 |
-| 13 | Jo’s silence continues | 1 | 0.61 | day 18 |
-| 14 | Rod almost broken. | 1 | 0.78 | day 19 |
-| 14 | Still no Jo log. | 1 | 0.78 | day 19 |
-| 14 | Selzalne + ashpimi haul. | 1 | 0.78 | day 19 |
+| 8 | No trades today | 3 | 0.94 | day 37 |
+| 10 | Still need Jo’s log or vaulting pole. | 2 | 0.69 | day 24 |
+| 11 | No log yet, but Jo still a mystery | 1 | 0.29 | day 16 |
+| 11 | Tools: shovel 30, axe 27, rod 17, net 29, ladder 30 *(not shown: weaker than the others)* | 1 | 0.29 | day 16 |
+| 13 | No bridge found | 1 | 0.47 | day 18 |
+| 13 | Jo’s silence continues | 1 | 0.47 | day 18 |
+| 14 | Rod almost broken. | 1 | 0.61 | day 19 |
+| 14 | Still no Jo log. | 1 | 0.61 | day 19 |
+| 14 | Selzalne + ashpimi haul. | 1 | 0.61 | day 19 |
+| 15 | Rod broken, fossil found | 1 | 0.78 | day 20 |
+| 15 | Need Jo’s log or pole tomorrow. | 1 | 0.78 | day 20 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 13) Remember to ask Jo face‑to‑face tomorrow for log or vaulting pole.
-- (day 13) Keep an eye on Jo tomorrow for the log.
-- (day 13) Ask Jo face‑to‑face tomorrow. Stay alert for her log. Sleep well.
 - (day 14) Check Jo again tomorrow. Keep an eye on the river for vaulting pole spots.
 - (day 14) Keep an eye on Jo tomorrow. Keep fishing for vaulting pole spots.
 - (day 14) Check Jo tomorrow for the vaulting pole.
+- (day 15) Remember to ask Jo tomorrow for the log or vaulting pole. Also plan to try beachcomb later if I find a bottle. Good day.
+- (day 15) Remember to ask Jo face‑to‑face tomorrow. Also keep an eye on the river for vaulting pole spots.
+- (day 15) Remember to ask Jo tomorrow for log or vaulting pole. Keep fishing for fish spots.
 
-## Yesterday (day 14)
+## Yesterday (day 15)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 looked for fish in the river, but there were no fish shadows in sight
-- 08:00 fished for a medium shadow in the river: caught a selzalne fish
-- 08:00 spotted a medium fish shadow in the river (lower ground, south, near Nook's Cranny) and went after it at 09:00 instead of fish (where: river)
-- 09:00 fished for a small shadow in the river: caught an ashpimi fish
-- 10:00 fished for a small shadow in the river: caught an ashpimi fish
+- 07:00 fished for a medium shadow in the river: caught an ashpimo fish
+- 07:00 spotted a medium fish shadow in the river (lower ground, southwest) and went after it at 08:00 instead of fish (where: river)
+- 08:00 fished for a small shadow in the river: caught an ashpimi fish
+- 08:00 spotted a large fish shadow in the river (lower ground, south, near the plaza) and went after it at 09:00 instead of fish (where: river)
+- 09:00 fished for a very large shadow in the river: caught a loka fish; your fishing rod broke after 30 uses and is gone from your pockets
+- 10:00 rested
 - 11:00 rested
-- 12:00 looked for fish in the river, but there were no fish shadows in sight
-- 13:00 looked for fish in the river, but there were no fish shadows in sight
-- 14:00 looked for fish in the river, but there were no fish shadows in sight
-- 15:00 rested
-- 16:00 looked for fish in the river, but there were no fish shadows in sight
+- 12:00 dug up a fossil; nobody knows what it is until Blathers assesses it at the museum
+- 13:00 looked around but saw no fossil dig spots there
+- 14:00 looked around but saw no fossil dig spots there
+- 15:00 looked around but saw no fossil dig spots there
+- 16:00 rested
+- 17:00 went to the plaza
+- 17:00 took down your board post [b84]
 
 ## The last conversation with each villager
 
@@ -122,3 +125,4 @@ axe 230, fishing bait 75, fishing rod 160, hardwood 90, ladder 570, net 180, sel
 - Day 12: Didn't write (no energy left).
 - Day 13: Wrote the page. Held on to: "No bridge found"; "Jo’s silence continues". Came back to: "Still need Jo’s log or vaulting pole.". Forgot: "Still 3 softwood, 1 hardwood, 2 selit fish"; "Need Jo’s log or rock for bait tomorrow".
 - Day 14: Wrote the page. Held on to: "Rod almost broken."; "Still no Jo log."; "Selzalne + ashpimi haul.".
+- Day 15: Wrote the page. Held on to: "Rod broken, fossil found"; "Need Jo’s log or pole tomorrow.". Came back to: "No trades today". Forgot: "Got a tubas fish."; "No trades today.".

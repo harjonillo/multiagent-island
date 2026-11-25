@@ -64,3 +64,9 @@ The sun was high when I left for Gus and Fen, but both were gone. I spent most o
 
 Day 13.  
 The sun was high when I left for Gus and Fen, but both were gone. I spent most of the day by the river—got a gormo, a tugorpi, a selzalne, and a selit. My ladder finally gave out after 30 uses, so I’ll need to replace it soon. I suggested stairs to Tom Nook; maybe we can chip in. No one answered at Dax’s place either—he’s still tired. I kept the selit fish handy for tomorrow’s trade, hoping Fen will finally respond. Bells are still tight; I have 100 in my wallet, nothing at home. The island feels quiet but steady.
+
+## Day 15
+
+Day 15.  
+Morning: chopped a hardwood, got a selzalne, an ashpimi. Tried Fen’s door, no answer. Ran back for the selit trade, he’s out of bait. Still got 100 bells, 80‑slot house, ladder barely alive. Tom Nook gave me a house, but I owe 98k bells—my wallet is still empty. The ladder is a liability; I’ll need a new one soon. The island is quiet, but the river’s still yielding fish. I’m holding onto the selit for tomorrow’s attempt.  
+Night: tired, no new plans. Just rest.

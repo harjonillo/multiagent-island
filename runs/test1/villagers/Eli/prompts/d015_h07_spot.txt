@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 14.  
+Morning was quiet, no fish shadows until the first bite: a selzalne, then a couple of ashpimi.  The river feels empty now, maybe the season shifts.  No trades, no new tools, but the fishing rod is almost dead—just three uses left.  I still need Jo’s log or a vaulting pole.  I’ll keep an eye on her and the river for a good spot.  Bells are fine, food stock steady.  Rest tonight, hope the next day brings something.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 15 (May 6, spring, sunny), 07:00. You are Eli, at the river.
+You just spotted:
+1. a medium fish shadow in the river (lower ground, southwest)
+Earlier today:
+- 07:00 fished for a medium shadow in the river: caught an ashpimo fish
+Things you remember (anything you don't hold on to at night fades):
+- (day 10) Still need Jo’s log or vaulting pole.
+- (day 14) Rod almost broken.
+- (day 14) Still no Jo log.
+- (day 14) Selzalne + ashpimi haul.
+Your notes from the last 2 days:
+- (day 13) Keep an eye on Jo tomorrow for the log.
+- (day 13) Ask Jo face‑to‑face tomorrow. Stay alert for her log. Sleep well.
+- (day 14) Check Jo again tomorrow. Keep an eye on the river for vaulting pole spots.
+- (day 14) Keep an eye on Jo tomorrow. Keep fishing for vaulting pole spots.
+- (day 14) Check Jo tomorrow for the vaulting pole.
+- (day 15) Remember to ask Jo tomorrow for the log or vaulting pole. Also plan to try beachcomb later if I find a bottle. Good day.
+At 08:00 you planned: fish (where: river).
+Actions left today: 5 of 10. Mental energy left today: 128.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (10 tokens, hidden from everyone) ===
+We decide to go after fish 1.
+
+=== REPLY ===
+{"thoughts":"Got a medium shadow, hope it’s a good catch before the rod dies. Time to try again.","go":1}

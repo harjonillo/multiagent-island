@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11, 23 h.  
+Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas and a gorpika, and a miruru from the pond. Bug‑catching netted an ashrumo moth near rock 6; I’ll trade that for softwood tomorrow. Went to Jo, got a nod but no trade—just offered a bit of fish, but she’s tired. Evening: caught a tubas fish in the sea. Still only 100 bells, no new items. I’m running low on rope and wood, and the bridge’s still a block. I’ll ask Dax tomorrow for any spare wood and maybe trade a selzalne for softwood. Need to keep the bridge funded.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 15 (May 6, spring, sunny), 14:00. You are Cal, at the Ike's home.
+Nearby: Ike.
+Earlier today:
+- 12:00 in your plan, 13 (put bells toward the bridge to the north bank (750/98000 raised) at Resident Services): it needs "bells": 1 to 100, so it wasn't planned
+- 12:00 looked for fish in the river, but there were no fish shadows in sight
+- 13:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 750 raised so far; anyone can chip in, and once built it crosses the river by Resident Services, so nobody needs a vaulting pole there. Anyone can also propose another bridge, or stairs up a cliff that anyone can climb without a ladder, right where they stand; each is built once 98000 bells are donated here. The island can have 10 in all, built or proposed, and has 3: the bridge to the north bank; stairs up to the top cliff (north), 0 raised; bridge across the river (lower ground, southwest), 0 raised.
+- 14:00 walked over to Ike's home (also nearby: Bo, Ike)
+- 14:00 knocked at Ike's home, but nobody answered
+Things you remember (anything you don't hold on to at night fades):
+- (day 11) Dax unresponsive today.
+- (day 11) Got an ashrumo moth; trade for softwood.
+- (day 11) Need more softwood for bridge and future trades.
+Your notes from the last 2 days:
+- (day 14) Remember to ask Dax for wood and trade selzalne. Also keep an eye on bridge fund tomorrow.
+- (day 14) Trade in progress, got softwood.
+- (day 14) Got another selzalne, good for softwood later.
+- (day 14) Remember to ask Dax tomorrow for wood and trade selzalne for softwood.
+- (day 15) Keep an eye on Dax tomorrow for wood. Remember the ladder request from Fen.
+- (day 15) Try to get a ladder tomorrow from someone else or trade.
+Mental energy left today: 64 (about 17 for each thing you say). Your plan for today: inward 80 (spent 86: 6 more than planned, from your spare), outward 70 (spent 0), spare 0 (used 6).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (4 tokens, hidden from everyone) ===
+Need JSON.
+
+=== REPLY ===
+{"thoughts":"Need softwood for bridge, Dax unresponsive, maybe ask Bo for ladder","approach":"Bo","say":"Hey Bo, got any spare softwood?"}

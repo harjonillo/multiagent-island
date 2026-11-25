@@ -1,6 +1,6 @@
 # Cal's assets
 
-## At the end of day 14
+## At the end of day 15
 
 - Bells with them: 100
 - Bells at home: 0
@@ -35,3 +35,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 12 | 100 | 0 | 40 | 45,210 | 0 | tent | 0 | 45,310 |
 | 13 | 100 | 0 | 38 | 43,580 | 0 | tent | 0 | 43,680 |
 | 14 | 100 | 0 | 40 | 43,640 | 0 | tent | 0 | 43,740 |
+| 15 | 100 | 0 | 40 | 43,640 | 0 | tent | 0 | 43,740 |

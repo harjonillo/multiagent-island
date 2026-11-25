@@ -1,4 +1,4 @@
-# Bo's memory, waking on day 15
+# Bo's memory, waking on day 16
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -22,64 +22,62 @@ Chosen by them at night, up to 3 a night, in their own words. Each fades unless 
 
 | from day | memory | times held | strength now | comes to mind through |
 |---|---|---|---|---|
-| 8 | Ladder 22 uses left, need more wood | 3 | 0.78 | day 33 |
-| 10 | Shovel uses 29 left. | 1 | 0.29 | day 15 |
-| 10 | No bait yet. | 1 | 0.29 | day 15 |
-| 11 | 28 shovel uses left | 1 | 0.37 | day 16 |
-| 11 | Gus wants 1 bait from me tomorrow | 1 | 0.37 | day 16 |
+| 8 | Ladder 22 uses left, need more wood | 3 | 0.73 | day 33 |
+| 11 | 28 shovel uses left | 1 | 0.29 | day 16 |
+| 11 | Gus wants 1 bait from me tomorrow | 1 | 0.29 | day 16 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 13) Remember to leave at least 4 wood in pocket for next bait trade.
-- (day 13) Remember to keep at least 4 wood in pocket after trade for future bait.
-- (day 13) Keep 4 wood ready.
-- (day 13) Keep track of wood trade with Ike, maybe next time I can give more wood for more gear.
-- (day 13) Got wood, keep 3 wood for bait trade tomorrow.
-- (day 13) Keep 2 wood left, 5-6 wood reserve.
-- (day 13) Remember to keep at least 4 wood in pocket for next bait trade.
-- (day 13) Keep 2 wood for next day, maybe try Dax or Gus again.
 - (day 14) Keep 4 wood for future bait trade.
 - (day 14) Remember to keep at least 4 wood in pocket for future bait trade.
 - (day 14) Got a second rod, keep 4 wood for bait
 - (day 14) Keep 4 wood for tomorrow's bait trade.
 - (day 14) No bait yet. Keep 4 wood for next trade.
 - (day 14) Keep an eye on wood count for future trades.
+- (day 15) Remember to keep 4 wood in pocket for next trade if possible.
+- (day 15) Got 2 wood for bait. Keep 1 wood for next trade.
+- (day 15) Remember to keep 4 wood in pocket for future trades. Keep track of ladder uses.
+- (day 15) Got bait, will trade wood back next time.
 
-## Yesterday (day 14)
+## Yesterday (day 15)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 ran into Ike out on a walk: you said "Hey Ike, got any spare wood? I could trade some for a better shovel or ladder."; Ike said "Hey Bo, give me a ladder for three woods?" [Ike's offer: Ike gives you 3 wood, you give Ike 1 ladder]; you said "Sorry, no room for the ladder right now."; Ike said "Thanks, Bo. I’ll see you later." [then you went your ways]
-- 08:00 walked over to Ari's home (also nearby: Ike)
-- 08:00 knocked at Ari's home, but nobody answered
-- 08:00 ran into Ike at Ari's home: you said "Hey Ike, I’ve got 4 wood—can we trade 3 for your ladder?"; Ike said "Sure thing, Bo. Here’s the ladder for you." [Ike's offer: Ike gives you 1 ladder, you give Ike 3 wood, but Ike had no room, so there was no offer]; you said "Hey Ike, can I trade you one wood for a fishing rod?" [your offer: you give Ike 1 wood, Ike gives you 1 fishing rod]; Ike said "Sure thing, Bo." [Ike accepted: you gave Ike 1 wood, Ike gave you 1 fishing rod]; you said "Got it, thanks Ike." [then you went your ways]
-- 09:00 crafted a campfire
-- 09:00 Ari visited you at home: Ari said "Hey Bo, I’ve got a wood for you—any bait you can spare?" [Ari's offer: Ari gives you 1 wood, you give Ari 1 fishing bait]; you said "Thanks, Ari." [then you went your ways]
-- 10:00 rested
-- 12:00 chopped a hardwood tree: softwood x1; with the last wood the axe brought the tree down, leaving a stump (also nearby: Gus)
-- 13:00 dug up a stump; the spot is clear now (also nearby: Gus)
-- 14:00 walked over to Ari's home
-- 14:00 knocked at Ari's home, but nobody answered
-- 15:00 tried to propose_stairs: there's no cliff edge for stairs within 8 steps of here (lower ground, southeast), away from other bridges and stairs; the nearest you can walk to is about 41 steps away (lower ground, east)
-- 16:00 rested
-- 17:00 rested
+- 10:00 ran into Dax out on a walk: you said "Hey Dax, got a couple of woods. Need some bait for the river. Got anything?"; Dax said "" [just nodded (too tired to talk)]
+- 12:00 walked over to Dax's home (also nearby: Jo)
+- 12:00 inside Dax's home: not much furniture yet
+- 12:00 visited Dax at home: you said "Hey Dax, can I trade 2 wood for a fishing bait?" [your offer: you give Dax 2 wood, Dax gives you 1 fishing bait, but you had only 1 wood, so there was no offer; then you went your ways]
+- 13:00 walked over to Gus's home (also nearby: Gus)
+- 13:00 knocked at Gus's home, but nobody answered
+- 14:00 walked over to Ike's home; your ladder broke after 30 uses and is gone from your pockets (also nearby: Cal, Ike)
+- 14:00 knocked at Ike's home, but nobody answered
+- 15:00 walked over to Ari's home (also nearby: Ari)
+- 15:00 knocked at Ari's home, but nobody answered
+- 15:00 spotted a small fish shadow in the river (lower ground, southeast, near rock 6) and went after it at 16:00 instead of rest
+- 16:00 fished for a small shadow in the river: caught an ashpimi fish
+- 16:00 spotted a medium fish shadow in the river (lower ground, southeast) and went after it at 17:00 instead of rest
+- 17:00 fished for a medium shadow in the river: caught a selzalne fish
 - 18:00 rested
-- 19:00 too tired to plan, so you planned nothing new
+- 19:00 walked over to Ari's home
+- 19:00 inside Ari's home: not much furniture yet
+- 19:00 visited Ari at home: you said "" [your offer: you give Ari 1 wood, Ari gives you 1 fishing bait]; Ari said "" [just nodded (too tired to talk)]
+- 20:00 proposed a bridge across the river (lower ground, southeast); Tom Nook builds it once 98000 bells have been donated at Resident Services, and anyone can chip in (4 of 10 bridges and stairs on the island, built or proposed)
+- 21:00 rested
 
 ## The last conversation with each villager
 
 Shown to them when they meet that villager again (the latest lines; "you" is Bo).
 
-### Ari (day 14, 09:00, at Bo's home)
+### Ari (day 15, 19:00, at Ari's home)
 
-- **Ari:** Hey Bo, I’ve got a wood for you—any bait you can spare? [Ari's offer: Ari gives you 1 wood, you give Ari 1 fishing bait]
-- **Bo:** Thanks, Ari. [then you went your ways]
+- **Bo:**  [your offer: you give Ari 1 wood, Ari gives you 1 fishing bait]
+- **Ari:**  [just nodded (too tired to talk)]
 
-### Dax (day 13, 09:00, at Dax's home)
+### Dax (day 15, 12:00, at Dax's home)
 
-- **Bo:** Hey Dax, got any bait? [your offer: you give Dax 3 wood, Dax gives you 1 fishing bait; then you went your ways]
+- **Bo:** Hey Dax, can I trade 2 wood for a fishing bait? [your offer: you give Dax 2 wood, Dax gives you 1 fishing bait, but you had only 1 wood, so there was no offer; then you went your ways]
 
 ### Gus (day 9, 08:00, out on a walk)
 
@@ -159,3 +157,4 @@ Shown to them when they meet that villager ("you" is Bo).
 - Day 12: Didn't write (no energy left).
 - Day 13: Didn't write (no energy left). Forgot: "Still no bait, need wood trade"; "Dax wants bait, I have none".
 - Day 14: Didn't write (no energy left).
+- Day 15: Didn't write (no energy left). Forgot: "Shovel uses 29 left."; "No bait yet.".
