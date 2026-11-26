@@ -1,0 +1,46 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15.  
+Morning: chopped a hardwood, got a selzalne, an ashpimi. Tried Fen’s door, no answer. Ran back for the selit trade, he’s out of bait. Still got 100 bells, 80‑slot house, ladder barely alive. Tom Nook gave me a house, but I owe 98k bells—my wallet is still empty. The ladder is a liability; I’ll need a new one soon. The island is quiet, but the river’s still yielding fish. I’m holding onto the selit for tomorrow’s attempt.  
+Night: tired, no new plans. Just rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 16 (May 7, spring, sunny), 10:00. You are Kit, at home.
+You just spotted:
+1. a medium fish shadow in the river (lower ground, centre)
+Earlier today:
+- 05:00 in your plan, visit: you have no ask for bait in your pockets, so it wasn't planned
+- 08:00 sold hardwood x3, wood x2 at Nook's Cranny for 450 bells (also nearby: Jo)
+- 08:00 ran into Jo at Nook's Cranny: you said "Hey Jo, got a sec?"; Jo said "Sure, what do you need?"; you said "Thanks again for the selit! Do you have any fishing bait I could trade for?" [you asked Jo for 1 fishing bait]; Jo said "Sure, I could use a fishing bait. Got any to spare?" [Jo asked you for 1 fishing bait]; you said "Hey Jo, could I swap a selit for your bait?" [your offer: you give Jo 1 selit fish, Jo gives you 1 fishing bait]; Jo said "Sorry, I’ve run out of bait."; you said "Thanks, Jo. I can trade a selzalne fish for your bait, if you still need it."; Jo said "Sorry, I still have none." [Jo asked you for 1 fishing bait]; you said "" [you asked Jo for 1 fishing bait]; Jo said "Sorry, I’m out of bait right now."; you said "Sorry, I'll keep looking for bait. Thanks anyway." [then you went your ways]
+- 09:00 fished for a very large shadow in the river: caught a loka fish
+Things you remember right now (other things may come to mind at other times):
+- (day 13, held on to) Keep selit fish for tomorrow.
+- (day 15) 08:00 fished for a small shadow in the river: caught an ashpimi fish
+- (day 15) 08:00 spotted a medium fish shadow in the clifftop (the middle cliff, centre) and went after it at 09:00 instead of beachcomb
+- (day 15, held on to) Fen out of bait.
+Your notes from the last 2 days:
+- (day 16) Keep the ladder handy for tomorrow’s climb. Maybe I can trade the selit for bait if Fen has any.
+- (day 16) Remember to ask Fen tomorrow for selit trade again.
+- (day 16) Keep bait for tomorrow
+- (day 16) If Jo still says no, consider offering selit next time.
+- (day 16) Keep offering selit if Jo ever gets bait.
+- (day 16) Keep selit handy for future trade. Remember to ask Fen tomorrow.
+At 11:00 you planned: rest.
+Actions left today: 7 of 10. Mental energy left today: 18.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (55 tokens, hidden from everyone) ===
+We need to choose action: maybe go fishing at 11. We have 7 actions left. Let's go after the medium fish shadow? But already caught? He spotted a medium earlier. Maybe go fishing at 11 to try another fish. So go=1.
+
+=== REPLY ===
+{"thoughts":"Need bait for tomorrow. Jo still out. Fen might have. Ladder for climb. Will try fishing at 11 to get more fish and maybe bait.", "go":1}

@@ -1,0 +1,42 @@
+=== SYSTEM ===
+You are Gus, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 14, night.  
+The morning was a mess—apple, rock, moth, another rock. I chased a moth again, but the rock I broke at 7:00 already showed a crack. I’m stuck without a ladder; I can’t chop hardwood or visit Ari. The river is dead, no fish shadows, so I’ll have to trade for bait tomorrow. I’ve lost my ladder after 30 uses, and I only have 5 wood left in pockets—three for Dax, two spare. I still have a selzalne, an ashrumo moth, and a fossil. I’m running low on apples too; I need to eat one tomorrow or trade. The tent is full of bells only, so I’ll stash my items elsewhere.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 16 (May 7, spring, sunny), 08:00. You are Gus, at the out for a walk.
+Nearby: Dax, Bo.
+Earlier today:
+- 05:00 in your plan, visit: "Nook's Cranny" isn't one of "at": Bo's home | Dax's home | Fen's home | Jo's home, so it wasn't planned
+- 07:00 walked over to Dax's home
+- 07:00 inside Dax's home: not much furniture yet
+- 07:00 visited Dax at home: you said "Hey Dax, wood for bait?" [your offer: you give Dax 1 wood, Dax gives you 1 fishing bait]; Dax said "Sure, I’ll give you a wood for a bait." [Dax asked you for 1 fishing bait]; you said "Hey Dax, wood for a bait?" [your offer: you give Dax 1 wood, Dax gives you 1 fishing bait]; Dax said "" [Dax asked you for 1 fishing bait]; you said "Yeah, wood for bait?" [your offer: you give Dax 1 wood, Dax gives you 1 fishing bait]; Dax said "Sure thing, Gus. I’ll give you my wood for a bait." [Dax asked you for 1 fishing bait]; you said "Sure, here's a wood." [you tried to hand Dax 1 wood but Dax had no room]; Dax said "Sure, give me a bait if you have one." [Dax asked you for 1 fishing bait]; you said "Hey Dax, wood for a bait?" [you tried to hand Dax 1 wood but Dax had no room; you asked Dax for 1 fishing bait]; Dax said "" [just nodded (too tired to talk)]
+Things you remember right now (other things may come to mind at other times):
+- (day 10, held on to) Dax says he wants bait first, so I’ll bring wood tomorrow.
+- (day 14, held on to) Need 3 wood for Dax tomorrow.
+- (day 15) 07:00 ran into Dax at the woods: Dax said "Sure, give me a bait if you have one, I'll give you a wood." [Dax handed you 1 wood; Dax asked you for 1 fishing bait]; you said "Hey Dax, I’ll give you a wood for a bait." [you handed Dax 1 wood
+- (day 15) 07:00 ran into Dax at the woods: Dax said "Hey Gus, can I get a fishing bait if you have one?" [Dax asked you for 1 fishing bait]; you said "Hey Dax, I'll trade you a wood for a bait." [you tried to hand Dax 1 wood but Dax had no room]
+Your notes from the last 2 days:
+- (day 16) Need to check if Dax accepts wood for bait today.
+- (day 16) Keep 3 wood for Dax tomorrow.
+- (day 16) Keep 3 wood for tomorrow, remember to trade with Ari tomorrow.
+- (day 16) Hope Dax accepts
+- (day 16) Got bait tomorrow, keep 3 wood for Dax.
+- (day 16) Keep 3 wood for tomorrow, try to get bait today. If Dax has none, maybe trade later or get from Ari.
+Mental energy left today: 22 (about 17 for each thing you say). Your plan for today: inward 24 (spent 37: 13 more than planned, from your spare), outward 30 (spent 91: 61 more than planned, from your spare), spare 96 (used 74).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (22 tokens, hidden from everyone) ===
+Need to choose whom to talk. Dax? Bo? Maybe ask Bo. I'll go to Bo.
+
+=== REPLY ===
+{"thoughts":"Need wood for bait. Bo might have wood or know Dax's trade. Go to Bo.", "approach":"Bo", "say":"Hey Bo, got any extra wood?"}

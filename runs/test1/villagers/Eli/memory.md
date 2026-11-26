@@ -1,61 +1,67 @@
-# Eli's memory, waking on day 16
+# Eli's memory, waking on day 17
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
 ## The page
 
-Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 15.
+Private and free-form; it replaces the one before and is in every prompt they get. Last written on the night of day 16.
 
-Day 15.  
-River’s hungry today. First bite at 07:00, an ashpimo—small but nice. Saw a medium shadow at 08:00, chased it, caught another ashpimi. The big one at 09:00 gave me a loka, but my rod snapped after 30 uses—gone. I dug a fossil at 12:00; hope Blathers knows what it is. Rested a bit, then walked to the plaza at 17:00 and posted my board. Bells are fine, food stock steady. I still need Jo’s log or a vaulting pole; she’s been silent all day. The river feels more open, maybe a new spot for the pole. Tomorrow I’ll keep fishing and keep an eye on her.
+Day 16.  
+Morning started with the plaza—post the same request, keep the offer steady. Sent Jo a parcel of selzalne; hope she opens it tomorrow. Rested at nine, but the selashren moth on the south stump had me chasing it instead of digging. Caught a few more moths, added to my stash. No fossil spots today, so I stuck to the plaza again at noon. Afternoon was quiet; just rest, ladder in my pack, no new plans. Evening left me exhausted, so I skipped the board. Bells are safe, tools still good. Still waiting on Jo for the log or pole, and a ladder might be handy for the river tomorrow.
 
 ## Things they remember
 
-Chosen by them at night, up to 3 a night, in their own words. Each fades unless they come back to it at night, which doubles how long it lasts. Plans, the plaza and conversations show the strongest 10; quick decisions show 4.
+From prompt version 20 nothing is forgotten. Everything they lived through is kept, and each prompt shows the few records closest to the situation in it (up to 8 in plans, the plaza and conversations, 4 in quick decisions, 10 at night), weighed by how recent they are. What they chose to hold on to at night counts 2 times as much, and fades more slowly each time they come back to it. So there is no fixed list here: the `recall` events in events.jsonl say what came to mind for each prompt.
 
-| from day | memory | times held | strength now | comes to mind through |
-|---|---|---|---|---|
-| 8 | No trades today | 3 | 0.94 | day 37 |
-| 10 | Still need Jo’s log or vaulting pole. | 2 | 0.69 | day 24 |
-| 11 | No log yet, but Jo still a mystery | 1 | 0.29 | day 16 |
-| 11 | Tools: shovel 30, axe 27, rod 17, net 29, ladder 30 *(not shown: weaker than the others)* | 1 | 0.29 | day 16 |
-| 13 | No bridge found | 1 | 0.47 | day 18 |
-| 13 | Jo’s silence continues | 1 | 0.47 | day 18 |
-| 14 | Rod almost broken. | 1 | 0.61 | day 19 |
-| 14 | Still no Jo log. | 1 | 0.61 | day 19 |
-| 14 | Selzalne + ashpimi haul. | 1 | 0.61 | day 19 |
-| 15 | Rod broken, fossil found | 1 | 0.78 | day 20 |
-| 15 | Need Jo’s log or pole tomorrow. | 1 | 0.78 | day 20 |
+Kept so far: 230 things that happened, 27 pieces of conversations, 82 notes and 42 pieces of nightly pages, from days 0 to 16.
+
+### What they chose to hold on to
+
+| from day | memory | times held | recency now |
+|---|---|---|---|
+| 8 | No trades today | 3 | 0.88 |
+| 10 | Still need Jo’s log or vaulting pole. | 2 | 0.61 |
+| 11 | No log yet, but Jo still a mystery | 1 | 0.22 |
+| 11 | Tools: shovel 30, axe 27, rod 17, net 29, ladder 30 | 1 | 0.22 |
+| 13 | No bridge found | 1 | 0.37 |
+| 13 | Jo’s silence continues | 1 | 0.37 |
+| 14 | Rod almost broken. | 1 | 0.47 |
+| 14 | Still no Jo log. | 1 | 0.47 |
+| 14 | Selzalne + ashpimi haul. | 2 | 0.88 |
+| 15 | Rod broken, fossil found | 1 | 0.61 |
+| 15 | Need Jo’s log or pole tomorrow. | 1 | 0.61 |
+| 15 | 07:00 spotted a medium fish shadow in the river (lower ground, southwest) and went after it at 08:00 instead of fish (where: river) | 1 | 0.78 |
+| 16 | Need Jo’s log or vaulting pole tomorrow. | 1 | 0.78 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 14) Check Jo again tomorrow. Keep an eye on the river for vaulting pole spots.
-- (day 14) Keep an eye on Jo tomorrow. Keep fishing for vaulting pole spots.
-- (day 14) Check Jo tomorrow for the vaulting pole.
 - (day 15) Remember to ask Jo tomorrow for the log or vaulting pole. Also plan to try beachcomb later if I find a bottle. Good day.
 - (day 15) Remember to ask Jo face‑to‑face tomorrow. Also keep an eye on the river for vaulting pole spots.
 - (day 15) Remember to ask Jo tomorrow for log or vaulting pole. Keep fishing for fish spots.
+- (day 16) Check Jo tomorrow face‑to‑face, maybe she’ll have something.
+- (day 16) Remember to bring the ladder tomorrow if needed.
+- (day 16) Tomorrow, check Jo in person for the log or pole. Maybe bring ladder if I need to reach the river.
+- (day 16) Keep an eye out for Jo tomorrow. Bring ladder if needed.
 
-## Yesterday (day 15)
+## Yesterday (day 16)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 fished for a medium shadow in the river: caught an ashpimo fish
-- 07:00 spotted a medium fish shadow in the river (lower ground, southwest) and went after it at 08:00 instead of fish (where: river)
-- 08:00 fished for a small shadow in the river: caught an ashpimi fish
-- 08:00 spotted a large fish shadow in the river (lower ground, south, near the plaza) and went after it at 09:00 instead of fish (where: river)
-- 09:00 fished for a very large shadow in the river: caught a loka fish; your fishing rod broke after 30 uses and is gone from your pockets
-- 10:00 rested
-- 11:00 rested
-- 12:00 dug up a fossil; nobody knows what it is until Blathers assesses it at the museum
-- 13:00 looked around but saw no fossil dig spots there
+- 07:00 went to the plaza
+- 07:00 posted on the board [b86]: "Eli: Need Jo’s log or a vaulting pole. Offer 1 selit fish and 1 softwood. Anyone"
+- 08:00 sent Jo a parcel: 5 selzalne fish ("Need vaulting pole or log."); it arrives tomorrow morning
+- 09:00 rested
+- 09:00 spotted a selashren moth on a stump (lower ground, south, near the airport) and went after it at 10:00 instead of dig_stump
+- 10:00 went bug catching on the stumps: caught a selashren moth
+- 12:00 in your plan, send: "airport" isn't one of "at": Ari | Bo | Cal | Dax | Fen | Gus | Ike | Jo | Kit, so it wasn't planned
+- 12:00 went to the plaza
 - 14:00 looked around but saw no fossil dig spots there
-- 15:00 looked around but saw no fossil dig spots there
+- 15:00 rested
 - 16:00 rested
 - 17:00 went to the plaza
-- 17:00 took down your board post [b84]
+- 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
 
@@ -126,3 +132,4 @@ axe 230, fishing bait 75, fishing rod 160, hardwood 90, ladder 570, net 180, sel
 - Day 13: Wrote the page. Held on to: "No bridge found"; "Jo’s silence continues". Came back to: "Still need Jo’s log or vaulting pole.". Forgot: "Still 3 softwood, 1 hardwood, 2 selit fish"; "Need Jo’s log or rock for bait tomorrow".
 - Day 14: Wrote the page. Held on to: "Rod almost broken."; "Still no Jo log."; "Selzalne + ashpimi haul.".
 - Day 15: Wrote the page. Held on to: "Rod broken, fossil found"; "Need Jo’s log or pole tomorrow.". Came back to: "No trades today". Forgot: "Got a tubas fish."; "No trades today.".
+- Day 16: Wrote the page. Held on to: "07:00 spotted a medium fish shadow in the river (lower ground, southwest) and went after it at 08:00 instead of fish (where: river)"; "Need Jo’s log or vaulting pole tomorrow.". Came back to: "Selzalne + ashpimi haul.".

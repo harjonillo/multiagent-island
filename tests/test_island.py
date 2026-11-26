@@ -756,6 +756,19 @@ def test_hidden_reasoning_is_recorded_and_optionally_charged():
         assert redo.text == "new" and not redo.cached
         replay = c.complete([{"role": "user", "content": "x"}])
         assert replay.text == "new" and replay.cached
+        # An empty reply isn't kept: the same prompt is asked again, and that reply is.
+        said = iter(["", "ok"])
+        c.inner.complete = lambda messages, temperature=0.7, max_tokens=600: Completion(next(said), tokens=50)
+        empty, asked, kept = (c.complete([{"role": "user", "content": "y"}]) for _ in range(3))
+        assert (empty.text, empty.cached) == ("", False)
+        assert (asked.text, asked.cached) == ("ok", False) and (kept.text, kept.cached) == ("ok", True)
+        # One kept by an older version isn't replayed either.
+        import json
+
+        for f in Path(d).glob("*/*.json"):
+            f.write_text(json.dumps({"model": "fake", "text": ""}))
+        said = iter(["again"])
+        assert c.complete([{"role": "user", "content": "y"}]).text == "again"
 
 
 def test_commons_contributions_split_public_from_home():
@@ -2956,3 +2969,31 @@ def test_switching_a_run_to_retrieval_fills_in_the_days_it_already_lived():
         # Resuming again fills nothing in: every day is already kept.
         IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False)
         assert len(load_run(run_dir).of("intervention")) == 2
+
+
+def test_parse_reply_forgives_misplaced_closing_brace():
+    """The slips gpt-oss-20b made in test1's plans: 10 of the 16 replies that couldn't be read."""
+    from llmabm.island.sim import parse_action_obj
+
+    plan = '{"thoughts":"t","actions":[{"hour":7,"pick":5}],"home":{"store":{},"take":{}}'
+    want = {
+        "thoughts": "t",
+        "actions": [{"hour": 7, "pick": 5}],
+        "home": {"store": {}, "take": {}},
+        "note": "n",
+    }
+    # the note in braces of its own, the plan's own never closed
+    assert parse_action_obj(plan + ',{"note":"n"}') == (want, None)
+    # the same, after the plan was closed
+    assert parse_action_obj(plan + '},{"note":"n"}') == (want, None)
+    # the note closed inside "home", with and without the final brace
+    inside = plan[:-1] + ',"note":"n"}'
+    assert parse_action_obj(inside) == (want, None)
+    assert parse_action_obj(inside + "}") == (want, None)
+    # braces inside a string are text
+    assert parse_action_obj('{"thoughts":"a }{ b"}') == ({"thoughts": "a }{ b"}, None)
+    # a reply cut off mid-way stays unread: half a plan isn't the plan
+    cut = '{"thoughts":"t","actions":[{"hour":7,"pick":5},{"'
+    assert parse_action_obj(cut)[0] is None
+    assert parse_action_obj('{"thoughts":"cut off')[0] is None
+    assert parse_action_obj("")[0] is None

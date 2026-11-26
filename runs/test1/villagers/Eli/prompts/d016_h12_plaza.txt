@@ -1,0 +1,129 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15.  
+River’s hungry today. First bite at 07:00, an ashpimo—small but nice. Saw a medium shadow at 08:00, chased it, caught another ashpimi. The big one at 09:00 gave me a loka, but my rod snapped after 30 uses—gone. I dug a fossil at 12:00; hope Blathers knows what it is. Rested a bit, then walked to the plaza at 17:00 and posted my board. Bells are fine, food stock steady. I still need Jo’s log or a vaulting pole; she’s been silent all day. The river feels more open, maybe a new spot for the pole. Tomorrow I’ll keep fishing and keep an eye on her.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: plaza
+Day 16 (May 7, spring, sunny), 12:00 at the plaza. You are Eli.
+You are usually up from 07:00 to 00:00.
+Bells: 100 in your wallet. Home: tent lower ground, south (site-12), no neighbors yet. Carrying 31/40 items.
+Tools you carry: shovel (29 uses left), axe (27 uses left), net (26 uses left), ladder (30 uses left)
+Other things you carry: wood x1, softwood x3, hardwood x1, selit fish x2, tubas fish x2, kalo fish x1, ashpimi fish x8, selashren moth x3, ashpimo fish x2, gormo fish x2, loka fish x1, fossil x1
+At home (a tent holds only bells): 0 bells
+Inside your home (0/6): nothing yet
+Recipes you know: clay furnace (clay x6, iron nugget x2; you have none); fruit basket (apple x6, softwood x2; in pockets: softwood 3); ironwood dresser (iron nugget x4, hardwood x8, wood x4; in pockets: hardwood 1, wood 1); simple wooden fence (wood x3; 1 in pockets)
+Nook's Cranny buys at (prices you've heard): axe 230, fishing bait 75, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, shovel 220, softwood 100, vaulting pole 230, wood 90
+Museum: fish 2/19 (ashpimi fish, selit fish); bugs 0/16 (none); fossils 1/12 (tuashne fossil); donated by Dax 1, Fen 1, Kit 1
+Bridges and stairs: bridge to the north bank: 750/98000 bells raised; stairs up to the top cliff (north) (proposed by Kit): 0/98000 bells raised; bridge across the river (lower ground, southwest) (proposed by Dax): 0/98000 bells raised; bridge across the river (lower ground, southeast) (proposed by Bo): 0/98000 bells raised. 4 of 10 so far
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640 (a young tree: plant it and it's a hardwood tree in 5 days), hyacinth seeds 240 (flower seeds: plant them and hyacinths grow), tulip seeds 240 (flower seeds: plant them and tulips grow), wooden mini table 1800 (furniture), record player 9800 (furniture), ceiling fan 4600 (furniture, indoors only)
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards (a card teaches you to craft the thing yourself, as often as you like; buy one as "<thing> recipe"): shovel recipe 200, axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, gold crown recipe 800
+Able Sisters today (09:00-21:00), clothes: raincoat 1600, tuxedo 3200, kimono 4800, bowler hat 900
+Things you remember right now (other things may come to mind at other times):
+- (day 8, held on to) No trades today
+- (day 15) 07:00 fished for a medium shadow in the river: caught an ashpimo fish
+- (day 15) 07:00 spotted a medium fish shadow in the river (lower ground, southwest) and went after it at 08:00 instead of fish (where: river)
+- (day 15) 08:00 fished for a small shadow in the river: caught an ashpimi fish
+- (day 15) 08:00 spotted a large fish shadow in the river (lower ground, south, near the plaza) and went after it at 09:00 instead of fish (where: river)
+- (day 15) 09:00 fished for a very large shadow in the river: caught a loka fish; your fishing rod broke after 30 uses and is gone from your pockets
+- (day 15, held on to) Rod broken, fossil found
+- (day 15, held on to) Need Jo’s log or pole tomorrow.
+Your notes from the last 2 days:
+- (day 14) Check Jo again tomorrow. Keep an eye on the river for vaulting pole spots.
+- (day 14) Keep an eye on Jo tomorrow. Keep fishing for vaulting pole spots.
+- (day 14) Check Jo tomorrow for the vaulting pole.
+- (day 15) Remember to ask Jo tomorrow for the log or vaulting pole. Also plan to try beachcomb later if I find a bottle. Good day.
+- (day 15) Remember to ask Jo face‑to‑face tomorrow. Also keep an eye on the river for vaulting pole spots.
+- (day 15) Remember to ask Jo tomorrow for log or vaulting pole. Keep fishing for fish spots.
+- (day 16) Check Jo tomorrow face‑to‑face, maybe she’ll have something.
+- (day 16) Remember to bring the ladder tomorrow if needed.
+Getting around: You are at lower ground, south. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Rocks: 1 (lower ground, southeast, out of reach without a vaulting pole); 2 (broken, coming back soon); 3 (the top cliff, northeast, out of reach without a vaulting pole); 4 (broken, coming back soon); 5 (lower ground, southeast, out of reach without a vaulting pole); 6 (lower ground, southeast, out of reach without a vaulting pole)
+Buildings: Resident Services (out of reach without a vaulting pole); plaza (about 22 steps); museum (out of reach without a vaulting pole); Nook's Cranny (out of reach without a vaulting pole); Able Sisters (about 26 steps)
+Trees around here (south): 4 stumps
+The Island 101 (closed): 17 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
+You spotted today:
+- 09:00 a selashren moth on a stump (lower ground, south, near the airport)
+Mental energy left today: 66 of 150. Your plan for today: inward 60 (spent 61: 1 more than planned, from your spare), outward 80 (spent 23), spare 10 (used 1). Typical costs: a plan 24, noticing someone 5, one thing you say in a conversation 17, a turn at the plaza 20, writing at night 12; longer replies cost more.
+
+Today you:
+- 07:00 went to the plaza
+- 07:00 posted on the board [b86]: "Eli: Need Jo’s log or a vaulting pole. Offer 1 selit fish and 1 softwood. Anyone"
+- 08:00 sent Jo a parcel: 5 selzalne fish ("Need vaulting pole or log."); it arrives tomorrow morning
+- 09:00 rested
+- 09:00 spotted a selashren moth on a stump (lower ground, south, near the airport) and went after it at 10:00 instead of dig_stump
+- 10:00 went bug catching on the stumps: caught a selashren moth
+- 12:00 in your plan, send: "airport" isn't one of "at": Ari | Bo | Cal | Dax | Fen | Gus | Ike | Jo | Kit, so it wasn't planned
+- 12:00 went to the plaza
+
+Letters and messages to you:
+(none)
+
+Bulletin board, newest last:
+- [b3] (day 0) you: Hey folks! I’m helping with the bridge to the north bank. We need 20,000 bells total. Anyone can chip in. I can offer 10 wood and 2 softwood for 2000 bells, or just a small donation. Let’s get this done!
+- [b7] (day 1) you: Need 2000 bells for bridge fund. I can offer 2 wood + 2 softwood for 2000 bells. Anyone else can chip in? Also looking for extra wood to build fences. Please let me know!
+- [b22] (day 2) you: Eli: Need 1 fishing bait. Will trade 1 wood or 2 softwood. Any takers? Thanks!
+- [b38] (day 4) you: Need 1 fishing bait. Will trade 1 selit fish. Anyone willing? Thanks!
+- [b50] (day 5) you: Eli: Need 1 fishing bait. Will trade 1 hardwood or 1 selit fish. Anyone willing? Thanks!
+- [b60] (day 5) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b61] (day 5) you: Eli: Need 1 fishing bait. Offer 1 selit fish. Also need a small bridge donation. Anyone willing?
+- [b67] (day 6) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b74] (day 6) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b75] (day 7) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b76] (day 7) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish and 1 softwood. Anyone willing?
+- [b77] (day 7) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish, 1 softwood, 1 rock. Anyone willing?
+- [b78] (day 7) you: Eli: Need 1 fishing bait and 1 bridge donation. Offer 1 selit fish, 1 softwood, 1 rock. Anyone willing?
+- [b81] (day 8) you: Eli: Need 1 fishing bait. Offer 1 selit fish and 1 softwood. Also, I could use a log or rock if you have one. Any help?
+- [b83] (day 9) you: Eli: Need 1 fishing bait. Offer 1 selit fish and 1 softwood. Also could use a log or rock if someone can spare one. Thanks!
+- [b86] (day 16) you: Eli: Need Jo’s log or a vaulting pole. Offer 1 selit fish and 1 softwood. Anyone?
+
+Other villagers: Ari, Bo, Cal, Dax, Fen, Gus, Ike, Jo, Kit
+
+You can post on the board (up to 250 characters) and take down posts of yours that are still up, write letters (up to 350 characters each), and send parcels of things from your pockets. Letters and parcels arrive tomorrow morning. A post, a letter or a parcel doesn't bind anyone to anything: a trade only happens when you meet in person and both agree. Doing nothing is fine. Use "bells" as an item name for money. Both are written as a "send": to whom ("at"), with "items" from your pockets, a "note", or both; a note alone is a letter. In your pockets right now: 100 bells, shovel x1, axe x1, net x1, ladder x1, wood x1, softwood x3, hardwood x1, selit fish x2, tubas fish x2, kalo fish x1, ashpimi fish x8, selashren moth x3, ashpimo fish x2, gormo fish x2, loka fish x1, fossil x1
+Respond with one JSON object and nothing else:
+{
+  "thoughts": "<your private reasoning; nobody else sees it>",
+  "send": [{"action": "send", "at": "<villager>", "items": {"<item>": <qty>}, "note": "..."}],
+  "board": "<post for everyone, or empty>",
+  "take_down": ["<number of a post of yours, like b3>"],
+  "note": "<optional private note to your future self>"
+}
+
+=== REASONING (127 tokens, hidden from everyone) ===
+We need to decide actions: maybe send parcel to Jo? already sent. Maybe trade? We have ladder. Need vaulting pole. Could ask Jo tomorrow. Maybe send a letter to Jo asking. Also maybe take down old post? b86 still up. Could keep. We have ladder for river? No. Could ask for vaulting pole. We'll send letter to Jo: note. No items. Also maybe send some fish to someone? Maybe to Dax for bridge? But we need log. Maybe send 1 selit fish to Jo? Already sent 5. Could send letter only. We'll not take down.
+
+=== REPLY ===
+{
+  "thoughts": "I’ve already posted the request for a vaulting pole and sent a parcel to Jo. I’ll send a quick letter to Jo to remind her of the request and ask if she has anything. No other action needed today. Keep the post up for now.",
+  "send": [
+    {
+      "action": "send",
+      "at": "Jo",
+      "items": {},
+      "note": "Hey Jo, just checking in—do you have a vaulting pole or a log? I could offer 1 selit fish and 1 softwood. Thanks!"
+    }
+  ],
+  "board": "",
+  "take_down": [],
+  "note": "Tomorrow, check Jo in person for the log or pole. Maybe bring ladder if I need to reach the river."
+}

@@ -1,0 +1,56 @@
+=== SYSTEM ===
+You are Fen, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15, night.  
+The river feels calmer; the loka fish came easy.  
+Still no ladder, no map.  
+Gus is still silent, maybe tired.  
+Kit left, no bait.  
+Dax is a mystery—no answer when I asked.  
+I made a fence, but it’s only a few planks.  
+I’m low on useful items: selit fish 2, selzalne 1, no bells.  
+Thought about the bridge: too far for now.  
+Tomorrow I’ll press Cal for a ladder, maybe trade selit.  
+And try to snag that island map from Dax, again.  
+If I can get a ladder, the bridge might be doable.  
+The night feels quiet; I’ll keep the selit fish ready.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 16 (May 7, spring, sunny), 10:00. You are Fen, at the river.
+You just spotted:
+1. a very large fish shadow in the river (lower ground, south, near the plaza)
+Earlier today:
+- 07:00 sent Cal a parcel: 1 selit fish ("Could you spare a ladder?"); it arrives tomorrow morning
+- 08:00 sent Dax a parcel: 1 selit fish ("Any chance you have an island map?"); it arrives tomorrow morning
+- 09:00 looked around but saw no fossil dig spots there
+- 10:00 fished for a medium shadow in the river: it got away
+Things you remember right now (other things may come to mind at other times):
+- (day 14) 17:00 spotted a large fish shadow in the river (lower ground, south, near the plaza) and went after it at 18:00
+- (day 14) 18:00 spotted a small fish shadow in the river (lower ground, south, near the plaza) and went after it at 19:00
+- (day 15) 13:00 fished for a very large shadow in the river: caught a loka fish
+- (day 15, held on to) Selit fish 2, selzalne 1 still handy.
+Your notes from the last 2 days:
+- (day 14) Remember to keep selit fish for later bait trades.
+- (day 14) Ask for ladder tomorrow, see if he has one. Keep selit fish for future trades.
+- (day 15) Remember to ask Cal again tomorrow for ladder; maybe trade selit fish for it.
+- (day 15) Ask Dax for map, trade selit fish if he has.
+- (day 15) Keep an eye on Kit for future trades, maybe I’ll need his ladder later.
+- (day 15) Remember to ask Dax for the map tomorrow. Also keep selit fish handy for Cal. Stay alert for Cal’s ladder. Keep an eye on the bridge proposals.
+At 11:00 you planned: rest.
+Actions left today: 5 of 10. Mental energy left today: 114.
+
+You can go after one of them at 11:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (25 tokens, hidden from everyone) ===
+We should decide: maybe go after the large fish shadow at 11. It's big, maybe loka. We'll go.
+
+=== REPLY ===
+{"thoughts":"Large fish shadow could be a loka, good bait. Go now before it swims away.","go":1}

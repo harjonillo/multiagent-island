@@ -70,3 +70,9 @@ The sun was high when I left for Gus and Fen, but both were gone. I spent most o
 Day 15.  
 Morning: chopped a hardwood, got a selzalne, an ashpimi. Tried Fen’s door, no answer. Ran back for the selit trade, he’s out of bait. Still got 100 bells, 80‑slot house, ladder barely alive. Tom Nook gave me a house, but I owe 98k bells—my wallet is still empty. The ladder is a liability; I’ll need a new one soon. The island is quiet, but the river’s still yielding fish. I’m holding onto the selit for tomorrow’s attempt.  
 Night: tired, no new plans. Just rest.
+
+## Day 16
+
+Day 15.  
+Morning: chopped a hardwood, got a selzalne, an ashpimi. Tried Fen’s door, no answer. Ran back for the selit trade, he’s out of bait. Still got 100 bells, 80‑slot house, ladder barely alive. Tom Nook gave me a house, but I owe 98k bells—my wallet is still empty. The ladder is a liability; I’ll need a new one soon. The island is quiet, but the river’s still yielding fish. I’m holding onto the selit for tomorrow’s attempt.  
+Night: tired, no new plans. Just rest.

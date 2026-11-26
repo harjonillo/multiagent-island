@@ -1,6 +1,6 @@
 # Dax's assets
 
-## At the end of day 15
+## At the end of day 16
 
 - Bells with them: 0
 - Bells at home: 0
@@ -8,7 +8,7 @@
 - Home: a tent in lower ground, west (storage for 0 items)
 - Pockets (40 of 40 slots, worth 32,740 at Nook's Cranny): apple x6, ashpimi fish x3, ashpimo fish x2, axe x1, fishing rod x1, gormo fish x1, hardwood x1, island map x1, kaselzal moth x1, lobas moth x1, loka fish x1, net x1, nevin moth x3, selashren moth x1, selit fish x4, selzalne fish x3, shovel x1, softwood x1, stone x1, tubas fish x1, wood x5
 - Kept at home (worth 0): nothing
-- Tools, uses so far: axe 3, fishing rod 10, net 6, shovel 1
+- Tools, uses so far: axe 3, fishing rod 10, net 6, shovel 2
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: clay furnace, iron garden bench, shovel, simple wooden fence, wooden bookshelf
@@ -36,3 +36,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 13 | 0 | 0 | 27 | 31,470 | 0 | tent | 0 | 31,470 |
 | 14 | 0 | 0 | 34 | 32,080 | 0 | tent | 0 | 32,080 |
 | 15 | 0 | 0 | 40 | 32,740 | 0 | tent | 0 | 32,740 |
+| 16 | 0 | 0 | 40 | 32,740 | 0 | tent | 0 | 32,740 |

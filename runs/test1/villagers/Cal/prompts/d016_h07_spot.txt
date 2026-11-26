@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15, 02 h.  
+The bridge still feels like a stone’s throw away; 750/98000 bells is a long way. I tried to stash my catch but my tent is a hole‑in‑the‑wall. Still no word from Dax—maybe he’s busy or the island’s quiet. I knocked at Ike and Kit, but they’re off. I offered Tom a house loan; maybe that’ll get him to help. I’m stuck with 100 bells, no new gear, and a full fishing net. My only plan: ask Dax for wood, trade selzalne for softwood, and see if anyone can swap a ladder for Fen. The island feels smaller each day.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 16 (May 7, spring, sunny), 07:00. You are Cal, around the island.
+You just spotted:
+1. a lobas moth on the flowers (lower ground, southeast, near rock 6)
+2. a phobasne moth on the flowers (lower ground, east)
+3. a sello beetle on the flowers (lower ground, southeast, near Nook's Cranny)
+4. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 07:00 sent Dax a parcel: 1 selzalne fish ("Can I trade a selzalne for a wood?"); it arrives tomorrow morning
+Things you remember right now (other things may come to mind at other times):
+- (day 14) 11:00 spotted a kaselzal moth on the flowers (lower ground, southeast, near rock 6) and went after it at 12:00
+- (day 15) 11:00 spotted a large fish shadow in the river (lower ground, centre) and went after it at 12:00
+- (day 15) 13:00 asked Tom Nook: right where they stand; each is built once 98000 bells are donated here. The island can have 10 in all, built or proposed, and has 3: the bridge to the north bank; stairs up to the top cliff (north), 0 raised
+- (day 15, held on to) Bridge: 750/98000
+Your notes from the last 2 days:
+- (day 14) Remember to ask Dax for wood and trade selzalne. Also keep an eye on bridge fund tomorrow.
+- (day 14) Trade in progress, got softwood.
+- (day 14) Got another selzalne, good for softwood later.
+- (day 14) Remember to ask Dax tomorrow for wood and trade selzalne for softwood.
+- (day 15) Keep an eye on Dax tomorrow for wood. Remember the ladder request from Fen.
+- (day 15) Try to get a ladder tomorrow from someone else or trade.
+At 08:00 you planned: contribute_bridge (bells: 100).
+Actions left today: 5 of 10. Mental energy left today: 113.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (52 tokens, hidden from everyone) ===
+Need to decide which to chase. He has 100 bells to donate. Maybe go after the very large fish shadow near rock 1? Could get fish. Also could go after phobasne moth? But fish gives food. Go after fish.
+
+=== REPLY ===
+{"thoughts":"I’ll head to the pond near rock 1 for the big fish shadow. A good catch could boost my food stash and maybe give me something useful for the bridge fund later. I’ll skip the moths for now.","go":4}

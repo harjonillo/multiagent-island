@@ -142,3 +142,12 @@ Sun slipped behind the cliffs, leaving the river humming. I trailed Bo around th
 
 Day 14, night.  
 Sun slipped behind the cliffs, leaving the river humming. I trailed Bo around the edge of my plot, trading a fishing rod for a single wood—small but steady. Ari dropped by with a wood and a half‑baked bait, but I’m still short of the full set. I’m running low on wood, but the ladder’s still solid; maybe I’ll swap it later for more. I’ll keep an eye on the river for that vaulting pole rumor. The night is quiet, my tent warm with 6,750 bells, and my tools feel heavy but useful. I’m tired, but the island’s rhythm steadies my thoughts.
+
+## Day 16
+
+Day 16, night.  
+Sun dipped, river hums. I cleared two stumps, sold wood, built fences.  
+Cal gave me a ladder for some wood—good trade.  
+Still short on fishing bait for Ari; hope we can swap soon.  
+Tools are fine, but my wood stash is low; will need another ladder trade next week.  
+The island feels steady, but I’m tired.

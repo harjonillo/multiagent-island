@@ -63,3 +63,7 @@ Day 13: The river’s wall still stands, and my pockets are full of fish but n
 ## Day 15
 
 Day 13: The river’s wall still stands, and my pockets are full of fish but no bait. I traded wood for nothing, kept chasing shadows, and lost another chance with Ike. Bo was kind but still no bait. I’m stuck with 4 woods, 12 hardwoods, 8 softwoods, and a handful of fish. The ladder’s useless without a path, and the plaza feels farther. I’ll keep asking around—Jo, Gus, Dax—maybe tomorrow the tide shifts. I’ll trade more wood; I can’t wait to throw that first hook. The island map is still my only guide. I’ll keep the hope alive and remember the small fish that slipped away.
+
+## Day 16
+
+Day 16: The river keeps its quiet rhythm, but my pockets feel emptier. I chased a small shadow at dawn, got nothing, and still have no bait. I sent Ike three parcels of wood—each a small plea—hoping he’ll reply with a hook. I caught an ashpimo, the first real catch, and a handful of selzalne that day. The tent is still a no‑storage zone, so I’m juggling every piece of wood like a puzzle. I tried to craft a log stool but short on wood; the axe is getting worn. I’ll keep asking Bo tomorrow, but the plaza feels too far for a quick visit. Still, each fish I pull up reminds me that the river’s gifts are worth the grind.

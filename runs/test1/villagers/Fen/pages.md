@@ -145,3 +145,19 @@ Tomorrow I’ll press Cal for a ladder, maybe trade selit.
 And try to snag that island map from Dax, again.  
 If I can get a ladder, the bridge might be doable.  
 The night feels quiet; I’ll keep the selit fish ready.
+
+## Day 16
+
+Day 15, night.  
+The river feels calmer; the loka fish came easy.  
+Still no ladder, no map.  
+Gus is still silent, maybe tired.  
+Kit left, no bait.  
+Dax is a mystery—no answer when I asked.  
+I made a fence, but it’s only a few planks.  
+I’m low on useful items: selit fish 2, selzalne 1, no bells.  
+Thought about the bridge: too far for now.  
+Tomorrow I’ll press Cal for a ladder, maybe trade selit.  
+And try to snag that island map from Dax, again.  
+If I can get a ladder, the bridge might be doable.  
+The night feels quiet; I’ll keep the selit fish ready.

@@ -1,0 +1,41 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15.  
+Morning: chopped a hardwood, got a selzalne, an ashpimi. Tried Fen’s door, no answer. Ran back for the selit trade, he’s out of bait. Still got 100 bells, 80‑slot house, ladder barely alive. Tom Nook gave me a house, but I owe 98k bells—my wallet is still empty. The ladder is a liability; I’ll need a new one soon. The island is quiet, but the river’s still yielding fish. I’m holding onto the selit for tomorrow’s attempt.  
+Night: tired, no new plans. Just rest.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 16 (May 7, spring, sunny), 08:00. You are Kit, at the Nook's Cranny.
+Nearby: Jo.
+Earlier today:
+- 05:00 in your plan, visit: you have no ask for bait in your pockets, so it wasn't planned
+- 08:00 sold hardwood x3, wood x2 at Nook's Cranny for 450 bells (also nearby: Jo)
+Things you remember right now (other things may come to mind at other times):
+- (day 10, held on to) 200 bells, no home stash
+- (day 15) 12:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- (day 15) 14:00 Tom Nook upgraded you to a house (storage 80); you now owe 98000 bells
+- (day 15, held on to) 100 bells, no stash.
+Your notes from the last 2 days:
+- (day 14) Keep selit fish handy for tomorrow’s trade.
+- (day 14) If Dax refuses, I’ll try again tomorrow. Also consider trading my selit fish for something else if he offers.
+- (day 15) Keep the ladder handy for next climb.
+- (day 15) Keep the other selit for tomorrow. Also remember to bring ladder next time.
+- (day 15) No trade today, keep selit for tomorrow.
+- (day 16) Keep the ladder handy for tomorrow’s climb. Maybe I can trade the selit for bait if Fen has any.
+Mental energy left today: 114 (about 17 for each thing you say). Your plan for today: inward 110 (spent 36), outward 40 (spent 0), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (4 tokens, hidden from everyone) ===
+Need JSON.
+
+=== REPLY ===
+{"thoughts":"Need more bait, ladder, maybe trade selit for bait with Fen if possible. Also could ask Jo about any info on trading spots.","approach":"Jo","say":"Hey Jo, got a sec?"}

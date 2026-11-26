@@ -1,0 +1,41 @@
+=== SYSTEM ===
+You are Dax, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 11: The river keeps giving, but my tent is still a void—only bells fit. I chased shadows all day, ending with a gormo and more selzalne. Gus stayed silent, so no bait. I still have the ladder, but no bridge spot close enough. I’m running low on wood for future trades; the map’s still a guide but useless without storage. I’ll keep the fence piece, maybe it’ll help somewhere. Sleep feels thin, but the fish feel good. I’ll ask Gus again tomorrow, maybe Bo will have some.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 16 (May 7, spring, sunny), 08:00. You are Dax, at the around the island.
+Nearby: Bo, Gus.
+Earlier today:
+- 05:00 in your plan, visit: you have no trade wood for bait in your pockets, so it wasn't planned
+- 05:00 in your plan, lay_path: you have no dirt to centre in your pockets, so it wasn't planned
+- 07:00 Gus visited you at home: Gus said "Hey Dax, wood for bait?" [Gus's offer: Gus gives you 1 wood, you give Gus 1 fishing bait]; you said "Sure, I’ll give you a wood for a bait." [you asked Gus for 1 fishing bait]; Gus said "Hey Dax, wood for a bait?" [Gus's offer: Gus gives you 1 wood, you give Gus 1 fishing bait]; you said "" [you asked Gus for 1 fishing bait]; Gus said "Yeah, wood for bait?" [Gus's offer: Gus gives you 1 wood, you give Gus 1 fishing bait]; you said "Sure thing, Gus. I’ll give you my wood for a bait." [you asked Gus for 1 fishing bait]; Gus said "Sure, here's a wood." [Gus tried to hand you 1 wood but you had no room]; you said "Sure, give me a bait if you have one." [you asked Gus for 1 fishing bait]; Gus said "Hey Dax, wood for a bait?" [Gus tried to hand you 1 wood but you had no room; Gus asked you for 1 fishing bait]; you said "" [just nodded (too tired to talk)]
+- 08:00 sent Jo a letter: "Hey Jo, could you bring a rock?"; it arrives tomorrow morning (also nearby: Bo, Gus)
+Things you remember right now (other things may come to mind at other times):
+- (day 15) 07:00 ran into Gus at the woods: you said "Sure, give me a bait if you have one, I'll give you a wood." [you handed Gus 1 wood; you asked Gus for 1 fishing bait]; Gus said "Hey Dax, I’ll give you a wood for a bait." [Gus handed you 1 wood
+- (day 15) 07:00 ran into Gus at the woods: you said "Sure, I’ll give you a wood for a bait." [you handed Gus 1 wood; you asked Gus for 1 fishing bait]; Gus said "Hey Dax, wood for bait?"; you said "" [just nodded (too tired to talk)]
+- (day 15) 10:00 ran into Bo out on a walk: Bo said "Hey Dax, got a couple of woods. Need some bait for the river. Got anything?"; you said "" [just nodded (too tired to talk)]
+- (day 15) 12:00 Bo visited you at home: Bo said "Hey Dax, can I trade 2 wood for a fishing bait?" [Bo's offer: Bo gives you 2 wood, you give Bo 1 fishing bait, but Bo had only 1 wood, so there was no offer; then you went your ways]
+Your notes from the last 2 days:
+- (day 15) Keep an eye on Gus tomorrow, maybe he’ll have bait again.
+- (day 16) Remember to keep wood stash at home tomorrow and keep an eye on Jo for rocks.
+- (day 16) Need to find bait soon.
+- (day 16) Ask for bait, offer wood if he accepts. Keep wood stash at home tomorrow.
+- (day 16) Remember to bring extra wood next time
+- (day 16) Need to find bait soon.
+Mental energy left today: 23 (about 17 for each thing you say). Your plan for today: inward 30 (spent 39: 9 more than planned, from your spare), outward 120 (spent 88), spare 0 (used 9).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (8 tokens, hidden from everyone) ===
+We choose to talk to Gus.
+
+=== REPLY ===
+{"thoughts":"Need bait, Gus has wood. Offer my wood for a bait. Maybe get a rock later.","approach":"Gus","say":"Hey Gus, I’ve got a wood, can I trade it for a bait?"}

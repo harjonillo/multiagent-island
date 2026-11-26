@@ -1,0 +1,44 @@
+=== SYSTEM ===
+You are Ari, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 13: The river’s wall still stands, and my pockets are full of fish but no bait. I traded wood for nothing, kept chasing shadows, and lost another chance with Ike. Bo was kind but still no bait. I’m stuck with 4 woods, 12 hardwoods, 8 softwoods, and a handful of fish. The ladder’s useless without a path, and the plaza feels farther. I’ll keep asking around—Jo, Gus, Dax—maybe tomorrow the tide shifts. I’ll trade more wood; I can’t wait to throw that first hook. The island map is still my only guide. I’ll keep the hope alive and remember the small fish that slipped away.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 16 (May 7, spring, sunny), 07:00. You are Ari, at home.
+You just spotted:
+1. an ashrumo moth on a rock (lower ground, southeast, near rock 6)
+2. a small fish shadow in the river (lower ground, southeast, near rock 6)
+Earlier today:
+- 05:00 in your plan, visit: you have no ike's home in your pockets, so it wasn't planned
+- 05:00 in your plan, ask: "Ike's home" isn't one of "at": Tom Nook | Isabelle | Timmy and Tommy, so it wasn't planned
+- 05:00 at home: couldn't take out wood: there is none at home
+Things you remember right now (other things may come to mind at other times):
+- (day 9, held on to) Got selit fish at 08:00
+- (day 14) 16:00 spotted a medium fish shadow in the river (lower ground, southwest) and went after it at 17:00
+- (day 14) 17:00 spotted a small fish shadow in the river (lower ground, southwest) and went after it at 18:00
+- (day 15) 07:00 spotted a medium fish shadow in the river (lower ground, southeast, near rock 6) and went after it at 08:00
+Your notes from the last 2 days:
+- (day 15) Trade one wood for selzalne fish. Still need bait. Ask Bo tomorrow.
+- (day 15) Remember to follow up with Bo tomorrow if I still don't get bait.
+- (day 15) Keep wood inventory low, hope Ike has bait.
+- (day 15) Ask for bait today; hope he has some.
+- (day 15) Remember to check Bo tomorrow for bait.
+- (day 16) Keep an eye on the island map for any new bait spots. Maybe the plaza has a bulletin about fishing supplies.
+At 08:00 you have nothing planned.
+Actions left today: 7 of 10. Mental energy left today: 114.
+
+You can go after one of them at 08:00: it takes that hour and is one of your actions. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (11 tokens, hidden from everyone) ===
+We choose to go after fish shadow 2.
+
+=== REPLY ===
+{"thoughts":"Got a good small fish shadow near rock 6. Might catch something. No bait yet, but I can try a quick catch and maybe get a small fish. If I fail, no big loss. I have time for another action later.","go":2}

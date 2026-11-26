@@ -1,18 +1,18 @@
 # Kit's assets
 
-## At the end of day 15
+## At the end of day 16
 
-- Bells with them: 100
+- Bells with them: 550
 - Bells at home: 0
 - Loan from Tom Nook: 98,000
 - Home: a house in lower ground, centre (storage for 80 items)
-- Pockets (30 of 40 slots, worth 16,610 at Nook's Cranny): ashpimi fish x2, axe x1, fishing rod x1, gormo fish x2, hardwood x3, island map x1, ladder x1, loka fish x1, net x1, selashren moth x1, selit fish x2, selzalne fish x8, simple wooden fence x1, softwood x1, tugorpi fish x2, wood x2
+- Pockets (27 of 40 slots, worth 16,670 at Nook's Cranny): ashpimi fish x3, axe x1, fishing rod x1, gormo fish x2, island map x1, ladder x1, loka fish x2, net x1, selashren moth x1, selit fish x2, selzalne fish x8, simple wooden fence x1, softwood x1, tugorpi fish x2
 - Kept at home (worth 0): nothing
-- Tools, uses so far: axe 2, fishing rod 18, ladder 23, net 2
+- Tools, uses so far: axe 2, fishing rod 21, ladder 25, net 2
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: campfire, clay furnace, iron garden bench, shovel, simple wooden fence
-- Net worth (bells and things at Cranny prices, less the loan): -81,290
+- Net worth (bells and things at Cranny prices, less the loan): -80,780
 
 ## Day by day
 
@@ -36,3 +36,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 13 | 100 | 0 | 23 | 15,320 | 0 | tent | 0 | 15,420 |
 | 14 | 100 | 0 | 25 | 15,550 | 0 | tent | 0 | 15,650 |
 | 15 | 100 | 0 | 30 | 16,610 | 0 | house | 98,000 | -81,290 |
+| 16 | 550 | 0 | 27 | 16,670 | 0 | house | 98,000 | -80,780 |

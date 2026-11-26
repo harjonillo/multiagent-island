@@ -1,4 +1,4 @@
-# Kit's memory, waking on day 16
+# Kit's memory, waking on day 17
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -12,54 +12,54 @@ Night: tired, no new plans. Just rest.
 
 ## Things they remember
 
-Chosen by them at night, up to 3 a night, in their own words. Each fades unless they come back to it at night, which doubles how long it lasts. Plans, the plaza and conversations show the strongest 10; quick decisions show 4.
+From prompt version 20 nothing is forgotten. Everything they lived through is kept, and each prompt shows the few records closest to the situation in it (up to 8 in plans, the plaza and conversations, 4 in quick decisions, 10 at night), weighed by how recent they are. What they chose to hold on to at night counts 2 times as much, and fades more slowly each time they come back to it. So there is no fixed list here: the `recall` events in events.jsonl say what came to mind for each prompt.
 
-| from day | memory | times held | strength now | comes to mind through |
-|---|---|---|---|---|
-| 10 | 200 bells, no home stash | 2 | 0.61 | day 23 |
-| 11 | One selit trade for bait with Fen. | 1 | 0.29 | day 16 |
-| 11 | Three new fish: selzalne, gormo, loka. *(not shown: weaker than the others)* | 1 | 0.29 | day 16 |
-| 11 | Still no map or log. *(not shown: weaker than the others)* | 1 | 0.29 | day 16 |
-| 12 | Fen still ghost; selit trade tomorrow. | 1 | 0.37 | day 17 |
-| 12 | 100 bells spent on fence, wallet empty. | 1 | 0.37 | day 17 |
-| 13 | Ladder gone, need a new one. | 1 | 0.47 | day 18 |
-| 13 | Propose stairs to Tom Nook. | 1 | 0.47 | day 18 |
-| 13 | Keep selit fish for tomorrow. | 1 | 0.47 | day 18 |
-| 15 | Ladder down after 28 uses. | 1 | 0.78 | day 20 |
-| 15 | Fen out of bait. | 1 | 0.78 | day 20 |
-| 15 | 100 bells, no stash. | 1 | 0.78 | day 20 |
+Kept so far: 261 things that happened, 65 pieces of conversations, 83 notes and 26 pieces of nightly pages, from days 0 to 16.
+
+### What they chose to hold on to
+
+| from day | memory | times held | recency now |
+|---|---|---|---|
+| 10 | 200 bells, no home stash | 2 | 0.54 |
+| 11 | One selit trade for bait with Fen. | 1 | 0.22 |
+| 11 | Three new fish: selzalne, gormo, loka. | 1 | 0.22 |
+| 11 | Still no map or log. | 1 | 0.22 |
+| 12 | Fen still ghost; selit trade tomorrow. | 1 | 0.29 |
+| 12 | 100 bells spent on fence, wallet empty. | 1 | 0.29 |
+| 13 | Ladder gone, need a new one. | 1 | 0.37 |
+| 13 | Propose stairs to Tom Nook. | 1 | 0.37 |
+| 13 | Keep selit fish for tomorrow. | 1 | 0.37 |
+| 15 | Ladder down after 28 uses. | 1 | 0.61 |
+| 15 | Fen out of bait. | 1 | 0.61 |
+| 15 | 100 bells, no stash. | 1 | 0.61 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 14) Keep an eye on Fen tomorrow, maybe try asking him again for the selit trade. Also remember to bring the ladder next time I need it.
-- (day 14) Keep selit ready for tomorrow's trade, and remember to ask Dax about the log.
-- (day 14) Try to get a log today, maybe trade fence later.
-- (day 14) Keep selit fish handy for tomorrow’s trade.
-- (day 14) If Dax refuses, I’ll try again tomorrow. Also consider trading my selit fish for something else if he offers.
 - (day 15) Keep the ladder handy for next climb.
 - (day 15) Keep the other selit for tomorrow. Also remember to bring ladder next time.
 - (day 15) No trade today, keep selit for tomorrow.
+- (day 16) Keep the ladder handy for tomorrow’s climb. Maybe I can trade the selit for bait if Fen has any.
+- (day 16) Remember to ask Fen tomorrow for selit trade again.
+- (day 16) Keep bait for tomorrow
+- (day 16) If Jo still says no, consider offering selit next time.
+- (day 16) Keep offering selit if Jo ever gets bait.
+- (day 16) Keep selit handy for future trade. Remember to ask Fen tomorrow.
 
-## Yesterday (day 15)
+## Yesterday (day 16)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 chopped a hardwood tree: wood x1, hardwood x1, softwood x1; with the last wood the axe brought the tree down, leaving a stump
-- 08:00 fished for a small shadow in the river: caught an ashpimi fish
-- 08:00 spotted a medium fish shadow in the clifftop (the middle cliff, centre) and went after it at 09:00 instead of beachcomb
-- 09:00 fished for a medium shadow in the clifftop: caught a selzalne fish
-- 10:00 walked over to Fen's home
-- 10:00 knocked at Fen's home, but nobody answered
-- 11:00 rested
-- 12:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
-- 12:00 in your plan, 38 (put bells toward the stairs up to the top cliff (north) (0/98000 raised, your proposal) at Resident Services): it needs "bells": 1 to 100, so it wasn't planned
-- 14:00 Tom Nook upgraded you to a house (storage 80); you now owe 98000 bells
-- 15:00 rested
-- 16:00 walked over to Fen's home
-- 16:00 inside Fen's home: not much furniture yet
-- 16:00 visited Fen at home: you said "Hey Fen, can we do the selit for bait again?" [your offer: you give Fen 1 selit fish, Fen gives you 1 fishing bait]; Fen said "Sorry, I’ve run out of bait."; you said "Sorry, I’ll come back another time." [then you went your ways]
+- 05:00 in your plan, visit: you have no ask for bait in your pockets, so it wasn't planned
+- 08:00 sold hardwood x3, wood x2 at Nook's Cranny for 450 bells (also nearby: Jo)
+- 08:00 ran into Jo at Nook's Cranny: you said "Hey Jo, got a sec?"; Jo said "Sure, what do you need?"; you said "Thanks again for the selit! Do you have any fishing bait I could trade for?" [you asked Jo for 1 fishing bait]; Jo said "Sure, I could use a fishing bait. Got any to spare?" [Jo asked you for 1 fishing bait]; you said "Hey Jo, could I swap a selit for your bait?" [your offer: you give Jo 1 selit fish, Jo gives you 1 fishing bait]; Jo said "Sorry, I’ve run out of bait."; you said "Thanks, Jo. I can trade a selzalne fish for your bait, if you still need it."; Jo said "Sorry, I still have none." [Jo asked you for 1 fishing bait]; you said "" [you asked Jo for 1 fishing bait]; Jo said "Sorry, I’m out of bait right now."; you said "Sorry, I'll keep looking for bait. Thanks anyway." [then you went your ways]
+- 09:00 fished for a very large shadow in the river: caught a loka fish
+- 10:00 spotted a medium fish shadow in the river (lower ground, centre) and went after it at 11:00 instead of rest
+- 11:00 fished for a medium shadow in the river: it got away
+- 11:00 spotted a small fish shadow in the river (lower ground, centre) and went after it at 12:00
+- 12:00 too tired to plan, so you planned nothing new
+- 12:00 fished for a small shadow in the river: caught an ashpimi fish
 - 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
@@ -87,6 +87,17 @@ Shown to them when they meet that villager again (the latest lines; "you" is Kit
 ### Gus (day 8, 20:00, at Gus's home)
 
 - **Kit:**  [just nodded (too tired to talk)]
+
+### Jo (day 16, 08:00, at Nook's Cranny)
+
+- **Jo:** Sure, I could use a fishing bait. Got any to spare? [Jo asked you for 1 fishing bait]
+- **Kit:** Hey Jo, could I swap a selit for your bait? [your offer: you give Jo 1 selit fish, Jo gives you 1 fishing bait]
+- **Jo:** Sorry, I’ve run out of bait.
+- **Kit:** Thanks, Jo. I can trade a selzalne fish for your bait, if you still need it.
+- **Jo:** Sorry, I still have none. [Jo asked you for 1 fishing bait]
+- **Kit:**  [you asked Jo for 1 fishing bait]
+- **Jo:** Sorry, I’m out of bait right now.
+- **Kit:** Sorry, I'll keep looking for bait. Thanks anyway. [then you went your ways]
 
 ## What has changed hands with each villager
 
@@ -116,7 +127,7 @@ Shown to them when they meet that villager ("you" is Kit).
 
 ## Prices they have seen
 
-axe 230, fishing rod 160, gormo fish 120, hardwood 90, ladder 570, loka fish 390, net 180, selit fish 410, selzalne fish 660, shovel 220, tugorpi fish 3670, vaulting pole 230, wood 90
+ashpimi fish 120, axe 230, fishing rod 160, gormo fish 120, hardwood 90, ladder 570, loka fish 390, net 180, selashren moth 520, selit fish 410, selzalne fish 660, shovel 220, simple wooden fence 90, softwood 100, tugorpi fish 3670, vaulting pole 230, wood 90
 
 ## Night by night
 
@@ -136,3 +147,4 @@ axe 230, fishing rod 160, gormo fish 120, hardwood 90, ladder 570, loka fish 390
 - Day 13: Wrote the page. Held on to: "Ladder gone, need a new one."; "Propose stairs to Tom Nook."; "Keep selit fish for tomorrow.".
 - Day 14: Didn't write (no energy left).
 - Day 15: Wrote the page. Held on to: "Ladder down after 28 uses."; "Fen out of bait."; "100 bells, no stash.". Forgot: "1 selit left for trade"; "1 selzalne still unused".
+- Day 16: Didn't write (no energy left).

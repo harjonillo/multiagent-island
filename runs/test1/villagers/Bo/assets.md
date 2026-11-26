@@ -1,18 +1,18 @@
 # Bo's assets
 
-## At the end of day 15
+## At the end of day 16
 
 - Bells with them: 0
 - Bells at home: 0
 - Loan from Tom Nook: 0
 - Home: a tent in lower ground, southwest (storage for 0 items)
-- Pockets (40 of 40 slots, worth 6,670 at Nook's Cranny): ashbastu shell x2, ashpimi fish x1, axe x1, campfire x1, fishing rod x2, fossil x1, gormo fish x2, hardwood x7, loka fish x2, miphosel shell x2, net x1, rune moth x1, selit fish x1, selzalne fish x1, shovel x2, shovel recipe x1, softwood x11, wood x1
+- Pockets (37 of 40 slots, worth 7,670 at Nook's Cranny): ashbastu shell x2, ashpimi fish x1, axe x1, campfire x1, fishing rod x2, fossil x1, gormo fish x2, hardwood x2, loka fish x2, miphosel shell x2, net x1, rune moth x1, selit fish x1, selzalne fish x3, shovel x3, shovel recipe x1, softwood x11
 - Kept at home (worth 0): nothing
-- Tools, uses so far: axe 12, fishing rod 14/6, net 1, shovel 4/0
+- Tools, uses so far: axe 12, fishing rod 15/6, net 1, shovel 5/0/0
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: campfire, clay furnace, iron worktable, shovel, simple wooden fence
-- Net worth (bells and things at Cranny prices, less the loan): 6,670
+- Net worth (bells and things at Cranny prices, less the loan): 7,670
 
 ## Day by day
 
@@ -36,3 +36,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 13 | 0 | 0 | 40 | 6,370 | 0 | tent | 0 | 6,370 |
 | 14 | 0 | 0 | 39 | 6,460 | 0 | tent | 0 | 6,460 |
 | 15 | 0 | 0 | 40 | 6,670 | 0 | tent | 0 | 6,670 |
+| 16 | 0 | 0 | 37 | 7,670 | 0 | tent | 0 | 7,670 |

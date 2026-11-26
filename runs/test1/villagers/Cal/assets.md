@@ -1,18 +1,18 @@
 # Cal's assets
 
-## At the end of day 15
+## At the end of day 16
 
-- Bells with them: 100
+- Bells with them: 0
 - Bells at home: 0
 - Loan from Tom Nook: 0
 - Home: a tent in lower ground, east (storage for 0 items)
-- Pockets (40 of 40 slots, worth 43,640 at Nook's Cranny): ashrumo moth x1, axe x1, clay x1, fishing rod x1, gold nugget x2, gorpika fish x2, island map x1, kaselzal moth x1, loka fish x4, lovin fish x2, miruru fish x2, moitbas fish x5, net x1, piren fish x1, selzalne fish x4, shovel x1, softwood x4, stone x3, tubas fish x3
+- Pockets (40 of 40 slots, worth 43,610 at Nook's Cranny): ashrumo moth x1, axe x1, clay x1, fishing rod x1, gold nugget x2, gorpika fish x2, island map x1, kaselzal moth x1, loka fish x4, lovin fish x3, miruru fish x2, moitbas fish x5, net x1, piren fish x1, selzalne fish x3, shovel x1, softwood x4, stone x3, tubas fish x3
 - Kept at home (worth 0): nothing
-- Tools, uses so far: axe 0, fishing rod 28, net 3, shovel 1
+- Tools, uses so far: axe 0, fishing rod 29, net 3, shovel 1
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: campfire, gold crown, ironwood dresser, simple wooden fence
-- Net worth (bells and things at Cranny prices, less the loan): 43,740
+- Net worth (bells and things at Cranny prices, less the loan): 43,610
 
 ## Day by day
 
@@ -36,3 +36,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 13 | 100 | 0 | 38 | 43,580 | 0 | tent | 0 | 43,680 |
 | 14 | 100 | 0 | 40 | 43,640 | 0 | tent | 0 | 43,740 |
 | 15 | 100 | 0 | 40 | 43,640 | 0 | tent | 0 | 43,740 |
+| 16 | 0 | 0 | 40 | 43,610 | 0 | tent | 0 | 43,610 |

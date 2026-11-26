@@ -1,4 +1,4 @@
-# Dax's memory, waking on day 16
+# Dax's memory, waking on day 17
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -10,25 +10,22 @@ Day 11: The river keeps giving, but my tent is still a void—only bells fit. I 
 
 ## Things they remember
 
-Chosen by them at night, up to 3 a night, in their own words. Each fades unless they come back to it at night, which doubles how long it lasts. Plans, the plaza and conversations show the strongest 10; quick decisions show 4.
+From prompt version 20 nothing is forgotten. Everything they lived through is kept, and each prompt shows the few records closest to the situation in it (up to 8 in plans, the plaza and conversations, 4 in quick decisions, 10 at night), weighed by how recent they are. What they chose to hold on to at night counts 2 times as much, and fades more slowly each time they come back to it. So there is no fixed list here: the `recall` events in events.jsonl say what came to mind for each prompt.
 
-| from day | memory | times held | strength now | comes to mind through |
-|---|---|---|---|---|
-| 11 | No wood stash at home today. | 1 | 0.29 | day 16 |
-| 11 | Got a gormo fish. | 1 | 0.29 | day 16 |
-| 11 | Still need fishing bait. | 1 | 0.29 | day 16 |
+Kept so far: 224 things that happened, 104 pieces of conversations, 89 notes and 27 pieces of nightly pages, from days 0 to 16.
+
+### What they chose to hold on to
+
+| from day | memory | times held | recency now |
+|---|---|---|---|
+| 11 | No wood stash at home today. | 1 | 0.22 |
+| 11 | Got a gormo fish. | 1 | 0.22 |
+| 11 | Still need fishing bait. | 1 | 0.22 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 14) If someone offers wood or bait, grab it. Keep the map safe.
-- (day 14) Track if Jo has a rock; if not, keep wood stash.
-- (day 14) Remember to check rocks near river tomorrow.
-- (day 14) Keep an eye on Jo for rocks tomorrow; maybe he’ll find one at the river. Also remember to stash wood at home soon.
-- (day 14) Remember to keep looking for rocks or stone for bridge.
-- (day 14) Ask Jo for a rock, keep track of when I find one.
-- (day 14) Stash wood at home tomorrow, ask Jo for a rock later.
 - (day 15) Ask Jo for a rock tomorrow.
 - (day 15) Remember to ask Gus for a rock tomorrow if he has one.
 - (day 15) Ask Gus for bait today, keep wood trade open for later.
@@ -36,21 +33,27 @@ What they jotted down in plans, conversations and at the plaza.
 - (day 15) Keep wood stash at home tomorrow.
 - (day 15) Ask again tomorrow, maybe trade wood later.
 - (day 15) Keep an eye on Gus tomorrow, maybe he’ll have bait again.
+- (day 16) Remember to keep wood stash at home tomorrow and keep an eye on Jo for rocks.
+- (day 16) Need to find bait soon.
+- (day 16) Ask for bait, offer wood if he accepts. Keep wood stash at home tomorrow.
+- (day 16) Remember to bring extra wood next time
+- (day 16) Need to find bait soon.
 
-## Yesterday (day 15)
+## Yesterday (day 16)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 chopped a fruit tree: wood x3, apple x3; with the last wood the axe brought the tree down, leaving a stump (also nearby: Gus)
-- 07:00 ran into Gus at the woods: Gus said "Hey Dax, could I swap a bit of wood with you?"; you said "Sure, I’ll give you a wood." [your offer: you give Gus 1 wood, Gus gives you 1 fishing bait]; Gus said "Sure, give me a wood and I'll trade you a bait." [Gus's offer: Gus gives you 1 wood, you give Gus 1 fishing bait]; you said "Sure, I could trade you a fishing bait if you have one." [you asked Gus for 1 fishing bait]; Gus said "Hey Dax, can you swap 1 wood for a bait?" [Gus's offer: Gus gives you 1 wood, you give Gus 1 fishing bait]; you said "Sure, give me a bait if you have one, I'll give you a wood." [you handed Gus 1 wood; you asked Gus for 1 fishing bait]; Gus said "Hey Dax, I’ll give you a wood for a bait." [Gus handed you 1 wood; Gus asked you for 1 fishing bait]; you said "Hey Gus, I got some wood, can I trade it for a bait?" [you handed Gus 1 wood; you asked Gus for 1 fishing bait]; Gus said "Sure thing, Dax. I'll give you a wood for a bait." [Gus handed you 1 wood; Gus asked you for 1 fishing bait]; you said "Hey Gus, can I get a fishing bait if you have one?" [you asked Gus for 1 fishing bait]; Gus said "Hey Dax, I'll trade you a wood for a bait." [Gus tried to hand you 1 wood but you had no room]; you said "Sure, I’ll give you a wood for a bait." [you handed Gus 1 wood; you asked Gus for 1 fishing bait]; Gus said "Hey Dax, wood for bait?"; you said "" [just nodded (too tired to talk)]
-- 08:00 fished for a small shadow in the sea: caught a tubas fish
-- 09:00 tried to fish: pockets full
-- 10:00 proposed a bridge across the river (lower ground, southwest); Tom Nook builds it once 98000 bells have been donated at Resident Services, and anyone can chip in (3 of 10 bridges and stairs on the island, built or proposed) (also nearby: Bo)
-- 10:00 ran into Bo out on a walk: Bo said "Hey Dax, got a couple of woods. Need some bait for the river. Got anything?"; you said "" [just nodded (too tired to talk)]
+- 05:00 in your plan, visit: you have no trade wood for bait in your pockets, so it wasn't planned
+- 05:00 in your plan, lay_path: you have no dirt to centre in your pockets, so it wasn't planned
+- 07:00 Gus visited you at home: Gus said "Hey Dax, wood for bait?" [Gus's offer: Gus gives you 1 wood, you give Gus 1 fishing bait]; you said "Sure, I’ll give you a wood for a bait." [you asked Gus for 1 fishing bait]; Gus said "Hey Dax, wood for a bait?" [Gus's offer: Gus gives you 1 wood, you give Gus 1 fishing bait]; you said "" [you asked Gus for 1 fishing bait]; Gus said "Yeah, wood for bait?" [Gus's offer: Gus gives you 1 wood, you give Gus 1 fishing bait]; you said "Sure thing, Gus. I’ll give you my wood for a bait." [you asked Gus for 1 fishing bait]; Gus said "Sure, here's a wood." [Gus tried to hand you 1 wood but you had no room]; you said "Sure, give me a bait if you have one." [you asked Gus for 1 fishing bait]; Gus said "Hey Dax, wood for a bait?" [Gus tried to hand you 1 wood but you had no room; Gus asked you for 1 fishing bait]; you said "" [just nodded (too tired to talk)]
+- 08:00 sent Jo a letter: "Hey Jo, could you bring a rock?"; it arrives tomorrow morning (also nearby: Bo, Gus)
+- 08:00 ran into Gus around the island: you said "Hey Gus, I’ve got a wood, can I trade it for a bait?"; Gus said "" [just nodded (too tired to talk)]
+- 09:00 dug up a stump; the spot is clear now (also nearby: Bo)
 - 11:00 rested
+- 11:00 Jo visited you at home: Jo said "Hey Dax, I’ve got a stone if you need it. Can you spare a rock for the bridge?" [Jo asked you for 1 stone]; you said "" [just nodded (too tired to talk)]
 - 12:00 too tired to plan, so you planned nothing new
-- 12:00 Bo visited you at home: Bo said "Hey Dax, can I trade 2 wood for a fishing bait?" [Bo's offer: Bo gives you 2 wood, you give Bo 1 fishing bait, but Bo had only 1 wood, so there was no offer; then you went your ways]
-- 15:00 Jo visited you at home: Jo said "Hey Dax, here's a stone." [Jo tried to hand you 1 stone but you had no room; then you went your ways]
+- 13:00 Fen visited you at home: Fen said "Hey Dax, any chance you’ve got a map?" [Fen's offer: Fen gives you 1 selit fish, you give Fen 1 island map, but Fen had no selit fish, so there was no offer]; you said "" [just nodded (too tired to talk)]
+- 15:00 Bo visited you at home: Bo said "" [just nodded (too tired to talk)]
 - 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
@@ -61,9 +64,9 @@ Shown to them when they meet that villager again (the latest lines; "you" is Dax
 
 - **Ari:**  [just nodded (too tired to talk)]
 
-### Bo (day 15, 12:00, at Dax's home)
+### Bo (day 16, 15:00, at Dax's home)
 
-- **Bo:** Hey Dax, can I trade 2 wood for a fishing bait? [Bo's offer: Bo gives you 2 wood, you give Bo 1 fishing bait, but Bo had only 1 wood, so there was no offer; then you went your ways]
+- **Bo:**  [just nodded (too tired to talk)]
 
 ### Cal (day 13, 08:00, out on a walk)
 
@@ -87,24 +90,20 @@ Shown to them when they meet that villager again (the latest lines; "you" is Dax
 - **Eli:** Hey Dax, could I trade a selzalne for a log? [Eli asked you for 1 log, but there's nothing called log on this island]
 - **Dax:**  [just nodded (too tired to talk)]
 
-### Fen (day 13, 12:00, at Dax's home)
+### Fen (day 16, 13:00, at Dax's home)
 
-- **Fen:** Hey Dax, any chance you’ll find a map soon? I’d love to see the island better. [Fen asked you for 1 island map; then you went your ways]
-
-### Gus (day 15, 07:00, at the woods)
-
-- **Gus:** Hey Dax, I’ll give you a wood for a bait. [Gus handed you 1 wood; Gus asked you for 1 fishing bait]
-- **Dax:** Hey Gus, I got some wood, can I trade it for a bait? [you handed Gus 1 wood; you asked Gus for 1 fishing bait]
-- **Gus:** Sure thing, Dax. I'll give you a wood for a bait. [Gus handed you 1 wood; Gus asked you for 1 fishing bait]
-- **Dax:** Hey Gus, can I get a fishing bait if you have one? [you asked Gus for 1 fishing bait]
-- **Gus:** Hey Dax, I'll trade you a wood for a bait. [Gus tried to hand you 1 wood but you had no room]
-- **Dax:** Sure, I’ll give you a wood for a bait. [you handed Gus 1 wood; you asked Gus for 1 fishing bait]
-- **Gus:** Hey Dax, wood for bait?
+- **Fen:** Hey Dax, any chance you’ve got a map? [Fen's offer: Fen gives you 1 selit fish, you give Fen 1 island map, but Fen had no selit fish, so there was no offer]
 - **Dax:**  [just nodded (too tired to talk)]
 
-### Jo (day 15, 15:00, at Dax's home)
+### Gus (day 16, 08:00, around the island)
 
-- **Jo:** Hey Dax, here's a stone. [Jo tried to hand you 1 stone but you had no room; then you went your ways]
+- **Dax:** Hey Gus, I’ve got a wood, can I trade it for a bait?
+- **Gus:**  [just nodded (too tired to talk)]
+
+### Jo (day 16, 11:00, at Dax's home)
+
+- **Jo:** Hey Dax, I’ve got a stone if you need it. Can you spare a rock for the bridge? [Jo asked you for 1 stone]
+- **Dax:**  [just nodded (too tired to talk)]
 
 ### Kit (day 14, 21:00, at Dax's home)
 
@@ -182,3 +181,4 @@ Shown to them when they meet that villager ("you" is Dax).
 - Day 13: Didn't write (no energy left). Forgot: "Ari: 1 wood for 1 bait, still pending"; "Cal: offered 1 wood for bait, need to confirm"; "Tent: no storage, only bells allowed".
 - Day 14: Didn't write (no energy left). Forgot: "I traded 1 softwood for 1 selit fish with Jo."; "I have 3 moths: lobas, kaselzal, nevin."; "I still need fishing bait from Bo and Jo.".
 - Day 15: Didn't write (no energy left).
+- Day 16: Didn't write (no energy left).

@@ -1,0 +1,40 @@
+=== SYSTEM ===
+You are Jo, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15, 23:45.  
+Morning gold from rock 1 was a good start, but the real haul came from that massive shadow in the pond—lovin fish in my bag now, and still feeling the rush of the catch. The river stayed empty; the pond is my only lifeline. I kept trying to get that bridge spot but the stretch is too wide, so I’ll keep scouting for a narrower section. Dax’s house is still empty, and he’s not answering the door. I left a stone for him, but he had no space. Ari didn’t talk, just nodded—maybe he’s tired. No trades today, so I’m holding onto my softwood and the extra moitbas. I still need more rocks for the bridge, and I’ll keep asking Dax tomorrow.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: notice
+Day 16 (May 7, spring, sunny), 08:00. You are Jo, at the Nook's Cranny.
+Nearby: Kit.
+Earlier today:
+- 05:00 in your plan, ask: you have no what in your pockets, so it wasn't planned
+- 08:00 sold selit fish x1, loka fish x1, lovin fish x1, gorpika fish x1, moitbas fish x3, tugorpi fish x2, miruru fish x3 at Nook's Cranny for 12970 bells (also nearby: Kit)
+Things you remember right now (other things may come to mind at other times):
+- (day 14) 05:00 at home: couldn't put away selit fish: your tent has no room for things; couldn't put away loka fish: your tent has no room for things; couldn't put away miruru fish: your tent has no room for things
+- (day 15) 07:00 rock 1 was the money rock: got 6750 bells
+- (day 15) 12:00 in your plan, 18 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- (day 15, held on to) Lovin fish added to my stash.
+Your notes from the last 2 days:
+- (day 14) Remember to ask for a rock tomorrow if he finds one.
+- (day 14) Remember to keep stones handy for bridge and keep talking to Dax about any real rocks he might find.
+- (day 15) Ask Dax for wood, buy bait, rest.
+- (day 15) Offer bait to keep trade going.
+- (day 15) Keep stones for bridge. Ask Dax again tomorrow if he finds a rock.
+- (day 16) Remember to ask Dax for a rock tomorrow if he finds one.
+Mental energy left today: 115 (about 17 for each thing you say). Your plan for today: inward 80 (spent 35), outward 70 (spent 0), spare 0 (used 0).
+
+Do you want to go and talk to one of them? You can talk to one villager at a time, and you don't have to. Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "approach": "<a name from Nearby, or empty>", "say": "<your opening line if you approach, or empty>"}
+
+=== REASONING (8 tokens, hidden from everyone) ===
+We choose to talk to Kit.
+
+=== REPLY ===
+{"thoughts":"Need more rocks for bridge, Dax hasn't answered. Kit might know where to find one. Ask for help and maybe trade for a rock.", "approach":"Kit", "say":"Hey Kit, any idea where I can snag a good rock for the bridge?"}

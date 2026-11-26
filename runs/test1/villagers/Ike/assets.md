@@ -1,18 +1,18 @@
 # Ike's assets
 
-## At the end of day 15
+## At the end of day 16
 
-- Bells with them: 0
+- Bells with them: 450
 - Bells at home: 6,750
 - Loan from Tom Nook: 0
 - Home: a tent in lower ground, east (storage for 0 items)
-- Pockets (40 of 40 slots, worth 13,800 at Nook's Cranny): ashrumo moth x2, axe x1, clay x3, fossil x1, gormo fish x1, iron nugget x2, ladder x1, loka fish x1, lovin fish x1, miruru fish x1, net x1, shovel x1, softwood x1, stone x10, tugorpi fish x2, wood x11
+- Pockets (37 of 40 slots, worth 13,530 at Nook's Cranny): ashrumo moth x2, axe x1, clay x3, fossil x1, gormo fish x1, iron nugget x2, ladder x1, loka fish x1, lovin fish x1, miruru fish x1, net x1, shovel x1, simple wooden fence x5, softwood x1, stone x10, tugorpi fish x2, wood x3
 - Kept at home (worth 0): nothing
-- Tools, uses so far: axe 1, ladder 11, net 2, shovel 4
+- Tools, uses so far: axe 1, ladder 11, net 2, shovel 6
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: clay furnace, golden candlestick, iron worktable, simple wooden fence
-- Net worth (bells and things at Cranny prices, less the loan): 20,550
+- Net worth (bells and things at Cranny prices, less the loan): 20,730
 
 ## Day by day
 
@@ -36,3 +36,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 13 | 0 | 6,750 | 40 | 14,440 | 0 | tent | 0 | 21,190 |
 | 14 | 0 | 6,750 | 40 | 14,370 | 0 | tent | 0 | 21,120 |
 | 15 | 0 | 6,750 | 40 | 13,800 | 0 | tent | 0 | 20,550 |
+| 16 | 450 | 6,750 | 37 | 13,530 | 0 | tent | 0 | 20,730 |

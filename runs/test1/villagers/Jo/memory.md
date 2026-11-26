@@ -1,4 +1,4 @@
-# Jo's memory, waking on day 16
+# Jo's memory, waking on day 17
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -11,54 +11,48 @@ Morning gold from rock 1 was a good start, but the real haul came from that mass
 
 ## Things they remember
 
-Chosen by them at night, up to 3 a night, in their own words. Each fades unless they come back to it at night, which doubles how long it lasts. Plans, the plaza and conversations show the strongest 10; quick decisions show 4.
+From prompt version 20 nothing is forgotten. Everything they lived through is kept, and each prompt shows the few records closest to the situation in it (up to 8 in plans, the plaza and conversations, 4 in quick decisions, 10 at night), weighed by how recent they are. What they chose to hold on to at night counts 2 times as much, and fades more slowly each time they come back to it. So there is no fixed list here: the `recall` events in events.jsonl say what came to mind for each prompt.
 
-| from day | memory | times held | strength now | comes to mind through |
-|---|---|---|---|---|
-| 12 | Cal only nodded, no talk. | 1 | 0.37 | day 17 |
-| 12 | I caught a gorpika and extra moitbas. | 1 | 0.37 | day 17 |
-| 12 | Ari needs bait tomorrow. | 1 | 0.37 | day 17 |
-| 15 | Lovin fish added to my stash. | 1 | 0.78 | day 20 |
-| 15 | No trade with Ari; he just nodded. | 1 | 0.78 | day 20 |
-| 15 | Dax still missing, leave stone, no answer. | 1 | 0.78 | day 20 |
+Kept so far: 223 things that happened, 102 pieces of conversations, 98 notes and 18 pieces of nightly pages, from days 0 to 16.
+
+### What they chose to hold on to
+
+| from day | memory | times held | recency now |
+|---|---|---|---|
+| 12 | Cal only nodded, no talk. | 1 | 0.29 |
+| 12 | I caught a gorpika and extra moitbas. | 1 | 0.29 |
+| 12 | Ari needs bait tomorrow. | 1 | 0.29 |
+| 15 | Lovin fish added to my stash. | 1 | 0.61 |
+| 15 | No trade with Ari; he just nodded. | 1 | 0.61 |
+| 15 | Dax still missing, leave stone, no answer. | 1 | 0.61 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 14) Ask Dax for rock tomorrow, keep softwood ready for Cal.
-- (day 14) Remember to keep wood handy for Dax and keep looking for rocks for the bridge.
-- (day 14) Wait for Dax to find rock.
-- (day 14) Remember to check with Dax tomorrow if he finds a rock; keep stones handy for bridge.
-- (day 14) Keep an eye on Dax for a rock tomorrow.
-- (day 14) Remember to ask for a rock tomorrow if he finds one.
-- (day 14) Remember to keep stones handy for bridge and keep talking to Dax about any real rocks he might find.
 - (day 15) Ask Dax for wood, buy bait, rest.
 - (day 15) Offer bait to keep trade going.
 - (day 15) Keep stones for bridge. Ask Dax again tomorrow if he finds a rock.
+- (day 16) Remember to ask Dax for a rock tomorrow if he finds one.
+- (day 16) Remember to ask Dax for a rock tomorrow.
+- (day 16) Remember to keep stones handy for bridge.
+- (day 16) Need to fish tomorrow to get bait.
+- (day 16) Remember to fish tomorrow to get bait.
+- (day 16) Remember to fish tomorrow for bait. Keep stones for bridge.
+- (day 16) Remember to follow up tomorrow if no rock.
 
-## Yesterday (day 15)
+## Yesterday (day 16)
 
 What happened to them, as their first plan of the day lists it.
 
-- 07:00 rock 1 was the money rock: got 6750 bells
-- 07:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 08:00 instead of mine_rock (rock: 5)
-- 08:00 fished for a very large shadow in the pond: caught a lovin fish
-- 09:00 tried to mine_rock: pockets full, could not take anything from rock 6
-- 10:00 walked over to Dax's home (also nearby: Gus, Fen)
-- 10:00 knocked at Dax's home, but nobody answered
-- 11:00 tried to propose_bridge: there's no stretch of river narrow enough for a bridge within 8 steps of here (lower ground, west), away from other bridges and stairs; the nearest you can walk to is about 26 steps away (lower ground, southwest)
-- 12:00 in your plan, 18 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
-- 12:00 walked over to Dax's home (also nearby: Bo)
-- 12:00 knocked at Dax's home, but nobody answered
-- 13:00 walked over to Ari's home
-- 13:00 inside Ari's home: not much furniture yet
-- 13:00 visited Ari at home: you said "Hey Ari, can I get some bait?" [you tried to hand Ari 1 fishing bait but you had no fishing bait]; Ari said "" [just nodded (too tired to talk)]
-- 15:00 walked over to Dax's home
-- 15:00 inside Dax's home: not much furniture yet
-- 15:00 visited Dax at home: you said "Hey Dax, here's a stone." [you tried to hand Dax 1 stone but Dax had no room; then you went your ways]
-- 16:00 rested
-- 17:00 rested
+- 05:00 in your plan, ask: you have no what in your pockets, so it wasn't planned
+- 08:00 sold selit fish x1, loka fish x1, lovin fish x1, gorpika fish x1, moitbas fish x3, tugorpi fish x2, miruru fish x3 at Nook's Cranny for 12970 bells (also nearby: Kit)
+- 08:00 ran into Kit at Nook's Cranny: Kit said "Hey Jo, got a sec?"; you said "Sure, what do you need?"; Kit said "Thanks again for the selit! Do you have any fishing bait I could trade for?" [Kit asked you for 1 fishing bait]; you said "Sure, I could use a fishing bait. Got any to spare?" [you asked Kit for 1 fishing bait]; Kit said "Hey Jo, could I swap a selit for your bait?" [Kit's offer: Kit gives you 1 selit fish, you give Kit 1 fishing bait]; you said "Sorry, I’ve run out of bait."; Kit said "Thanks, Jo. I can trade a selzalne fish for your bait, if you still need it."; you said "Sorry, I still have none." [you asked Kit for 1 fishing bait]; Kit said "" [Kit asked you for 1 fishing bait]; you said "Sorry, I’m out of bait right now."; Kit said "Sorry, I'll keep looking for bait. Thanks anyway." [then you went your ways]
+- 09:00 bought the shovel recipe card for 200 bells; learned the shovel recipe (needs hardwood x5)
+- 11:00 walked over to Dax's home
+- 11:00 inside Dax's home: not much furniture yet
+- 11:00 visited Dax at home: you said "Hey Dax, I’ve got a stone if you need it. Can you spare a rock for the bridge?" [you asked Dax for 1 stone]; Dax said "" [just nodded (too tired to talk)]
+- 12:00 too tired to plan, so you planned nothing new
 - 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
@@ -85,9 +79,10 @@ Shown to them when they meet that villager again (the latest lines; "you" is Jo)
 - **Jo:** Sure, deal. [you accepted: Cal gave you 1 selzalne fish, you gave Cal 1 softwood; your offer: you give Cal 1 softwood, Cal gives you 1 selzalne fish, but you had no softwood, so there was no offer]
 - **Cal:**  [just nodded (too tired to talk)]
 
-### Dax (day 15, 15:00, at Dax's home)
+### Dax (day 16, 11:00, at Dax's home)
 
-- **Jo:** Hey Dax, here's a stone. [you tried to hand Dax 1 stone but Dax had no room; then you went your ways]
+- **Jo:** Hey Dax, I’ve got a stone if you need it. Can you spare a rock for the bridge? [you asked Dax for 1 stone]
+- **Dax:**  [just nodded (too tired to talk)]
 
 ### Fen (day 11, 07:00, at the rocks)
 
@@ -105,6 +100,17 @@ Shown to them when they meet that villager again (the latest lines; "you" is Jo)
 - **Jo:** Sure, here’s my selzalne. [your offer: you give Gus 1 selzalne fish, Gus gives you 1 wood]
 - **Gus:** Deal, thanks! [Gus accepted: you gave Gus 1 selzalne fish, Gus gave you 1 wood]
 - **Jo:**  [just nodded (too tired to talk)]
+
+### Kit (day 16, 08:00, at Nook's Cranny)
+
+- **Jo:** Sure, I could use a fishing bait. Got any to spare? [you asked Kit for 1 fishing bait]
+- **Kit:** Hey Jo, could I swap a selit for your bait? [Kit's offer: Kit gives you 1 selit fish, you give Kit 1 fishing bait]
+- **Jo:** Sorry, I’ve run out of bait.
+- **Kit:** Thanks, Jo. I can trade a selzalne fish for your bait, if you still need it.
+- **Jo:** Sorry, I still have none. [you asked Kit for 1 fishing bait]
+- **Kit:**  [Kit asked you for 1 fishing bait]
+- **Jo:** Sorry, I’m out of bait right now.
+- **Kit:** Sorry, I'll keep looking for bait. Thanks anyway. [then you went your ways]
 
 ## What has changed hands with each villager
 
@@ -162,6 +168,10 @@ Shown to them when they meet that villager ("you" is Jo).
 - day 5: you gave Kit 1 selzalne fish
 - day 5: you gave Kit 2 selit fish
 
+## Prices they have seen
+
+axe 230, clay 70, fishing rod 160, fossil 400, gorpika fish 3120, iron nugget 570, ladder 570, loka fish 390, lovin fish 630, miruru fish 180, moitbas fish 180, net 180, nevin moth 3690, selit fish 410, shovel 220, stone 60, tugorpi fish 3670
+
 ## Night by night
 
 - Day 0: Wrote the page.
@@ -180,3 +190,4 @@ Shown to them when they meet that villager ("you" is Jo).
 - Day 13: Didn't write (no energy left).
 - Day 14: Didn't write (no energy left). Forgot: "Cal gave 2 softwood, I traded 1 selzalne."; "Dax still wants bait, I owe him one."; "Bridge still 2k.".
 - Day 15: Wrote the page. Held on to: "Lovin fish added to my stash."; "No trade with Ari; he just nodded."; "Dax still missing, leave stone, no answer.".
+- Day 16: Didn't write (no energy left).

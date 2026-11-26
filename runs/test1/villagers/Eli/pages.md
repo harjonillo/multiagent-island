@@ -74,3 +74,8 @@ Morning was quiet, no fish shadows until the first bite: a selzalne, then a coup
 
 Day 15.  
 River’s hungry today. First bite at 07:00, an ashpimo—small but nice. Saw a medium shadow at 08:00, chased it, caught another ashpimi. The big one at 09:00 gave me a loka, but my rod snapped after 30 uses—gone. I dug a fossil at 12:00; hope Blathers knows what it is. Rested a bit, then walked to the plaza at 17:00 and posted my board. Bells are fine, food stock steady. I still need Jo’s log or a vaulting pole; she’s been silent all day. The river feels more open, maybe a new spot for the pole. Tomorrow I’ll keep fishing and keep an eye on her.
+
+## Day 16
+
+Day 16.  
+Morning started with the plaza—post the same request, keep the offer steady. Sent Jo a parcel of selzalne; hope she opens it tomorrow. Rested at nine, but the selashren moth on the south stump had me chasing it instead of digging. Caught a few more moths, added to my stash. No fossil spots today, so I stuck to the plaza again at noon. Afternoon was quiet; just rest, ladder in my pack, no new plans. Evening left me exhausted, so I skipped the board. Bells are safe, tools still good. Still waiting on Jo for the log or pole, and a ladder might be handy for the river tomorrow.

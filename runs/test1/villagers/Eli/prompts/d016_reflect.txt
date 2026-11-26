@@ -1,0 +1,81 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15.  
+River’s hungry today. First bite at 07:00, an ashpimo—small but nice. Saw a medium shadow at 08:00, chased it, caught another ashpimi. The big one at 09:00 gave me a loka, but my rod snapped after 30 uses—gone. I dug a fossil at 12:00; hope Blathers knows what it is. Rested a bit, then walked to the plaza at 17:00 and posted my board. Bells are fine, food stock steady. I still need Jo’s log or a vaulting pole; she’s been silent all day. The river feels more open, maybe a new spot for the pole. Tomorrow I’ll keep fishing and keep an eye on her.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: reflect
+It is the end of day 16. You are Eli, at home before sleep.
+
+What happened today:
+- 07:00 went to the plaza
+- 07:00 posted on the board [b86]: "Eli: Need Jo’s log or a vaulting pole. Offer 1 selit fish and 1 softwood. Anyone"
+- 08:00 sent Jo a parcel: 5 selzalne fish ("Need vaulting pole or log."); it arrives tomorrow morning
+- 09:00 rested
+- 09:00 spotted a selashren moth on a stump (lower ground, south, near the airport) and went after it at 10:00 instead of dig_stump
+- 10:00 went bug catching on the stumps: caught a selashren moth
+- 12:00 in your plan, send: "airport" isn't one of "at": Ari | Bo | Cal | Dax | Fen | Gus | Ike | Jo | Kit, so it wasn't planned
+- 12:00 went to the plaza
+- 14:00 looked around but saw no fossil dig spots there
+- 15:00 rested
+- 16:00 rested
+- 17:00 went to the plaza
+- 19:00 too tired to plan, so you planned nothing new
+
+What you have tonight:
+Bells: 100 in your wallet
+Tools you carry: shovel (29 uses left), axe (27 uses left), net (26 uses left), ladder (30 uses left)
+Other things you carry: wood x1, softwood x3, hardwood x1, selit fish x2, tubas fish x2, kalo fish x1, ashpimi fish x8, selashren moth x3, ashpimo fish x2, gormo fish x2, loka fish x1, fossil x1
+At home (a tent holds only bells): 0 bells
+Recipes you know: clay furnace, fruit basket, ironwood dresser, simple wooden fence
+Since this morning: +1 selashren moth; −5 selzalne fish
+
+Open requests:
+(none)
+
+Your notes:
+- (day 15) Remember to ask Jo tomorrow for the log or vaulting pole. Also plan to try beachcomb later if I find a bottle. Good day.
+- (day 15) Remember to ask Jo face‑to‑face tomorrow. Also keep an eye on the river for vaulting pole spots.
+- (day 15) Remember to ask Jo tomorrow for log or vaulting pole. Keep fishing for fish spots.
+- (day 16) Check Jo tomorrow face‑to‑face, maybe she’ll have something.
+- (day 16) Remember to bring the ladder tomorrow if needed.
+- (day 16) Tomorrow, check Jo in person for the log or pole. Maybe bring ladder if I need to reach the river.
+- (day 16) Keep an eye out for Jo tomorrow. Bring ladder if needed.
+
+Things you remember right now, numbered:
+1. (day 8, held on to) No trades today
+2. (day 10, held on to) Still need Jo’s log or vaulting pole.
+3. (day 14, held on to) Selzalne + ashpimi haul.
+4. (day 15) 07:00 fished for a medium shadow in the river: caught an ashpimo fish
+5. (day 15) 07:00 spotted a medium fish shadow in the river (lower ground, southwest) and went after it at 08:00 instead of fish (where: river)
+6. (day 15) 08:00 fished for a small shadow in the river: caught an ashpimi fish
+7. (day 15) 08:00 spotted a large fish shadow in the river (lower ground, south, near the plaza) and went after it at 09:00 instead of fish (where: river)
+8. (day 15) 09:00 fished for a very large shadow in the river: caught a loka fish; your fishing rod broke after 30 uses and is gone from your pockets
+9. (day 15) 17:00 took down your board post [b84]
+10. (day 15, held on to) Need Jo’s log or pole tomorrow.
+
+What you wrote last night:
+Day 15.  
+River’s hungry today. First bite at 07:00, an ashpimo—small but nice. Saw a medium shadow at 08:00, chased it, caught another ashpimi. The big one at 09:00 gave me a loka, but my rod snapped after 30 uses—gone. I dug a fossil at 12:00; hope Blathers knows what it is. Rested a bit, then walked to the plaza at 17:00 and posted my board. Bells are fine, food stock steady. I still need Jo’s log or a vaulting pole; she’s been silent all day. The river feels more open, maybe a new spot for the pole. Tomorrow I’ll keep fishing and keep an eye on her.
+
+This page is private; nobody else will read it. Write whatever you like, in any form, up to 150 words. It replaces what you wrote last night, and you will see it again tomorrow.
+
+After the page, if you want to hold on to anything, add a line "Remember:" and then up to 3 short lines, each something from today in your own words or the number of something in the list above that is still on your mind. Nothing is lost, but what you don't hold on to comes to mind less easily as days pass; what you come back to comes to mind longer.
+
+=== REASONING (24 tokens, hidden from everyone) ===
+Need to write new diary entry up to 150 words. Then optional Remember lines. Let's craft ~120 words.
+
+=== REPLY ===
+Day 16.  
+Morning started with the plaza—post the same request, keep the offer steady. Sent Jo a parcel of selzalne; hope she opens it tomorrow. Rested at nine, but the selashren moth on the south stump had me chasing it instead of digging. Caught a few more moths, added to my stash. No fossil spots today, so I stuck to the plaza again at noon. Afternoon was quiet; just rest, ladder in my pack, no new plans. Evening left me exhausted, so I skipped the board. Bells are safe, tools still good. Still waiting on Jo for the log or pole, and a ladder might be handy for the river tomorrow.
+
+Remember:
+- 5 selzalne sent to Jo
+- 3 selashren moths added
+- Need Jo’s log or vaulting pole tomorrow.

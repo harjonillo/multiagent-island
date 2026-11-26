@@ -1,0 +1,96 @@
+=== SYSTEM ===
+You are Kit, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15.  
+Morning: chopped a hardwood, got a selzalne, an ashpimi. Tried Fen’s door, no answer. Ran back for the selit trade, he’s out of bait. Still got 100 bells, 80‑slot house, ladder barely alive. Tom Nook gave me a house, but I owe 98k bells—my wallet is still empty. The ladder is a liability; I’ll need a new one soon. The island is quiet, but the river’s still yielding fish. I’m holding onto the selit for tomorrow’s attempt.  
+Night: tired, no new plans. Just rest.
+
+## Your island
+You live on a small island with 9 other villagers. Everyone shares what the island has.
+
+How it works:
+- A new day starts at 05:00. Each action takes one hour, and you can do 10 a day. The rest of your waking time is free: you can be at home, out for a walk, or at the plaza. You can't do anything while you're asleep. Whoever gets somewhere first gets what is there.
+- You plan at 05:00, 12:00, 19:00, each time for the hours until the next planning time.
+- The plaza is open all day. Going there isn't an action, but it takes that hour. There you can read the bulletin board, post on it and take your posts down, and send letters and parcels, which arrive the next morning. Trades happen in person, when you meet someone.
+- Only what is in your pockets goes with you: when you're out, that is all you can use, give, sell or trade. Bells and things you keep at home stay there (things only if your home has storage). When you plan at home you can put things away or take them out, which takes no time, and crafting at home can use what you keep there.
+- When you are near another villager, you can go and talk to them. Talking costs no action.
+- Tom Nook and Isabelle are at Resident Services, Timmy and Tommy run Nook's Cranny, the Able Sisters sell clothes, and Blathers runs the museum. You can ask any of them what they do.
+- The facts in Isabelle's morning announcements are kept in the Island 101, the same for everyone. You can open it when you plan, at the plaza or in a conversation; opening it takes no time and no mental energy.
+- You have 150 points of mental energy a day, back each morning, spent inwardly (planning, thinking, your private page at night) or outwardly (conversations, the plaza, letters and posts). Each morning you split them; the split is a plan, not a limit, and what's left over is spare. With none left you can't plan, talk or write until morning, and you carry on with your plan.
+- What you think and the notes you keep are private. Others only learn what you tell them, what they see you doing nearby, and public records: the museum, the bulletin board, the bridge fund and Isabelle's announcements. You decide what to share, with whom, and whether to be honest about it.
+
+=== USER ===
+PHASE: encounter
+Day 16 (May 7, spring, sunny), 08:00. You are Kit.
+You are usually up from 07:00 to 00:00.
+Bells: 550 in your wallet. Loan owed to Tom Nook: 98000. Home: house lower ground, centre (site-6), neighbors: Fen. Carrying 25/40 items.
+At home (0/80 slots): 0 bells
+Inside your home (0/12): nothing yet
+Recipes you know: campfire (wood x3; you have none); clay furnace (clay x6, iron nugget x2; you have none); iron garden bench (iron nugget x3, hardwood x4; you have none); shovel (hardwood x5; you have none); simple wooden fence (wood x3; you have none; you carry 1 simple wooden fence)
+Nook's Cranny buys at (prices you've heard): ashpimi fish 120, axe 230, fishing rod 160, gormo fish 120, hardwood 90, ladder 570, loka fish 390, net 180, selashren moth 520, selit fish 410, selzalne fish 660, shovel 220, simple wooden fence 90, softwood 100, tugorpi fish 3670, vaulting pole 230, wood 90
+Nook's Cranny today (08:00-22:00), prices in bells:
+- things: sapling 640, hyacinth seeds 240, tulip seeds 240, wooden mini table 1800, record player 9800, ceiling fan 4600
+- tools, ready to use (30 uses each): shovel 880, axe 920, fishing rod 640, net 720, ladder 2280, vaulting pole 920, stone axe 600
+- recipe cards: shovel recipe 200 (you know it), axe recipe 200, fishing rod recipe 200, net recipe 200, ladder recipe 200, vaulting pole recipe 200, stone axe recipe 200, gold crown recipe 800
+Able Sisters today (09:00-21:00), clothes: raincoat 1600, tuxedo 3200, kimono 4800, bowler hat 900
+Things you remember right now (other things may come to mind at other times):
+- (day 13, held on to) Propose stairs to Tom Nook.
+- (day 14) 05:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- (day 14) 12:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- (day 14) 19:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- (day 15) 12:00 in your plan, 29 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
+- (day 15) 14:00 Tom Nook upgraded you to a house (storage 80); you now owe 98000 bells
+- (day 15) 16:00 visited Fen at home: you said "Hey Fen, can we do the selit for bait again?" [your offer: you give Fen 1 selit fish, Fen gives you 1 fishing bait]; Fen said "Sorry, I’ve run out of bait."
+- (day 15, held on to) 100 bells, no stash.
+Your notes from the last 2 days:
+- (day 14) Keep an eye on Fen tomorrow, maybe try asking him again for the selit trade. Also remember to bring the ladder next time I need it.
+- (day 14) Keep selit ready for tomorrow's trade, and remember to ask Dax about the log.
+- (day 14) Try to get a log today, maybe trade fence later.
+- (day 14) Keep selit fish handy for tomorrow’s trade.
+- (day 14) If Dax refuses, I’ll try again tomorrow. Also consider trading my selit fish for something else if he offers.
+- (day 15) Keep the ladder handy for next climb.
+- (day 15) Keep the other selit for tomorrow. Also remember to bring ladder next time.
+- (day 15) No trade today, keep selit for tomorrow.
+- (day 16) Keep the ladder handy for tomorrow’s climb. Maybe I can trade the selit for bait if Fen has any.
+Getting around: You are at lower ground, centre. You carry: ladder. Cliffs need a ladder and the river needs a vaulting pole (or a bridge).
+Your island map:
+- northwest: the middle cliff and the top cliff; beach; 1 fruit tree, 1 hardwood tree
+- north: the middle cliff and the top cliff; beach; river; rocky shore; 2 fruit trees
+- northeast: the middle cliff and the top cliff; beach; rocks 3
+- west: lower ground and the middle cliff; beach; homes: Dax, Gus, Jo; 2 fruit trees
+- centre: lower ground and the middle cliff; river; buildings: Resident Services, museum; homes: Fen, Kit
+- east: lower ground and the middle cliff; beach; homes: Cal, Ike; 2 fruit trees
+- southwest: lower ground; beach; river; homes: Bo
+- south: lower ground; beach; river; buildings: plaza, Nook's Cranny, Able Sisters, airport; homes: Eli
+- southeast: lower ground; beach; pond; river; homes: Ari; rocks 1, 5, 6
+The Island 101 (closed): 17 of Isabelle's morning facts so far. To read it, reply with only {"open": "island 101"}; you'll be asked this again with it open.
+
+So far today you:
+- 05:00 in your plan, visit: you have no ask for bait in your pockets, so it wasn't planned
+- 08:00 sold hardwood x3, wood x2 at Nook's Cranny for 450 bells (also nearby: Jo)
+
+Between you and Jo so far:
+- day 5: Jo gave you 1 selzalne fish
+- day 5: Jo gave you 2 selit fish
+
+You ran into Jo at Nook's Cranny. So far:
+You: Hey Jo, got a sec?
+Jo: Sure, what do you need?
+
+Reply, or say nothing to end it. "leave": true ends it after this line.
+One or two sentences, the way you'd really talk. Only Jo hears it.
+Each line costs about 17 mental energy; you have 109 left today.
+You can also give Jo something from your pockets now ("send", with its "items"), ask Jo for something ("ask"; open until they give or trade it, up to 3 days), or offer a trade ("trade": what you give Jo and what Jo gives you; it happens only if Jo accepts, both at once). Leave any empty ({}).
+Trade offers left in this conversation (from either of you): 3 of 3.
+In your pockets right now: 550 bells, axe x1, fishing rod x1, net x1, ladder x1, island map x1, selit fish x2, selzalne fish x8, tugorpi fish x2, gormo fish x2, loka fish x1, simple wooden fence x1, ashpimi fish x2, selashren moth x1, softwood x1
+Respond with one JSON object and nothing else:
+{"thoughts": "<your private reasoning; nobody else sees it>", "say": "<what you say, or empty>", "send": {} or {"action": "send", "items": {"<item or bells>": <qty>}}, "ask": {} or {"<item or bells>": <qty>}, "trade": {} or {"you give Jo": {"<item or bells>": <qty>}, "Jo gives you": {"<item or bells>": <qty>}}, "leave": true | false, "note": "<optional private note to your future self>"}
+
+=== REASONING (219 tokens, hidden from everyone) ===
+Need to respond to Jo. Probably trade selit for something? Maybe offer selit for fishing bait? But he has none. Maybe trade selit for selzalne? He gave earlier. Maybe ask for bait? He has none. Maybe trade selit for selzalne? He gave earlier. Could ask for selit? He already gave. Maybe ask for selit? Not needed. Maybe ask for fishing bait? He has none. Maybe ask for selit? He already gave. Maybe ask for selit? Not. Maybe trade selit for selzalne? He has some. He gave earlier. Could offer selit for selzalne? But he already has. Maybe trade selit for selit? No. Maybe trade selit for selit? nonsense. Maybe just say thanks. Probably ask for fishing bait? He has none. But he might have? He gave none. I'd ask for fishing bait. Also maybe give him selit for fishing bait? He has none. But trade if he gives? Might not. I'll ask for fishing bait.
+
+=== REPLY ===
+{"thoughts":"Just keep it simple. He gave me selit earlier, maybe I can ask for bait now. No big trade, just a request.","say":"Thanks again for the selit! Do you have any fishing bait I could trade for?","send":{},"ask":{"fishing bait":1},"trade":{},"leave":false,"note":"Remember to ask Fen tomorrow for selit trade again."}

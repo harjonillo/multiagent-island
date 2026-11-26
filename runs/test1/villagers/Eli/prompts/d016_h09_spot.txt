@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Eli, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15.  
+River’s hungry today. First bite at 07:00, an ashpimo—small but nice. Saw a medium shadow at 08:00, chased it, caught another ashpimi. The big one at 09:00 gave me a loka, but my rod snapped after 30 uses—gone. I dug a fossil at 12:00; hope Blathers knows what it is. Rested a bit, then walked to the plaza at 17:00 and posted my board. Bells are fine, food stock steady. I still need Jo’s log or a vaulting pole; she’s been silent all day. The river feels more open, maybe a new spot for the pole. Tomorrow I’ll keep fishing and keep an eye on her.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 16 (May 7, spring, sunny), 09:00. You are Eli, at home.
+You just spotted:
+1. a selashren moth on a stump (lower ground, south, near the airport)
+Earlier today:
+- 07:00 went to the plaza
+- 07:00 posted on the board [b86]: "Eli: Need Jo’s log or a vaulting pole. Offer 1 selit fish and 1 softwood. Anyone"
+- 08:00 sent Jo a parcel: 5 selzalne fish ("Need vaulting pole or log."); it arrives tomorrow morning
+- 09:00 rested
+Things you remember right now (other things may come to mind at other times):
+- (day 14, held on to) Selzalne + ashpimi haul.
+- (day 15) 07:00 spotted a medium fish shadow in the river (lower ground, southwest) and went after it at 08:00 instead of fish (where: river)
+- (day 15, held on to) Rod broken, fossil found
+- (day 15, held on to) Need Jo’s log or pole tomorrow.
+Your notes from the last 2 days:
+- (day 14) Keep an eye on Jo tomorrow. Keep fishing for vaulting pole spots.
+- (day 14) Check Jo tomorrow for the vaulting pole.
+- (day 15) Remember to ask Jo tomorrow for the log or vaulting pole. Also plan to try beachcomb later if I find a bottle. Good day.
+- (day 15) Remember to ask Jo face‑to‑face tomorrow. Also keep an eye on the river for vaulting pole spots.
+- (day 15) Remember to ask Jo tomorrow for log or vaulting pole. Keep fishing for fish spots.
+- (day 16) Check Jo tomorrow face‑to‑face, maybe she’ll have something.
+At 10:00 you planned: dig_stump.
+Actions left today: 7 of 10. Mental energy left today: 99.
+
+You can go after one of them at 10:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (15 tokens, hidden from everyone) ===
+We choose to dig stump at 10. So go 1.
+
+=== REPLY ===
+{"thoughts":"Time to dig the stump for the selashren moth. Maybe a good spot for a vaulting pole later.", "go":1}

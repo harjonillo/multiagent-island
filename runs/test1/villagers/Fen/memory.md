@@ -1,4 +1,4 @@
-# Fen's memory, waking on day 16
+# Fen's memory, waking on day 17
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -22,51 +22,64 @@ The night feels quiet; I’ll keep the selit fish ready.
 
 ## Things they remember
 
-Chosen by them at night, up to 3 a night, in their own words. Each fades unless they come back to it at night, which doubles how long it lasts. Plans, the plaza and conversations show the strongest 10; quick decisions show 4.
+From prompt version 20 nothing is forgotten. Everything they lived through is kept, and each prompt shows the few records closest to the situation in it (up to 8 in plans, the plaza and conversations, 4 in quick decisions, 10 at night), weighed by how recent they are. What they chose to hold on to at night counts 2 times as much, and fades more slowly each time they come back to it. So there is no fixed list here: the `recall` events in events.jsonl say what came to mind for each prompt.
 
-| from day | memory | times held | strength now | comes to mind through |
-|---|---|---|---|---|
-| 15 | Dax: map, no answer today. | 1 | 0.78 | day 20 |
-| 15 | Cal: ladder, maybe selit trade. | 1 | 0.78 | day 20 |
-| 15 | Selit fish 2, selzalne 1 still handy. | 1 | 0.78 | day 20 |
+Kept so far: 260 things that happened, 68 pieces of conversations, 79 notes and 23 pieces of nightly pages, from days 0 to 16.
+
+### What they chose to hold on to
+
+| from day | memory | times held | recency now |
+|---|---|---|---|
+| 15 | Dax: map, no answer today. | 1 | 0.61 |
+| 15 | Cal: ladder, maybe selit trade. | 1 | 0.61 |
+| 15 | Selit fish 2, selzalne 1 still handy. | 1 | 0.61 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 14) Remember to ask Cal for selit fish tomorrow if he’s willing; I need it for future trades.
-- (day 14) Keep the selzalne handy for later trades.
-- (day 14) Remember to keep selit fish for later bait trades.
-- (day 14) Ask for ladder tomorrow, see if he has one. Keep selit fish for future trades.
 - (day 15) Remember to ask Cal again tomorrow for ladder; maybe trade selit fish for it.
 - (day 15) Ask Dax for map, trade selit fish if he has.
 - (day 15) Keep an eye on Kit for future trades, maybe I’ll need his ladder later.
 - (day 15) Remember to ask Dax for the map tomorrow. Also keep selit fish handy for Cal. Stay alert for Cal’s ladder. Keep an eye on the bridge proposals.
+- (day 16) If Dax still says no map, maybe try Cal tomorrow. Also keep an eye on the bridge proposals.
+- (day 16) If denied, try Cal tomorrow.
+- (day 16) Keep selit for bait
+- (day 16) Keep track of how many selit fish I have after this trade.
 
-## Yesterday (day 15)
+## Yesterday (day 16)
 
 What happened to them, as their first plan of the day lists it.
 
-- 05:00 in your plan, there is no 0 on your list, so it wasn't planned
-- 07:00 rested
-- 08:00 put a simple wooden fence outside near home
-- 09:00 tried to propose_bridge: there's no stretch of river narrow enough for a bridge within 8 steps of here (lower ground, centre), away from other bridges and stairs; the nearest you can walk to is about 14 steps away (lower ground, centre)
-- 10:00 walked over to Dax's home (also nearby: Gus, Jo)
-- 10:00 knocked at Dax's home, but nobody answered
-- 10:00 ran into Gus at Dax's home: you said "Hey Gus, got a minute? I’m looking for a ladder and maybe some selit fish if you’ve got any spare."; Gus said "" [just nodded (too tired to talk)]
-- 12:00 walked over to Bo's home
-- 12:00 knocked at Bo's home, but nobody answered
-- 13:00 fished for a very large shadow in the river: caught a loka fish
-- 14:00 walked over to Bo's home
-- 14:00 knocked at Bo's home, but nobody answered
-- 15:00 donated an ashpimi fish to the museum
+- 07:00 sent Cal a parcel: 1 selit fish ("Could you spare a ladder?"); it arrives tomorrow morning
+- 08:00 sent Dax a parcel: 1 selit fish ("Any chance you have an island map?"); it arrives tomorrow morning
+- 09:00 looked around but saw no fossil dig spots there
+- 10:00 fished for a medium shadow in the river: it got away
+- 10:00 spotted a very large fish shadow in the river (lower ground, south, near the plaza) and went after it at 11:00 instead of rest
+- 11:00 fished for a small shadow in the river: caught an ashpimi fish
+- 12:00 fished for a small shadow in the river: it got away
+- 13:00 walked over to Dax's home
+- 13:00 inside Dax's home: not much furniture yet
+- 13:00 visited Dax at home: you said "Hey Dax, any chance you’ve got a map?" [your offer: you give Dax 1 selit fish, Dax gives you 1 island map, but you had no selit fish, so there was no offer]; Dax said "" [just nodded (too tired to talk)]
+- 14:00 looked for fish in the river, but there were no fish shadows in sight (also nearby: Bo)
+- 14:00 ran into Bo at the river: you said "Hey Bo, you seen any selit fish around?"; Bo said "Hey Fen, got any selit fish? I can trade you a wood for one." [Bo's offer: Bo gives you 1 wood, you give Bo 1 selit fish]; you said "Sure, I’ll trade you my selzalne for a wood." [your offer: you give Bo 1 selzalne fish, Bo gives you 1 wood]; Bo said "Sure, I'll take that." [Bo accepted: you gave Bo 1 selzalne fish, Bo gave you 1 wood]; you said "Hey Bo, got any selit fish around? I could trade a wood if you need it." [you asked Bo for 1 selit fish]; Bo said "Sure thing, here’s a selit fish for a wood." [Bo's offer: Bo gives you 1 selit fish, you give Bo 1 wood]; you said "" [just nodded (too tired to talk)]
 - 16:00 rested
-- 16:00 Kit visited you at home: Kit said "Hey Fen, can we do the selit for bait again?" [Kit's offer: Kit gives you 1 selit fish, you give Kit 1 fishing bait]; you said "Sorry, I’ve run out of bait."; Kit said "Sorry, I’ll come back another time." [then you went your ways]
-- 17:00 rested
+- 17:00 looked for fish in the river, but there were no fish shadows in sight (also nearby: Jo)
+- 19:00 too tired to plan, so you planned nothing new
 
 ## The last conversation with each villager
 
 Shown to them when they meet that villager again (the latest lines; "you" is Fen).
+
+### Bo (day 16, 14:00, at the river)
+
+- **Fen:** Hey Bo, you seen any selit fish around?
+- **Bo:** Hey Fen, got any selit fish? I can trade you a wood for one. [Bo's offer: Bo gives you 1 wood, you give Bo 1 selit fish]
+- **Fen:** Sure, I’ll trade you my selzalne for a wood. [your offer: you give Bo 1 selzalne fish, Bo gives you 1 wood]
+- **Bo:** Sure, I'll take that. [Bo accepted: you gave Bo 1 selzalne fish, Bo gave you 1 wood]
+- **Fen:** Hey Bo, got any selit fish around? I could trade a wood if you need it. [you asked Bo for 1 selit fish]
+- **Bo:** Sure thing, here’s a selit fish for a wood. [Bo's offer: Bo gives you 1 selit fish, you give Bo 1 wood]
+- **Fen:**  [just nodded (too tired to talk)]
 
 ### Cal (day 14, 08:00, at Fen's home)
 
@@ -77,9 +90,10 @@ Shown to them when they meet that villager again (the latest lines; "you" is Fen
 - **Cal:** Sure, here's the selit fish. [Cal accepted: you gave Cal 1 selzalne fish, Cal gave you 1 selit fish; Cal's offer: Cal gives you 1 selit fish, you give Cal 1 selzalne fish, but Cal had no selit fish, so there was no offer]
 - **Fen:** Hey Cal, could you spare a ladder for the cliffs? [you asked Cal for 1 ladder; then you went your ways]
 
-### Dax (day 13, 12:00, at Dax's home)
+### Dax (day 16, 13:00, at Dax's home)
 
-- **Fen:** Hey Dax, any chance you’ll find a map soon? I’d love to see the island better. [you asked Dax for 1 island map; then you went your ways]
+- **Fen:** Hey Dax, any chance you’ve got a map? [your offer: you give Dax 1 selit fish, Dax gives you 1 island map, but you had no selit fish, so there was no offer]
+- **Dax:**  [just nodded (too tired to talk)]
 
 ### Gus (day 15, 10:00, at Dax's home)
 
@@ -112,6 +126,7 @@ Shown to them when they meet that villager ("you" is Fen).
 ### Bo
 
 - day 6: you gave Bo 1 wood
+- day 16: you gave Bo 1 selzalne fish and Bo gave you 1 wood, in a trade
 
 ### Cal
 
@@ -172,3 +187,4 @@ axe 230, fishing rod 160, hardwood 90, ladder 570, net 180, selzalne fish 660, s
 - Day 13: Didn't write (no energy left). Forgot: "Need apple before rock break"; "Gus traded selzalne for bait, but gave me none"; "Still only 1 map in hand, still no path to plaza".
 - Day 14: Didn't write (no energy left).
 - Day 15: Wrote the page. Held on to: "Dax: map, no answer today."; "Cal: ladder, maybe selit trade."; "Selit fish 2, selzalne 1 still handy.".
+- Day 16: Didn't write (no energy left).

@@ -1,6 +1,6 @@
 # Gus's assets
 
-## At the end of day 15
+## At the end of day 16
 
 - Bells with them: 60
 - Bells at home: 0
@@ -36,3 +36,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 13 | 60 | 0 | 40 | 11,120 | 0 | tent | 0 | 11,180 |
 | 14 | 60 | 0 | 40 | 10,800 | 0 | tent | 0 | 10,860 |
 | 15 | 60 | 0 | 39 | 10,740 | 0 | tent | 0 | 10,800 |
+| 16 | 60 | 0 | 39 | 10,740 | 0 | tent | 0 | 10,800 |

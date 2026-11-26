@@ -292,7 +292,8 @@ class Cached:
     """Disk cache keyed on (model, prompt, sampling params, salt). The salt is the
     run seed, so the same seed replays a run for free and a new seed resamples. With `refresh`
     (`--no-cache`) nothing is read from the cache: every call is made, and its reply replaces
-    whatever was kept for that prompt, so a later replay gets the new replies."""
+    whatever was kept for that prompt, so a later replay gets the new replies. An empty reply is
+    never kept or replayed: a resumed run asks again."""
 
     def __init__(self, inner, cache_dir: Path, salt: str = "", refresh: bool = False):
         self.refresh = refresh
@@ -314,15 +315,18 @@ class Cached:
         path = self.dir / key[:2] / f"{key}.json"
         if path.exists() and not self.refresh:
             d = json.loads(path.read_text())
-            return Completion(
-                d["text"],
-                cached=True,
-                reasoning=d.get("reasoning", ""),
-                reasoning_tokens=d.get("reasoning_tokens", 0),
-            )
+            if d["text"].strip():  # an empty one kept by an older version: ask again
+                return Completion(
+                    d["text"],
+                    cached=True,
+                    reasoning=d.get("reasoning", ""),
+                    reasoning_tokens=d.get("reasoning_tokens", 0),
+                )
         c = self.inner.complete(
             messages, temperature=temperature, max_tokens=max_tokens
         )
+        if not c.text.strip():
+            return c  # nothing to replay: the next run asks again
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(
             json.dumps(

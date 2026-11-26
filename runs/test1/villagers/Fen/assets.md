@@ -1,18 +1,18 @@
 # Fen's assets
 
-## At the end of day 15
+## At the end of day 16
 
 - Bells with them: 0
 - Bells at home: 0
 - Loan from Tom Nook: 0
 - Home: a tent in lower ground, centre (storage for 0 items)
-- Pockets (39 of 40 slots, worth 33,930 at Nook's Cranny): ashpimi fish x1, ashpimo fish x1, axe x1, clay x4, fishing rod x1, gold nugget x1, gormo fish x1, hardwood x1, iron nugget x1, island map x3, kalo fish x1, loka fish x2, net x1, nevin moth x1, selit fish x2, sello beetle x1, selzalne fish x1, shovel x2, simple wooden fence x3, softwood x5, stone x2, tubas fish x1, wood x2
+- Pockets (38 of 40 slots, worth 32,660 at Nook's Cranny): ashpimi fish x2, ashpimo fish x1, axe x1, clay x4, fishing rod x1, gold nugget x1, gormo fish x1, hardwood x1, iron nugget x1, island map x3, kalo fish x1, loka fish x2, net x1, nevin moth x1, sello beetle x1, shovel x2, simple wooden fence x3, softwood x5, stone x2, tubas fish x1, wood x3
 - Kept at home (worth 0): nothing
-- Tools, uses so far: axe 3, fishing rod 11, net 2, shovel 1/0
+- Tools, uses so far: axe 3, fishing rod 14, net 2, shovel 1/0
 - Wearing: nothing special
 - Furniture inside: none
 - Recipes known: campfire, iron fence, simple wooden fence, wooden bookshelf
-- Net worth (bells and things at Cranny prices, less the loan): 33,930
+- Net worth (bells and things at Cranny prices, less the loan): 32,660
 
 ## Day by day
 
@@ -36,3 +36,4 @@ At the end of each day. Worth is at Nook's Cranny prices.
 | 13 | 0 | 0 | 40 | 30,250 | 0 | tent | 0 | 30,250 |
 | 14 | 0 | 0 | 40 | 33,750 | 0 | tent | 0 | 33,750 |
 | 15 | 0 | 0 | 39 | 33,930 | 0 | tent | 0 | 33,930 |
+| 16 | 0 | 0 | 38 | 32,660 | 0 | tent | 0 | 32,660 |

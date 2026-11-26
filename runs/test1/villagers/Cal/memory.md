@@ -1,4 +1,4 @@
-# Cal's memory, waking on day 16
+# Cal's memory, waking on day 17
 
 Everything they carry from earlier days into their prompts. Whatever isn't here is gone for them, unless someone tells them or they see it again.
 
@@ -11,49 +11,47 @@ The bridge still feels like a stone’s throw away; 750/98000 bells is a long wa
 
 ## Things they remember
 
-Chosen by them at night, up to 3 a night, in their own words. Each fades unless they come back to it at night, which doubles how long it lasts. Plans, the plaza and conversations show the strongest 10; quick decisions show 4.
+From prompt version 20 nothing is forgotten. Everything they lived through is kept, and each prompt shows the few records closest to the situation in it (up to 8 in plans, the plaza and conversations, 4 in quick decisions, 10 at night), weighed by how recent they are. What they chose to hold on to at night counts 2 times as much, and fades more slowly each time they come back to it. So there is no fixed list here: the `recall` events in events.jsonl say what came to mind for each prompt.
 
-| from day | memory | times held | strength now | comes to mind through |
-|---|---|---|---|---|
-| 11 | Dax unresponsive today. | 1 | 0.29 | day 16 |
-| 11 | Got an ashrumo moth; trade for softwood. | 1 | 0.29 | day 16 |
-| 11 | Need more softwood for bridge and future trades. | 1 | 0.29 | day 16 |
-| 15 | Bridge: 750/98000 | 1 | 0.78 | day 20 |
-| 15 | Dax: wood & softwood trade | 1 | 0.78 | day 20 |
-| 15 | Fen: ladder request pending | 1 | 0.78 | day 20 |
+Kept so far: 264 things that happened, 62 pieces of conversations, 78 notes and 27 pieces of nightly pages, from days 0 to 16.
+
+### What they chose to hold on to
+
+| from day | memory | times held | recency now |
+|---|---|---|---|
+| 11 | Dax unresponsive today. | 1 | 0.22 |
+| 11 | Got an ashrumo moth; trade for softwood. | 1 | 0.22 |
+| 11 | Need more softwood for bridge and future trades. | 1 | 0.22 |
+| 15 | Bridge: 750/98000 | 1 | 0.61 |
+| 15 | Dax: wood & softwood trade | 1 | 0.61 |
+| 15 | Fen: ladder request pending | 1 | 0.61 |
 
 ## Notes from the last 2 days
 
 What they jotted down in plans, conversations and at the plaza.
 
-- (day 14) Remember to ask Dax for wood and trade selzalne. Also keep an eye on bridge fund tomorrow.
-- (day 14) Trade in progress, got softwood.
-- (day 14) Got another selzalne, good for softwood later.
-- (day 14) Remember to ask Dax tomorrow for wood and trade selzalne for softwood.
 - (day 15) Keep an eye on Dax tomorrow for wood. Remember the ladder request from Fen.
 - (day 15) Try to get a ladder tomorrow from someone else or trade.
+- (day 16) Keep an eye on Dax tomorrow for wood. Fen’s ladder still pending.
+- (day 16) Rest and plan to ask Dax for wood tomorrow. Keep an eye on Fen’s ladder request.
 
-## Yesterday (day 15)
+## Yesterday (day 16)
 
 What happened to them, as their first plan of the day lists it.
 
-- 05:00 in your plan, 11 (sell at Nook's Cranny): it needs "items": {"<thing>": <how many>}, so it wasn't planned
-- 05:00 at home: couldn't put away selzalne fish: your tent has no room for things; couldn't put away moitbas fish: your tent has no room for things; couldn't put away gorpika fish: your tent has no room for things
-- 07:00 walked over to Ike's home
-- 07:00 knocked at Ike's home, but nobody answered
-- 08:00 walked over to Kit's home
-- 08:00 knocked at Kit's home, but nobody answered
-- 09:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 750 raised so far; anyone can chip in, and once built it crosses the river by Resident Services, so nobody needs a vaulting pole there. Anyone can also propose another bridge, or stairs up a cliff that anyone can climb without a ladder, right where they stand; each is built once 98000 bells are donated here. The island can have 10 in all, built or proposed, and has 2: the bridge to the north bank; stairs up to the top cliff (north), 0 raised.
-- 10:00 spotted a small fish shadow in the river (lower ground, south, near the plaza) and went after it at 11:00 instead of rest
-- 11:00 tried to fish: pockets full
-- 11:00 spotted a large fish shadow in the river (lower ground, centre) and went after it at 12:00
-- 12:00 in your plan, 13 (put bells toward the bridge to the north bank (750/98000 raised) at Resident Services): it needs "bells": 1 to 100, so it wasn't planned
-- 12:00 looked for fish in the river, but there were no fish shadows in sight
-- 13:00 asked Tom Nook: I can build you a house (storage 80, room for 12 pieces of furniture inside) right away, on a loan of 98000 bells with no interest and no deadline. A loan has to be paid off before the next upgrade. I can also move your home to a free homesite overnight for 10000 bells. Free homesites: site-2 (lower ground, east), site-4 (lower ground, southeast), site-5 (lower ground, west), site-11 (lower ground, southwest). The bridge to the north bank costs 98000 bells, 750 raised so far; anyone can chip in, and once built it crosses the river by Resident Services, so nobody needs a vaulting pole there. Anyone can also propose another bridge, or stairs up a cliff that anyone can climb without a ladder, right where they stand; each is built once 98000 bells are donated here. The island can have 10 in all, built or proposed, and has 3: the bridge to the north bank; stairs up to the top cliff (north), 0 raised; bridge across the river (lower ground, southwest), 0 raised.
-- 14:00 walked over to Ike's home (also nearby: Bo, Ike)
-- 14:00 knocked at Ike's home, but nobody answered
+- 07:00 sent Dax a parcel: 1 selzalne fish ("Can I trade a selzalne for a wood?"); it arrives tomorrow morning
+- 07:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 08:00 instead of contribute_bridge (bells: 100)
+- 08:00 fished for a very large shadow in the pond: caught a lovin fish
+- 08:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 09:00 instead of visit (who: Ike)
+- 09:00 tried to fish: pockets full
+- 10:00 rested
+- 11:00 rested
+- 12:00 tried to propose_bridge: there's no stretch of river narrow enough for a bridge within 8 steps of here (lower ground, east), away from other bridges and stairs; the nearest you can walk to is about 22 steps away (lower ground, southeast)
+- 13:00 put 100 bells toward the bridge to the north bank (850/98000)
+- 14:00 sent Fen a letter: "Do you have a ladder for the cliffs?"; it arrives tomorrow morning
 - 15:00 rested
 - 16:00 rested
+- 21:00 ran into Ike out on a walk: you said "Hey Ike, how’s the day going?"; Ike said "Hey Cal, could you spare some wood?" [Ike's offer: Ike gives you 1 ladder, you give Ike 3 wood]; you said "" [just nodded (too tired to talk)]
 
 ## The last conversation with each villager
 
@@ -79,8 +77,10 @@ Shown to them when they meet that villager again (the latest lines; "you" is Cal
 - **Cal:** Sure, here's the selit fish. [you accepted: Fen gave you 1 selzalne fish, you gave Fen 1 selit fish; your offer: you give Fen 1 selit fish, Fen gives you 1 selzalne fish, but you had no selit fish, so there was no offer]
 - **Fen:** Hey Cal, could you spare a ladder for the cliffs? [Fen asked you for 1 ladder; then you went your ways]
 
-### Ike (day 9, 14:00, at Ike's home)
+### Ike (day 16, 21:00, out on a walk)
 
+- **Cal:** Hey Ike, how’s the day going?
+- **Ike:** Hey Cal, could you spare some wood? [Ike's offer: Ike gives you 1 ladder, you give Ike 3 wood]
 - **Cal:**  [just nodded (too tired to talk)]
 
 ### Jo (day 13, 10:00, at the rocks)
@@ -150,3 +150,4 @@ Shown to them when they meet that villager ("you" is Cal).
 - Day 13: Didn't write (no energy left).
 - Day 14: Didn't write (no energy left).
 - Day 15: Wrote the page. Held on to: "Bridge: 750/98000"; "Dax: wood & softwood trade"; "Fen: ladder request pending".
+- Day 16: Didn't write (no energy left).

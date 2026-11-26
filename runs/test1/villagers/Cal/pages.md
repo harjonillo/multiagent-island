@@ -80,3 +80,8 @@ Morning: nothing from Dax—still no reply. Went fishing twice, got a moitbas an
 
 Day 15, 02 h.  
 The bridge still feels like a stone’s throw away; 750/98000 bells is a long way. I tried to stash my catch but my tent is a hole‑in‑the‑wall. Still no word from Dax—maybe he’s busy or the island’s quiet. I knocked at Ike and Kit, but they’re off. I offered Tom a house loan; maybe that’ll get him to help. I’m stuck with 100 bells, no new gear, and a full fishing net. My only plan: ask Dax for wood, trade selzalne for softwood, and see if anyone can swap a ladder for Fen. The island feels smaller each day.
+
+## Day 16
+
+Day 15, 02 h.  
+The bridge still feels like a stone’s throw away; 750/98000 bells is a long way. I tried to stash my catch but my tent is a hole‑in‑the‑wall. Still no word from Dax—maybe he’s busy or the island’s quiet. I knocked at Ike and Kit, but they’re off. I offered Tom a house loan; maybe that’ll get him to help. I’m stuck with 100 bells, no new gear, and a full fishing net. My only plan: ask Dax for wood, trade selzalne for softwood, and see if anyone can swap a ladder for Fen. The island feels smaller each day.

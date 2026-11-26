@@ -80,3 +80,8 @@ The river stayed empty; the pond kept giving. I chased a big shadow and ended up
 
 Day 15, 23:45.  
 Morning gold from rock 1 was a good start, but the real haul came from that massive shadow in the pond—lovin fish in my bag now, and still feeling the rush of the catch. The river stayed empty; the pond is my only lifeline. I kept trying to get that bridge spot but the stretch is too wide, so I’ll keep scouting for a narrower section. Dax’s house is still empty, and he’s not answering the door. I left a stone for him, but he had no space. Ari didn’t talk, just nodded—maybe he’s tired. No trades today, so I’m holding onto my softwood and the extra moitbas. I still need more rocks for the bridge, and I’ll keep asking Dax tomorrow.
+
+## Day 16
+
+Day 15, 23:45.  
+Morning gold from rock 1 was a good start, but the real haul came from that massive shadow in the pond—lovin fish in my bag now, and still feeling the rush of the catch. The river stayed empty; the pond is my only lifeline. I kept trying to get that bridge spot but the stretch is too wide, so I’ll keep scouting for a narrower section. Dax’s house is still empty, and he’s not answering the door. I left a stone for him, but he had no space. Ari didn’t talk, just nodded—maybe he’s tired. No trades today, so I’m holding onto my softwood and the extra moitbas. I still need more rocks for the bridge, and I’ll keep asking Dax tomorrow.

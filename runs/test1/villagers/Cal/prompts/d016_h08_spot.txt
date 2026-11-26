@@ -1,0 +1,45 @@
+=== SYSTEM ===
+You are Cal, one of the villagers who has just moved to this island.
+
+Make your own choices. Talk the way you would, and keep messages short.
+
+## What you wrote to yourself last night
+Day 15, 02 h.  
+The bridge still feels like a stone’s throw away; 750/98000 bells is a long way. I tried to stash my catch but my tent is a hole‑in‑the‑wall. Still no word from Dax—maybe he’s busy or the island’s quiet. I knocked at Ike and Kit, but they’re off. I offered Tom a house loan; maybe that’ll get him to help. I’m stuck with 100 bells, no new gear, and a full fishing net. My only plan: ask Dax for wood, trade selzalne for softwood, and see if anyone can swap a ladder for Fen. The island feels smaller each day.
+
+You live on a small island with other villagers. What you think is private; others only know what you say to them and what they see you do.
+
+=== USER ===
+PHASE: spot
+Day 16 (May 7, spring, sunny), 08:00. You are Cal, at the pond.
+You just spotted:
+1. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+2. a very large fish shadow in the pond (lower ground, southeast, near rock 1)
+Earlier today:
+- 07:00 sent Dax a parcel: 1 selzalne fish ("Can I trade a selzalne for a wood?"); it arrives tomorrow morning
+- 07:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 08:00 instead of contribute_bridge (bells: 100)
+- 08:00 fished for a very large shadow in the pond: caught a lovin fish
+Things you remember right now (other things may come to mind at other times):
+- (day 14) 12:00 spotted a very large fish shadow in the pond (lower ground, southeast, near rock 1) and went after it at 13:00 instead of fish (where: sea)
+- (day 15) 10:00 spotted a small fish shadow in the river (lower ground, south, near the plaza) and went after it at 11:00 instead of rest
+- (day 15) 11:00 spotted a large fish shadow in the river (lower ground, centre) and went after it at 12:00
+- (day 15, held on to) Bridge: 750/98000
+Your notes from the last 2 days:
+- (day 14) Remember to ask Dax for wood and trade selzalne. Also keep an eye on bridge fund tomorrow.
+- (day 14) Trade in progress, got softwood.
+- (day 14) Got another selzalne, good for softwood later.
+- (day 14) Remember to ask Dax tomorrow for wood and trade selzalne for softwood.
+- (day 15) Keep an eye on Dax tomorrow for wood. Remember the ladder request from Fen.
+- (day 15) Try to get a ladder tomorrow from someone else or trade.
+At 09:00 you planned: visit (who: Ike).
+Actions left today: 5 of 10. Mental energy left today: 106.
+
+You can go after one of them at 09:00: it takes that hour and is one of your actions, instead of what you planned. It may be gone by then or get away. You don't have to.
+Respond with one JSON object and nothing else:
+{"thoughts": "<private>", "go": <the number of the one to go after, or 0>}
+
+=== REASONING (45 tokens, hidden from everyone) ===
+We should decide: we have two large fish shadows at pond. We can go after one at 09:00. Probably try to catch one to get more fish. Use 1 action. So go=1.
+
+=== REPLY ===
+{"thoughts":"I’ll try to catch one of those big shadows now. 5 actions left, 106 energy. 1 action will be fishing at the pond. 1 fish should help with food and maybe a bit of bells if I sell it. 1 fish = 50 bells? Probably. 1 fish also gives me a chance to use the net? I’ll just go fishing. 0 means I’d skip. I’ll go after the first one.","go":1}

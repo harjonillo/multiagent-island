@@ -3449,9 +3449,67 @@ def _pools_delta(before: dict, after: dict) -> dict:
     return out
 
 
+def _open_braces(s: str) -> str | None:
+    """The brackets `s` leaves open, outermost first; None if it closes one it never opened or
+    ends inside a string."""
+    stack, in_str, esc = [], False, False
+    for ch in s:
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+        elif ch == '"':
+            in_str = True
+        elif ch in "{[":
+            stack.append(ch)
+        elif ch in "}]":
+            if not stack or stack.pop() != "{["["}]".index(ch)]:
+                return None
+    return None if in_str else "".join(stack)
+
+
+def _loads_lenient(s: str, whole: bool):
+    """json.loads, forgiving the slips small models make in an otherwise complete reply:
+    - a last key wrapped in braces of its own: {..., "home": {...}}, {"note": "..."}
+    - the final closing brace left off. Only when the reply ended on a brace (`whole`): one that
+      stops mid-way was cut off, and half a plan isn't the plan.
+    Raises the first JSONDecodeError if none of these is what went wrong."""
+    first = None
+    for _ in range(4):
+        try:
+            return json.loads(s)
+        except json.JSONDecodeError as err:
+            first = first or err
+            at = err.pos
+            if (
+                err.msg.startswith("Expecting property name")
+                and s[at : at + 1] == "{"
+                and s[:at].rstrip().endswith(",")
+            ):  # a key in its own braces, inside an object that is still open
+                s = s[:at] + s[at + 1 :]
+            elif err.msg == "Extra data":  # the same, after the object was closed
+                obj, rest = json.loads(s[:at]), s[at:].lstrip().lstrip(",").lstrip()
+                more = _loads_lenient(rest, whole) if rest.startswith("{") else None
+                if not isinstance(obj, dict) or not isinstance(more, dict):
+                    raise first
+                return {**more, **obj}
+            elif whole and at >= len(s.rstrip()):
+                left = _open_braces(s)
+                if not left or set(left) != {"{"}:
+                    raise first
+                s = s + "}" * len(left)
+            else:
+                raise first
+    raise first
+
+
 def parse_action_obj(text: str):
     """Pull the first JSON object out of a reply. Free models are messy, so this tolerates
-    code fences, reasoning blocks and trailing chatter."""
+    code fences, reasoning blocks, trailing chatter and a misplaced or missing closing brace.
+    """
     import re
 
     t = re.sub(r"<think>.*?</think>", "", text or "", flags=re.S | re.I)
@@ -3459,9 +3517,12 @@ def parse_action_obj(text: str):
     if s < 0 or e <= s:
         return None, "no JSON object in reply"
     try:
-        obj = json.loads(t[s : e + 1])
+        obj = _loads_lenient(t[s : e + 1], whole=not t[e + 1 :].strip(" \n\t`"))
     except json.JSONDecodeError as err:
         return None, f"invalid JSON: {err}"
-    return (
-        (obj, None) if isinstance(obj, dict) else (None, "reply JSON is not an object")
-    )
+    if not isinstance(obj, dict):
+        return None, "reply JSON is not an object"
+    home = obj.get("home")
+    if isinstance(home, dict) and "note" in home and "note" not in obj:
+        obj["note"] = home.pop("note")  # the note, closed inside "home" by mistake
+    return obj, None

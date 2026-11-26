@@ -2,6 +2,17 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-25 13:00
+  what: Replies with a misplaced closing brace are read
+  when: every run, from its next day
+  details:
+    - "why: in test1, 16 replies through day 15 couldn't be read, 12 of them plans, and a villager whose plan isn't read does nothing in those hours. 10 of the 16 were complete plans with one brace out of place"
+    - "a note wrapped in braces of its own after \"home\" ({..., \"home\": {...}}, {\"note\": \"...\"}) is read as the plan's note: 9 plans"
+    - "a reply that ends on a brace but is one short gets it: 1 plan"
+    - "a note closed inside \"home\" is the plan's note. These plans were read before but the note was lost: 21 notes in test1"
+    - "a reply cut off mid-way is still not read, since half a plan isn't the plan: the other 6 (2 empty, 3 cut off, 1 with no actions). The model's hidden reasoning used up the reply's tokens"
+    - "an empty reply is no longer kept in the reply cache, and one already there isn't replayed: a resumed run asks again. Before, resuming a stopped day replayed it (Dax's 5am plans on days 3 and 13)"
+    - "nothing villagers are shown changed, and days already lived stay as they happened"
 - time: 2026-11-24 12:00
   what: Prompt version 21, plans pick actions by name
   when: new runs from now on, or a run resumed with --prompt-version 21
