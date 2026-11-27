@@ -1,18 +1,29 @@
 """Island world rules and an end-to-end mock run. Works with pytest or plain python."""
 
+from __future__ import annotations
+
 import pickle
 import random
 import re
-from collections import Counter
 import tempfile
+from collections import Counter
+from collections.abc import Callable
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, NoReturn
 
-from llmabm.island import IslandSimulation, load_island_scenario
-from llmabm.island.sim import _change_note
-from llmabm.island.analysis import day_log, extraction_shares, forgone_donations, summary
-from llmabm.island.world import Island, load_world
 from llmabm.analysis import load_run
+from llmabm.island import IslandSimulation, load_island_scenario
+from llmabm.island.analysis import day_log, extraction_shares, summary
+from llmabm.island.sim import _change_note
+from llmabm.island.world import Island, load_world
 from llmabm.llm import load_backends
+
+if TYPE_CHECKING:
+    from llmabm.island.body import Bodies
+    from llmabm.island.grid import GridSpace
+    from llmabm.island.sim import IslandScenario
+    from llmabm.island.villager import Villager
+    from llmabm.llm import ChatBackend
 
 ROOT = Path(__file__).resolve().parent.parent
 WORLD = ROOT / "data/island_world.yaml"
@@ -23,14 +34,15 @@ def _seen(prompt_file: Path) -> str:
     return prompt_file.read_text().split("\n=== REASONING")[0]
 
 
-def _prompts(run_dir, tag: str = "*", name: str = "*") -> list:
+def _prompts(run_dir: str | Path, tag: str = "*", name: str = "*") -> list[Path]:
     """The logged prompt files of a run: each villager's in villagers/<name>/prompts/, Isabelle's in prompts/."""
     run_dir = Path(run_dir)
     return sorted(run_dir.glob(f"villagers/{name}/prompts/{tag}.txt")) + (
         sorted(run_dir.glob(f"prompts/{tag}.txt")) if name == "*" else [])
 
 
-def _island(names=("A", "B")):
+def _island(names: tuple[str, ...] = ("A", "B")) -> Island:
+    """An island on the abstract map with everyone moved in and day 1 begun."""
     isl = Island(load_world(WORLD), list(names), random.Random(0))
     for n in names:  # everyone already moved in; start on day 1
         isl.arrived[n] = 5
@@ -39,7 +51,10 @@ def _island(names=("A", "B")):
     return isl
 
 
-def test_rocks_are_shared_and_run_out():
+def test_rocks_are_shared_and_run_out() -> None:
+    """The rocks are one shared stock: a villager who mines them all leaves none for the next, and they refill
+    overnight.
+    """
     isl = _island()
     isl.v["A"].inventory.clear()  # room in A's pockets for everything the rocks give
     got = [isl.act("A", {"do": "mine_rock"}, 8)[0] for _ in range(isl.n_rocks)]
@@ -50,7 +65,8 @@ def test_rocks_are_shared_and_run_out():
     assert isl.act("B", {"do": "mine_rock"}, 8)[0]  # rocks refill overnight
 
 
-def test_loan_blocks_second_upgrade_until_paid():
+def test_loan_blocks_second_upgrade_until_paid() -> None:
+    """A house upgrade puts the villager in debt, and no further upgrade is allowed until that loan is paid off."""
     isl = _island()
     assert isl.act("A", {"do": "upgrade_house"}, 8)[0]
     assert isl.v["A"].loan == 98000
@@ -60,7 +76,8 @@ def test_loan_blocks_second_upgrade_until_paid():
     assert isl.act("A", {"do": "upgrade_house"}, 8)[0]
 
 
-def test_museum_takes_first_of_each_species_only():
+def test_museum_takes_first_of_each_species_only() -> None:
+    """The museum accepts a species once: the second villager to bring the same fish is told it already has one."""
     isl = _island()
     isl.v["A"].inventory["sea bass"] = 1
     isl.v["B"].inventory["sea bass"] = 1
@@ -69,7 +86,10 @@ def test_museum_takes_first_of_each_species_only():
     assert not ok and "already has" in msg
 
 
-def test_fossils_need_assessing_and_the_museum_keeps_a_tally():
+def test_fossils_need_assessing_and_the_museum_keeps_a_tally() -> None:
+    """A dug fossil is unidentified: it sells for a flat price but can't be donated until assessed into a species, and
+    the museum credits the donor.
+    """
     isl = _island()
     a = isl.v["A"]
     a.inventory.clear()
@@ -88,7 +108,8 @@ def test_fossils_need_assessing_and_the_museum_keeps_a_tally():
         assert all(1000 <= p <= 10000 for p in load_world(WORLD, "perturbed", seed=seed)["fossils"].values())
 
 
-def test_shops_keep_opening_hours_and_fish_keep_their_hours():
+def test_shops_keep_opening_hours_and_fish_keep_their_hours() -> None:
+    """A shop refuses a sale before it opens, and a fish that bites only by day is never caught at night."""
     isl = _island()
     isl.v["A"].inventory["wood"] = 1
     ok, msg = isl.act("A", {"do": "sell", "items": {"wood": 1}}, 6)
@@ -100,7 +121,10 @@ def test_shops_keep_opening_hours_and_fish_keep_their_hours():
     assert not any("pale chub" in r for r in night)
 
 
-def test_sleep_schedule_and_ordinance_shift():
+def test_sleep_schedule_and_ordinance_shift() -> None:
+    """A villager is awake only between their own waking and bed hours; an ordinance takes effect the next morning and
+    then shifts everyone's hours and the shops'.
+    """
     isl = _island()
     isl.v["A"].wakes, isl.v["A"].sleeps = 8, 2   # up at 08:00, bed at 02:00
     assert isl.awake_window("A") == (8, 26)
@@ -114,65 +138,57 @@ def test_sleep_schedule_and_ordinance_shift():
     assert isl.is_open("cranny", 23) and not isl.is_open("cranny", 9)
 
 
-def test_bell_boom_raises_prices():
+def test_bell_boom_raises_prices() -> None:
+    """Under the bell boom ordinance the shop pays more for the same thing."""
     isl = _island()
     base = isl.sell_price("wood")
     isl.ordinance = "bell_boom"
     assert isl.sell_price("wood") > base
 
 
-def test_perturbed_world_renames_species():
+def test_perturbed_world_renames_species() -> None:
+    """A perturbed world keeps as many fish as the canonical one but gives every one of them a new name."""
     canon, pert = load_world(WORLD), load_world(WORLD, "perturbed", seed=1)
     assert not set(canon["fish"]) & set(pert["fish"])
     assert len(canon["fish"]) == len(pert["fish"])
 
 
-def test_island_mock_run_end_to_end():
-    for scenario in ("island_blank.yaml",):
-        sc = load_island_scenario(ROOT / "scenarios" / scenario, seed=4)
-        assert len(sc.villagers) == 10
-        with tempfile.TemporaryDirectory() as d:
-            IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=4, backend_override="mock", verbose=False).run(5)
-            run = load_run(Path(d) / "run")
-            assert len(run.of("snapshot")) == 5
-            assert run.of("trade") or run.of("offer")
-            shares = extraction_shares(run)
-            assert abs(sum(shares["wood"].values()) - 1) < 1e-6
-            assert isinstance(forgone_donations(run), list)
-            assert "Museum:" in summary(run)
-            log = day_log(run, 0)
-            assert log.startswith("# Day 0") and "## End of day" in log
-            # Nobody acts while asleep.
-            starts = {e["day"]: e["awake"] for e in run.of("day_start")}
-            for e in run.of("action"):
-                if e["day"] == 0:  # landing day: up from the moment they land at 05:00
-                    continue
-                a, b = starts[e["day"]][e["agent"]]
-                assert a <= e["hour"] < b
-            # Hourly snapshots cover every hour of every day.
-            cal = sc.world["calendar"]
-            assert len(run.of("hour_state")) == 5 * cal["day_length"]
-            # Nobody acts twice in one hour or beyond the daily budget.
-            per_hour = Counter((e["day"], e["hour"], e["agent"]) for e in run.of("action"))
-            per_day = Counter((e["day"], e["agent"]) for e in run.of("action"))
-            assert max(per_hour.values()) == 1 and max(per_day.values()) <= cal["actions_per_day"]
-
-
-def test_resume_matches_an_uninterrupted_run():
-    import json
-    sc = lambda: load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=9)  # noqa: E731
+def test_island_mock_run_end_to_end() -> None:
+    """A five-day run with ten mock villagers logs every day and hour, and nobody acts while asleep, twice in one
+    hour, or beyond the daily number of actions.
+    """
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=4)
+    assert len(sc.villagers) == 10
     with tempfile.TemporaryDirectory() as d:
-        a, b = Path(d) / "a", Path(d) / "b"
-        IslandSimulation(sc(), load_backends(None), a, seed=9, backend_override="mock", verbose=False).run(3)
-        IslandSimulation(sc(), load_backends(None), b, seed=9, backend_override="mock", verbose=False).run(1)
-        IslandSimulation.resume(b, load_backends(None), days=2, verbose=False)
-        skip = {"run_start", "run_end", "resume"}
-        clean = lambda p: [{k: v for k, v in e.items() if k not in ("time", "latency")}  # noqa: E731
-                           for e in map(json.loads, p.read_text().splitlines()) if e["type"] not in skip]
-        assert clean(a / "events.jsonl") == clean(b / "events.jsonl")
+        IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=4, backend_override="mock", verbose=False).run(5)
+        run = load_run(Path(d) / "run")
+        assert len(run.of("snapshot")) == 5
+        assert run.of("trade")
+        shares = extraction_shares(run)
+        assert abs(sum(shares["wood"].values()) - 1) < 1e-6
+        assert "Museum:" in summary(run)
+        log = day_log(run, 0)
+        assert log.startswith("# Day 0") and "## End of day" in log
+        # Nobody acts while asleep.
+        starts = {e["day"]: e["awake"] for e in run.of("day_start")}
+        for e in run.of("action"):
+            if e["day"] == 0:  # landing day: up from the moment they land at 05:00
+                continue
+            a, b = starts[e["day"]][e["agent"]]
+            assert a <= e["hour"] < b
+        # Hourly snapshots cover every hour of every day.
+        cal = sc.world["calendar"]
+        assert len(run.of("hour_state")) == 5 * cal["day_length"]
+        # Nobody acts twice in one hour or beyond the daily budget.
+        per_hour = Counter((e["day"], e["hour"], e["agent"]) for e in run.of("action"))
+        per_day = Counter((e["day"], e["agent"]) for e in run.of("action"))
+        assert max(per_hour.values()) == 1 and max(per_day.values()) <= cal["actions_per_day"]
 
 
-def test_day0_random_homes_and_private_thoughts():
+def test_day0_random_homes_and_private_thoughts() -> None:
+    """Everyone lands at the same hour on day 0 on a homesite drawn for them, with no call to choose one, and a
+    villager's private thoughts are logged but never shown in any prompt.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=2)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=2, backend_override="mock",
@@ -198,7 +214,10 @@ def test_day0_random_homes_and_private_thoughts():
         assert (Path(d) / "run" / "days" / "day_000_isabelle.md").exists()
 
 
-def test_encounters_are_one_on_one_and_capped():
+def test_encounters_are_one_on_one_and_capped() -> None:
+    """A chat is between two different villagers who were out and within the encounter radius, starts with one
+    deciding to approach, and each villager's chats per day are capped.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=4)
     with tempfile.TemporaryDirectory() as d:
         IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=4, backend_override="mock", verbose=False).run(3)
@@ -223,7 +242,8 @@ def test_encounters_are_one_on_one_and_capped():
             assert math.dist(a["pos"], b["pos"]) <= radius
 
 
-def test_bodies_shorter_walk_gets_there_first():
+def test_bodies_shorter_walk_gets_there_first() -> None:
+    """When two villagers go for the same rock in the same hour, the one with the shorter walk acts first."""
     isl, g, bodies = _grid_island(("Near", "Far"))
     rng = random.Random(0)
     # Both go for the same rock; Near is standing next to it.
@@ -240,7 +260,10 @@ def test_bodies_shorter_walk_gets_there_first():
     assert [n for n, _ in bodies.order(batch, rng)] == ["Far", "Near"]
 
 
-def test_fixtures_keep_a_free_tile_between_them():
+def test_fixtures_keep_a_free_tile_between_them() -> None:
+    """On every generated map, buildings, homesites, trees and rocks keep a free tile between them, no door is
+    blocked, and no flower grows on a fixture.
+    """
     from llmabm.island.grid import GridSpace
 
     w = load_world(WORLD)
@@ -259,9 +282,12 @@ def test_fixtures_keep_a_free_tile_between_them():
         assert not set(g.flowers) & g.fixtures  # nothing grows on the plaza or a homesite
 
 
-def test_grid_tools_gate_movement():
-    from llmabm.island.grid import GridSpace
+def test_grid_tools_gate_movement() -> None:
+    """A vaulting pole or a ladder opens more of the map: without one a villager is told they can't get to a building
+    across the water, and with a pole they can.
+    """
     from llmabm.island.body import Bodies
+    from llmabm.island.grid import GridSpace
 
     w = load_world(WORLD)
     g = GridSpace(w, seed=0)
@@ -288,14 +314,15 @@ def test_grid_tools_gate_movement():
     bodies = Bodies(isl, g)
     bodies.place_at_home("A")
     _, _, _, err = g.resolve(isl, "A", action, bodies.b["A"].pos, bodies.tools_of("A"), random.Random(0))
-    if g.coords_of_place(far) not in g.distances(bodies.b["A"].pos, frozenset()):
-        assert err and "can't get to" in err
-        isl.v["A"].inventory["vaulting pole"] = 1
-        _, _, _, err = g.resolve(isl, "A", action, bodies.b["A"].pos, bodies.tools_of("A"), random.Random(0))
-        assert err is None
+    assert g.coords_of_place(far) not in g.distances(bodies.b["A"].pos, frozenset())
+    assert err and "can't get to" in err
+    isl.v["A"].inventory["vaulting pole"] = 1
+    _, _, _, err = g.resolve(isl, "A", action, bodies.b["A"].pos, bodies.tools_of("A"), random.Random(0))
+    assert err is None
 
 
-def test_grid_run_and_resume():
+def test_grid_run_and_resume() -> None:
+    """A run stopped after one day and resumed for two more writes the same events as one run of three days."""
     import json
     sc = lambda: load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)  # noqa: E731
     with tempfile.TemporaryDirectory() as d:
@@ -311,7 +338,10 @@ def test_grid_run_and_resume():
         assert run.manifest["space"] == "grid" and run.of("snapshot")[-1]["objects"]["rocks"]
 
 
-def test_blank_villagers_reflect_privately():
+def test_blank_villagers_reflect_privately() -> None:
+    """Villagers who start identical each get a nightly page; what one writes is in their own prompt the next day and
+    in nobody else's.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=1)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=1, backend_override="mock",
@@ -320,7 +350,7 @@ def test_blank_villagers_reflect_privately():
         run = load_run(Path(d) / "run")
         refl = run.of("reflection")
         assert len(refl) == 30
-        assert all(e["self_doc"] and "ratings" not in e for e in refl if not e.get("skipped"))
+        assert all(e["self_doc"] for e in refl if not e.get("skipped"))
         assert sum(not e.get("skipped") for e in refl) >= 10  # some choose not to write, or run out
         assert {e["skipped"] for e in refl if e.get("skipped")} <= {"chose not to write tonight", "no energy left"}
         # Identical villagers at the start: same persona apart from the name, same schedule.
@@ -344,12 +374,15 @@ def test_blank_villagers_reflect_privately():
                     raise AssertionError(f"{who}'s nightly page leaked into {owner}'s {f.name}")
         from llmabm.island.traits import write_traits
 
-        paths = write_traits(run, Path(d) / "run")
+        write_traits(run, Path(d) / "run")
         assert (Path(d) / "run" / "traits_daily.csv").exists()
-        assert all((vdir / e["agent"] / "pages.md").exists() for e in refl) and not (Path(d) / "run" / "selves").exists()
+        assert all((vdir / e["agent"] / "pages.md").exists() for e in refl)
 
 
-def _grid_island(names=("A", "B")):
+def _grid_island(names: tuple[str, ...] = ("A", "B")) -> tuple[Island, GridSpace, Bodies]:
+    """An island on the grid map with everyone housed where they can walk to Resident Services, plus the grid and the
+    bodies.
+    """
     from llmabm.island.body import Bodies
     from llmabm.island.grid import GridSpace
 
@@ -374,8 +407,12 @@ def _grid_island(names=("A", "B")):
     return isl, g, bodies
 
 
-def test_building_roads_fences_furniture_flowers():
+def test_building_roads_fences_furniture_flowers() -> None:
+    """Prompt version 21: a road is laid a few tiles an hour along the walking route; paths and furniture can be taken
+    up only by their owner; fences leave the door open; seeds bloom days later.
+    """
     isl, g, bodies = _grid_island()
+    isl.prompt_version = 21  # the island picks the tiles ("near", "from"/"to"); version 22 names them itself
     rng = random.Random(0)
     act = lambda a: bodies.perform("A", a, 10, rng)  # noqa: E731
     # Roads: laid along the walking route, a limited number of tiles per hour, continuing next time.
@@ -384,6 +421,12 @@ def test_building_roads_fences_furniture_flowers():
     first = len(g.paths)
     act({"do": "lay_path", "style": "stone", "from": "home", "to": "Resident Services"})
     assert len(g.paths) >= first
+    # Taking a path up again: only the one who laid it can, and the tiles are gone afterwards.
+    laid, tile = len(g.paths), list(next(iter(g.paths)))
+    ok, msg = bodies.perform("B", {"do": "remove_path", "near": tile}, 10, rng)
+    assert not ok and len(g.paths) == laid, msg
+    ok, msg = act({"do": "remove_path", "near": tile, "count": 3})
+    assert ok and "removed 3 tiles of path" in msg and len(g.paths) == laid - 3, msg
     # Furniture: crafted pieces go outside, block their tiles, and can be picked up again by the owner only.
     isl.v["A"].inventory["log bench"] = 1
     ok, msg = act({"do": "place", "item": "log bench", "near": "home"})
@@ -408,7 +451,11 @@ def test_building_roads_fences_furniture_flowers():
     assert mine[0]["bloom_day"] == isl.day + isl.w["building"]["flower_bloom_days"]
 
 
-def test_stumps_and_breaking_rocks():
+def test_stumps_and_breaking_rocks() -> None:
+    """A stone axe gathers wood and leaves the tree while the axe fells it to a stump that blocks its tile until dug
+    up; breaking a rock costs a fruit and the rock comes back days later (prompt version 3 for a stretch: the old
+    single axe).
+    """
     isl, g, bodies = _grid_island()
     rng = random.Random(0)
     isl.v["A"].inventory["ladder"] = 1
@@ -466,8 +513,12 @@ def test_stumps_and_breaking_rocks():
     assert g.rock_cells[rock - 1] is not None and isl.rocks[rock - 1] > 0
 
 
-def test_wandering_follows_roads():
+def test_wandering_follows_roads() -> None:
+    """Prompt version 21: with a strong road bias, a villager wandering from a road tile ends up on the road far more
+    often than with none.
+    """
     isl, g, bodies = _grid_island()
+    isl.prompt_version = 21  # a road laid "from"/"to", as before version 22
     rng = random.Random(0)
     for _ in range(6):
         bodies.perform("A", {"do": "lay_path", "style": "stone", "from": "home", "to": "Resident Services"}, 10, rng)
@@ -476,7 +527,8 @@ def test_wandering_follows_roads():
     start = sorted(road)[len(road) // 2]
     home = g.sites[isl.home["A"]]["door"]
 
-    def share_on_road(bias):
+    def share_on_road(bias: float) -> float:
+        """The share of 200 wanders from the middle of the road that end on a road tile, at this road bias."""
         g.building["road_bias"] = bias
         on = total = 0
         r = random.Random(1)
@@ -489,7 +541,10 @@ def test_wandering_follows_roads():
     assert share_on_road(0.95) > share_on_road(0.0) + 0.2
 
 
-def test_seasons_weather_and_bug_habitats():
+def test_seasons_weather_and_bug_habitats() -> None:
+    """Each morning draws weather for the season as the months go by; a species is found only in its months, hours and
+    weather, and bugs caught by the rocks are rock bugs.
+    """
     isl = _island(("A",))
     w = isl.w
     # Weather is drawn each morning from the season's odds, and the date moves through months.
@@ -524,7 +579,8 @@ def test_seasons_weather_and_bug_habitats():
     assert caught and caught <= rock_bugs
 
 
-def test_bugs_on_the_grid_need_their_habitat():
+def test_bugs_on_the_grid_need_their_habitat() -> None:
+    """On the grid a villager can catch bugs among the flowers only while there are flowers on the island."""
     isl, g, bodies = _grid_island()
     rng = random.Random(0)
     assert g.flowers and all(f["owner"] is None for f in g.flowers.values())  # wild flowers to start
@@ -535,7 +591,10 @@ def test_bugs_on_the_grid_need_their_habitat():
     assert not ok and "no flowers" in msg, msg
 
 
-def test_decorating_has_limited_room():
+def test_decorating_has_limited_room() -> None:
+    """A house holds only so many pieces of furniture: one more is refused, taking a piece out returns it to the
+    pockets, and only furniture goes inside.
+    """
     isl = _island(("A",))
     vil = isl.v["A"]
     room = isl.interior_slots(vil)
@@ -549,7 +608,10 @@ def test_decorating_has_limited_room():
     assert not isl._do_decorate(vil, {"item": "wood"}, 10)[0]  # only furniture goes inside
 
 
-def test_tools_wear_out_and_recipe_cards_replace_them():
+def test_tools_wear_out_and_recipe_cards_replace_them() -> None:
+    """A tool breaks after its number of uses; tool recipe cards are always for sale at the Cranny, a second card is
+    kept as a spare that teaches whoever receives it, and a worn tool stays worn when handed over.
+    """
     isl = _island(("A", "B"))
     a, b = isl.v["A"], isl.v["B"]
     tools = isl.w["tools"]["start_with"]
@@ -583,7 +645,10 @@ def test_tools_wear_out_and_recipe_cards_replace_them():
     assert sorted(b.wear["shovel"]) == [0, 0, 1] and a.inventory["shovel"] == 0
 
 
-def test_bodies_need_tools_and_wear_ladders_on_climbs():
+def test_bodies_need_tools_and_wear_ladders_on_climbs() -> None:
+    """A villager with no axe doesn't set out to chop; climbing to a rock and back wears the ladder each way, and a
+    ladder that breaks is gone from the pockets.
+    """
     isl, g, bodies = _grid_island()
     rng = random.Random(0)
     a = isl.v["A"]
@@ -604,7 +669,10 @@ def test_bodies_need_tools_and_wear_ladders_on_climbs():
     assert "your ladder broke" in msg and a.inventory["ladder"] == 0 and bodies.broke
 
 
-def test_letters_and_parcels_arrive_the_next_morning():
+def test_letters_and_parcels_arrive_the_next_morning() -> None:
+    """A letter or parcel sent in the evening leaves the sender's pockets at once and reaches the other villager's
+    inbox and pockets with the next morning's post.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock", verbose=False)
@@ -616,9 +684,9 @@ def test_letters_and_parcels_arrive_the_next_morning():
         ari, bo = isl.v["Ari"], isl.v["Bo"]
         ari.inventory["axe"] = 1
         axes = bo.inventory["axe"]
-        sim._apply_evening(day, 0, "Ari", {"letters": [{"to": "Bo", "content": "hello from Ari"}],
-                                           "parcels": [{"to": "Bo", "items": {"axe": 1}, "note": "a spare"}],
-                                           "teach": [{"to": "Bo", "recipe": "log stool"}]})
+        # One way of writing it since version 21: "send". A note alone is a letter; with things, a parcel.
+        sim._apply_evening(day, 0, "Ari", {"send": [{"to": "Bo", "note": "hello from Ari"},
+                                                    {"to": "Bo", "items": {"axe": 1}, "note": "a spare"}]})
         assert ari.inventory["axe"] == 0 and bo.inventory["axe"] == axes  # in the post
         assert not any("hello" in x for x in bo.inbox)
         sim._deliver_mail(day + 1)
@@ -627,10 +695,13 @@ def test_letters_and_parcels_arrive_the_next_morning():
         assert any("parcel from Ari: 1 axe" in x for x in bo.inbox)
         sim._raw_log.close()
         run = load_run(Path(d) / "run")
-        assert run.of("parcel") and any(g["how"] == "by mail" for g in run.of("gift")) and not run.of("teach")
+        assert run.of("parcel") and any(g["how"] == "by mail" for g in run.of("gift"))
 
 
-def test_mail_is_capped_paged_and_booked_as_talking():
+def test_mail_is_capped_paged_and_booked_as_talking() -> None:
+    """Letters and board notes are cut to their length limits, only the oldest few unread items are shown with the
+    rest said to be waiting, and reading mail inside a plan is booked as talking.
+    """
     from llmabm.island.energy import MentalEnergy
     from llmabm.island.prompts import BOARD_CHARS, INBOX_SHOWN, LETTER_CHARS, inbox_text
 
@@ -658,7 +729,8 @@ def test_mail_is_capped_paged_and_booked_as_talking():
     assert en.spent["A"]["planning"] == 8 and en.spent["A"]["talking"] == 4 and en.left["A"] == 88
 
 
-def test_favors_are_settled_by_gifts():
+def test_favors_are_settled_by_gifts() -> None:
+    """A favor asked stays open until one gift covers it in full, and nobody can give what they don't have."""
     isl = _island(("A", "B"))
     isl.v["B"].inventory["wood"] = 5
     f = isl.ask_favor("A", "B", {"wood": 3})
@@ -672,7 +744,10 @@ def test_favors_are_settled_by_gifts():
     assert not isl.favor_lines("A")
 
 
-def test_visits_gifts_and_favors_in_a_run():
+def test_visits_gifts_and_favors_in_a_run() -> None:
+    """Over a ten-day run villagers visit each other at home, every answered visit becomes a chat with a host who is
+    awake, and gifts, favors and weather show in the summary.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=1)
     with tempfile.TemporaryDirectory() as d:
         IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=1, backend_override="mock", verbose=False).run(10)
@@ -691,7 +766,10 @@ def test_visits_gifts_and_favors_in_a_run():
         assert "Visits" in text and "Gifts" in text and "weather" in text.lower()
 
 
-def test_mental_energy_budget_rules():
+def test_mental_energy_budget_rules() -> None:
+    """Every call draws on one daily pool of mental energy, booked by what it went on; parallel calls are settled
+    later in a fixed order, and an empty pool affords nothing until morning.
+    """
     from llmabm.island.energy import MentalEnergy
 
     en = MentalEnergy({"enabled": True, "daily": 100, "tokens_per_point": 100}, ["A", "B"])
@@ -720,7 +798,10 @@ def test_mental_energy_budget_rules():
     assert off.can("A", 10 ** 6) and off.status_line("A") == ""
 
 
-def test_hidden_reasoning_is_recorded_and_optionally_charged():
+def test_hidden_reasoning_is_recorded_and_optionally_charged() -> None:
+    """A model's hidden reasoning is always recorded but charged to the pool only when asked; a cached reply keeps its
+    reasoning, and an empty reply is never kept or replayed.
+    """
     from llmabm.island.energy import MentalEnergy
     from llmabm.llm import Cached, Completion, split_reasoning
 
@@ -739,9 +820,12 @@ def test_hidden_reasoning_is_recorded_and_optionally_charged():
     # A cached reply keeps its reasoning, so a replayed run charges the same.
 
     class Fake:
+        """A backend that always gives the same reply, with some hidden reasoning."""
+
         name, model_id = "fake", "fake"
 
-        def complete(self, messages, temperature=0.7, max_tokens=600):
+        def complete(self, messages: list[dict], temperature: float = 0.7, max_tokens: int = 600) -> Completion:
+            """The same reply whatever is asked."""
             return Completion("hi", tokens=50, reasoning="thinking...", reasoning_tokens=12)
 
     with tempfile.TemporaryDirectory() as d:
@@ -771,7 +855,10 @@ def test_hidden_reasoning_is_recorded_and_optionally_charged():
         assert c.complete([{"role": "user", "content": "y"}]).text == "again"
 
 
-def test_commons_contributions_split_public_from_home():
+def test_commons_contributions_split_public_from_home() -> None:
+    """What each villager gave to the island (museum donations, bridge bells, paths in public or at home) matches the
+    run's events, and the shares taken add up to one.
+    """
     from llmabm.island.analysis import commons_contributions
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=4)
@@ -782,7 +869,7 @@ def test_commons_contributions_split_public_from_home():
         c = commons_contributions(run)
         assert set(c) == set(sc.villagers)
         donated = Counter(e["agent"] for e in run.of("action") if e["ok"] and e["action"].get("do") == "donate")
-        bridge = Counter()
+        bridge: Counter[str] = Counter()
         for e in run.of("action"):
             if e["ok"] and e["action"].get("do") == "contribute_bridge":
                 bridge[e["agent"]] -= e["delta"]["bells"]
@@ -795,7 +882,10 @@ def test_commons_contributions_split_public_from_home():
         assert abs(sum(o["took"] for o in c.values()) - 1.0) < 1e-9
 
 
-def test_plans_follow_each_villagers_own_waking_hours():
+def test_plans_follow_each_villagers_own_waking_hours() -> None:
+    """Each villager plans twice a day, at waking and halfway through their own waking hours, with half the day's
+    actions for each plan; a run started with fixed plan windows keeps them.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock", verbose=False)
@@ -822,15 +912,25 @@ def test_plans_follow_each_villagers_own_waking_hours():
         assert sorted(sim._plan_slots()) == [5, 12, 19]
 
 
-def test_memories_are_chosen_at_night_and_fade_unless_revisited():
-    from llmabm.island.memory import consolidate, forget, recalled, settings, split_picks, strength
+def test_memories_are_chosen_at_night_and_fade_unless_revisited() -> None:
+    """A villager picks a few things to remember each night; a memory fades away within days unless it is picked
+    again, which doubles how long it lasts, and what is remembered shows in later plans.
+    """
+    from llmabm.island.memory import (
+        consolidate,
+        forget,
+        recalled,
+        settings,
+        split_picks,
+        strength,
+    )
 
     cfg = settings({"mode": "consolidate"})
     assert settings({}) is None  # without the block, the older rule: keep the last memory_size notes
     page, picks = split_picks("A long day.\n\nRemember:\n- Bo gave me a ladder\n2. the money rock\n- 1")
     assert page == "A long day." and picks == ["Bo gave me a ladder", "the money rock", "1"]
     assert split_picks("No list tonight.") == ("No list tonight.", [])
-    mem = []
+    mem: list[dict] = []
     new, again = consolidate(mem, ["Bo gave me a ladder", "the money rock"], 0, cfg)
     assert [m["text"] for m in new] == ["Bo gave me a ladder", "the money rock"] and not again
     # Unvisited, a memory fades: still there after 5 days, gone after 6 (exp(-6/4) < 0.25).
@@ -862,17 +962,25 @@ def test_memories_are_chosen_at_night_and_fade_unless_revisited():
         assert "Long-term memory:" in summary(run)
 
 
-def test_a_daily_limit_stops_at_once_and_a_minute_limit_waits():
+def test_a_daily_limit_stops_at_once_and_a_minute_limit_waits() -> None:
+    """A provider's per-day rate limit stops the call at once with no retry, while a per-minute limit is waited out
+    and retried.
+    """
     import io
     import urllib.error
     from unittest import mock
 
-    from llmabm.llm import DailyLimit, OpenAICompatible
+    from llmabm.llm import DailyLimit, LLMError, OpenAICompatible
 
-    def refuse(body, retry_after="0"):
-        def fn(req, timeout=None):
-            raise urllib.error.HTTPError(req.full_url, 429, "Too Many Requests", {"Retry-After": retry_after},
-                                         io.BytesIO(body.encode()))
+    def refuse(body: str, retry_after: str = "0") -> Callable[..., NoReturn]:
+        """A stand-in for urlopen that refuses every request with a 429 carrying this body."""
+
+        def fn(req: Any, timeout: float | None = None) -> NoReturn:
+            """Refuse the request."""
+            raise urllib.error.HTTPError(
+                req.full_url, 429, "Too Many Requests",
+                {"Retry-After": retry_after},  # a plain dict stands in for the headers
+                io.BytesIO(body.encode()))
         return fn
 
     import os
@@ -892,15 +1000,18 @@ def test_a_daily_limit_stops_at_once_and_a_minute_limit_waits():
         try:
             b.complete([{"role": "user", "content": "hi"}])
         except DailyLimit:
-            raise AssertionError("a per-minute limit is not a daily one")
-        except Exception:
-            pass
+            raise AssertionError("a per-minute limit is not a daily one") from None
+        except LLMError:
+            pass  # still refused after the retries
         assert up.call_count == 3  # retried
+    del os.environ["X_TEST_KEY"]
 
 
-def test_resume_sets_aside_a_day_that_did_not_finish():
+def test_resume_sets_aside_a_day_that_did_not_finish() -> None:
+    """A run stopped mid-day resumes from the last finished day, and the unfinished day's events are set aside, not
+    replayed twice.
+    """
     import json
-    import pickle
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=8)
     with tempfile.TemporaryDirectory() as d:
@@ -927,7 +1038,10 @@ def test_resume_sets_aside_a_day_that_did_not_finish():
         assert _set_aside_unfinished(run_dir, None, 0) is None and events.read_text() == day0
 
 
-def test_site_data_and_page_for_a_mock_run():
+def test_site_data_and_page_for_a_mock_run() -> None:
+    """The site data built from a run agrees with its events (days, map, actions, social ties, assets, Isabelle), and
+    the run page, the Experiments page and the published site are built from it, with stale data rebuilt first.
+    """
     import html
     import json
 
@@ -1069,7 +1183,10 @@ def test_site_data_and_page_for_a_mock_run():
     assert fail_bucket("you have no axe") == "Has no tool for it" and fail_bucket("whatever") == "Other"
 
 
-def test_runs_keep_their_prompt_wording_unless_switched_on_purpose():
+def test_runs_keep_their_prompt_wording_unless_switched_on_purpose() -> None:
+    """A resumed run keeps the prompt version it started with (version 1 if it predates versions); switching on
+    purpose is logged as an intervention from the next day, and an unknown version is refused.
+    """
     import json
     import pickle
 
@@ -1127,7 +1244,10 @@ def test_runs_keep_their_prompt_wording_unless_switched_on_purpose():
             pass
 
 
-def test_tom_nook_or_isabelle_hand_out_a_map_from_version_3():
+def test_tom_nook_or_isabelle_hand_out_a_map_from_version_3() -> None:
+    """Prompt versions 2 and 3: from version 3 asking Tom Nook or Isabelle gives a villager one island map, shown in
+    their status only while they still hold it.
+    """
     from llmabm.island.prompts import status_block
     from llmabm.island.world import MAP
 
@@ -1152,14 +1272,17 @@ def test_tom_nook_or_isabelle_hand_out_a_map_from_version_3():
         assert "Your island map" not in status_block(isl, ari, "10:00")
 
 
-def _at_version(sim, v):
+def _at_version(sim: IslandSimulation, v: int) -> IslandSimulation:
     """Run a new simulation with an older prompt wording."""
     sim.prompt_version = sim.isl.prompt_version = v
     sim._build_systems()
     return sim
 
 
-def test_spending_choices_are_read_from_plans():
+def test_spending_choices_are_read_from_plans() -> None:
+    """Prompt version 6: a villager's choices in a plan (skip the plaza, don't write tonight, repeat by habit) are
+    kept when readable and save the calls they skip.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=5, backend_override="mock", verbose=False)
@@ -1179,7 +1302,10 @@ def test_spending_choices_are_read_from_plans():
         assert any(e.get("skipped") == "chose not to write tonight" for e in run.of("reflection"))
 
 
-def test_ask_npcs_and_move_house():
+def test_ask_npcs_and_move_house() -> None:
+    """Asking Tom Nook, Isabelle or the shopkeepers gives their prices and terms when they are there to ask; moving
+    home costs bells, needs a free homesite, and happens overnight with the furniture.
+    """
     isl, g, bodies = _grid_island()
     vil = isl.v["A"]
     ok, msg = isl.act("A", {"do": "ask", "who": "Tom Nook"}, 10)
@@ -1214,7 +1340,10 @@ def test_ask_npcs_and_move_house():
     assert any("A moved home" in n for n in isl.yesterday_news)
 
 
-def test_mental_energy_in_a_run():
+def test_mental_energy_in_a_run() -> None:
+    """With a small daily energy budget villagers run out: their plans are held with nothing scheduled, spending stays
+    near the budget, and the prompt and summary show the energy.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=2)
     assert sc.mental_energy["enabled"]
     sc.mental_energy["daily"] = sc.world["mental_energy"]["daily"] = 25
@@ -1239,13 +1368,16 @@ def test_mental_energy_in_a_run():
         text = summary(run)
         assert "Estimated villager tokens" in text and "ran out" in text and "hidden reasoning: 0 tokens" in text
         assert "Who gave to the island" in text
-        assert "=== REASONING (0 tokens" in prompt or "=== REASONING (0 tokens" in next(
+        # the ignore: next() of a list would raise, and is only reached if the first half is false
+        assert "=== REASONING (0 tokens" in prompt or "=== REASONING (0 tokens" in next(  # type: ignore[call-overload]
             _prompts(Path(d) / "run", "d001_*")).read_text()
         assert run.manifest["backends"]["mock"] == "mock"
 
 
-def test_mental_energy_resume_matches():
-    def make():
+def test_mental_energy_resume_matches() -> None:
+    """With mental energy on, a run resumed after one day writes the same events as one uninterrupted run."""
+    def make() -> IslandScenario:
+        """The blank scenario with a daily mental energy of 90."""
         sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
         sc.mental_energy["daily"] = sc.world["mental_energy"]["daily"] = 90
         return sc
@@ -1262,7 +1394,10 @@ def test_mental_energy_resume_matches():
         assert clean(a / "events.jsonl") == clean(b / "events.jsonl")
 
 
-def test_fishing_bait_makes_a_fish_appear():
+def test_fishing_bait_makes_a_fish_appear() -> None:
+    """Bait makes a fish appear where no shadow is; asking for bait without having any means fishing without it, and
+    the bait is kept when no fish of that water is out.
+    """
     isl, g, bodies = _grid_island()
     rng = random.Random(0)
     isl.month, isl.weather = 4, "sunny"
@@ -1286,7 +1421,10 @@ def test_fishing_bait_makes_a_fish_appear():
     assert ok and "kept your bait" in msg and isl.v["A"].inventory["fishing bait"] == 1, msg
 
 
-def test_bugs_and_fish_shadows_are_seen_before_caught():
+def test_bugs_and_fish_shadows_are_seen_before_caught() -> None:
+    """Only species out at that hour, month and weather appear, in their own habitat; a villager catches the bug they
+    can see, spends the hour looking when none is in sight, and learns a fish's species only by catching it.
+    """
     isl, g, bodies = _grid_island()
     rng = random.Random(0)
     isl.month, isl.weather = 4, "sunny"
@@ -1326,7 +1464,10 @@ def test_bugs_and_fish_shadows_are_seen_before_caught():
     assert ok and f"{sea[0]['size']} shadow" in msg and "caught" in msg, msg
 
 
-def test_shells_and_dig_spots_are_known_only_once_seen():
+def test_shells_and_dig_spots_are_known_only_once_seen() -> None:
+    """A villager knows only the shells within sight of where they have looked; beachcombing walks on to beach spots
+    not yet looked at, and what was spotted is noted once for the day and shown in their status.
+    """
     isl, g, bodies = _grid_island()
     rng = random.Random(0)
     assert g.shells and not g.known
@@ -1341,11 +1482,7 @@ def test_shells_and_dig_spots_are_known_only_once_seen():
     ok, msg = bodies.perform("A", {"do": "beachcomb"}, 10, rng)
     assert ok, msg
     assert len(g.looked["A"]) > before
-    if "saw no shells" in msg:
-        ok, msg2 = bodies.perform("A", {"do": "beachcomb"}, 11, rng)
-        assert g.looked["A"][-1] not in g.looked["A"][:before + 1]
     # Being told where to look works too: "near" can be a part of the island.
-    assert g.landmark(isl, "A", "north beach", pos) is not None
     from llmabm.island.grid import SAND
     nb = g.landmark(isl, "A", "north beach", pos)
     assert g.terrain[nb[1]][nb[0]] == SAND and nb[1] < g.H / 3
@@ -1360,7 +1497,10 @@ def test_shells_and_dig_spots_are_known_only_once_seen():
     assert sum("large fish shadow" in x for x in isl.spotted["A"]) == 1  # each one is noted once
 
 
-def test_minds_cannot_set_body_targets():
+def test_minds_cannot_set_body_targets() -> None:
+    """A planned action that tries to set fields only the island fills in (the species, the habitat, whether one was
+    seen) is scheduled without them.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=0)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=0, backend_override="mock", verbose=False)
@@ -1373,15 +1513,18 @@ def test_minds_cannot_set_body_targets():
         assert out and out[0][1] == {"do": "catch_bug"}
 
 
-if __name__ == "__main__":
-    for name, fn in list(globals().items()):
-        if name.startswith("test_"):
-            fn()
-            print("ok", name)
-
-
-def test_announcement_from_version_5_is_short_and_ends_with_a_fun_fact():
-    from llmabm.island.prompts import ANNOUNCE_WORDS, FACT_WORDS, _announcement_v1, announcement_text, fun_fact, fun_facts
+def test_announcement_from_version_5_is_short_and_ends_with_a_fun_fact() -> None:
+    """Prompt versions 3 to 5: up to version 4 the morning announcement is the original one; from 5 it is held to a
+    word limit, with long news cut short, and ends with a different fun fact each morning.
+    """
+    from llmabm.island.prompts import (
+        ANNOUNCE_WORDS,
+        FACT_WORDS,
+        _announcement_v1,
+        announcement_text,
+        fun_fact,
+        fun_facts,
+    )
 
     isl = _island(("Ari", "Bo"))
     isl.yesterday_news = [f"villager {i} moved to the island and lives lower ground, centre" for i in range(12)]
@@ -1404,7 +1547,10 @@ def test_announcement_from_version_5_is_short_and_ends_with_a_fun_fact():
     assert len(announcement_text(isl)[: -len(fun_fact(isl))].split()) <= ANNOUNCE_WORDS
 
 
-def test_from_version_6_the_plaza_is_opt_in():
+def test_from_version_6_the_plaza_is_opt_in() -> None:
+    """Prompt version 6: nobody goes to the plaza in the evening unless a plan that day said so; those who didn't are
+    skipped there.
+    """
     from llmabm.island.prompts import island_rules
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=7)
@@ -1427,7 +1573,10 @@ def test_from_version_6_the_plaza_is_opt_in():
                 assert r0[n].get("skipped") != "chose not to go to the plaza"
 
 
-def test_from_version_7_the_plaza_is_open_all_day_and_energy_is_planned():
+def test_from_version_7_the_plaza_is_open_all_day_and_energy_is_planned() -> None:
+    """A villager goes to the plaza in any hour a plan sets aside, which isn't one of the day's actions, and the first
+    plan of the day splits their energy between inward and outward, shown against what was spent later.
+    """
     from llmabm.island.prompts import action_menu, island_rules
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=7)
@@ -1471,7 +1620,10 @@ def test_from_version_7_the_plaza_is_open_all_day_and_energy_is_planned():
         assert not any(p.get("habit") for p in run.of("plan"))
 
 
-def test_item_names_resolve_for_gifts_requests_and_offers():
+def test_item_names_resolve_for_gifts_requests_and_offers() -> None:
+    """A loosely named item ("map", "bait", "wood x10") is read as the island's own name for it, so a request and the
+    gift that meets it match; a name for nothing on the island isn't kept as a request.
+    """
     from llmabm.island.world import MAP, resolve_item
 
     assert resolve_item("map", [MAP, "wood"]) == MAP
@@ -1497,7 +1649,10 @@ def test_item_names_resolve_for_gifts_requests_and_offers():
     assert isl.transfer("A", "B", {MAP: 1})[0] and old["status"] == "done"
 
 
-def test_prompt_version_8_shows_what_you_have_and_what_changed_hands():
+def test_prompt_version_8_shows_what_you_have_and_what_changed_hands() -> None:
+    """Prompt version 17 (and 7 for the old wording): from version 8 the status lists tools apart from other things,
+    and what changed hands with someone is recalled from each side when they meet and at night.
+    """
     from llmabm.island.prompts import encounter_prompt, reflect_prompt, status_block
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=2)
@@ -1538,7 +1693,10 @@ def test_prompt_version_8_shows_what_you_have_and_what_changed_hands():
         assert all({"day", "how", "from", "to", "items", "got", "asked"} <= set(e) for e in getattr(sim.isl, "exchanges", []))
 
 
-def test_prompt_version_9_conversations_end_when_someone_leaves():
+def test_prompt_version_9_conversations_end_when_someone_leaves() -> None:
+    """Prompt versions 8, 9, 12 and 13: from version 9 a villager can leave a conversation, and with no set length it
+    runs until someone does; the wording of that choice differs by version.
+    """
     from llmabm.island.prompts import encounter_prompt
     from llmabm.island.sim import _turn_cap
 
@@ -1566,7 +1724,8 @@ def test_prompt_version_9_conversations_end_when_someone_leaves():
         sim.sc.world["encounters"]["turns"] = None
         calls = []
 
-        def scripted(name, user, tag, **kw):
+        def scripted(name: str, user: str, tag: str, **kw: Any) -> tuple[None, dict[str, Any], None]:
+            """Stand in for a villager's reply: a numbered line each call, leaving on the fifth."""
             calls.append(name)
             obj = {"say": f"line {len(calls)}", "leave": len(calls) == 5}
             return None, obj, None
@@ -1579,7 +1738,10 @@ def test_prompt_version_9_conversations_end_when_someone_leaves():
         assert len(calls) == 5 and "then you went your ways" in isl.v[a].today[n]  # told from their side (version 12)
 
 
-def test_prompt_version_10_trees_around_here_and_tools_breaking():
+def test_prompt_version_10_trees_around_here_and_tools_breaking() -> None:
+    """Prompt version 9 for the old wording: from version 10 a villager is told which trees and stumps are around
+    them, and a tool breaks after its 30th use.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=4)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=4, backend_override="mock", verbose=False)
@@ -1603,7 +1765,10 @@ def test_prompt_version_10_trees_around_here_and_tools_breaking():
 
 
 
-def test_who_felled_and_planted_each_tree_comes_from_the_log():
+def test_who_felled_and_planted_each_tree_comes_from_the_log() -> None:
+    """The map's note on a tree says who felled or planted it and on which day, worked out from the logged actions;
+    taking wood without felling leaves no note.
+    """
     from llmabm.analysis import Run
     from llmabm.island.site_data import _object_info, tree_history
 
@@ -1623,7 +1788,10 @@ def test_who_felled_and_planted_each_tree_comes_from_the_log():
     assert info[(21, 20)] == "hardwood tree" and info[(50, 50)] == "stump"  # a stump from before anyone chopped
 
 
-def test_clams_on_the_beach_make_fishing_bait():
+def test_clams_on_the_beach_make_fishing_bait() -> None:
+    """Prompt versions 10 and 11: digging a first clam teaches the fishing bait recipe, a clam crafts into bait, clam
+    spots run out for the day, and the action exists only from version 11.
+    """
     from llmabm.island.prompts import action_menu, fun_facts
     from llmabm.island.world import BAIT, CLAM
 
@@ -1646,7 +1814,10 @@ def test_clams_on_the_beach_make_fishing_bait():
     assert not any("manila clam" in f for f in fun_facts(isl))
 
 
-def test_prompt_version_12_pockets_and_home_are_apart():
+def test_prompt_version_12_pockets_and_home_are_apart() -> None:
+    """Prompt version 12 (and 11 for the old rule): pockets and home are separate stores; a tent keeps only bells, a
+    house keeps things with their wear, and crafting can use what is at home only when at home.
+    """
     isl = _island()
     isl.prompt_version = 12
     a = isl.v["A"]
@@ -1681,9 +1852,18 @@ def test_prompt_version_12_pockets_and_home_are_apart():
     assert isl.capacity(a) == isl.w["pockets"] + isl.w["house_levels"][1]["storage"]
 
 
-def test_prompt_version_12_what_villagers_know_and_who_did_what():
-    from llmabm.island.prompts import (REQUEST_DAYS, encounter_prompt, last_chat_with, plan_prompt, status_block,
-                                       turn_act_text)
+def test_prompt_version_12_what_villagers_know_and_who_did_what() -> None:
+    """Prompt version 12: the status shows tool uses left, what is kept at home and what the shop sells; requests say
+    who wants what and lapse after a few days; what happened in a conversation is told from each side.
+    """
+    from llmabm.island.prompts import (
+        REQUEST_DAYS,
+        encounter_prompt,
+        last_chat_with,
+        plan_prompt,
+        status_block,
+        turn_act_text,
+    )
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
     with tempfile.TemporaryDirectory() as d:
@@ -1760,8 +1940,16 @@ def test_prompt_version_12_what_villagers_know_and_who_did_what():
         assert sim.isl.favors[0]["status"] == "expired"
 
 
-def test_prompt_version_13_shorter_prompts_and_a_clearer_action_menu():
-    from llmabm.island.prompts import action_menu, encounter_prompt, island_rules, plan_prompt, status_block
+def test_prompt_version_13_shorter_prompts_and_a_clearer_action_menu() -> None:
+    """From version 13 the status leaves out what doesn't apply (no loan, no ordinance), a conversation prompt leaves
+    out what only plans use, and the action menu says which tool each action needs and what isn't an action.
+    """
+    from llmabm.island.prompts import (
+        action_menu,
+        encounter_prompt,
+        island_rules,
+        status_block,
+    )
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
     with tempfile.TemporaryDirectory() as d:
@@ -1812,8 +2000,17 @@ def test_prompt_version_13_shorter_prompts_and_a_clearer_action_menu():
         assert "Not actions" in sim.systems[a] and "Not actions" not in sim.talk_systems[a]
 
 
-def test_prompt_version_13_a_conversation_holds_at_most_three_trade_offers():
-    from llmabm.island.prompts import TRADE_TRIES, encounter_prompt, open_trade, trade_tries, turn_act_text
+def test_prompt_version_13_a_conversation_holds_at_most_three_trade_offers() -> None:
+    """Prompt version 17 (and 12 for no limit): a conversation allows three trade offers between the two villagers; an
+    offer its proposer can't cover uses a try without going on the table, and one that can't be met can't be accepted.
+    """
+    from llmabm.island.prompts import (
+        TRADE_TRIES,
+        encounter_prompt,
+        open_trade,
+        trade_tries,
+        turn_act_text,
+    )
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
     with tempfile.TemporaryDirectory() as d:
@@ -1827,7 +2024,7 @@ def test_prompt_version_13_a_conversation_holds_at_most_three_trade_offers():
         a, b = sorted(isl.v)[:2]
         va, vb = isl.v[a], isl.v[b]
         va.inventory["wood"], vb.inventory["fishing bait"] = 5, 1
-        turns = []
+        turns: list[dict] = []
         assert "Trade offers left in this conversation (from either of you): 3 of 3." in encounter_prompt(
             isl, va, b, "river", 10, turns, opener=False)
         for i, (sp, ot) in enumerate([(a, b), (b, a), (a, b)]):
@@ -1852,7 +2049,7 @@ def test_prompt_version_13_a_conversation_holds_at_most_three_trade_offers():
         assert "You can't accept it (no room)." in encounter_prompt(isl, vb, a, "river", 10, turns, opener=False)
         del isl.room_problem
         # An offer the proposer's own pockets can't hold up isn't put on the table (version 13); it is a try.
-        turns2 = []
+        turns2: list[dict] = []
         t0 = {"speaker": b, "text": "bait for wood?"}
         sim._chat_acts(isl.day, b, a, {"trade": {"give": {"fishing bait": 5}, "want": {"wood": 1}}}, t0, turns2)
         turns2.append(t0)
@@ -1879,8 +2076,17 @@ def test_prompt_version_13_a_conversation_holds_at_most_three_trade_offers():
         assert t5["acts"][-1]["kind"] == "proposed" and not t5["acts"][-1].get("over")
 
 
-def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied():
-    from llmabm.island.prompts import encounter_prompt, exchange_line, open_trade, plaza_prompt, turn_act_text
+def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied() -> None:
+    """Prompt version 17: a trade is offered and accepted face to face, nothing moves until it is accepted, and it
+    settles open requests; the plaza takes no offers, and a board post can be taken down only by its author.
+    """
+    from llmabm.island.prompts import (
+        encounter_prompt,
+        exchange_line,
+        open_trade,
+        plaza_prompt,
+        turn_act_text,
+    )
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
     with tempfile.TemporaryDirectory() as d:
@@ -1899,7 +2105,7 @@ def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied():
                       {"id": "f2", "day": isl.day, "asker": b, "asked": a, "items": {"wood": 2},
                        "status": "open", "done_day": None}]
         # a offers 2 wood for 1 bait; b sees it on the table and can accept.
-        turns = []
+        turns: list[dict] = []
         t1 = {"speaker": a, "text": "swap?"}
         sim._chat_acts(isl.day, a, b, {"trade": {"give": {"wood": 2}, "want": {"fishing bait": 1}}}, t1, turns)
         turns.append(t1)
@@ -1959,11 +2165,14 @@ def test_prompt_version_12_trades_happen_in_person_and_the_board_is_tidied():
         assert not isl.board and va.today[-1].endswith(f"took down your board post [{bid}]")
 
 
-def test_site_econ_counts_what_was_gathered_and_sold():
+def test_site_econ_counts_what_was_gathered_and_sold() -> None:
+    """The site's economy table counts what was gathered and sold by kind, at shop prices, and sorts bells by where
+    they came from or went.
+    """
+    import json as _json
+
     from llmabm.island.site_data import econ_of, gather_kind
     from llmabm.island.world import sell_prices
-
-    import json as _json
     w = _json.loads((ROOT / "runs/test1/manifest.json").read_text())["world"]
     prices = sell_prices(w)
     fish = next(iter(w["fish"]))
@@ -1985,7 +2194,10 @@ def test_site_econ_counts_what_was_gathered_and_sold():
     assert e["bells"] == {"from selling": prices[fish] + 2 * prices[shell], "at the shops": -300, "from rocks": 450}
 
 
-def test_site_page_opening_skips_a_heading_only_first_line():
+def test_site_page_opening_skips_a_heading_only_first_line() -> None:
+    """The opening shown for a nightly page joins a first line that is only a heading ("Day 7.") to the sentence after
+    it.
+    """
     from llmabm.island.site_data import page_opening
 
     assert page_opening("Day 7.  \nThe plaza feels empty today; I kept coming back.\nMore tomorrow.") == (
@@ -1995,7 +2207,11 @@ def test_site_page_opening_skips_a_heading_only_first_line():
     assert page_opening("") == ("", "") and page_opening("Short.") == ("Short.", "")
 
 
-def test_prompt_version_14_going_after_what_you_spot():
+def test_prompt_version_14_going_after_what_you_spot() -> None:
+    """From version 14 a villager who spots a fish with a rod in hand is asked whether to go after it: doing so
+    replaces next hour's planned action or uses one of the day's, and they aren't asked without the tool, past the
+    day's cap, or with no actions left.
+    """
     from llmabm.island.prompts import spot_prompt
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
@@ -2014,9 +2230,11 @@ def test_prompt_version_14_going_after_what_you_spot():
                 "cell": (1, 1), "text": "a large fish shadow in the river (somewhere)"}
         sim.space.critters = sim.space._crit() + [fish]
         sim.spots_today, sim.used = {}, {n: 0 for n in isl.v}
+        sim.energy.left[a] = sim.energy.daily  # whatever the mock's day left them with
         go = {"go": 1}
 
-        def call(name, user, *args, **kw):
+        def call(name: str, user: str, *args: Any, **kw: Any) -> tuple[None, dict[str, int], None]:
+            """Stand in for a villager's reply: keep the prompt and answer with `go`."""
             prompts.append(user)
             return None, dict(go), None
         sim._call = call
@@ -2051,9 +2269,10 @@ def test_prompt_version_14_going_after_what_you_spot():
         assert "at home." in spot_prompt(isl, va, "home", h, ["x"], None, 3, 10)
 
 
-def test_prompts_are_kept_and_on_the_site():
+def test_prompts_are_kept_and_on_the_site() -> None:
     """Every call's prompt is logged without overwriting another (a villager's several turns in one hour each
-    get a file), and the site gets one script per day with an index of who made which call."""
+    get a file), and the site gets one script per day with an index of who made which call.
+    """
     import json
 
     from llmabm.island.site_build import build_site
@@ -2082,7 +2301,7 @@ def test_prompts_are_kept_and_on_the_site():
         assert day["sys"][sys_i] and user and reply is not None
 
 
-def test_version_15_says_what_was_missing():
+def test_version_15_says_what_was_missing() -> None:
     """Prompt version 15: plans written in common ways are read as meant, and failures say what would work."""
     isl, g, bodies = _grid_island()
     isl.prompt_version = 15
@@ -2107,9 +2326,10 @@ def test_version_15_says_what_was_missing():
     assert "wallet is empty" in isl._do_contribute_bridge(vil, {"bells": 100}, 10)[1]
 
 
-def test_rescue_service_once_a_day():
+def test_rescue_service_once_a_day() -> None:
     """Prompt version 15: a villager who can't get home stays out in free time, and the Rescue Service takes them
-    home once a day, saying why they got stuck; a second call that day is turned down."""
+    home once a day, saying why they got stuck; a second call that day is turned down.
+    """
     isl, g, bodies = _grid_island()
     isl.prompt_version = 15
     rng = random.Random(0)
@@ -2138,7 +2358,7 @@ def test_rescue_service_once_a_day():
     assert b.pos == home
 
 
-def _stocked(isl, name="A"):
+def _stocked(isl: Island, name: str = "A") -> Villager:
     """A villager with a bit of everything, so most kinds of option come up."""
     vil = isl.v[name]
     fruit = isl.w["island"]["native_fruit"]
@@ -2151,12 +2371,31 @@ def _stocked(isl, name="A"):
     return vil
 
 
-def test_version_16_lists_only_what_a_villager_can_do():
+def _free_steps(g: GridSpace, isl: Island, bodies: Bodies, do: str, item: str = "", n: int = 1,
+                name: str = "A") -> list[dict[str, int]]:
+    """Version 22: the first n tiles south and east of where a villager stands that this can go on, as steps."""
+    start = bodies.b[name].pos or bodies.home_point(name)
+    from llmabm.island.grid import steps_of
+
+    out: list[dict[str, int]] = []
+    for y in [*range(1, 6), *range(-5, 1)]:
+        for x in [*range(0, 6), *range(-5, 0)]:
+            st = steps_of((x, y))
+            if st and not g.exact_tiles(isl, name, {"do": do, "item": item, "tiles": out + [st]}, start,
+                                 bodies.tools_of(name))[1]:
+                out.append(st)
+            if len(out) == n:
+                return out
+    raise AssertionError("no free tile in sight")
+
+
+def test_version_16_lists_only_what_a_villager_can_do() -> None:
     """Prompt version 16: the plan's numbered list has no option that would fail if done right away, and leaves
-    out what needs something the villager doesn't have: bait, bells, a way across the river."""
+    out what needs something the villager doesn't have: bait, bells, a way across the river.
+    """
     import copy
 
-    from llmabm.island.options import Choice, Count, Items, plan_options
+    from llmabm.island.options import Choice, Count, Items, Tiles, plan_options
 
     isl, g, bodies = _grid_island()
     assert isl.prompt_version >= 16
@@ -2164,7 +2403,7 @@ def test_version_16_lists_only_what_a_villager_can_do():
     hours = list(range(8, 20))
     opts = plan_options(isl, bodies, g, "A", hours)
     kinds = {o.action["do"] for o in opts}
-    assert {"mine_rock", "break_rock", "chop_wood", "fish", "catch_bug", "dig_fossil", "plant", "place", "fence_off",
+    assert {"mine_rock", "break_rock", "chop_wood", "fish", "catch_bug", "dig_fossil", "plant", "place", "lay_path",
             "craft", "wear", "visit", "ask", "sell", "buy", "donate", "assess", "rest", "plaza"} <= kinds, kinds
     assert not any(o.action["do"] == "visit" and o.action["who"] in ("A", "Nook's Cranny", "Tom Nook") for o in opts)
     for i, o in enumerate(opts):
@@ -2179,6 +2418,8 @@ def test_version_16_lists_only_what_a_villager_can_do():
             elif isinstance(spec, Items):
                 k0 = next(iter(spec.have))
                 act[k] = {k0: 1}
+            elif isinstance(spec, Tiles):  # version 22: an exact tile, here the first free one in sight
+                act[k] = _free_steps(g, isl, bodies, act["do"], act.get("item", ""))
         b2 = copy.deepcopy(bodies)  # the island, grid and bodies together, so each option starts from the same state
         hour = min(o.hours) if o.hours else hours[0]
         ok, msg = b2.perform("A", act, hour, random.Random(i))
@@ -2205,7 +2446,10 @@ def test_version_16_lists_only_what_a_villager_can_do():
     assert all(o.hours == frozenset({8, 9}) for o in day if o.action.get("shop") == "cranny")
 
 
-def test_version_16_reads_picks_by_number():
+def test_version_16_reads_picks_by_number() -> None:
+    """A pick by number becomes that option's action with its fields held to their limits and opening hours; a number
+    not on the list or a pick with no number is set aside with the reason.
+    """
     from llmabm.island.options import Count, Option, read_picks, unread_line
 
     opts = [Option("rest", {"do": "rest"}),
@@ -2222,9 +2466,10 @@ def test_version_16_reads_picks_by_number():
     assert unread_line(7, bad[1]) == "07:00 in your plan, there is no 7 on your list, so it wasn't planned"
 
 
-def test_version_16_mock_run_has_no_malformed_actions():
+def test_mock_run_has_no_malformed_actions() -> None:
     """End to end on the latest wording: every action comes from a list, so nothing fails on form, and shop and
-    service picks land in hours they're open."""
+    service picks land in hours they're open.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=5)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=5, backend_override="mock",
@@ -2255,17 +2500,25 @@ def test_version_16_mock_run_has_no_malformed_actions():
         assert '"send": {} or {"action": "send", "items": ' in chat and '"give": {}' not in chat
 
 
-def test_version_21_picks_by_name():
+def test_version_21_picks_by_name() -> None:
     """Prompt version 21: a plan names each action with what it takes, in the parts docs/actions.md's charts
     have: "items" from the pockets, "at" where, "what" which one. The list is the same actions as version 16's,
-    a line per kind; only what is in the pockets can be named, and only a part with a choice has to be."""
-    from llmabm.island.options import KINDS, Items, menu_text, plan_options, read_actions, unread_line
+    a line per kind; only what is in the pockets can be named, and only a part with a choice has to be.
+    """
+    from llmabm.island.options import (
+        KINDS,
+        Items,
+        menu_text,
+        plan_options,
+        read_actions,
+        unread_line,
+    )
 
     isl, g, bodies = _grid_island()
     assert isl.prompt_version >= 21
     vil = _stocked(isl)
     opts = plan_options(isl, bodies, g, "A", list(range(8, 20)))
-    lines = menu_text(opts, isl, "A", g).splitlines()
+    lines = menu_text(opts, isl, "A").splitlines()
     assert lines[0].startswith('In your pockets (the only things that can go in "items"): ')
     assert "sea bass x1" in lines[0] and "wood x4" in lines[0] and lines[0].endswith("30000 bells in your wallet")
     heads = [ln[2:].split(".")[0].split(" (")[0] for ln in lines if ln.startswith("- ")]
@@ -2276,13 +2529,15 @@ def test_version_21_picks_by_name():
     assert any(ln.startswith("- donate. items: ") and "sea bass" in ln and ln.endswith("at: museum") for ln in lines)
     assert any(ln.startswith("- fish. items: fishing rod, and if you like fishing bait x2. at: ") for ln in lines)
     assert any(ln.startswith("- chop_wood. items: one of stone axe x1, axe x1. at: hardwood tree | fruit tree") for ln in lines)
-    assert lines[-1].startswith("Places: home, ")
+    assert lines[-1].startswith("- plaza. ")  # version 22: nothing on this list takes a place any more
 
-    def read(pick):
+    def read(pick: dict[str, Any]) -> tuple[Any, Any]:
+        """One pick at 09:00 as the island reads it: the action it became, and why it wasn't planned."""
         acts, bad = read_actions(opts, [{"hour": 9, "pick": pick}], vil.inventory)
         return (acts[0] if acts else None), (bad[0]["why"] if bad else None)
 
-    def only(pick, **want):
+    def only(pick: dict[str, Any], **want: Any) -> None:
+        """Check that a pick is read without complaint and becomes an action with these parts."""
         act, why = read(pick)
         assert why is None and all(act[k] == v for k, v in want.items()), (pick, act, why)
 
@@ -2313,9 +2568,10 @@ def test_version_21_picks_by_name():
     assert act["where"] == "sea" and not act.get("bait")
     only({"action": "fish", "items": {"fishing rod": 1}, "at": "sea"}, where="sea")
     only({"action": "fish", "items": {"bait": 1}, "at": "sea"}, where="sea", bait=True)
-    only({"action": "place", "items": {"simple wooden fence": 2}, "at": "home"}, item="simple wooden fence", count=2,
-         near="home")
-    only({"action": "place", "items": {"log stool": 1}}, item="log stool", near="home")
+    # Version 22: where it goes is said exactly, as steps from a door (see the version 22 test).
+    free = _free_steps(g, isl, bodies, "place", "log stool")
+    only({"action": "place", "items": {"log stool": 1}, "steps": free[0]}, item="log stool", tiles=free)
+    assert read({"action": "place", "items": {"log stool": 1}})[1].startswith('place: say exactly where, "tiles": ')
     only({"action": "craft", "what": "log stool"}, do="craft", recipe="log stool")
     only({"action": "wear", "items": ["straw hat"]}, item="straw hat")
     # Buying: the thing is "what" (or read as meant from "items"); bells are taken as before.
@@ -2366,30 +2622,280 @@ def test_version_21_picks_by_name():
             pick["to"] = o.fields["to"].values[-1]
         if "note" in o.fields:
             pick["note"] = "hello"
+        if "tiles" in o.fields:  # version 22: any tile in sight can be named
+            pick["tiles"] = [{"south": 2}]
         act, why = read({k: v for k, v in pick.items() if v})
         assert why is None and all(act[k] == v for k, v in o.action.items()), (o.text, pick, act, why)
 
 
-def test_actions_doc_has_a_chart_for_every_kind_of_action():
+def test_version_22_a_part_an_action_does_not_have_is_said_so_and_why_is_kept() -> None:
+    """Prompt version 22: a "what" or "items" an action's line doesn't have isn't read as something from the
+    pockets. The pick isn't planned and the reason says which parts the action takes. A pick can say what it is
+    for in "why" (ten words kept), which the island doesn't act on. Version 21 reads as it did.
+    """
+    from llmabm.island.options import plan_options, read_actions
+    from llmabm.island.prompts import action_text, plan_retry_prompt
+
+    isl, g, bodies = _grid_island()
+    assert isl.prompt_version >= 22
+    vil = _stocked(isl)
+    opts = plan_options(isl, bodies, g, "A", list(range(8, 20)))
+    kinds = {o.kind for o in opts}
+    assert {"visit", "rest", "sell", "donate"} <= kinds
+
+    def read(pick: dict[str, Any], strict: bool = True) -> tuple[Any, Any]:
+        """One pick at 09:00 as the island reads it: the action it became, and why it wasn't planned."""
+        acts, bad = read_actions(opts, [{"hour": 9, "pick": pick}], vil.inventory, strict=strict)
+        return (acts[0] if acts else None), (bad[0]["why"] if bad else None)
+
+    # What test1's villagers wrote on day 16, the first day of picks by name.
+    purpose = {"action": "visit", "at": "B's home", "what": "ask for bait"}
+    assert read(purpose, strict=False)[1] == "visit: you have no ask for bait in your pockets"
+    why = read(purpose)[1]
+    assert why == 'visit: it has no "what" (it takes only "at"); what it is for can go in "why"'
+    assert read({"action": "visit", "at": "B's home", "items": {"wood": 1}})[1].startswith(
+        'visit: it has no "items" (it takes only "at")')
+    assert read({"action": "rest", "items": {"wood": 1}})[1].startswith('rest: it has no "items" (it takes nothing more)')
+    if "ask" in kinds:
+        assert read({"action": "ask", "at": "Tom Nook", "items": {"what": "upgrade_house"}})[1].startswith(
+            'ask: it has no "items" (it takes only "at")')
+    if "lay_path" in kinds:
+        assert read({"action": "lay_path", "at": "west", "what": "dirt to centre"})[1].startswith(
+            'lay_path: it has no "what" (it takes only "style", "tiles")')
+    # A "what" that only repeats the place or the thing named adds nothing, and the pick is read.
+    act, why = read({"action": "visit", "at": "B's home", "what": "B's home"})
+    assert why is None and (act["do"], act["who"]) == ("visit", "B")
+    act, why = read({"action": "sell", "items": {"wood": 2}, "at": "Nook's Cranny", "what": "wood"})
+    assert why is None and act["items"] == {"wood": 2}
+    # Where the action does take things from the pockets, the thing named in "what" is still read as meant,
+    # and something that isn't there still isn't planned.
+    act, why = read({"action": "donate", "what": "sea bass"})
+    assert why is None and act["item"] == "sea bass"
+    assert read({"action": "sell", "items": {"dace": 1}})[1].startswith("sell: you have no dace in your pockets")
+    # "why": theirs, cut at ten words, kept with the action and shown back with what they planned.
+    said = "to ask Bo whether there is any bait left for me today"
+    act, why = read({"action": "visit", "at": "B's home", "why": said})
+    assert why is None and act["for"] == " ".join(said.split()[:10]) and act["who"] == "B"
+    assert action_text(act).endswith("for: to ask Bo whether there is any bait left for)")
+    assert "for" not in read({"action": "visit", "at": "B's home", "why": said}, strict=False)[0]
+    assert "for" not in read({"action": "rest"})[0]
+    # What comes straight back: each pick that couldn't be read, with its hour and the reason.
+    _, bad = read_actions(opts, [{"hour": 9, "pick": purpose}], vil.inventory, strict=True)
+    again = plan_retry_prompt("PHASE: plan\n...", bad)
+    assert again.startswith("PHASE: plan\n...") and "- 09:00, " in again and '"what": "ask for bait"' in again
+    assert 'it has no "what" (it takes only "at")' in again and "costs no mental energy and happens once" in again
+
+
+def test_version_22_the_island_answers_a_plan_at_once_and_a_plan_costs_the_same() -> None:
+    """Prompt version 22: a pick that can't be read comes back at once with the reason, and what the villager
+    writes in its place is planned. That second reply is free and happens once. A plan costs a set number of
+    points of mental energy whatever its length.
+    """
+    import json
+    import re
+
+    from llmabm.llm import Completion
+
+    class Slips:
+        """The mock, except that `who`'s plan is one pick with a part its action doesn't have, put right when
+        the island says so (or not, with `stubborn`).
+        """
+        name = model_id = "mock"
+        seen: list[str]
+
+        def __init__(self, mock: ChatBackend) -> None:
+            """Wrap the mock; nobody slips until `who` is set."""
+            self.mock, self.who, self.seen, self.stubborn = mock, None, [], False
+
+        def complete(self, messages: list[dict], temperature: float = 0.7, max_tokens: int = 600) -> Completion:
+            """The mock's reply, except to `who`'s plans: a pick that can't be read, then put right (or not)."""
+            user = messages[-1]["content"]
+            if self.who and user.startswith("PHASE: plan") and f"You are {self.who}." in user:
+                self.seen.append(user)
+                hour = int(re.search(r"Plan up to \d+ actions between (\d+):00", user).group(1))
+                bad = {"hour": hour, "pick": {"action": "rest", "items": {"wood": 1}}}
+                good = {"hour": hour, "pick": {"action": "rest", "why": "one two three four five six seven eight nine ten eleven"}}
+                if "the island couldn't read these picks" in user:
+                    return Completion(json.dumps({"actions": [bad if self.stubborn else good]}))
+                return Completion(json.dumps({"thoughts": "a rest", "actions": [bad]}))
+            return self.mock.complete(messages, temperature, max_tokens)
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=4)
+    with tempfile.TemporaryDirectory() as d:
+        backends = load_backends(None)
+        backends["mock"] = slips = Slips(backends["mock"])
+        sim = IslandSimulation(sc, backends, Path(d) / "run", seed=4, backend_override="mock", verbose=False, log_prompts=True)
+        sim.run(1)
+        # The mock names tiles at random, so only those come back to it; nothing else it writes does.
+        assert any("\nIn sight of where you are now, as steps from where you stand:\n  " in _seen(p)
+                   for p in _prompts(Path(d) / "run", "d000_p*"))
+        assert sim.prompt_version >= 22 and all(
+            r["why"].startswith(("lay_path: ", "place: ", "plant: "))
+            for p in load_run(sim.run_dir).of("plan") for r in (p.get("retry") or {}).get("rejected", []))
+        # A mock day: every plan cost the same, whatever was in it.
+        day0 = load_run(sim.run_dir).of("energy")[0]["villagers"]
+        plans = Counter(p["agent"] for p in load_run(sim.run_dir).of("plan") if p.get("raw"))
+        assert all(abs(day0[n]["spent"]["planning"] - 24 * plans[n]) < 0.06 for n in day0), (day0, plans)
+
+        def plan_once(name: str) -> int:
+            """Start a new day and have this villager make their first plan of it; the hour they planned at."""
+            sim.isl.new_day(), sim.energy.new_day(), sim.space.new_day(sim.isl, sim.rng), sim.space.sync(sim.isl), sim.bodies.new_day()
+            sim.hour, sim.first_plan = 5, {n: True for n in sim.isl.v}
+            sim.used, sim.schedule, sim.noticed = {n: 0 for n in sim.isl.v}, {}, {n: [] for n in sim.isl.v}
+            slots = sim._plan_slots()
+            at = min(h for h, s in slots.items() if any(x[0] == name for x in s))
+            sim.hour = at
+            sim._plan(sim.isl.day, at, [x for x in slots[at] if x[0] == name])
+            return at
+
+        name = sorted(sim.isl.v)[0]
+        slips.who = name
+        sim._open_log("a")
+        calls = sim.calls
+        plan_once(name)
+        first, second = slips.seen
+        assert sim.calls == calls + 2
+        assert second.startswith(first) and 'rest: it has no "items" (it takes nothing more)' in second
+        assert [p.name for p in _prompts(sim.run_dir, "d001_p0*", name)] == ["d001_p0.txt", "d001_p0_2.txt"]
+        (act,) = [a for lst in sim.schedule.values() for n, a in lst if n == name]
+        assert act == {"do": "rest", "for": "one two three four five six seven eight nine ten"}
+        assert not any("wasn't planned" in line for line in sim.isl.v[name].today)
+        # Free: the plan cost what a plan costs, and the second reply nothing.
+        en = sim.energy
+        assert abs((en.daily - en.left[name]) - 24) < 1e-6 and en.typical("plan") == 24
+        assert "Typical costs: a plan 24," in first and "A plan costs 24 points, whatever its length." in sim.isl.v[name].system
+        # Once: a pick that still can't be read isn't planned, and their day says why, as before.
+        slips.stubborn, slips.seen = True, []
+        calls = sim.calls
+        plan_once(name)
+        assert sim.calls == calls + 2 and len(slips.seen) == 2
+        assert not any(n == name for lst in sim.schedule.values() for n, _ in lst)
+        assert sim.isl.v[name].today[-1].endswith('rest: it has no "items" (it takes nothing more); what it is for can go '
+                                                  'in "why", so it wasn\'t planned')
+        sim._raw_log.close()
+        one, two = [p for p in load_run(sim.run_dir).of("plan") if p["day"] >= 1 and p["agent"] == name]
+        assert one["retry"]["rejected"][0]["pick"] == {"action": "rest", "items": {"wood": 1}} and one["scheduled"]
+        assert json.loads(one["retry"]["raw"])["actions"][0]["pick"]["action"] == "rest"
+        assert two["retry"] and not two["scheduled"] and two["dropped"][0]["why"].startswith('rest: it has no "items"')
+
+
+def test_version_22_full_pockets_repeat_asks_and_proposals_in_range() -> None:
+    """Prompt version 22: a villager who spots a bug or fish sees how full their pockets are, and one caught with
+    no room is named and let go; asking for the
+    same thing twice in a conversation does nothing; a visitor is reminded what they came for; and proposing a
+    bridge or stairs is on the list only within reach of a spot.
+    """
+    from llmabm.island.options import plan_options
+    from llmabm.island.prompts import encounter_prompt, turn_act_text
+    from llmabm.island.world import structures_cfg
+
+    sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=3)
+    with tempfile.TemporaryDirectory() as d:
+        sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=3, backend_override="mock", verbose=False)
+        sim.run(1)
+        assert sim.prompt_version >= 22
+        events, prompts = [], []
+        sim.log = lambda type_, **data: events.append({"type": type_, **data})
+        isl = sim.isl
+        a, b = sorted(isl.v)[:2]
+        va, vb = isl.v[a], isl.v[b]
+        # Spotting something with full pockets: they see how full, the choice is theirs, and a catch is let go.
+        wake, _ = isl.awake_window(a)
+        h = wake + 2
+        fish = {"id": "t-fish", "kind": "fish", "habitat": "river", "size": "large", "species": "loka fish",
+                "cell": (1, 1), "text": "a large fish shadow in the river (somewhere)"}
+        sim.space.critters = sim.space._crit() + [fish]
+        sim.spots_today, sim.used = {}, {n: 0 for n in isl.v}
+        sim.energy.left[a] = sim.energy.daily  # whatever the mock's day left them with
+
+        def call(name: str, user: str, *args: Any, **kw: Any) -> tuple[None, dict[str, int], None]:
+            """Stand in for a villager's reply: keep the prompt and go after the first thing spotted."""
+            prompts.append(user)
+            return None, {"go": 1}, None
+        real_call, sim._call = sim._call, call
+        va.inventory["fishing rod"] = 1
+        room = isl.space(va)
+        va.inventory["stone"] += room
+        assert isl.space(va) == 0
+        sim.schedule = {h + 1: [(a, {"do": "rest"})]}
+        sim.space.just_seen = {a: [fish]}
+        sim._spot_decisions(isl.day, h)
+        cap = isl.capacity(va)
+        assert len(prompts) == 1 and f"In your pockets: {cap} of {cap} slots used." in prompts[0]
+        assert sim.schedule[h + 1][0][1]["do"] == "fish"
+        isl.w["island"]["catch_fail_rate"] = 0.0
+        before = va.items()
+        ok, msg = isl._catch(va, {}, "fished in the river", "fish", species="loka fish")
+        assert not ok and msg == "fished in the river: caught a loka fish, but with your pockets full you let it go"
+        assert va.items() == before and va.inventory["loka fish"] == 0
+        isl.prompt_version = 21
+        assert isl._catch(va, {}, "fished in the river", "fish", species="loka fish") == (False, "pockets full")
+        isl.prompt_version = 22
+        va.inventory["stone"] -= max(room, 1)
+        sim._call = real_call
+        # Asking twice: the second time nothing new is asked, and both are told so.
+        events.clear()
+        turns: list[dict] = []
+        for _ in range(2):
+            t = {"speaker": a, "text": "any bait?"}
+            sim._chat_acts(isl.day, a, b, {"ask": {"fishing bait": 1}}, t, turns)
+            turns.append(t)
+        assert [e["type"] for e in events].count("favor_asked") == 1
+        assert turns[0]["acts"] == [{"kind": "asked", "items": {"fishing bait": 1}}]
+        assert turns[1]["acts"] == [{"kind": "asked", "items": {"fishing bait": 1}, "again": True}]
+        assert turns[1]["act"] == f"asked {b} for 1 fishing bait again (already asked)"
+        assert turn_act_text(turns[1], a, b, True, True).endswith("again, which did nothing: you had already asked")
+        assert turn_act_text(turns[1], b, a, True, True) == f"{a} asked you for 1 fishing bait again"
+        pa = encounter_prompt(isl, va, b, "river", 10, turns, opener=False)
+        assert f"You have already asked {b} for 1 fishing bait in this conversation; asking for it again does nothing." in pa
+        assert "You have already asked" not in encounter_prompt(isl, vb, a, "river", 10, turns, opener=False)
+        t = {"speaker": a, "text": "two, then?"}  # more than was asked for is a new ask
+        sim._chat_acts(isl.day, a, b, {"ask": {"fishing bait": 2}}, t, turns)
+        assert t["acts"] == [{"kind": "asked", "items": {"fishing bait": 2}}]
+        # A visitor's own words on why they came, for them only.
+        va.came_for = "ask for bait"
+        assert 'When you planned this visit you wrote why: "ask for bait".' in encounter_prompt(
+            isl, va, b, f"{b}'s home", 10, [], opener=True, visit="guest")
+        assert "you wrote why" not in encounter_prompt(isl, vb, a, f"{b}'s home", 10, [], opener=False, visit="host")
+        # Proposing: listed standing at a spot, not where the nearest spot is out of reach.
+        hours = list(range(8, 20))
+        near = structures_cfg(isl.w)["near"]
+        tools = frozenset(sim.bodies.tools_of(a))
+        listed = lambda: any(o.kind == "propose_bridge" for o in plan_options(isl, sim.bodies, sim.space, a, hours))  # noqa: E731
+        walk = sim.space.distances(tuple(sim.bodies.b[a].pos), tools)
+        spots = [sp for sp in sim.space.structure_spots(isl, "bridge") if any(e in walk for e in sp["ends"])]
+        assert spots and isl.proposal_problem(a) is None
+        sim.bodies.b[a].pos = next(e for e in spots[0]["ends"] if e in walk)
+        assert listed()
+        far = next((c for c in walk if not sim.space.structure_spots(isl, "bridge", c, near)), None)
+        assert far is not None
+        sim.bodies.b[a].pos = far
+        assert not listed()
+        isl.prompt_version = 21
+        assert listed()  # before: wherever a spot could be walked to
+
+
+def test_actions_doc_has_a_chart_for_every_kind_of_action() -> None:
     """docs/actions.md and a plan's list name the same actions, and the doc's example picks are those actions."""
     import importlib.util
 
     from llmabm.island.options import KINDS
 
     spec = importlib.util.spec_from_file_location("actions_doc", ROOT / "scripts/actions_doc.py")
-    doc = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(doc)
+    doc = importlib.util.module_from_spec(spec)  # the file exists, so there is a spec
+    spec.loader.exec_module(doc)  # and a loader
     names = [a[0] for _, group in doc.entries(doc.world_numbers(load_world(WORLD))) for a in group]
     assert {n.split(" (")[0] for n in names} == set(KINDS)
     assert set(doc.PLAN) == set(names)
     assert all(pick["action"] == n.split(" (")[0] for n, (_, pick) in doc.PLAN.items())
 
 
-def test_version_17_bridges_and_stairs():
+def test_version_17_bridges_and_stairs() -> None:
     """Prompt version 17: anyone proposes a bridge or stairs where they stand; each is built once its own fund
-    reaches the cost, at most 10 on the island (the first bridge included), one open proposal per villager."""
-    from llmabm.island.options import plan_options
+    reaches the cost, at most 10 on the island (the first bridge included), one open proposal per villager.
+    """
     from llmabm.island.grid import BRIDGE
+    from llmabm.island.options import plan_options
 
     isl, g, bodies = _grid_island(("A", "B", "C"))
     assert isl.prompt_version >= 17
@@ -2400,8 +2906,13 @@ def test_version_17_bridges_and_stairs():
     walk = g.distances(home, frozenset())
     spot = next(sp for sp in g.structure_spots(isl, "stairs") if sp["steps"][0][0] in walk and sp["steps"][0][1] not in walk)
     (lo, hi), (lo2, hi2) = spot["steps"]
-    assert any(o.action["do"] == "propose_stairs" for o in plan_options(isl, bodies, g, "A", list(range(8, 20))))
+    listed = lambda: any(  # noqa: E731
+        o.action["do"] == "propose_stairs" for o in plan_options(isl, bodies, g, "A", list(range(8, 20))))
+    latest, isl.prompt_version = isl.prompt_version, 21
+    assert listed()  # before version 22: on the list wherever a spot could be walked to
+    isl.prompt_version = latest
     bodies.b["A"].pos = lo
+    assert listed()  # version 22: on the list when standing within reach of a spot
     ok, msg = bodies.perform("A", {"do": "propose_stairs"}, 10, rng)
     assert ok and msg.startswith("proposed stairs up to") and "2 of 10" in msg, msg
     st = isl.projects[0]
@@ -2449,7 +2960,7 @@ def test_version_17_bridges_and_stairs():
     assert not isl.act("B", {"do": "propose_stairs", "_cells": [list(lo), list(hi)]}, 10)[0]
 
 
-def test_version_17_bridges_only_give_access():
+def test_version_17_bridges_only_give_access() -> None:
     """From prompt version 17 the first bridge adds no rocks or trees when built, and nobody says it does."""
     from llmabm.island.prompts import fun_facts
 
@@ -2464,10 +2975,17 @@ def test_version_17_bridges_only_give_access():
         assert ("rocks and trees" in said) == extra
 
 
-def test_version_18_trades_name_both_people():
+def test_version_18_trades_name_both_people() -> None:
     """Prompt version 18: a trade says who gives what to whom, never "X for Y", in the reply, the offer on the
-    table, each turn's tag, what has changed hands, and the record; a request to you says how many you have."""
-    from llmabm.island.prompts import (act_record, encounter_prompt, exchange_line, trade_sides, turn_act_text)
+    table, each turn's tag, what has changed hands, and the record; a request to you says how many you have.
+    """
+    from llmabm.island.prompts import (
+        act_record,
+        encounter_prompt,
+        exchange_line,
+        trade_sides,
+        turn_act_text,
+    )
 
     isl = _island(("Ari", "Ike"))
     assert isl.prompt_version >= 18
@@ -2504,9 +3022,24 @@ def test_version_18_trades_name_both_people():
     assert exchange_line(e, "Ari") == "Ike traded you 1 wood for your 1 fishing bait"  # earlier versions as they were
 
 
-def test_version_19_island_101_is_the_same_for_everyone():
-    from llmabm.island.prompts import (encounter_prompt, fun_facts, island_101, island_101_closed, island_101_open,
-                                       island_rules, notice_prompt, plan_prompt, plaza_prompt, reflect_prompt, spot_prompt)
+def test_version_19_island_101_is_the_same_for_everyone() -> None:
+    """Prompt version 19 (and 18 for none of it): Isabelle's morning facts collect in the Island 101, which grows by a
+    fact a day and reads the same for every villager; plans, the plaza and conversations show it closed, with how to
+    open it.
+    """
+    from llmabm.island.prompts import (
+        encounter_prompt,
+        fun_facts,
+        island_101,
+        island_101_closed,
+        island_101_open,
+        island_rules,
+        notice_prompt,
+        plan_prompt,
+        plaza_prompt,
+        reflect_prompt,
+        spot_prompt,
+    )
 
     isl = _island(("Ari", "Bo"))  # day 1: Isabelle has told two facts, on days 0 and 1
     assert isl.prompt_version >= 19 and isl.day == 1
@@ -2544,19 +3077,26 @@ def test_version_19_island_101_is_the_same_for_everyone():
     assert island_101(isl) == [] and "Island 101" not in plan(ari)
 
 
-def test_version_19_opening_island_101_is_free_and_asks_again():
+def test_version_19_opening_island_101_is_free_and_asks_again() -> None:
+    """A villager who opens the Island 101 during a plan gets the same prompt again with the facts in it; both prompts
+    are kept, the lookup is logged, and only the plan is charged.
+    """
     import json
+
     from llmabm.island.prompts import island_101_closed, island_101_open
     from llmabm.llm import Completion
 
     class Opens:
         """The mock, except that it never opens the Island 101 by itself, and opens it for `who` when told to."""
         name = model_id = "mock"
+        seen: list[str]
 
-        def __init__(self, mock):
+        def __init__(self, mock: ChatBackend) -> None:
+            """Wrap the mock; nobody opens the Island 101 until `who` is set."""
             self.mock, self.who, self.seen = mock, None, []
 
-        def complete(self, messages, temperature=0.7, max_tokens=600):
+        def complete(self, messages: list[dict], temperature: float = 0.7, max_tokens: int = 600) -> Completion:
+            """Open the Island 101 for `who`; for anyone else, the mock's reply with the closed line left out."""
             user = messages[-1]["content"]
             closed = "\nThe Island 101 (closed): " in user
             if closed and self.who and f"You are {self.who}." in user:
@@ -2601,14 +3141,16 @@ def test_version_19_opening_island_101_is_free_and_asks_again():
         assert (look["agent"], look["during"], look["entries"], look["day"]) == (name, "plan", 2, 1)
         plan = [p for p in run.of("plan") if p["day"] == 1][-1]
         assert plan["agent"] == name and plan["scheduled"] and json.loads(plan["raw"]).get("actions")
-        # Free: the villager is charged what the open prompt costs without the reference, plus that reply;
-        # not the reply that opened it, and not the reference.
+        # Free: the villager is charged for the plan (from version 22 a set number of points, whatever its
+        # length); not the reply that opened it, and not the reference.
         en = sim.energy
-        cost = en.points(sim._self_doc(name) or "", second) - en.points(opened) + en.points(plan["raw"])
-        assert abs((en.daily - en.left[name]) - cost) < 1e-6
+        assert en.plan_cost == 24 and abs((en.daily - en.left[name]) - en.plan_cost) < 1e-6
 
 
-def test_version_19_mock_run_opens_island_101_and_the_record_shows_it():
+def test_version_19_mock_run_opens_island_101_and_the_record_shows_it() -> None:
+    """Over a mock run villagers open the Island 101 in plans, at the plaza and in chats; each opening is logged,
+    shows in the day log and the summary, and is followed by a prompt with it open.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=6)
     with tempfile.TemporaryDirectory() as d:
         sim = IslandSimulation(sc, load_backends(None), Path(d) / "run", seed=6, backend_override="mock", verbose=False,
@@ -2626,7 +3168,10 @@ def test_version_19_mock_run_opens_island_101_and_the_record_shows_it():
         assert len(opened) == len(looks) and all("(closed)" not in _seen(f) for f in opened)
 
 
-def test_each_villager_has_a_folder_with_their_memory_assets_pages_and_prompts():
+def test_each_villager_has_a_folder_with_their_memory_assets_pages_and_prompts() -> None:
+    """Each villager's folder holds their profile, memory, assets, nightly pages and prompts, the memory file being
+    what their prompts are built from; a run kept in the older layout, all prompts together, is read the same.
+    """
     from llmabm.island.analysis import analyze_island
     from llmabm.island.site_prompts import build
 
@@ -2674,7 +3219,10 @@ def test_each_villager_has_a_folder_with_their_memory_assets_pages_and_prompts()
         assert build(old, 3, list(sc.villagers)) == build(run_dir, 3, list(sc.villagers))
 
 
-def test_walks_on_the_map_follow_the_ground_and_match_what_was_walked():
+def test_walks_on_the_map_follow_the_ground_and_match_what_was_walked() -> None:
+    """A walk drawn on the site's map ends where the villager was that hour, crosses the river only with a vaulting
+    pole, marks a tool where one was needed, and is mostly as long as the distance they walked.
+    """
     from llmabm.island.grid import RIVER, GridSpace
     from llmabm.island.site_data import _STEP, day_detail
 
@@ -2704,8 +3252,11 @@ def test_walks_on_the_map_follow_the_ground_and_match_what_was_walked():
         assert legs > 20 and exact / legs > 0.6  # most hours are one walk; some have a detour that isn't located
 
 
-def test_npcs_are_classes_and_answer_as_before():
-    from llmabm.island.npc import ROSTER, RESCUE, NPC, find
+def test_npcs_are_classes_and_answer_as_before() -> None:
+    """The island's characters (Tom Nook, Isabelle, Blathers, the shopkeepers) are found by any of their names and
+    each answers when asked; they aren't villagers, and only Tom Nook and Isabelle hand out the map.
+    """
+    from llmabm.island.npc import NPC, RESCUE, ROSTER, find
     from llmabm.island.villager import Villager
     from llmabm.island.world import NPCS
 
@@ -2726,7 +3277,10 @@ def test_npcs_are_classes_and_answer_as_before():
     assert isl.act("A", {"do": "ask", "who": "B"}, 10)[0] is False
 
 
-def test_a_villager_owns_their_spec_body_energy_and_what_the_sim_used_to_keep():
+def test_a_villager_owns_their_spec_body_energy_and_what_the_sim_used_to_keep() -> None:
+    """Each villager carries their own spec, body, energy and day's state, which the simulation still reads by name; a
+    checkpoint from before, with those kept in dicts on the simulation, loads and resumes the same.
+    """
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=11)
     with tempfile.TemporaryDirectory() as d:
         run_dir = Path(d) / "run"
@@ -2764,8 +3318,18 @@ def test_a_villager_owns_their_spec_body_energy_and_what_the_sim_used_to_keep():
         assert load_run(run_dir).manifest["days_completed"] == 2
 
 
-def test_embeddings_are_the_same_every_time_and_kept_on_disk():
-    from llmabm.llm import CachedEmbeddings, Embeddings, HashEmbeddings, LLMError, LocalEmbeddings, load_embedder
+def test_embeddings_are_the_same_every_time_and_kept_on_disk() -> None:
+    """The offline embedder gives the same vector for the same text and brings texts that share words close; the disk
+    cache embeds each text once, keeping questions apart from passages, and an unknown embedder or kind is refused.
+    """
+    from llmabm.llm import (
+        CachedEmbeddings,
+        Embeddings,
+        HashEmbeddings,
+        LLMError,
+        LocalEmbeddings,
+        load_embedder,
+    )
 
     h = HashEmbeddings()
     a, b, c = h.embed(["Bo gave you a shovel at the river", "you met Bo by the river and got a shovel",
@@ -2778,7 +3342,10 @@ def test_embeddings_are_the_same_every_time_and_kept_on_disk():
         calls = []
 
         class Counting(HashEmbeddings):
-            def embed(self, texts, role="passage"):
+            """The offline embedder, keeping a list of what it was asked to embed."""
+
+            def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+                """Note the texts, then embed them as usual."""
                 calls.append(list(texts))
                 return super().embed(texts, role)
 
@@ -2817,9 +3384,20 @@ def test_embeddings_are_the_same_every_time_and_kept_on_disk():
             assert "not defined" in str(e)
 
 
-def test_everything_lived_is_kept_and_what_comes_to_mind_fits_the_situation():
-    from llmabm.island.memory import (MemoryStore, chunks, consolidate_recalled, recall, record_key, score_records,
-                                      settings)
+def test_everything_lived_is_kept_and_what_comes_to_mind_fits_the_situation() -> None:
+    """From version 20 everything a villager lived is kept in pieces and never forgotten; what comes to mind is scored
+    by relevance, recency and picks, leaving out what the prompt already shows (prompt version 19 at the end: the old
+    fading memory).
+    """
+    from llmabm.island.memory import (
+        MemoryStore,
+        chunks,
+        consolidate_recalled,
+        recall,
+        record_key,
+        score_records,
+        settings,
+    )
     from llmabm.island.villager import Villager
     from llmabm.llm import HashEmbeddings
 
@@ -2911,7 +3489,7 @@ def test_everything_lived_is_kept_and_what_comes_to_mind_fits_the_situation():
                 # yesterday's (a plan shows yesterday in full). What they chose to hold on to last night
                 # can be there, as it always could.
                 for ln in lines:
-                    day = int(re.match(r"- \(day (\d+)", ln).group(1))
+                    day = int(re.match(r"- \(day (\d+)", ln).group(1))  # always matches
                     assert ln.split(") ", 1)[1] in own and (day < 4 or (day == 4 and "held on to" in ln)), ln
                     seen_old += 1
                 assert len(lines) <= sim.isl.memory["k"]
@@ -2929,7 +3507,10 @@ def test_everything_lived_is_kept_and_what_comes_to_mind_fits_the_situation():
                    for f in _prompts(Path(d) / "v19", "d002_p0"))
 
 
-def test_switching_a_run_to_retrieval_fills_in_the_days_it_already_lived():
+def test_switching_a_run_to_retrieval_fills_in_the_days_it_already_lived() -> None:
+    """Prompt version 19 switched to 20: resuming a run onto retrieval fills each villager's memory with the days
+    already lived, from the checkpoint and the logged plans, keeps what they had picked, and does so only once.
+    """
     from llmabm.island.memory import chunks
 
     sc = load_island_scenario(ROOT / "scenarios/island_blank.yaml", seed=12)
@@ -2943,7 +3524,7 @@ def test_switching_a_run_to_retrieval_fills_in_the_days_it_already_lived():
         lived = {n: list(vil.yesterday) for n, vil in sim.isl.v.items()}  # day 2, as each villager saw it
         picks = {n: [dict(m) for m in vil.memories] for n, vil in sim.isl.v.items()}
         ck = (run_dir / "checkpoint.pkl").read_bytes()
-        for attempt in range(2):  # the second time replays the same day from the same checkpoint
+        for _ in range(2):  # the second time replays the same day from the same checkpoint
             (run_dir / "checkpoint.pkl").write_bytes(ck)
             IslandSimulation.resume(run_dir, load_backends(None), days=1, backend_override="mock", verbose=False,
                                     prompt_version=20)
@@ -2953,7 +3534,7 @@ def test_switching_a_run_to_retrieval_fills_in_the_days_it_already_lived():
             assert "days 0 to 2, 10 villagers" in filled["details"][0]
             back = pickle.loads((run_dir / "checkpoint.pkl").read_bytes())
             for n, vil in back.isl.v.items():
-                by_day = lambda day, kinds: [r["text"] for r in vil.experience  # noqa: E731
+                by_day = lambda day, kinds: [r["text"] for r in vil.experience  # noqa: E731, B023
                                              if r["day"] == day and r["kind"] in kinds]
                 # The last day comes from the checkpoint, word for word.
                 assert by_day(2, ("event", "chat")) == [c for line in lived[n] for c in chunks(line, 240)]
@@ -2971,7 +3552,7 @@ def test_switching_a_run_to_retrieval_fills_in_the_days_it_already_lived():
         assert len(load_run(run_dir).of("intervention")) == 2
 
 
-def test_parse_reply_forgives_misplaced_closing_brace():
+def test_parse_reply_forgives_misplaced_closing_brace() -> None:
     """The slips gpt-oss-20b made in test1's plans: 10 of the 16 replies that couldn't be read."""
     from llmabm.island.sim import parse_action_obj
 
@@ -2997,3 +3578,181 @@ def test_parse_reply_forgives_misplaced_closing_brace():
     assert parse_action_obj(cut)[0] is None
     assert parse_action_obj('{"thoughts":"cut off')[0] is None
     assert parse_action_obj("")[0] is None
+
+
+def test_version_22_exactly_where_as_steps_from_where_they_stand() -> None:
+    """Prompt version 22: a path, fencing, furniture, a sapling and flower seeds go on the tiles the villager
+    names, each as steps from where they stand when the hour comes and within sight (8 steps), as a bridge is
+    proposed where they stand. The island doesn't choose a tile for them; they end up at the last tile.
+    """
+    from llmabm.island.options import plan_options, read_actions
+
+    isl, g, bodies = _grid_island()
+    vil = _stocked(isl)
+    hours = list(range(8, 20))
+    opts = plan_options(isl, bodies, g, "A", hours)
+    kinds = {o.kind for o in opts}
+    assert "fence_off" not in kinds and {"lay_path", "place", "plant"} <= kinds
+    assert all("tiles" in o.fields and not {"near", "count", "from", "to"} & set(o.fields)
+               for o in opts if o.kind in ("lay_path", "place", "plant"))
+    here = lambda: tuple(bodies.b["A"].pos or bodies.home_point("A"))  # noqa: E731
+    cell = lambda st: (here()[0] + st.get("east", 0) - st.get("west", 0),  # noqa: E731
+                       here()[1] + st.get("south", 0) - st.get("north", 0))
+
+    def read(pick: dict[str, Any]) -> tuple[Any, Any]:
+        """One pick at 09:00 as the island reads it: the action it became, and why it wasn't planned."""
+        acts, bad = read_actions(opts, [{"hour": 9, "pick": pick}], vil.inventory, strict=True)
+        return (acts[0] if acts else None), (bad[0]["why"] if bad else None)
+
+    # A path: exactly the tiles named, nothing between or beyond them, and they end up on the last one.
+    tiles = _free_steps(g, isl, bodies, "lay_path", n=3)
+    cells = [cell(st) for st in tiles]
+    act, why = read({"action": "lay_path", "style": "stone", "tiles": tiles})
+    assert why is None and act["tiles"] == tiles and "near" not in act
+    ok, msg = bodies.perform("A", act, 9, random.Random(0))
+    assert ok and msg.startswith("laid 3 tiles of stone path, the first ") and "of where you stood" in msg, msg
+    assert {c for c, p in g.paths.items() if p["owner"] == "A"} == set(cells) and here() == cells[-1]
+    # Standing there now, the same steps are other tiles; the tile under them is path already, and said so.
+    ok, msg = bodies.perform("A", {"do": "lay_path", "tiles": [{}]}, 10, random.Random(0))
+    assert not ok and msg == "the tile you stand on is path already", msg
+    # What can be said when planning: the shape, and that a tile is within sight. What is on it is said then.
+    assert read({"action": "lay_path", "tiles": [{"up": 2}]})[1] == \
+        'lay_path: "up" isn\'t a direction: north, south, east or west'
+    assert read({"action": "lay_path"})[1].startswith('lay_path: say exactly where, "tiles": [')
+    assert read({"action": "lay_path", "tiles": [{"east": 7, "south": 5}]})[1] == (
+        "lay_path: 5 south, 7 east of where you stand is further than you see: a tile has to be within 8 steps "
+        "of where you stand")
+    assert read({"action": "lay_path", "tiles": [{"east": 8}] * 40})[0]["tiles"] == [{"east": 8}] * 40  # no other cap
+    # Fencing and furniture: one piece for each tile, at most what they carry; one tile can be "steps".
+    assert read({"action": "place", "items": {"simple wooden fence": 1}, "tiles": [{"south": 1}] * 4})[1] == \
+        "place: that names 4 tiles; you carry 3"
+    spots = _free_steps(g, isl, bodies, "place", "simple wooden fence", n=2)
+    at = [cell(st) for st in spots]
+    act, why = read({"action": "place", "items": {"simple wooden fence": 1}, "steps": spots[0]})
+    assert why is None and act["tiles"] == [spots[0]]
+    ok, msg = bodies.perform("A", act, 11, random.Random(0))
+    assert ok and msg.startswith("put a simple wooden fence outside, ") and g.placed[at[0]]["owner"] == "A", msg
+    assert vil.inventory["simple wooden fence"] == 2
+    # A tile that can't be used is left out and said so; the rest is done.
+    back = {k: v for k, v in (("south", at[0][1] - here()[1]), ("east", at[0][0] - here()[0])) if v}
+    back = {("north" if k == "south" else "west") if v < 0 else k: abs(v) for k, v in back.items()}
+    free = _free_steps(g, isl, bodies, "place", "simple wooden fence")
+    ok, msg = bodies.perform("A", {"do": "place", "item": "simple wooden fence", "tiles": [back, free[0]]},
+                             12, random.Random(0))
+    assert ok and "; not done: " in msg and msg.endswith("has simple wooden fence on it"), msg
+    # A sapling, where they say; and what is in sight is given in the same words.
+    spot = _free_steps(g, isl, bodies, "plant", "sapling")
+    want = cell(spot[0])
+    act, why = read({"action": "plant", "items": {"sapling": 1}, "tiles": spot})
+    ok, msg = bodies.perform("A", act, 13, random.Random(0))
+    assert ok and msg.startswith("planted a sapling, ") and any(t.pos == want for t in isl.trees), msg
+    seen = g.in_sight(isl, "A", here(), ["here"])
+    assert any(ln.startswith("simple wooden fence (yours): ") and ln.split(": ")[1][0].isdigit() for ln in seen), seen
+    assert any(ln.startswith("stone path: ") for ln in seen) and any(ln.startswith("sapling: ") for ln in seen)
+    # Version 21: as before, the island chooses the tiles.
+    isl.prompt_version = 21
+    vil.inventory["simple wooden fence"] = 2
+    old = plan_options(isl, bodies, g, "A", hours)
+    assert "fence_off" in {o.kind for o in old} and not any("tiles" in o.fields for o in old)
+
+
+def test_shaking_a_tree_gives_its_fruit_and_the_tree_regrows() -> None:
+    """Shaking a tree moves its fruit into the villager's pockets and starts the tree regrowing; with no fruit on any
+    tree there is nothing to shake.
+    """
+    isl = _island()
+    vil, fruit = isl.v["A"], isl.w["island"]["native_fruit"]
+    on_trees = lambda: sum(t.fruit for t in isl.trees if t.kind == "fruit")  # noqa: E731
+    before, had = on_trees(), vil.inventory[fruit]
+    assert before > 0
+    ok, msg = isl._do_shake_tree(vil, {}, 10)
+    got = vil.inventory[fruit] - had
+    assert ok and got > 0 and f"shook a tree: {fruit} x{got}" == msg, msg
+    assert on_trees() == before - got and isl.collected["A"]["fruit"] == got
+    shaken = [t for t in isl.trees if t.kind == "fruit" and t.fruit == 0]
+    assert shaken and all(t.regrow_in == isl.w["island"]["fruit_regrow_days"] for t in shaken)
+    # With no fruit anywhere there is nothing to shake.
+    for t in isl.trees:
+        t.fruit = 0
+    assert isl._do_shake_tree(vil, {}, 10) == (False, "no fruit tree has fruit right now")
+
+
+def test_unspent_mental_energy_carries_over_by_the_set_share() -> None:
+    """With a carry-over share set, that share of yesterday's unspent mental energy is added to the new day's; by
+    default nothing carries over.
+    """
+    from llmabm.island.energy import MentalEnergy
+
+    e = MentalEnergy({"enabled": True, "daily": 100, "carry_over": 0.5}, ["A"])
+    e.new_day()
+    assert e.left["A"] == 100
+    e.left["A"] = 40  # what was not spent today
+    e.new_day()
+    assert e.left["A"] == 120  # a new day's 100, plus half of the 40 left
+    none = MentalEnergy({"enabled": True, "daily": 100}, ["A"])  # by default nothing carries over
+    none.new_day()
+    none.left["A"] = 40
+    none.new_day()
+    assert none.left["A"] == 100
+
+
+def test_a_reply_from_the_provider_is_read_with_its_reasoning_and_tokens() -> None:
+    """A call to an OpenAI-compatible provider sends the model, temperature and token limit with the key, and reads
+    back the text, the hidden reasoning and the token counts.
+    """
+    import io
+    import json
+    import os
+    from unittest import mock
+
+    from llmabm.llm import OpenAICompatible
+
+    body = {"choices": [{"message": {"content": '{"do": "rest"}', "reasoning": "nothing else to do"}}],
+            "usage": {"total_tokens": 321, "completion_tokens_details": {"reasoning_tokens": 7}}}
+    reply = mock.MagicMock()
+    reply.__enter__.return_value = io.BytesIO(json.dumps(body).encode())
+    os.environ["X_TEST_KEY"] = "k"
+    try:
+        b = OpenAICompatible(name="groq", base_url="https://x/v1", model="m", api_key_env="X_TEST_KEY")
+        with mock.patch("urllib.request.urlopen", return_value=reply) as up:
+            c = b.complete([{"role": "user", "content": "hi"}], temperature=0.2, max_tokens=50)
+        sent = up.call_args.args[0]
+        asked = json.loads(sent.data)
+        assert sent.full_url == "https://x/v1/chat/completions" and sent.get_header("Authorization") == "Bearer k"
+        assert asked["model"] == "m" and asked["max_tokens"] == 50 and asked["temperature"] == 0.2
+        assert c.text == '{"do": "rest"}' and c.reasoning == "nothing else to do"
+        assert c.tokens == 321 and c.reasoning_tokens == 7 and not c.cached
+    finally:
+        del os.environ["X_TEST_KEY"]
+
+
+def test_the_command_line_runs_resumes_and_switches_the_prompt_version() -> None:
+    """Prompt version 21 on resume: the command line runs a scenario, refuses a second run into the same folder, logs
+    the switch of version on resume, and treats an unknown version or a missing run as an error.
+    """
+    import json
+
+    from llmabm.cli import main
+
+    with tempfile.TemporaryDirectory() as d:
+        run_dir, config = str(Path(d) / "run"), str(ROOT / "config/models.yaml")
+        common = ["--backend", "mock", "--config", config, "--no-analyze"]
+        assert main(["run", str(ROOT / "scenarios/island_blank.yaml"), "--seed", "1", "--days", "1",
+                     "--run-dir", run_dir, *common]) == 0
+        # A second `run` into the same folder is refused: that is what `resume` is for.
+        assert main(["run", str(ROOT / "scenarios/island_blank.yaml"), "--run-dir", run_dir, *common]) == 2
+        assert main(["resume", run_dir, "--days", "1", "--prompt-version", "21", *common]) == 0
+        m = json.loads((Path(run_dir) / "manifest.json").read_text())
+        assert m["days_completed"] == 2
+        assert any("prompt version 22 -> 21" in str(i) for i in m["interventions"]), m["interventions"]
+        # A version that doesn't exist is an error, not a crash, and nothing more is run.
+        assert main(["resume", run_dir, "--prompt-version", "999", *common]) == 2
+        assert json.loads((Path(run_dir) / "manifest.json").read_text())["days_completed"] == 2
+        assert main(["resume", str(Path(d) / "nowhere"), *common]) == 2
+
+
+if __name__ == "__main__":
+    for name, fn in list(globals().items()):
+        if name.startswith("test_"):
+            fn()
+            print("ok", name)

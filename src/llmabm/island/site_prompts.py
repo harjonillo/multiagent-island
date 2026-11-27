@@ -17,6 +17,9 @@ import json
 import re
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
+
+from .villager_files import prompt_dir
 
 # The kinds of call, in the order they come within an hour, and what each tag in a file name means.
 KINDS = ["plan", "spot", "notice", "chat", "plaza", "evening", "night", "isabelle"]
@@ -31,8 +34,11 @@ DAY_START = 5  # an hour before this is the night after the day
 
 
 def _parts(text: str) -> dict:
+    """A prompt file split at its `=== SYSTEM ===` style headings: {heading: text}, plus "tokens"
+    when a heading gives a count.
+    """
     found = list(_PART.finditer(text))
-    out = {}
+    out: dict[str, Any] = {}
     for i, m in enumerate(found):
         end = found[i + 1].start() if i + 1 < len(found) else len(text)
         out[m.group(1)] = text[m.end() : end].strip("\n")
@@ -47,16 +53,18 @@ def prompt_files(run_dir: Path, villagers: list[str]) -> list[tuple[Path, str | 
     their own folders, for everyone's; the name is then None here and read from the file name).
     """
     run_dir = Path(run_dir)
-    out = [(p, None) for p in sorted((run_dir / "prompts").glob("d*.txt"))]
+    out: list[tuple[Path, str | None]] = [
+        (p, None) for p in sorted(prompt_dir(run_dir, None).glob("d*.txt"))
+    ]
     for n in villagers:
-        out += [
-            (p, n)
-            for p in sorted((run_dir / "villagers" / n / "prompts").glob("d*.txt"))
-        ]
+        out += [(p, n) for p in sorted(prompt_dir(run_dir, n).glob("d*.txt"))]
     return out
 
 
 def _call(path: Path, owner: str | None = None) -> dict | None:
+    """One prompt file as a call: whose it was, the day, hour and kind (from the file's name), and
+    its parts. None when the name isn't a prompt file's or the file has no USER part.
+    """
     stem = path.stem
     if (
         owner
@@ -91,7 +99,10 @@ def _call(path: Path, owner: str | None = None) -> dict | None:
     }
 
 
-def _order(c: dict) -> tuple:
+def _order(c: dict) -> tuple[int, int, int]:
+    """Sort key putting a day's calls in the order they were made: by hour (after midnight last,
+    calls with no hour at the end), then by kind, then by their number.
+    """
     h = c["hour"]
     h = 99 if h is None else h + 24 if h < DAY_START else h
     return (h, KINDS.index(c["kind"]) if c["kind"] in KINDS else len(KINDS), c["seq"])
@@ -118,6 +129,7 @@ def build(
         and not (Path(run_dir) / "villagers").is_dir()
     ):
         return None, {}
+    index: dict[str, dict[str, list]]
     index, files = {}, {}
     for day, calls in sorted(by_day.items()):
         calls.sort(key=_order)

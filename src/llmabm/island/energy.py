@@ -35,32 +35,45 @@ from __future__ import annotations
 
 import threading
 from collections import defaultdict
+from typing import Any, cast
 
 KINDS = ("planning", "thinking", "talking")
 CHARS_PER_TOKEN = 4
 
 
 class MentalEnergy:
-    def __init__(self, cfg: dict | None, names: list[str]):
+    """Everyone's mental energy: what each villager has left today, what they spent it on, and what
+    each kind of call has cost so far. Calls made in parallel are queued and settled together.
+    """
+
+    def __init__(self, cfg: dict | None, names: list[str]) -> None:
+        """Read the `mental_energy` settings and start every villager with nothing spent."""
         cfg = dict(cfg or {})
         self.enabled = bool(cfg.get("enabled", False))
         self.daily = float(cfg.get("daily", 150))
         self.tpp = float(cfg.get("tokens_per_point", 100))
         self.carry = float(cfg.get("carry_over", 0.0))
         self.charge_reasoning = bool(cfg.get("charge_reasoning", False))
+        # Prompt version 22: what a plan costs whatever its length; None charges it for what it reads and writes.
+        # Set by the simulation from the run's prompt version and `mental_energy.plan_cost`.
+        self.plan_cost: float | None = None
         self.left = {n: 0.0 for n in names}
-        self.spent = {n: defaultdict(float) for n in names}
-        self.skipped = {n: defaultdict(int) for n in names}
-        self.tokens = defaultdict(
+        self.spent: dict[str, defaultdict[str, float]] = {
+            n: defaultdict(float) for n in names
+        }
+        self.skipped: dict[str, defaultdict[str, int]] = {
+            n: defaultdict(int) for n in names
+        }
+        self.tokens: defaultdict[str, float] = defaultdict(
             float
         )  # estimated tokens sent and received per villager today, all of it
-        self.reasoning = {
+        self.reasoning: dict[str, defaultdict[str, float]] = {
             n: defaultdict(float) for n in names
         }  # hidden reasoning tokens today, by call type
-        self.cost_sum = defaultdict(
+        self.cost_sum: defaultdict[str, float] = defaultdict(
             float
         )  # call type -> points, for "typical cost" hints
-        self.cost_n = defaultdict(int)
+        self.cost_n: defaultdict[str, int] = defaultdict(int)
         self.estimates = {
             "plan": 12,
             "notice": 3,
@@ -76,16 +89,19 @@ class MentalEnergy:
             n: None for n in names
         }  # today's split, from version 7
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict[str, Any]:
+        """Everything but the lock, which can't be saved in a checkpoint."""
         state = dict(self.__dict__)
         state.pop("_lock", None)
         return state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        """Load a checkpoint, giving older ones what has been added since, and make a new lock."""
         state.setdefault(
             "charge_reasoning", False
         )  # checkpoints from before reasoning was tracked
         state.setdefault("reasoning", {n: defaultdict(float) for n in state["left"]})
+        state.setdefault("plan_cost", None)  # checkpoints from before version 22
         state.setdefault(
             "plans", {n: None for n in state["left"]}
         )  # checkpoints from before energy plans
@@ -94,6 +110,9 @@ class MentalEnergy:
 
     # --- daily cycle -------------------------------------------------------------
     def new_day(self) -> None:
+        """Morning: everyone gets the daily amount (plus the share of yesterday's that carries over), and
+        the day's records and plans start empty.
+        """
         for n in self.left:
             self.left[n] = self.daily + self.carry * self.left[n]
             self.spent[n] = defaultdict(float)
@@ -102,7 +121,10 @@ class MentalEnergy:
             self.plans[n] = None
         self.tokens = defaultdict(float)
 
-    def day_record(self) -> dict:
+    def day_record(self) -> dict[str, dict[str, Any]]:
+        """The day's energy for the log, by villager: spent by kind, left, calls skipped, tokens, hidden
+        reasoning by call type, and the day's plan if they made one.
+        """
         return {
             n: {
                 "spent": {k: round(self.spent[n][k], 1) for k in KINDS},
@@ -116,9 +138,10 @@ class MentalEnergy:
         }
 
     # --- the day's plan (prompt version 7) -------------------------------------------
-    def set_plan(self, name: str, plan) -> dict | None:
+    def set_plan(self, name: str, plan: Any) -> dict[str, int] | None:
         """Read {"inward": n, "outward": n} from a plan reply. Unreadable parts keep today's plan;
-        each side is at most the daily total. Returns the plan if it changed."""
+        each side is at most the daily total. Returns the plan if it changed.
+        """
         if not isinstance(plan, dict) or name not in self.left:
             return None
         new = dict(self.plans.get(name) or {})
@@ -159,9 +182,15 @@ class MentalEnergy:
 
     # --- costs -----------------------------------------------------------------------
     def points(self, *texts: str) -> float:
+        """What reading or writing these texts costs, in points."""
         return sum(len(t or "") for t in texts) / CHARS_PER_TOKEN / self.tpp
 
     def typical(self, what: str) -> int:
+        """What a call of this type usually costs, for the hints villagers are shown: the set cost of a
+        plan (version 22), else the average over everyone's calls so far, else the configured estimate.
+        """
+        if what == "plan" and getattr(self, "plan_cost", None) is not None:
+            return max(1, round(cast(float, self.plan_cost)))
         if self.cost_n[what]:
             return max(1, round(self.cost_sum[what] / self.cost_n[what]))
         return int(self.estimates.get(what, 10))
@@ -173,6 +202,7 @@ class MentalEnergy:
         return self.left[name] >= need + 1.0
 
     def skip(self, name: str, kind: str) -> None:
+        """Count a call of this kind that wasn't made for lack of energy."""
         if name in self.skipped:
             self.skipped[name][kind] += 1
 
@@ -203,12 +233,16 @@ class MentalEnergy:
                 self._pending.append(item)
 
     def settle(self) -> None:
+        """Apply the charges queued by calls made in parallel, in a fixed order (by name, then call type)."""
         with self._lock:
             items, self._pending = sorted(self._pending, key=lambda x: (x[0], x[2])), []
         for it in items:
             self._apply(it)
 
-    def _apply(self, item) -> None:
+    def _apply(self, item: tuple) -> None:
+        """Book one call: its tokens and reasoning, its cost toward the typical costs, and (when it has a
+        kind) what it spent, taken from what the villager has left.
+        """
         name, kind, what, read, written, thought, fixed, *rest = item
         social = min(rest[0] if rest else 0.0, read)
         hidden = rest[1] if len(rest) > 1 else 0.0
@@ -233,6 +267,9 @@ class MentalEnergy:
             self.left[name] = max(0.0, self.left[name] - total)
 
     def status_line(self, name: str, v7: bool = False) -> str:
+        """What a villager is told about their energy: what is left and what things typically cost. From
+        prompt version 7 (`v7`) also the day's plan against what was spent. Empty when energy is off.
+        """
         if not self.enabled or name not in self.left:
             return ""
         if v7:
@@ -259,34 +296,41 @@ class MentalEnergy:
 class EnergyAccount:
     """One villager's share of the pool: the same questions and charges, without passing their name.
     The numbers stay in `MentalEnergy` (costs are averaged over everyone, and calls made in parallel are
-    settled together), so this holds nothing of its own and is never saved."""
+    settled together), so this holds nothing of its own and is never saved.
+    """
 
-    def __init__(self, pool: MentalEnergy, name: str):
+    def __init__(self, pool: MentalEnergy, name: str) -> None:
+        """Tie one villager's name to the shared pool."""
         self.pool, self.name = pool, name
 
     @property
     def left(self) -> float:
+        """Points this villager has left today."""
         return self.pool.left.get(self.name, 0)
 
     def can(self, need: float) -> bool:
+        """Is there energy left for a call that reads `need` points?"""
         return self.pool.can(self.name, need)
 
     def skip(self, kind: str) -> None:
+        """Count a call of this kind that this villager was too tired to make."""
         self.pool.skip(self.name, kind)
 
-    def set_plan(self, plan) -> dict | None:
+    def set_plan(self, plan: Any) -> dict[str, int] | None:
+        """Read the day's inward and outward split from a plan reply; the plan if it changed."""
         return self.pool.set_plan(self.name, plan)
 
     def record(
         self,
-        kind,
+        kind: str | None,
         what: str,
         read: float,
         written: float,
         thought: float,
         immediate: bool,
-        **more,
+        **more: float,
     ) -> None:
+        """Queue (or apply) the charge for one of this villager's calls, as `MentalEnergy.record`."""
         self.pool.record(
             self.name, kind, what, read, written, thought, immediate, **more
         )

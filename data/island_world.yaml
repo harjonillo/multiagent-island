@@ -322,15 +322,19 @@ mental_energy:
   daily: 150                       # points per villager per day (150 x 100 = about 15k tokens)
   tokens_per_point: 100
   carry_over: 0.0                  # share of unspent energy kept for the next day
+  plan_cost: 24                    # from prompt version 22: points a plan costs, whatever its length (before,
+                                   # a plan was charged for what it read and wrote, like every other call)
 
 building:
   path_styles: [dirt, stone, brick, sand, terracotta]
-  path_tiles_per_action: 30        # how much road one hour of work lays
+  path_tiles_per_action: 30        # how much road one hour of work lays (until prompt version 22: after that a path
+                                   # goes on the tiles a villager names, any within sight of where they stand)
   path_step_cost: 1.0              # ACNH: paths don't change walking speed. Below 1 makes roads faster.
   flower_bloom_days: 3             # seeds sprout, then bloom after this many days
   rock_respawn_days: 3             # a broken rock comes back somewhere else after this many days
   owner_only_pickup: true          # only the villager who placed something can pick it up or remove it
-  max_place_distance: 12           # how far from the named landmark things can be put
+  max_place_distance: 12           # how far from the named landmark things can be put (until prompt version 22,
+                                   # when the tiles are named exactly)
   road_bias: 0.8                   # wandering villagers on or next to a path step onto it this often
 
 # Able Sisters' clothing. These are placeholders: replace them with your own designs.

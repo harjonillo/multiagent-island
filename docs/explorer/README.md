@@ -9,8 +9,8 @@ and the "← experiments" link in the top bar of a run's pages. Everything else 
 |---|---|
 | `SPEC.md` | the three tabs (Home, Days, Social), their behaviour, and where every number comes from in a run directory |
 | `tokens.css` | the "Island Pixel" design tokens: colours, fonts, borders, shadows |
-| `export_map.py` | reference code for rendering the pixel island map and the overlay positions |
-| `door_sprites.py` | the pixel-art door, its four opening frames and the handle, as SVG; run it for a preview page |
+| `export_map.py` | removed: it was reference code for the pixel island map. The explorer now builds the map in `src/llmabm/island/site_data.py` (`map_data`) |
+| `door_sprites.py` | removed: the code-drawn door now lives only in `src/llmabm/island/site_doors.py` |
 | `door_art/` | Nov 9: Hannah's hand-drawn door, its hover sprite and six opening frames, replacing the door from `door_sprites.py`. Its README lists where it differs from SPEC.md and has a prompt |
 | `mockups/doors.dc.html`, `home.dc.html`, `days.dc.html`, `social.dc.html` | the mockup sources from the design canvas: inline styles and sample data to match visually (not standalone pages) |
 

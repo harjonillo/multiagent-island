@@ -8,32 +8,28 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
+from dotenv import load_dotenv
 
 from .island import IslandSimulation, load_island_scenario
 from .island.analysis import analyze_island
 from .island.sim import RunAborted
 from .llm import LLMError, load_backends, load_embedder
 
+if TYPE_CHECKING:
+    from .llm import Embedder
 
-def load_dotenv(path: Path = Path(".env")) -> None:
-    if not path.exists():
-        return
-    for line in path.read_text().splitlines():
-        line = line.strip()
-        if line and not line.startswith("#") and "=" in line:
-            k, v = line.split("=", 1)
-            os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
-
-
+LLM_CACHE = Path(".cache/llm")
 EMBED_CACHE = Path(".cache/embed")
 
 
-def _embedder(args):
+def _embedder(args: argparse.Namespace) -> tuple[Embedder | None, str | None]:
     """The embedder for retrieving memories (prompt version 20 on). `--embeddings` names one from the
     models file; without it the file's `embeddings.default` is used, except that an all-mock run stays
-    offline with the built-in word-hashing embedder. Returns (embedder, error)."""
+    offline with the built-in word-hashing embedder. Returns (embedder, error).
+    """
     name = args.embeddings or ("hash" if args.backend == "mock" else None)
     try:
         emb = load_embedder(args.config, EMBED_CACHE, name)
@@ -49,6 +45,14 @@ def _embedder(args):
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Run one `llmabm` command: run, resume, analyze or site.
+
+    Args:
+        argv: The arguments after the program name; None reads the real command line.
+
+    Returns:
+        The exit code: 0 when it worked, 2 for a mistake in what was asked, 3 when a run stopped early.
+    """
     ap = argparse.ArgumentParser(
         prog="llmabm", description="LLM agent-based model of an island"
     )
@@ -155,7 +159,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     args = ap.parse_args(argv)
-    load_dotenv()
+    load_dotenv(Path(".env"))  # API keys; what the environment already sets wins
 
     if args.cmd == "run":
         if (yaml.safe_load(args.scenario.read_text()) or {}).get("type") != "island":
@@ -168,10 +172,7 @@ def main(argv: list[str] | None = None) -> int:
         models = {a.model for a in sc.villagers.values()}
         try:
             backends = load_backends(
-                args.config,
-                Path(".cache/llm"),
-                salt=str(args.seed),
-                refresh=args.no_cache,
+                args.config, LLM_CACHE, salt=str(args.seed), refresh=args.no_cache
             )
         except LLMError as e:
             print(f"error: {e}", file=sys.stderr)
@@ -230,7 +231,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         seed = json.loads((args.run_dir / "manifest.json").read_text())["seed"]
         backends = load_backends(
-            args.config, Path(".cache/llm"), salt=str(seed), refresh=args.no_cache
+            args.config, LLM_CACHE, salt=str(seed), refresh=args.no_cache
         )
         embedder, problem = _embedder(args)
         if problem:

@@ -21,6 +21,14 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ..agent import AgentSpec
+    from .body import Body
+    from .energy import EnergyAccount
+    from .memory import MemoryStore
+    from .world import Island
 
 _LINKS = (
     "spec",
@@ -36,11 +44,14 @@ _LINKS = (
 
 
 def _choices() -> dict:
+    """Where a villager spends their energy until a plan says otherwise."""
     return {"plaza": True, "write": True, "next": "plan"}
 
 
 @dataclass
 class Villager:
+    """One villager: what they own and know, and the links to the rest of them."""
+
     name: str
     bells: int = 1000
     loan: int = 0
@@ -90,13 +101,24 @@ class Villager:
         default_factory=list
     )  # things they noticed today without doing anything
     arrival_hour: int | None = None  # the game hour they land on day 0
+    came_for: str | None = (
+        None  # version 22: why they planned the visit they are on, in their words
+    )
     # Prompt version 20: everything they lived through, kept for retrieval (see memory.MemoryStore).
     experience: list = field(default_factory=list)
     # Links, made again on load (see the module docstring).
-    spec: object = field(default=None, repr=False, compare=False)
-    body: object = field(default=None, repr=False, compare=False)
-    energy: object = field(default=None, repr=False, compare=False)
-    isl: object = field(default=None, repr=False, compare=False)
+    spec: AgentSpec = field(
+        default=None, repr=False, compare=False  # type: ignore[assignment]  # linked before use
+    )
+    body: Body = field(
+        default=None, repr=False, compare=False  # type: ignore[assignment]  # linked before use
+    )
+    energy: EnergyAccount = field(
+        default=None, repr=False, compare=False  # type: ignore[assignment]  # linked before use
+    )
+    isl: Island = field(
+        default=None, repr=False, compare=False  # type: ignore[assignment]  # linked before use
+    )
     keeps_page: bool = field(
         default=False, repr=False, compare=False
     )  # whether nightly reflection is on
@@ -113,20 +135,24 @@ class Villager:
     # before the prompt is built, cleared after. None means nothing was retrieved for this prompt.
     recalled: list | None = field(default=None, repr=False, compare=False)
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict[str, Any]:
+        """What a checkpoint keeps of them: everything but the links."""
         return {k: v for k, v in self.__dict__.items() if k not in _LINKS}
 
     def __setstate__(
-        self, state
-    ):  # checkpoints from before a field existed get its default
+        self, state: dict[str, Any]
+    ) -> None:  # checkpoints from before a field existed get its default
+        """Load from a checkpoint; anything it lacks starts as it would for a new villager."""
         fresh = Villager(state.get("name", ""))
         self.__dict__.update({**fresh.__dict__, **state})
 
     # --- what they own -------------------------------------------------------
     def items(self) -> int:
+        """How many things are in their pockets."""
         return sum(self.inventory.values())
 
     def home_count(self) -> int:
+        """How many things they keep at home."""
         return sum(self.home_items.values())
 
     def capacity(self) -> int:
@@ -136,22 +162,22 @@ class Villager:
     # --- who they are --------------------------------------------------------
     @property
     def persona(self) -> str:
+        """Who they are, as their cast file tells it."""
         return self.spec.persona
 
     @property
     def model(self) -> str:
+        """The LLM backend that speaks for them."""
         return self.spec.model
 
     # --- their day -----------------------------------------------------------
-    def awake_window(self) -> tuple[int, int]:
-        """[wake, sleep) in game hours, after any ordinance shift."""
-        return self.isl.awake_window(self.name)
-
     def is_awake(self, hour: int) -> bool:
+        """Whether they are up at this game hour."""
         return self.isl.is_awake(self.name, hour)
 
-    def neighbors(self) -> list[str]:
-        return self.isl.neighbors(self.name)
+    def holding(self, item: str) -> int:
+        """How many of `item` are in their pockets ("bells" is the wallet)."""
+        return self.bells if item == "bells" else self.inventory[item]
 
     # --- their mind ----------------------------------------------------------
     def page(self) -> str | None:
@@ -160,7 +186,8 @@ class Villager:
 
     def need(self, user: str) -> float:
         """Points of mental energy it takes to read this prompt: what changes from call to call
-        (the situation, and their own nightly page), not the fixed rules and persona."""
+        (the situation, and their own nightly page), not the fixed rules and persona.
+        """
         return self.energy.pool.points(self.page() or "", user)
 
     def can_read(self, user: str) -> bool:
@@ -168,7 +195,7 @@ class Villager:
         return self.energy.can(self.need(user))
 
     @property
-    def memory(self):
+    def memory(self) -> MemoryStore:
         """Their memory as one thing: what they chose to hold on to and everything they lived through."""
         from .memory import MemoryStore
 

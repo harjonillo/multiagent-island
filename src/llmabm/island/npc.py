@@ -13,8 +13,20 @@ roster here.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, cast
+
+from .space import version_of
+
+if TYPE_CHECKING:
+    from .body import Body
+    from .space import Outcome, Point
+    from .villager import Villager
+    from .world import Island
+
 
 class NPC:
+    """Someone who runs a building and answers `ask` with fixed text."""
+
     key: str = ""  # how the simulation names them (prompt files, events)
     name: str = ""  # how villagers see the name
     aliases: tuple[
@@ -25,19 +37,18 @@ class NPC:
     listed: bool = True  # whether plans offer "ask <name>"
     gives_map: bool = False  # hands out an island map (prompt version 3 on)
 
-    def describe(self, isl, vil) -> str:
+    def describe(self, isl: Island, vil: Villager) -> str:
         """What they say when asked: what they do, and what it costs."""
         raise NotImplementedError
 
-    def ask(self, isl, vil, hour) -> tuple[bool, str]:
+    def ask(self, isl: Island, vil: Villager, hour: int) -> Outcome:
+        """Answer a villager who asks. Tom Nook and Isabelle also hand over an island map to anyone who carries none
+        (prompt version 3 on).
+        """
         from .world import MAP
 
         text = self.describe(isl, vil)
-        if (
-            self.gives_map
-            and getattr(isl, "prompt_version", 1) >= 3
-            and vil.inventory[MAP] < 1
-        ):
+        if self.gives_map and version_of(isl) >= 3 and vil.inventory[MAP] < 1:
             if isl.space(vil) < 1:
                 text += " I'd give you a map of the island, but your pockets are full."
             else:
@@ -50,15 +61,18 @@ class NPC:
 
 
 class TomNook(NPC):
+    """Tom Nook at Resident Services: house upgrades, moving home, bridges and stairs."""
+
     key, name, aliases = "tom nook", "Tom Nook", ("tom nook",)
     building, place = "Resident Services", "resident_services"
     gives_map = True
 
-    def describe(self, isl, vil) -> str:
+    def describe(self, isl: Island, vil: Villager) -> str:
+        """The next house upgrade and the loan, moving home, and the bridge and stairs funds."""
         from .world import structures_cfg
 
         w = isl.w
-        version = getattr(isl, "prompt_version", 1)
+        version = version_of(isl)
         levels = w["house_levels"]
         if vil.house + 1 < len(levels):
             nxt = levels[vil.house + 1]
@@ -72,7 +86,7 @@ class TomNook(NPC):
             up += f". You still owe {vil.loan} bells, and that needs paying off before the next upgrade"
         else:
             up += ". A loan has to be paid off before the next upgrade"
-        free = [s for s in isl.free_sites() if s not in isl.pending_moves.values()]
+        free = isl.open_sites()
         sites = (
             ", ".join(f"{s} ({isl.sites[s]['area']})" for s in free) or "none right now"
         )
@@ -113,12 +127,15 @@ class TomNook(NPC):
 
 
 class Isabelle(NPC):
+    """Isabelle at Resident Services: ordinances, and the island's nightly report."""
+
     key, name, aliases = "isabelle", "Isabelle", ("isabelle",)
     building, place = "Resident Services", "resident_services"
     gives_map = True
 
-    def describe(self, isl, vil) -> str:
-        from .world import ORDINANCE_TEXT
+    def describe(self, isl: Island, vil: Villager) -> str:
+        """The ordinance in effect, the others, and what setting one costs."""
+        from .world import ORDINANCE_TEXT, ordinance_name
 
         ords = isl.w.get("ordinances", {})
         opts = "; ".join(
@@ -127,7 +144,7 @@ class Isabelle(NPC):
             if k != "none"
         )
         return (
-            f"Isabelle: The ordinance now is {ORDINANCE_TEXT.get(isl.ordinance, isl.ordinance).split(':')[0].lower()}. "
+            f"Isabelle: The ordinance now is {ordinance_name(isl.ordinance).lower()}. "
             f"Anyone can pay me {ords.get('cost', 0)} bells to set one for the whole island from the next "
             f"morning, or to lift it (none). Options: {opts}."
         )
@@ -135,29 +152,36 @@ class Isabelle(NPC):
     # The part of Isabelle that is an LLM: the nightly report and the morning announcement.
     @property
     def system(self) -> str:
+        """Her system prompt for the report and the announcement."""
         from .prompts import ISABELLE_SYSTEM
 
         return ISABELLE_SYSTEM
 
     def summary_prompt(self, day: int, digest: str) -> str:
+        """The prompt for her nightly report, from the day's digest."""
         from .prompts import isabelle_summary_prompt
 
         return isabelle_summary_prompt(day, digest)
 
     def announce_prompt(self, day: int, public: str, version: int) -> str:
+        """The prompt for her morning announcement, from what happened in public."""
         from .prompts import isabelle_announce_prompt
 
         return isabelle_announce_prompt(day, public, version)
 
     def backend_name(self, override: str | None, cfg: dict) -> str:
+        """The LLM backend that writes for her: the override, else the one in her settings, else the default."""
         return override or cfg.get("backend") or "default"
 
 
 class Blathers(NPC):
+    """Blathers at the museum: donations and fossil assessment."""
+
     key, name, aliases = "blathers", "Blathers", ("blathers",)
     building, place = "museum", "museum"
 
-    def describe(self, isl, vil) -> str:
+    def describe(self, isl: Island, vil: Villager) -> str:
+        """What the museum takes, how fossils are assessed, and what it holds so far."""
         from .world import FOSSIL
 
         return (
@@ -169,6 +193,8 @@ class Blathers(NPC):
 
 
 class TimmyAndTommy(NPC):
+    """Timmy and Tommy at Nook's Cranny: they buy almost anything and sell a daily stock."""
+
     key, name, aliases = (
         "timmy and tommy",
         "Timmy and Tommy",
@@ -176,7 +202,10 @@ class TimmyAndTommy(NPC):
     )
     building, place = "Nook's Cranny", "cranny"
 
-    def describe(self, isl, vil) -> str:
+    def describe(self, isl: Island, vil: Villager) -> str:
+        """What the shop does, and what it would pay for each thing the villager carries (prices they have then
+        heard).
+        """
         mine = {
             k: isl.sell_price(k)
             for k in sorted(vil.inventory)
@@ -202,6 +231,8 @@ class TimmyAndTommy(NPC):
 
 
 class AbleSisters(NPC):
+    """The Able Sisters at their clothes shop."""
+
     key, name, aliases = (
         "able sisters",
         "Able Sisters",
@@ -209,20 +240,23 @@ class AbleSisters(NPC):
     )
     building, place = "Able Sisters", "able"
 
-    def describe(self, isl, vil) -> str:
+    def describe(self, isl: Island, vil: Villager) -> str:
+        """That they sell clothes, and that others see what is worn."""
         return "The Able Sisters: We sell clothes, a few different ones every day. Others see what you wear."
 
 
 class RescueService(NPC):
     """Prompt version 15: takes a stranded villager home, once a day, free. Not someone to `ask`: a plan
-    calls them with the `call_rescue` action, wherever the villager is."""
+    calls them with the `call_rescue` action, wherever the villager is.
+    """
 
     key, name = "rescue service", "Rescue Service"
     listed = False
 
-    def take_home(self, body) -> tuple[bool, str]:
+    def take_home(self, body: Body) -> Outcome:
         """It comes only when there is no way home with the tools they carry, and says why they got stuck. A
-        second call that day is turned down: they get home when they fall asleep."""
+        second call that day is turned down: they get home when they fall asleep.
+        """
         isl, space = body.isl, body.space
         home = body.home_point()
         if home is None or body.pos is None:
@@ -257,7 +291,7 @@ class RescueService(NPC):
             "a ladder and a vaulting pole": "the way home crosses the river and climbs a cliff, and you carry "
             "neither a vaulting pole nor a ladder",
         }.get(gap, "there was no way home " "with the tools you carry")
-        body.pos, body.place = tuple(home), "home"
+        body.pos, body.place = cast("Point", tuple(home)), "home"
         return True, (
             f"the Rescue Service took you home from {where}, and gave you a talking-to: you were stuck "
             f"because {why}. Ladders and vaulting poles wear out a little on every trip that needs them, "
@@ -279,6 +313,6 @@ ROSTER: list[NPC] = [
 _BY_ALIAS = {a: npc for npc in ROSTER for a in npc.aliases}
 
 
-def find(who) -> NPC | None:
+def find(who: object) -> NPC | None:
     """The NPC a villager means by `who` (an `ask` action's "who"), or None."""
     return _BY_ALIAS.get(str(who or "").strip().lower())

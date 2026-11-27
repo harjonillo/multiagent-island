@@ -12,12 +12,13 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from collections.abc import Callable, Iterable, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
-from ..analysis import Run, load_run
+from ..analysis import Run, backend_names, backend_spec, load_run
 from .analysis import (
     RESOURCES,
-    _side,
     action_mix,
     assets,
     extraction_shares,
@@ -29,7 +30,12 @@ from .analysis import (
     run_out,
     snapshots,
 )
+from .fmt import side_text
 from .world import CATEGORIES, CLAM, FOSSIL, clock, sell_prices
+
+if TYPE_CHECKING:
+    from .grid import GridSpace
+    from .space import Cell, Event
 
 VERSION = 12  # 2: per-day detail for the Days tab; 3: interactions for the Social tab; 4: assets per day; 5: Isabelle; 6: recipes known
 # 7: what each thing on the map is, for hovering (objects.info), buildings' tiles, and each day's house names
@@ -81,6 +87,7 @@ TILE = {
 
 
 def fail_bucket(result: str) -> str:
+    """The FAIL_BUCKETS heading a failed action's result falls under; "Other" when it fits none."""
     for label, keys in FAIL_BUCKETS:
         if any(k in result for k in keys):
             return label
@@ -88,16 +95,18 @@ def fail_bucket(result: str) -> str:
 
 
 def _short_date(date: str) -> str:
+    """A day's date without its season and weather."""
     return (date or "").split(",")[0]  # "April 1, spring, rain" -> "April 1"
 
 
 def _date_range(dates: list[str]) -> str:
+    """The first and last of `dates` as one span: "April 1 to 5", or "April 28 to May 2" across months."""
     if not dates:
         return ""
     a, b = _short_date(dates[0]), _short_date(dates[-1])
     if a == b:
         return a
-    (ma, da), (mb, db) = a.rsplit(" ", 1), b.rsplit(" ", 1)
+    (ma, _), (mb, db) = a.rsplit(" ", 1), b.rsplit(" ", 1)
     return f"{a} to {db}" if ma == mb else f"{a} to {b}"
 
 
@@ -163,6 +172,9 @@ def map_data(run: Run) -> dict:
 
 
 def _objects(snap: dict) -> dict:
+    """What stood on the island at the end of a day, as the map draws it: positions only for paths,
+    things put outside and flowers.
+    """
     o = snap.get("objects") or {}
     return {
         "trees": o.get("trees", []),
@@ -194,7 +206,12 @@ def _act(t: dict, e: dict) -> str:
 FELLED = ("brought the tree down", "chopped down")  # chop results that left a stump
 
 
-def _near(at, objs, ok, taken) -> tuple | None:
+def _near(
+    at: Sequence[int],
+    objs: Iterable[Sequence[Any]],
+    ok: Callable[[Sequence[Any]], bool],
+    taken: set[Cell],
+) -> Cell | None:
     """The object at most one tile (diagonals too) from `at` that `ok` accepts and isn't `taken` yet, nearest first."""
     best = None
     for o in objs:
@@ -239,7 +256,8 @@ def tree_history(run: Run) -> dict[tuple, list[tuple]]:
 
 def _rock_notes(run: Run) -> dict[int, dict[int, str]]:
     """Per day, per rock number: whether it was the money rock, what was left at the end of the day, and who
-    mined it."""
+    mined it.
+    """
     import re
 
     hits = int(run.manifest["world"]["island"].get("rock_hits", 0))
@@ -332,6 +350,9 @@ def _object_info(snap: dict, hist: dict, rocks: dict) -> list[list]:
 
 
 def days_data(run: Run) -> list[dict]:
+    """For each finished day, what the map needs to draw it: the date, who lived where and in what,
+    everything standing on the island, and the bridge fund.
+    """
     starts = {e["day"]: e for e in run.of("day_start")}
     levels = run.manifest["world"]["house_levels"]
     hist, rocks = tree_history(run), _rock_notes(run)
@@ -346,7 +367,6 @@ def days_data(run: Run) -> list[dict]:
                 "day": d,
                 "date": _short_date(st.get("date", "")),
                 "season": st.get("season", ""),
-                "weather": st.get("weather", ""),
                 "homes": snap.get("homes", {}),
                 "home_areas": snap.get("home_areas", {}),
                 "objects": objects,
@@ -360,6 +380,7 @@ def days_data(run: Run) -> list[dict]:
 
 
 def home_data(run: Run) -> dict:
+    """Everything on the explorer's first page: the headline numbers, the charts and a card for each villager."""
     m, snaps = run.manifest, snapshots(run)
     last, names, ndays = snaps[-1], list(m["villagers"]), len(snaps)
     world = m["world"]
@@ -367,7 +388,10 @@ def home_data(run: Run) -> dict:
     failed = [a for a in acts if not a["ok"]]
     days = [s["day"] for s in snaps]
 
-    def per_day(events, key=lambda e: True):
+    def per_day(
+        events: list[Event], key: Callable[[Event], bool] = lambda e: True
+    ) -> list[int]:
+        """How many of `events` (those `key` accepts) fell on each day of the run."""
         c = Counter(e["day"] for e in events if key(e))
         return [c[d] for d in days]
 
@@ -444,6 +468,8 @@ def home_data(run: Run) -> dict:
     ]
 
     sightings = Counter(e["agent"] for e in run.of("sighting") for _ in e["seen"])
+    talk: Counter[str]
+    spent: Counter[str]
     talk, spent = Counter(), Counter()
     for e in run.of("energy"):
         for n, v in e["villagers"].items():
@@ -467,7 +493,7 @@ def home_data(run: Run) -> dict:
             }
         )
 
-    pages = {n: [None] * ndays for n in names}
+    pages: dict[str, list[dict[str, Any] | None]] = {n: [None] * ndays for n in names}
     index = {d: i for i, d in enumerate(days)}
     for e in run.of("reflection"):
         if e["day"] not in index:
@@ -543,9 +569,10 @@ def _pools(p: dict) -> dict:
     }
 
 
-def _offer_text(e: dict) -> str:
+def _offer_text(e: Event) -> str:
+    """A plaza trade offer as the Days tab words it."""
     return (
-        f"offers {_side(e['give'])} for {_side(e['want'])}"
+        f"offers {side_text(e['give'])} for {side_text(e['want'])}"
         + (" (a counter-offer)" if e.get("parent") else "")
         + (f': "{e["note"]}"' if e.get("note") else "")
     )
@@ -556,7 +583,8 @@ def _assets(v: dict, world: dict) -> dict:
     inventory: the house only adds room to it (pockets plus the house's storage). From version 12 the pockets
     and what is kept at home are apart: `bells`, `n`, `value` and `items` are the pockets (bells in the wallet),
     and `home_bells`, `home_value` and `home_items` what is kept at home. Snapshots list the items from Nov 2026
-    on; older ones only count them (`items` is then None)."""
+    on; older ones only count them (`items` is then None).
+    """
     house = world["house_levels"][v["house"]]
     return {
         "bells": v["bells"],
@@ -673,7 +701,8 @@ def _isabelle(start: dict | None, events: list[dict], llm_announce: bool) -> dic
     """What Isabelle said that day. The morning announcement is the day_start event's `heard`, exactly as the
     villagers' first plan of the day showed it; older runs didn't record it, and are rebuilt from the same event
     with the same function (they all used the original template). The report is her end-of-day summary,
-    written for the researcher and never shown to villagers."""
+    written for the researcher and never shown to villagers.
+    """
     from types import SimpleNamespace
 
     from .prompts import announcement_text
@@ -692,7 +721,7 @@ def _isabelle(start: dict | None, events: list[dict], llm_announce: bool) -> dic
         )
         if not start.get("date"):
             del isl.weather  # runs without a calendar leave the weather line out
-        heard = announcement_text(isl)
+        heard = announcement_text(isl)  # type: ignore[arg-type]  # a stand-in with just what the original template reads
     report = next(
         (e.get("text") for e in events if e["type"] == "isabelle_summary"), None
     )
@@ -712,7 +741,7 @@ _TOOLSETS = [
 _STEP = {(1, 0): "r", (-1, 0): "l", (0, 1): "d", (0, -1): "u"}
 
 
-def day_routes(g, states: list[dict]) -> dict[str, list]:
+def day_routes(g: GridSpace, states: list[Event]) -> dict[str, list]:
     """Where each villager walked in a day, for drawing on the map: per villager, a list of legs
     [hour, x, y, steps, length, tools]. A leg is the shortest walk between where they were at the end of one
     hour and the next, starting at (x, y), one letter per tile in `steps` (r, l, d, u). The events keep
@@ -727,7 +756,7 @@ def day_routes(g, states: list[dict]) -> dict[str, list]:
     _, lvl = g._lookups()
     stairs = g.stair_steps()
     out: dict[str, list] = {}
-    last: dict[str, tuple] = {}
+    last: dict[str, tuple | None] = {}
     for st in states:
         for n, v in st["villagers"].items():
             pos = tuple(v["pos"]) if v.get("pos") else None
@@ -760,7 +789,7 @@ def day_routes(g, states: list[dict]) -> dict[str, list]:
                 t
                 for t in best[2]
                 if g.walk(before[0], pos, best[2] - {t}) is None
-                or g.walk(before[0], pos, best[2] - {t})[1] > length + 1e-9
+                or g.walk(before[0], pos, best[2] - {t})[1] > length + 1e-9  # type: ignore[index]  # the line above rules out None
             )
             leg = [st["hour"], cells[0][0], cells[0][1], steps, round(length), used]
             at, wet = [], []
@@ -787,14 +816,15 @@ def day_routes(g, states: list[dict]) -> dict[str, list]:
 def day_detail(run: Run) -> list[dict]:
     """Per day, for the Days tab: counts, the commons hour by hour, and per villager their plans,
     actions, sightings and nightly page; plus every conversation and piece of mail.
-    Hours are the island's (5 to 28); the page shows hour % 24."""
+    Hours are the island's (5 to 28); the page shows hour % 24.
+    """
     days = [s["day"] for s in snapshots(run)]
     by_day: dict[int, list[dict]] = {d: [] for d in days}
     for e in run.events:
         if e.get("day") in by_day:
             by_day[e["day"]].append(e)
     snaps = {s["day"]: s for s in snapshots(run)}
-    from .grid import BRIDGE, GridSpace
+    from .grid import GridSpace
 
     grid = GridSpace(
         run.manifest["world"], run.manifest["seed"]
@@ -804,20 +834,21 @@ def day_detail(run: Run) -> list[dict]:
     out = []
     for d in days:
         ev = by_day[d]
-        of = lambda t: [e for e in ev if e["type"] == t]  # noqa: E731
+        # `of` is only called in this turn of the loop, so reading `ev` late is safe (B023).
+        of = lambda t: [e for e in ev if e["type"] == t]  # noqa: E731, B023
         start = next((e for e in ev if e["type"] == "day_start"), None)
         states = of("hour_state")
         if ((snaps.get(d - 1) or {}).get("objects") or {}).get(
             "bridge_open"
         ) and not grid.bridge_built:
-            for x, y in grid.bridge_cells:
-                grid.terrain[y][x] = BRIDGE
-            grid.bridge_built = True
-            grid._version += 1
+            grid.open_bridge()
         hours = [h["hour"] for h in states]
         series = [_pools(start["pools"])] if start else []
         series += [_pools(h["pools"]) for h in states]
 
+        plans: dict[str, list[dict[str, Any]]]
+        acts: dict[str, list[list]]
+        seen: dict[str, list[list]]
         plans, acts, seen, pages = {}, {}, {}, {}
         for e in of("plan"):
             plans.setdefault(e["agent"], []).append(
@@ -882,7 +913,7 @@ def day_detail(run: Run) -> list[dict]:
                     "h": e["hour"],
                     "from": e["sender"],
                     "to": e["recipient"],
-                    "text": _side(e["items"])
+                    "text": side_text(e["items"])
                     + (f': "{e["note"]}"' if e.get("note") else ""),
                 }
             )
@@ -924,7 +955,7 @@ def day_detail(run: Run) -> list[dict]:
                     "from": e["giver"],
                     "to": e["receiver"],
                     "in_person": e["how"] == "in person",
-                    "text": f"{_side(e['items'])}, {e['how']}"
+                    "text": f"{side_text(e['items'])}, {e['how']}"
                     + ("" if e["ok"] else f"; failed: {e['result']}"),
                 }
             )
@@ -988,7 +1019,8 @@ def social_data(run: Run) -> list[dict]:
     kinds: chat (a chance meeting; `a` approached `b`), visit (`a` knocked at `b`'s door; an answered
     visit carries the conversation that followed, so it counts once), letter, parcel, gift (in person;
     mailed gifts are the parcels), offer (`a` offered `b`), trade (`a` sold to `b`). Dialogue only:
-    private thoughts stay on the Days tab."""
+    private thoughts stay on the Days tab.
+    """
     names = set(run.manifest["villagers"])
     done = {
         snap["day"] for snap in snapshots(run)
@@ -1040,7 +1072,7 @@ def social_data(run: Run) -> list[dict]:
                 "k": "parcel",
                 "a": e["sender"],
                 "b": e["recipient"],
-                "text": _side(e["items"])
+                "text": side_text(e["items"])
                 + (f': "{e["note"]}"' if e.get("note") else ""),
             }
         elif t == "gift" and e.get("how") == "in person":
@@ -1048,7 +1080,7 @@ def social_data(run: Run) -> list[dict]:
                 "k": "gift",
                 "a": e["giver"],
                 "b": e["receiver"],
-                "text": _side(e["items"])
+                "text": side_text(e["items"])
                 + ("" if e["ok"] else f" (failed: {e['result']})"),
             }
         elif t == "offer":
@@ -1070,7 +1102,7 @@ def social_data(run: Run) -> list[dict]:
                 "k": "trade",
                 "a": e["seller"],
                 "b": e["buyer"],
-                "text": f"{_side(e['give'])} for {_side(e['want'])} (Cranny value {e.get('give_cranny_value', '?'):,} "
+                "text": f"{side_text(e['give'])} for {side_text(e['want'])} (Cranny value {e.get('give_cranny_value', '?'):,} "
                 f"for {e.get('want_cranny_value', '?'):,})",
             }
         if (
@@ -1085,14 +1117,13 @@ def social_data(run: Run) -> list[dict]:
 
 
 def build(run_dir: Path) -> dict:
+    """Everything the explorer page shows about a run, as one JSON-ready dict. `VERSION` goes with it,
+    so a page can tell data built by older code.
+    """
     run = load_run(run_dir)
     m, snaps = run.manifest, snapshots(run)
     starts = run.of("day_start")
-    backend = (
-        m.get("backend_override")
-        or sorted({v["model"] for v in m["villagers"].values()})[0]
-    )
-    model = (m.get("backends") or {}).get(backend, backend)
+    backend = backend_names(m)[0]
     return {
         "version": VERSION,
         "run": {
@@ -1100,7 +1131,7 @@ def build(run_dir: Path) -> dict:
             "scenario": m["scenario"],
             "seed": m["seed"],
             "backend": backend,
-            "model": model.split("|")[1] if "|" in model else model,
+            "model": backend_spec(m, backend)[1],
             "villagers": list(m["villagers"]),
             "days": len(snaps),
             "dates": _date_range(
@@ -1122,18 +1153,12 @@ def build(run_dir: Path) -> dict:
 def mind_data(run: Run) -> dict:
     """What every villager is made of, for the How they work tab: the model and request settings, the
     daily mental energy, the nightly page, memory, and which prompt version each day used (with what
-    changed mid-run)."""
+    changed mid-run).
+    """
     m = run.manifest
     cfg = m.get("scenario_config") or {}
-    backend = (
-        m.get("backend_override")
-        or sorted({v["model"] for v in m["villagers"].values()})[0]
-    )
-    spec = (m.get("backends") or {}).get(backend, backend).split("|")
-    try:
-        params = json.loads(spec[2]) if len(spec) > 2 else {}
-    except ValueError:
-        params = {}
+    backend = backend_names(m)[0]
+    url, model, params = backend_spec(m, backend)
     # Prompt versions: what the run started with, then each resume that switched it.
     start = m.get("prompt_version")
     if start is None:
@@ -1160,8 +1185,8 @@ def mind_data(run: Run) -> dict:
         memory = {"mode": "consolidate", **DEFAULTS}
     return {
         "backend": backend,
-        "url": spec[0] if len(spec) > 1 else "",
-        "model": spec[1] if len(spec) > 1 else spec[0],
+        "url": url,
+        "model": model,
         "params": params,
         "llm": cfg.get("llm", {}),
         "energy": cfg.get("mental_energy", {}),
@@ -1182,6 +1207,7 @@ def mind_data(run: Run) -> dict:
 
 
 def write(run_dir: Path) -> Path:
+    """Write <run_dir>/site_data.json and return its path."""
     out = Path(run_dir) / "site_data.json"
     out.write_text(
         json.dumps(build(run_dir), ensure_ascii=False, separators=(",", ":"))

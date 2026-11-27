@@ -35,7 +35,8 @@ def _crumb(run_dir: Path, home: str) -> str:
 def fresh_site_data(run_dir: Path) -> Path:
     """<run_dir>/site_data.json, written again (no LLM calls) if it is missing, older than the run's
     events.jsonl or manifest.json (say after a resume that stopped at a daily cap, which skips
-    `llmabm analyze`), or from an older version of the site code."""
+    `llmabm analyze`), or from an older version of the site code.
+    """
     run_dir = Path(run_dir)
     out = run_dir / "site_data.json"
     if out.exists():
@@ -91,7 +92,8 @@ def build_all(runs_dir: Path, out_dir: Path | None = None) -> list[Path]:
 
     By default the pages go inside the runs folder (<run>/site/, and site/ for the Experiments page).
     With out_dir, the whole site goes there instead, ready to publish: index.html is the Experiments
-    page and <run>/index.html each run's."""
+    page and <run>/index.html each run's.
+    """
     runs_dir = Path(runs_dir)
     out = []
     for run_dir in experiment_order(runs_dir):

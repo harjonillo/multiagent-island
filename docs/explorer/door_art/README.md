@@ -1,8 +1,7 @@
 # Hand-drawn door art
 
 Added Nov 9. Hannah drew her own door to replace the code-drawn one on the Experiments page
-(`docs/explorer/door_sprites.py`, used in the repo as `src/llmabm/island/site_doors.py` and
-`site_experiments.py`).
+(`src/llmabm/island/site_doors.py` and `site_experiments.py`).
 
 | file | what it is |
 |---|---|

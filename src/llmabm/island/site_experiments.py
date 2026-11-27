@@ -14,8 +14,10 @@ import html
 import json
 import time
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
+from ..analysis import backend_names, backend_spec, read_events
 from .site_doors import (
     EMPTY_DOOR,
     FRAME_MS,
@@ -33,11 +35,14 @@ TOKENS = Path(__file__).with_name("site_tokens.css")
 
 
 def is_run(path: Path) -> bool:
+    """Whether a folder is a run directory (it has a manifest.json)."""
     return (Path(path) / "manifest.json").exists()
 
 
 def _first_events(run_dir: Path) -> tuple[dict, dict]:
     """The run_start event and day 0's day_start event (empty dicts if missing)."""
+    start: dict[str, Any]
+    day0: dict[str, Any]
     start, day0 = {}, {}
     p = run_dir / "events.jsonl"
     if p.exists():
@@ -56,17 +61,13 @@ def _first_events(run_dir: Path) -> tuple[dict, dict]:
 def is_mock(run_dir: Path) -> bool:
     """A run whose villagers all used the mock backend (scripted replies, for testing the code)."""
     m = json.loads((Path(run_dir) / "manifest.json").read_text())
-    names = (
-        [m["backend_override"]]
-        if m.get("backend_override")
-        else {v["model"] for v in m["villagers"].values()}
-    )
-    return all(n == "mock" or (m.get("backends") or {}).get(n) == "mock" for n in names)
+    return all(n == "mock" or backend_spec(m, n)[1] == "mock" for n in backend_names(m))
 
 
 def experiment_order(runs_dir: Path) -> list[Path]:
     """Run directories in a runs folder, oldest first (by the run_start time, else the folder's).
-    Mock runs are left out: they test the code, they aren't experiments."""
+    Mock runs are left out: they test the code, they aren't experiments.
+    """
     runs = [
         p
         for p in Path(runs_dir).iterdir()
@@ -74,6 +75,7 @@ def experiment_order(runs_dir: Path) -> list[Path]:
     ]
 
     def started(p: Path) -> float:
+        """When the run began: its run_start time, else when its folder was last changed."""
         return _first_events(p)[0].get("time") or p.stat().st_mtime
 
     return sorted(runs, key=lambda p: (started(p), p.name))
@@ -81,20 +83,13 @@ def experiment_order(runs_dir: Path) -> list[Path]:
 
 def agents_label(m: dict) -> str:
     """Backend and model the villagers use, e.g. `groq · openai/gpt-oss-20b`, or `mock backend`."""
-    names = (
-        [m["backend_override"]]
-        if m.get("backend_override")
-        else sorted({v["model"] for v in m["villagers"].values()})
-    )
     parts = []
-    for name in names:
-        spec = (m.get("backends") or {}).get(name, name)
-        if spec == "mock" or name == "mock":
+    for name in backend_names(m):
+        url, model, _ = backend_spec(m, name)
+        if model == "mock" or name == "mock":
             parts.append("mock backend")
             continue
-        url, _, rest = spec.partition("|")
-        model = rest.split("|")[0] if rest else url
-        if name == "default" and rest:  # name the provider rather than "default"
+        if name == "default" and url:  # name the provider rather than "default"
             host = urlparse(url).hostname or ""
             name = host.split(".")[-2] if host.count(".") >= 1 else host or name
         parts.append(f"{name} · {model}")
@@ -102,6 +97,7 @@ def agents_label(m: dict) -> str:
 
 
 def _list(items: list[str]) -> str:
+    """The items with commas between them, or "none"."""
     return ", ".join(items) if items else "none"
 
 
@@ -174,6 +170,9 @@ def conditions(m: dict, day0: dict) -> dict:
 
 
 def experiment(run_dir: Path, number: int) -> dict:
+    """What the Experiments page shows for one run: its number, scenario, seed, agents, progress,
+    start date and initial conditions.
+    """
     run_dir = Path(run_dir)
     m = json.loads((run_dir / "manifest.json").read_text())
     start, day0 = _first_events(run_dir)
@@ -197,10 +196,12 @@ def experiment(run_dir: Path, number: int) -> dict:
 
 
 def _day(n: int, dates: dict) -> str:
+    """An island day for the changelog, with its date when the run has a calendar: "day 3 · April 4"."""
     return f"day {n}" + (f" · {dates[n]}" if dates.get(n) else "")
 
 
 def _real_date(t: float) -> str:
+    """A real-world time as a date in local time: "Nov 27, 2026"."""
     lt = time.localtime(t)
     return f"{time.strftime('%b', lt)} {lt.tm_mday}, {lt.tm_year}"
 
@@ -214,7 +215,7 @@ def changes(run_dir: Path, e: dict) -> list[dict]:
     m = json.loads((run_dir / "manifest.json").read_text())
     dates, start_time, out = {}, None, []
     p = run_dir / "events.jsonl"
-    events = [json.loads(line) for line in p.open()] if p.exists() else []
+    events = read_events(p) if p.exists() else []
     for ev in events:
         if ev.get("type") == "day_start":
             dates[ev["day"]] = (ev.get("date") or "").split(",")[
@@ -310,10 +311,12 @@ def sim_changes(path: Path = SIM_CHANGES) -> list[dict]:
 
 # --- the page ------------------------------------------------------------------------------
 def _pos(d: dict) -> str:
+    """A dict of CSS properties as the text of a style attribute."""
     return "; ".join(f"{k}: {v}" for k, v in d.items())
 
 
 def _rows(rows: list[list[str]]) -> str:
+    """Label and value pairs as the rows of a card, escaped."""
     return "".join(
         f'<div class="row"><div class="k">{html.escape(k)}</div><div>{html.escape(v)}</div></div>'
         for k, v in rows
@@ -321,6 +324,7 @@ def _rows(rows: list[list[str]]) -> str:
 
 
 def _sign(number: int, line: str) -> str:
+    """The sign board on a code-drawn door: the experiment's number and one line under it."""
     return (
         f'<div class="sign" style="{_pos(SIGN)}"><span class="exp">EXP {number:02d}</span>'
         f'<span class="scn">{html.escape(line)}</span></div>'
@@ -328,6 +332,7 @@ def _sign(number: int, line: str) -> str:
 
 
 def door_html(e: dict) -> str:
+    """One experiment's slot: its door, linking to the run's page, and the card under it."""
     n = e["number"]
     label = f"Open experiment {n:02d}: {e['scenario']}, {e['agents']}"
     c = e["conditions"]
@@ -357,6 +362,7 @@ def door_html(e: dict) -> str:
 
 
 def empty_html(number: int, runs_dir: Path) -> str:
+    """The faded slot after the last experiment, with a command that would fill it."""
     cmd = f"llmabm run scenarios/island_blank.yaml --backend groq --seed 0 --run-dir {runs_dir.name}/exp{number:02d}"
     return f"""
     <div class="slot">
@@ -375,13 +381,15 @@ def empty_html(number: int, runs_dir: Path) -> str:
 
 
 def _sentence(t: str) -> str:
+    """The text starting with a capital and ending with a full stop, unless it already ends a sentence."""
     t = t[:1].upper() + t[1:]
     return t if t[-1:] in ".!?" else t + "."
 
 
 def changelog_html(entries: list[dict]) -> str:
     """The sidebar: every experiment's start and changes, newest first. It folds to a tab (the script
-    remembers which); without the script it stays open."""
+    remembers which); without the script it stays open.
+    """
     items = []
     for c in sorted(entries, key=lambda c: -c["time"]):
         exp = c.get("label") or f"EXP {c['number']:02d}"
@@ -420,7 +428,8 @@ def build_experiments(runs_dir: Path, out_dir: Path | None = None) -> Path:
 
     By default it goes to <runs_dir>/site/index.html, linking to each run's <run>/site/index.html.
     With out_dir (a folder to publish, as for GitHub Pages) it is <out_dir>/index.html, linking to
-    <out_dir>/<run>/index.html; build_all writes the run pages there."""
+    <out_dir>/<run>/index.html; build_all writes the run pages there.
+    """
     runs_dir = Path(runs_dir)
     exps = [experiment(p, i) for i, p in enumerate(experiment_order(runs_dir))]
     for e in exps:

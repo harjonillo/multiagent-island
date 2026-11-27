@@ -3,8 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+import numpy as np
 
 from .grid import BRIDGE, POND, RIVER, ROCKY, SAND, SEA, GridSpace
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
 COLORS = {
     "sea": (0.62, 0.79, 0.90),
@@ -21,9 +27,8 @@ COLORS = {
 }
 
 
-def _rgb(g: GridSpace, homes: dict | None):
-    import numpy as np
-
+def _rgb(g: GridSpace, homes: dict | None) -> np.ndarray:
+    """The island as an image, one pixel per tile: ground, water, buildings and homesites (lived in or free)."""
     img = np.zeros((g.H, g.W, 3))
     for y in range(g.H):
         for x in range(g.W):
@@ -41,7 +46,7 @@ def _rgb(g: GridSpace, homes: dict | None):
             else:
                 c = COLORS[f"tier{g.tier[y][x]}"]
             img[y, x] = c
-    for name, b in g.buildings.items():
+    for name, b in g.buildings.items():  # noqa: B007
         for x, y in b["cells"]:
             img[y, x] = (
                 COLORS["plaza"] if not b.get("blocking", True) else COLORS["building"]
@@ -62,13 +67,15 @@ PATH_COLORS = {
 }
 
 
-def _overlay_rgb(img, objects: dict):
+def _overlay_rgb(img: np.ndarray, objects: dict) -> np.ndarray:
+    """Paint the paths villagers laid onto the island image."""
     for x, y, style, *_ in objects.get("paths", []):
         img[y, x] = PATH_COLORS.get(style, (0.72, 0.58, 0.42))
     return img
 
 
-def _built(ax, objects: dict, small: bool = False):
+def _built(ax: Axes, objects: dict, small: bool = False) -> None:
+    """Draw what villagers put outside: fences, furniture, and flowers in bloom or still growing."""
     ms = 1.5 if small else 3.0
     fences = [
         (x, y)
@@ -98,7 +105,8 @@ def _built(ax, objects: dict, small: bool = False):
         ax.plot(*zip(*fl_s), ".", ms=ms, color="#8fbf6a", ls="")
 
 
-def _objects(ax, g: GridSpace, trees: list, rocks: list, small: bool = False):
+def _objects(ax: Axes, trees: list, rocks: list, small: bool = False) -> None:
+    """Draw the trees, stumps, saplings and rocks."""
     ms = 1.5 if small else 3.2
     rocks = [r for r in rocks if r]
     hard = [(x, y) for x, y, k in trees if k == "hardwood"]
@@ -117,7 +125,8 @@ def _objects(ax, g: GridSpace, trees: list, rocks: list, small: bool = False):
         ax.plot(*zip(*rocks), "s", ms=ms * 1.1, color="#6b6a66", ls="")
 
 
-def _legend(ax, g: GridSpace, homes: dict | None, bridge_site: bool) -> None:
+def _legend(ax: Axes, g: GridSpace, homes: dict | None, bridge_site: bool) -> None:
+    """The key to the map's colours and markers, beside the map."""
     from matplotlib.lines import Line2D
     from matplotlib.patches import Patch
 
@@ -125,7 +134,7 @@ def _legend(ax, g: GridSpace, homes: dict | None, bridge_site: bool) -> None:
         facecolor=c, edgecolor="#8a8984", label=label
     )  # noqa: E731
     dot = lambda label, **k: Line2D([], [], ls="", label=label, **k)  # noqa: E731
-    h = [
+    h: list[Patch | Line2D] = [
         sq(COLORS["sea"], "sea"),
         sq(COLORS["sand"], "beach"),
         sq((0.55, 0.52, 0.47), "rocky beach (no walking)"),
@@ -164,6 +173,10 @@ def render_grid_map(
     objects: dict | None = None,
     bridge_site: bool = False,
 ) -> Path:
+    """Draw the island map to `out`: ground and water, named buildings, homesites with who lives there, numbered
+    rocks, trees, and what villagers built. Left out, `rocks` are the grid's own; `bridge_site` marks where the
+    first bridge will go while it is not built. Returns the file written.
+    """
     import matplotlib
 
     matplotlib.use("Agg")
@@ -175,7 +188,7 @@ def render_grid_map(
         interpolation="nearest",
         origin="upper",
     )
-    _objects(ax, g, trees or [], rocks if rocks is not None else list(g.rock_cells))
+    _objects(ax, trees or [], rocks if rocks is not None else list(g.rock_cells))
     _built(ax, objects or {})
     for i, c in enumerate(rocks if rocks is not None else g.rock_cells):
         if c:
@@ -234,7 +247,8 @@ def render_tracks(
 ) -> Path:
     """Small multiples: each villager's hour-by-hour positions over one day on a faint map. With `walks`
     (per villager, every tile they walked in order) the line follows the walk; without, it joins the
-    positions straight."""
+    positions straight.
+    """
     import matplotlib
 
     matplotlib.use("Agg")
@@ -251,7 +265,7 @@ def render_tracks(
     base = _overlay_rgb(_rgb(g, homes), objects or {}) * 0.45 + 0.55
     for ax, n in zip(axes.flat, names):
         ax.imshow(base, interpolation="nearest", origin="upper")
-        _objects(ax, g, trees, rocks, small=True)
+        _objects(ax, trees, rocks, small=True)
         pts = [p for p in tracks[n] if p]
         if pts:
             xs, ys = zip(*pts)

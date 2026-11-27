@@ -11,7 +11,10 @@ Only the door leaf (x 20..43, y 11..48) changes. The frame, step and plants are 
 usage: python make_door_frames.py   (needs Pillow)
 """
 from pathlib import Path
+
 from PIL import Image
+
+RGBA = tuple[int, int, int, int]  # a pixel's colour
 
 HERE = Path(__file__).parent
 src = Image.open(HERE / "door_source.png").convert("RGBA")
@@ -40,17 +43,25 @@ KNOB = [(x, y) for x in range(36, 42) for y in range(28, 35) if turned.getpixel(
 SPECS = [(24, 1.00, 0), (20, 0.90, 1), (15, 0.80, 2), (10, 0.70, 3), (6, 0.60, 3), (3, 0.50, 4)]
 
 
-def shade(c, k):
+def shade(c: RGBA, k: float) -> RGBA:
+    """The colour darkened to `k` of its brightness, as opaque as before."""
     return (int(c[0] * k), int(c[1] * k), int(c[2] * k), c[3])
 
 
-def squish(base, w, k, shrink, mapping=None):
+def squish(base: Image.Image, w: int, k: float, shrink: int,
+           mapping: dict[tuple[int, int], tuple[int, int]] | None = None) -> Image.Image:
+    """The source with its door leaf redrawn from `base`, part of the way open.
+
+    The leaf is narrowed to `w` columns from its left hinge and darkened to `k`; its free edge pulls in
+    by `shrink` rows at top and bottom. The doorway left uncovered shows the dark room. `mapping`,
+    when given, is filled with where each leaf pixel that was kept ended up.
+    """
     leaf = base.crop((X0, Y0, X1, Y1)).load()
     im = src.copy()
     px = im.load()
     for y in range(Y0, Y1):
         for x in range(X0, X1):
-            px[x, y] = FLOOR if y >= Y1 - 3 else INTERIOR
+            px[x, y] = FLOOR if y >= Y1 - 3 else INTERIOR  # type: ignore[index]  # an image in memory always has its pixels
     for dx in range(w):
         sx = min(W - 1, dx * W // w)
         s = round(shrink * (dx + 1) / w)
@@ -59,18 +70,18 @@ def squish(base, w, k, shrink, mapping=None):
             sy = min(H - 1, dy * H // h)
             if mapping is not None:
                 mapping.setdefault((X0 + sx, Y0 + sy), (X0 + dx, Y0 + s + dy))
-            px[X0 + dx, Y0 + s + dy] = shade(leaf[sx, sy], k)
+            px[X0 + dx, Y0 + s + dy] = shade(leaf[sx, sy], k)  # type: ignore[index, arg-type]  # as above; an RGBA pixel is 4 ints
     return im
 
 
 frames = [src.copy()]
 # Frame 1: squish the door without its lever, then lay the turned knob on top at full size, so the
 # column-dropping squish does not cut the lever's arm off.
-m = {}
+m: dict[tuple[int, int], tuple[int, int]] = {}
 f1 = squish(plain, *SPECS[1], mapping=m)
 ox, oy = m[(39, 30)][0] - 39, m[(39, 30)][1] - 30
 for (x, y) in KNOB:
-    f1.putpixel((x + ox, y + oy), shade(turned.getpixel((x, y)), SPECS[1][1]))
+    f1.putpixel((x + ox, y + oy), shade(turned.getpixel((x, y)), SPECS[1][1]))  # type: ignore[arg-type]  # an RGBA pixel is 4 ints
 frames.append(f1)
 frames += [squish(turned, *s) for s in SPECS[2:]]
 
@@ -85,9 +96,9 @@ sheet.save(HERE / "door_open_sheet.png")
 seq = frames + [frames[-1]] * 6 + frames[::-1] + [frames[0]] * 8
 out = []
 for f in seq:
-    b = f.resize((384, 384), Image.NEAREST)
-    c = Image.new("RGBA", b.size, (238, 232, 214, 255))
-    c.alpha_composite(b)
-    out.append(c.convert("RGB"))
+    b = f.resize((384, 384), Image.NEAREST)  # type: ignore[attr-defined]  # Pillow's older name for Resampling.NEAREST, still there
+    c = Image.new("RGBA", b.size, (238, 232, 214, 255))  # type: ignore[assignment]  # c was a colour in a loop above
+    c.alpha_composite(b)  # type: ignore[attr-defined]  # as above
+    out.append(c.convert("RGB"))  # type: ignore[attr-defined]  # as above
 out[0].save(HERE / "door_preview.gif", save_all=True, append_images=out[1:], duration=80, loop=0)
 print("wrote frames to", HERE)

@@ -1,20 +1,31 @@
 """Reading an island run back: hoarding, wealth, the museum dilemma, trades,
-recipe spread, plots and a readable diary."""
+recipe spread, plots and a readable diary.
+"""
 
 from __future__ import annotations
 
 import re
+import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, cast
+
+import numpy as np
 
 from ..analysis import Run, load_run
+from .fmt import side_text
 from .prompts import act_record
 from .world import CATEGORIES, FOSSIL, ORDINANCE_TEXT, category_of, clock
+
+if TYPE_CHECKING:
+    from .space import Cell, Event
+    from .world import Island
 
 RESOURCES = ["rocks", "wood", "fruit", "fish", "bugs", "shells", "fossils"]
 
 
-def snapshots(run: Run) -> list[dict]:
+def snapshots(run: Run) -> list[Event]:
+    """The end-of-day snapshots of a run, one per finished day, in order."""
     return run.of("snapshot")
 
 
@@ -23,16 +34,18 @@ def assets(v: dict) -> int:
     return (
         v["bells"]
         + v.get("home_bells", 0)
-        + v["inventory_value"]
+        + v.get("inventory_value", 0)
         + v.get("home_value", 0)
     )
 
 
 def net_worth(snap: dict) -> dict[str, int]:
+    """Each villager's assets less their loan, from one end-of-day snapshot."""
     return {n: assets(v) - v["loan"] for n, v in snap["villagers"].items()}
 
 
 def gini(xs: list[float]) -> float:
+    """The Gini coefficient: 0 when everyone has the same, near 1 when one has it all. Negatives count as 0."""
     xs = sorted(max(0.0, x) for x in xs)
     n, s = len(xs), sum(xs)
     if n == 0 or s == 0:
@@ -78,7 +91,8 @@ def commons_contributions(run: Run) -> dict[str, dict]:
     sites = GridSpace(world, run.manifest["seed"]).sites
     homes_on = {sn["day"]: sn["homes"] for sn in snaps}
 
-    def public(name, cell, homes) -> bool:
+    def public(name: str, cell: Cell | None, homes: dict[str, str]) -> bool:
+        """Whether `cell` is more than YARD tiles from `name`'s own homesite (or they have none)."""
         site = sites.get(homes.get(name) or "")
         if not site or cell is None:
             return True
@@ -105,7 +119,7 @@ def commons_contributions(run: Run) -> dict[str, dict]:
         "bells",
         "hours",
     )
-    out = {n: dict.fromkeys(keys, 0) for n in names}
+    out: dict[str, dict[str, Any]] = {n: dict.fromkeys(keys, 0) for n in names}
     for e in run.events:
         if e["type"] == "gift" and e.get("ok") and e.get("giver") in out:
             o = out[e["giver"]]
@@ -116,7 +130,7 @@ def commons_contributions(run: Run) -> dict[str, dict]:
         if e["type"] != "action" or not e.get("ok") or e.get("agent") not in out:
             continue
         o, a, do = out[e["agent"]], e["action"], e["action"].get("do")
-        homes = homes_on.get(e["day"], last["homes"])
+        homes = cast("dict[str, str]", homes_on.get(e["day"], last["homes"]))
         if do == "donate":
             o["museum"] += 1
             o["museum_bells"] += prices.get(str(a.get("item", "")).lower(), 0)
@@ -144,7 +158,7 @@ def commons_contributions(run: Run) -> dict[str, dict]:
             out[owner][
                 "paths_public" if public(owner, (x, y), last["homes"]) else "paths_home"
             ] += 1
-    tiles = Counter()
+    tiles: Counter[tuple[str, str, bool]] = Counter()
     for x, y, item, kind, owner in objs.get("placed", []):
         if owner in out and kind != "fence":
             tiles[(owner, item, public(owner, (x, y), last["homes"]))] += 1
@@ -155,9 +169,9 @@ def commons_contributions(run: Run) -> dict[str, dict]:
         out[owner]["bells"] += pieces * prices.get(item, 0) if pub else 0
     shares = extraction_shares(run)
     used = [r for r in RESOURCES if any(shares[r].values())]
-    for n, o in out.items():
+    for n, o in out.items():  # type: ignore[assignment]  # n was a count in the loop above
         o["bells"] += o["museum_bells"] + o["bridge"]
-        o["took"] = sum(shares[r].get(n, 0) for r in used) / len(used) if used else 0.0
+        o["took"] = sum(shares[r].get(n, 0) for r in used) / len(used) if used else 0.0  # type: ignore[call-overload]  # n is a name here
     return out
 
 
@@ -169,7 +183,7 @@ def hhi(shares: dict[str, float]) -> float:
 def forgone_donations(run: Run) -> list[dict]:
     """Every time a villager sold a fish, bug or fossil the museum did not have yet."""
     world = run.manifest["world"]
-    museum = {c: set() for c in CATEGORIES}
+    museum: dict[str, set[str]] = {c: set() for c in CATEGORIES}
     out = []
     for e in run.events:
         if e["type"] != "action" or not e["ok"]:
@@ -193,6 +207,7 @@ def forgone_donations(run: Run) -> list[dict]:
 
 
 def commons_lines(run: Run) -> list[str]:
+    """The summary's table of who gave what to the island; empty when the run has no snapshot."""
     c = commons_contributions(run)
     if not c:
         return []
@@ -247,6 +262,9 @@ def fossil_stats(run: Run) -> tuple[int, int]:
 
 
 def trade_stats(run: Run) -> dict:
+    """Counts of offers and trades, how the offers ended, who traded with whom, and for each
+    items-for-bells trade the bells paid over the Cranny value of the items.
+    """
     trades = run.of("trade")
     offers = run.of("offer")
     final = {}
@@ -300,7 +318,7 @@ def reply_errors(run: Run) -> int:
 
 def run_out(run: Run) -> dict[str, tuple[int | None, int]]:
     """For rocks, shells and fossil spots: (median hour they ran out, number of days they did)."""
-    gone = defaultdict(dict)
+    gone: defaultdict[int, dict[str, int]] = defaultdict(dict)
     for st in run.of("hour_state"):
         p = st["pools"]
         for key, empty in (
@@ -313,18 +331,20 @@ def run_out(run: Run) -> dict[str, tuple[int | None, int]]:
     out = {}
     for key in ("rocks", "shells", "fossils"):
         hs = sorted(g[key] for g in gone.values() if key in g)
-        out[key] = (hs[len(hs) // 2] if hs else None, len(hs))
+        out[key] = (statistics.median_high(hs) if hs else None, len(hs))
     return out
 
 
 def action_mix(run: Run) -> dict[str, Counter]:
-    mix = defaultdict(Counter)
+    """{villager: how many times they tried each kind of action}."""
+    mix: defaultdict[str, Counter[str]] = defaultdict(Counter)
     for e in run.of("action"):
         mix[e["agent"]][e["action"].get("do", "?")] += 1
     return mix
 
 
 def summary(run: Run) -> str:
+    """The text of summary.txt: the whole run in numbers, section by section."""
     m, snaps = run.manifest, snapshots(run)
     last = snaps[-1]
     names = list(m["villagers"])
@@ -351,7 +371,7 @@ def summary(run: Run) -> str:
     for key, (hour, n) in run_out(run).items():
         L.append(
             f"  {key:<8} "
-            + (f"{clock(hour)} on {n}/{len(snaps)} days" if n else "never ran out")
+            + (f"{clock(hour)} on {n}/{len(snaps)} days" if n else "never ran out")  # type: ignore[arg-type]  # there is an hour whenever n > 0
         )
 
     L += [
@@ -374,7 +394,7 @@ def summary(run: Run) -> str:
         "",
         f"Net worth on the last day (bells + items at Cranny prices - loan); Gini {gini(list(nw.values())):.2f}",
     ]
-    for n, v in sorted(nw.items(), key=lambda kv: -kv[1]):
+    for n, v in sorted(nw.items(), key=lambda kv: -kv[1]):  # type: ignore[assignment]  # n was a count of days above
         s = last["villagers"][n]
         L.append(
             f"  {n:<8} {v:>9}   bells {s['bells']:>7}  loan {s['loan']:>7}  "
@@ -451,8 +471,8 @@ def summary(run: Run) -> str:
     ]
 
     ts = trade_stats(run)
-    rs = sorted(ts["price_ratios"])
-    med = rs[len(rs) // 2] if rs else None
+    rs = ts["price_ratios"]
+    med = statistics.median_high(rs) if rs else None
     L += [
         "",
         f"Trades: {ts['n_trades']} completed from {ts['n_offers']} offers ({ts['counters']} were counteroffers); "
@@ -494,8 +514,7 @@ def summary(run: Run) -> str:
         + (", ".join(f"{a}-{b} x{n}" for (a, b), n in pairs.most_common(5)) or "none"),
     ]
 
-    snaps_ = snapshots(run)
-    objs = (snaps_[-1].get("objects") or {}) if snaps_ else {}
+    objs = snaps[-1].get("objects") or {}
     if objs.get("paths") is not None:
         paths_by = Counter(o for *_, o in objs.get("paths", []))
         placed_by = Counter(o for *_, o in objs.get("placed", []))
@@ -535,7 +554,7 @@ def summary(run: Run) -> str:
         ("19-24", range(19, 24)),
         ("00-05", range(24, 29)),
     ]
-    acts_by = defaultdict(Counter)
+    acts_by: defaultdict[str, Counter[str]] = defaultdict(Counter)
     for a in acts:
         for label, rng_ in parts:
             if a["hour"] in rng_:
@@ -550,7 +569,7 @@ def summary(run: Run) -> str:
         )
 
     L += ["", "What each villager spent actions on:"]
-    for n, c in action_mix(run).items():
+    for n, c in action_mix(run).items():  # type: ignore[assignment]  # n was a count of days above
         L.append(f"  {n:<8} " + ", ".join(f"{k} {v}" for k, v in c.most_common(6)))
     errs = [p for p in plans + eves if p["error"]][:5]
     if errs:
@@ -562,7 +581,8 @@ def summary(run: Run) -> str:
 
 def weather_lines(run: Run) -> list[str]:
     """Does the weather change what villagers do? Time use (awake villager-hours) by weather,
-    and what they caught."""
+    and what they caught.
+    """
     days = {e["day"]: e.get("weather") for e in run.of("day_start")}
     if not any(days.values()):
         return []
@@ -571,7 +591,7 @@ def weather_lines(run: Run) -> list[str]:
         "Seasons and weather: "
         + ", ".join(f"{w} {n} days" for w, n in Counter(days.values()).most_common()),
     ]
-    use = defaultdict(Counter)
+    use: defaultdict[str | None, Counter[str]] = defaultdict(Counter)
     for st in run.of("hour_state"):
         w = days.get(st["day"])
         for v in st["villagers"].values():
@@ -587,7 +607,7 @@ def weather_lines(run: Run) -> list[str]:
         L.append(
             "    " + f"{str(w):<8}" + "".join(f"{c[g] / tot:>14.0%}" for g in groups)
         )
-    caught = defaultdict(Counter)
+    caught: defaultdict[str | None, Counter[str]] = defaultdict(Counter)
     for a in run.of("action"):
         if (
             a["ok"]
@@ -595,7 +615,7 @@ def weather_lines(run: Run) -> list[str]:
             and ": caught " in a["result"]
         ):
             caught[days.get(a["day"])][a["action"]["do"]] += 1
-    tries = defaultdict(Counter)
+    tries: defaultdict[str | None, Counter[str]] = defaultdict(Counter)
     for a in run.of("action"):
         if a["action"].get("do") in ("fish", "catch_bug"):
             tries[days.get(a["day"])][a["action"]["do"]] += 1
@@ -614,6 +634,8 @@ def sight_lines(run: Run, names: list[str]) -> list[str]:
     sights = run.of("sighting")
     if not sights:
         return []
+    tries: Counter[str]
+    blind: Counter[str]
     tries, blind = Counter(), Counter()
     for a in run.of("action"):
         do = a["action"].get("do")
@@ -665,6 +687,7 @@ def lookup_lines(run: Run, names: list[str]) -> list[str]:
 
 
 def social_ties_lines(run: Run, names: list[str]) -> list[str]:
+    """Visits, gifts and favors: the totals, a row per villager, and the pairs who gave most."""
     visits, gifts = run.of("visit"), run.of("gift")
     asked, done = run.of("favor_asked"), run.of("favor_done")
     if not (visits or gifts or asked):
@@ -703,14 +726,17 @@ def social_ties_lines(run: Run, names: list[str]) -> list[str]:
 
 def energy_lines(run: Run, names: list[str]) -> list[str]:
     """Estimated tokens per villager (always), and with mental energy on, what each villager
-    spent it on, what they chose to skip, and how often they ran out."""
+    spent it on, what they chose to skip, and how often they ran out.
+    """
     days = run.of("energy")
     if not days:
         return []
     on = any(e.get("enabled") for e in days)
     tok = defaultdict(list)
-    spent = defaultdict(Counter)
-    skipped = defaultdict(Counter)
+    spent: defaultdict[str, Counter[str]] = defaultdict(Counter)
+    skipped: defaultdict[str, Counter[str]] = defaultdict(Counter)
+    reason: Counter[str]
+    reason_by: Counter[str]
     reason, reason_by = Counter(), Counter()
     for e in days:
         for n, v in e["villagers"].items():
@@ -753,7 +779,7 @@ def energy_lines(run: Run, names: list[str]) -> list[str]:
             )
         )
         return L
-    chose = defaultdict(Counter)
+    chose: defaultdict[str, Counter[str]] = defaultdict(Counter)
     for p in run.of("plan"):
         if p.get("habit_reason") == "chosen":
             chose[p["agent"]]["habit"] += 1
@@ -798,6 +824,9 @@ def memory_summary(run: Run, names: list[str]) -> list[str]:
     """Long-term memory, when it is on: what was held on to, came back to, and forgotten."""
     if not run.of("memory"):
         return []
+    new: Counter[str]
+    again: Counter[str]
+    gone: Counter[str]
     new, again, gone = Counter(), Counter(), Counter()
     for e in run.of("reflection"):
         new[e["agent"]] += len(e.get("remembered") or [])
@@ -833,6 +862,7 @@ def memory_summary(run: Run, names: list[str]) -> list[str]:
 
 
 def _reason(text: str) -> str:
+    """The stock phrase in a failed action's result that says why, else its first 60 characters."""
     for key in (
         "is closed",
         "mined out",
@@ -895,6 +925,7 @@ ACTIVITY_GROUPS = {
 
 
 def activity_group(activity: str) -> str:
+    """The ACTIVITY_GROUPS heading an activity falls under; "free time" when it is in none."""
     if activity == "asleep":
         return "asleep"
     for g, acts in ACTIVITY_GROUPS.items():
@@ -903,7 +934,8 @@ def activity_group(activity: str) -> str:
     return "free time"
 
 
-def _delta_text(e: dict) -> str:
+def _delta_text(e: Event) -> str:
+    """What an action changed, for the day log: the villager's bells, loan and items, and the island's pools."""
     parts = []
     d = e.get("delta") or {}
     if "bells" in d:
@@ -933,6 +965,7 @@ def _delta_text(e: dict) -> str:
 
 
 def _pools_text(p: dict) -> str:
+    """One line saying what is left of each shared resource."""
     rocks = "/".join(str(x) for x in p["rocks"])
     return (
         f"rocks {rocks} · wood {p['wood_left']} · fruit {p['fruit_on_trees']} · shells {p['shells_left']} · "
@@ -940,8 +973,9 @@ def _pools_text(p: dict) -> str:
     )
 
 
-def _day_events_by_hour(ev: list[dict]) -> dict[int, list[dict]]:
-    by_hour = defaultdict(list)
+def _day_events_by_hour(ev: list[Event]) -> dict[int, list[Event]]:
+    """A day's events grouped by game hour, without the ones that belong to the day as a whole."""
+    by_hour: defaultdict[int, list[Event]] = defaultdict(list)
     for e in ev:
         if (
             e["type"]
@@ -957,7 +991,10 @@ def _day_events_by_hour(ev: list[dict]) -> dict[int, list[dict]]:
     return by_hour
 
 
-def _social_lines(hev: list[dict]) -> list[str]:
+def _social_lines(hev: list[Event]) -> list[str]:
+    """One line for each event between villagers (letters, offers, conversations, visits, gifts,
+    favors) and each sighting, arrival or broken tool among `hev`.
+    """
     out = []
     for e in hev:
         t = e["type"]
@@ -967,7 +1004,7 @@ def _social_lines(hev: list[dict]) -> list[str]:
             )
         elif t == "parcel":
             out.append(
-                f"📦 {e['sender']} sent {e['recipient']} {_side(e['items'])} (arrives day {e['arrives_day']})"
+                f"📦 {e['sender']} sent {e['recipient']} {side_text(e['items'])} (arrives day {e['arrives_day']})"
                 + (f': "{e["note"]}"' if e.get("note") else "")
             )
         elif t == "tool_broke":
@@ -976,7 +1013,7 @@ def _social_lines(hev: list[dict]) -> list[str]:
             out.append(f"{e['author']} posted on the board: {e['content']}")
         elif t == "offer":
             out.append(
-                f"[{e['id']}] {e['sender']} offers {e['recipient']} {_side(e['give'])} for {_side(e['want'])}"
+                f"[{e['id']}] {e['sender']} offers {e['recipient']} {side_text(e['give'])} for {side_text(e['want'])}"
                 + (f" (counter to {e['parent']})" if e.get("parent") else "")
                 + (f': "{e["note"]}"' if e["note"] else "")
             )
@@ -998,8 +1035,9 @@ def _social_lines(hev: list[dict]) -> list[str]:
                 if e.get("visit")
                 else f"{who} met at the {e['location']}"
             )
+            # `other` is only called in this turn of the loop, so reading `e` late is safe (B023).
             other = lambda s: next(
-                (v for v in e["villagers"] if v != s), ""
+                (v for v in e["villagers"] if v != s), ""  # noqa: B023
             )  # noqa: E731
             out.append(
                 f"{head}: "
@@ -1028,12 +1066,12 @@ def _social_lines(hev: list[dict]) -> list[str]:
             )
         elif t == "gift":
             out.append(
-                f"🎁 {e['giver']} gave {e['receiver']} {_side(e['items'])} ({e['how']})"
+                f"🎁 {e['giver']} gave {e['receiver']} {side_text(e['items'])} ({e['how']})"
                 + ("" if e["ok"] else f", but it failed: {e['result']}")
             )
         elif t == "favor_asked":
             out.append(
-                f"{e['asker']} asked {e['asked']} for {_side(e['items'])} [{e['id']}]"
+                f"{e['asker']} asked {e['asked']} for {side_text(e['items'])} [{e['id']}]"
             )
         elif t == "favor_done":
             out.append(
@@ -1042,7 +1080,7 @@ def _social_lines(hev: list[dict]) -> list[str]:
             )
         elif t == "trade_proposed":
             out.append(
-                f"{e['proposer']} offered {e['to']} {_side(e['give'])} for {_side(e['want'])} in person"
+                f"{e['proposer']} offered {e['to']} {side_text(e['give'])} for {side_text(e['want'])} in person"
             )
         elif t == "trade_failed":
             out.append(
@@ -1209,7 +1247,7 @@ def day_log(run: Run, day: int, private: bool = True) -> str:
                 f"again: “{t}”" for t in e.get("rehearsed") or []
             ]
             if held:
-                out.append(f"  - 🧠 holds on to: " + "; ".join(held))
+                out.append("  - 🧠 holds on to: " + "; ".join(held))
         gone = [
             (e["agent"], t)
             for e in ev
@@ -1223,9 +1261,10 @@ def day_log(run: Run, day: int, private: bool = True) -> str:
     return "\n".join(out) + "\n"
 
 
-def day_digest(events: list[dict], isl=None) -> str:
+def day_digest(events: list[Event], isl: Island | None = None) -> str:
     """Compact record of one day for Isabelle: actions, conversations and trades, hour by hour,
-    plus the end-of-day state. Private thoughts and notes are left out."""
+    plus the end-of-day state. Private thoughts and notes are left out.
+    """
     lines = []
     for h, hev in sorted(_day_events_by_hour(events).items()):
         row = []
@@ -1258,7 +1297,7 @@ def day_digest(events: list[dict], isl=None) -> str:
     return "\n".join(lines)
 
 
-def public_digest(isl, events: list[dict]) -> str:
+def public_digest(isl: Island, events: list[Event]) -> str:
     """Only what any villager could know: public news, board posts, museum, bridge, ordinance."""
     board = [
         f"{e['author']} posted: {e['content']}" for e in events if e["type"] == "board"
@@ -1280,12 +1319,10 @@ def public_digest(isl, events: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def diary(run: Run) -> str:
-    """All days in one file."""
-    return "\n".join(day_log(run, s["day"]) for s in snapshots(run))
-
-
 def write_hourly_csv(run: Run, out_dir: Path) -> tuple[Path, Path]:
+    """Write hourly_villagers.csv (a row per villager per hour) and hourly_island.csv (the shared
+    resources each hour) into `out_dir`, and return the two paths.
+    """
     import csv
 
     vpath, ipath = (
@@ -1366,17 +1403,13 @@ def write_hourly_csv(run: Run, out_dir: Path) -> tuple[Path, Path]:
     return vpath, ipath
 
 
-def _side(d: dict) -> str:
-    return (
-        ", ".join(f"{v} bells" if k == "bells" else f"{k} x{v}" for k, v in d.items())
-        or "nothing"
-    )
-
-
 # --- plots -----------------------------------------------------------------
 
 
 def plot_all(run: Run, out_dir: Path) -> list[Path]:
+    """Draw the run's plots into `out_dir` and return their paths: net worth, the museum, who took
+    what, trees and the bridge, and what villagers do at each hour.
+    """
     import matplotlib
 
     matplotlib.use("Agg")
@@ -1450,7 +1483,6 @@ def plot_all(run: Run, out_dir: Path) -> list[Path]:
     # Who took what: villagers x resources heatmap, one sequential hue.
     shares = extraction_shares(run)
     res = [r for r in RESOURCES if any(shares[r].values())]
-    import numpy as np
     from matplotlib.colors import LinearSegmentedColormap
 
     grid = np.array([[shares[r][n] for r in res] for n in names])
@@ -1500,7 +1532,7 @@ def plot_all(run: Run, out_dir: Path) -> list[Path]:
     if states:
         groups = list(ACTIVITY_GROUPS) + ["free time", "asleep"]
         colors = SERIES[: len(ACTIVITY_GROUPS)] + ["#d6d5cf", "#8a8984"]
-        counts = defaultdict(Counter)
+        counts: defaultdict[int, Counter[str]] = defaultdict(Counter)
         for s in states:
             for v in s["villagers"].values():
                 counts[s["hour"]][activity_group(v["activity"])] += 1
@@ -1539,7 +1571,7 @@ def plot_all(run: Run, out_dir: Path) -> list[Path]:
 
 def render_grid_outputs(run: Run, day: int | None = None) -> list[Path]:
     """Rebuild the (seeded, deterministic) grid and draw the island and one day's movements."""
-    from .grid import BRIDGE, GridSpace
+    from .grid import GridSpace
     from .grid_render import render_grid_map, render_tracks
 
     snaps = snapshots(run)
@@ -1547,8 +1579,7 @@ def render_grid_outputs(run: Run, day: int | None = None) -> list[Path]:
     g = GridSpace(run.manifest["world"], run.manifest["seed"])
     objs = snap.get("objects") or {}
     if objs.get("bridge_open"):
-        for x, y in g.bridge_cells:
-            g.terrain[y][x] = BRIDGE
+        g.open_bridge()
     trees = [tuple(t) for t in objs.get("trees", [])]
     rocks = [tuple(r) if r else None for r in objs.get("rocks", [])]
     homes = snap.get("homes") or {}
@@ -1563,7 +1594,7 @@ def render_grid_outputs(run: Run, day: int | None = None) -> list[Path]:
             objects=objs,
         )
     ]
-    tracks = {n: [] for n in run.manifest["villagers"]}
+    tracks: dict[str, list[Cell]] = {n: [] for n in run.manifest["villagers"]}
     for st in run.of("hour_state"):
         if st["day"] == snap["day"]:
             for n, v in st["villagers"].items():
@@ -1603,6 +1634,9 @@ def render_grid_outputs(run: Run, day: int | None = None) -> list[Path]:
 
 
 def analyze_island(run_dir: Path) -> None:
+    """Write everything read back from a run into its folder (the summary, the daily logs, plots,
+    CSVs, the explorer's data, each villager's files and the maps) and print the summary.
+    """
     run = load_run(run_dir)
     text = summary(run)
     if run.of("reflection"):
