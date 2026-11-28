@@ -19,13 +19,18 @@ import threading
 import time
 import urllib.error
 import urllib.request
+from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, Protocol
 
 import yaml
 
 
 class LLMError(RuntimeError):
+    """A model call that could not be made or gave nothing usable, after any retries."""
+
     pass
 
 
@@ -38,9 +43,10 @@ _DAILY = re.compile(r"per day|\b(TPD|RPD)\b", re.I)
 
 @dataclass
 class Completion:
+    """One reply from a chat backend, with what it cost."""
+
     text: str
     cached: bool = False
-    latency: float = 0.0
     tokens: int = (
         0  # prompt + completion (reasoning included) as the provider reported it; 0 if cached
     )
@@ -48,6 +54,30 @@ class Completion:
     reasoning_tokens: int = (
         0  # as reported, or estimated from the reasoning text; kept when cached
     )
+
+
+class ChatBackend(Protocol):
+    """What the simulation needs of a chat model: a name, an id for the cache key, and `complete`."""
+
+    name: str
+    model_id: str
+
+    def complete(
+        self, messages: list[dict], temperature: float = 0.7, max_tokens: int = 600
+    ) -> Completion:
+        """The model's reply to a chat."""
+        ...
+
+
+class Embedder(Protocol):
+    """What the simulation needs of an embedding model: a name, an id for the cache key, and `embed`."""
+
+    name: str
+    model_id: str
+
+    def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+        """One unit vector per text; `role` is "query" for a situation and "passage" for a memory."""
+        ...
 
 
 _THINK = re.compile(r"<think>(.*?)</think>", re.S)
@@ -73,14 +103,23 @@ class RateLimiter:
     completion budget, then the reservation is corrected to what the provider says it used.
     """
 
-    def __init__(self, rpm: float | None, tpm: float | None = None):
+    def __init__(self, rpm: float | None, tpm: float | None = None) -> None:
+        """A limiter for `rpm` requests and `tpm` tokens a minute; None or 0 means no cap."""
         self.interval = 60.0 / rpm if rpm else 0.0
         self.tpm = tpm
         self._lock = threading.Lock()
         self._next = 0.0
-        self._window: list[list[float]] = []  # [time, tokens] in the last minute
+        self._window: deque[list[float]] = (
+            deque()
+        )  # [time, tokens] in the last minute, oldest first
 
     def wait(self, tokens: float = 0.0) -> list[float] | None:
+        """Sleep until a request reserving `tokens` may be sent.
+
+        Returns:
+            The reservation, to hand to `settle` once the real count is known; None when there is
+            no token cap.
+        """
         if self.interval:
             with self._lock:
                 start = max(time.monotonic(), self._next)
@@ -94,7 +133,8 @@ class RateLimiter:
         while True:
             with self._lock:
                 now = time.monotonic()
-                self._window = [w for w in self._window if now - w[0] < 60]
+                while self._window and now - self._window[0][0] >= 60:
+                    self._window.popleft()
                 if sum(w[1] for w in self._window) + tokens <= self.tpm:
                     entry = [now, tokens]
                     self._window.append(entry)
@@ -103,12 +143,15 @@ class RateLimiter:
             time.sleep(delay)
 
     def settle(self, entry: list[float] | None, tokens: float) -> None:
+        """Correct a reservation from `wait` to the tokens the request really used."""
         if entry is not None:
             with self._lock:
                 entry[1] = tokens
 
 
 class OpenAICompatible:
+    """A chat model behind an OpenAI-compatible `/chat/completions` endpoint, rate limited and retried."""
+
     def __init__(
         self,
         name: str,
@@ -122,7 +165,22 @@ class OpenAICompatible:
         max_retries: int = 5,
         headers: dict | None = None,
         params: dict | None = None,
-    ):
+    ) -> None:
+        """Set up the backend from its entry in the models file.
+
+        Args:
+            name: The backend's name in the models file.
+            base_url: The API root, without `/chat/completions`.
+            model: The provider's name for the model.
+            api_key_env: The environment variable holding the key; None when no key is needed.
+            rpm: Requests a minute allowed; None for no cap.
+            tpm: Tokens a minute allowed; None for no cap.
+            json_mode: Ask the provider for a JSON object as the reply.
+            timeout: Seconds to wait for one reply.
+            max_retries: Tries after the first before giving up.
+            headers: Extra HTTP headers.
+            params: Extra request fields, sent with every call and part of the cache key.
+        """
         self.name = name
         self.base_url = base_url.rstrip("/")
         self.model = model
@@ -142,6 +200,12 @@ class OpenAICompatible:
     def complete(
         self, messages: list[dict], temperature: float = 0.7, max_tokens: int = 600
     ) -> Completion:
+        """The model's reply to a chat.
+
+        Raises:
+            DailyLimit: The provider's daily cap for this model is used up.
+            LLMError: The key is missing, or every try failed.
+        """
         headers = self._headers()
         body = {
             "model": self.model,
@@ -152,12 +216,12 @@ class OpenAICompatible:
         }
         if self.json_mode:
             body["response_format"] = {"type": "json_object"}
-        t0 = time.monotonic()
         budget = (
             len(json.dumps(messages)) / 4 + max_tokens
         )  # rough tokens, before the provider counts them
 
         def read(data: dict) -> tuple[Completion, int]:
+            """The reply in the provider's JSON, and the tokens it used."""
             usage = data.get("usage") or {}
             text, reasoning, n_reason = split_reasoning(
                 data["choices"][0]["message"], usage
@@ -166,7 +230,6 @@ class OpenAICompatible:
             return (
                 Completion(
                     text,
-                    latency=time.monotonic() - t0,
                     tokens=used,
                     reasoning=reasoning,
                     reasoning_tokens=n_reason,
@@ -176,7 +239,8 @@ class OpenAICompatible:
 
         return self._post("/chat/completions", body, headers, budget, read)
 
-    def _headers(self) -> dict:
+    def _headers(self) -> dict[str, str]:
+        """The HTTP headers of a request, with the key; raises LLMError when the key is not set."""
         key = os.environ.get(self.api_key_env, "") if self.api_key_env else ""
         if self.api_key_env and not key:
             raise LLMError(
@@ -193,9 +257,17 @@ class OpenAICompatible:
             headers["Authorization"] = f"Bearer {key}"
         return headers
 
-    def _post(self, path: str, body: dict, headers: dict, budget: float, read):
+    def _post[T](
+        self,
+        path: str,
+        body: dict,
+        headers: dict,
+        budget: float,
+        read: Callable[[dict], tuple[T, int]],
+    ) -> T:
         """One request, with the rate limiter and the retries. `read(data)` turns the provider's JSON into
-        (result, tokens used); a reply it can't read counts as a failed try."""
+        (result, tokens used); a reply it can't read counts as a failed try.
+        """
         for attempt in range(self.max_retries + 1):
             slot = self.limiter.wait(budget)
             req = urllib.request.Request(
@@ -254,7 +326,8 @@ class OpenAICompatible:
 
 class MockBackend:
     """Offline stand-in. Routes each island prompt by its PHASE line to a canned but
-    valid random reply. Deterministic given the prompt."""
+    valid random reply. Deterministic given the prompt.
+    """
 
     name = "mock"
     model_id = "mock"
@@ -262,6 +335,7 @@ class MockBackend:
     def complete(
         self, messages: list[dict], temperature: float = 0.7, max_tokens: int = 600
     ) -> Completion:
+        """The canned reply to the last message, drawn with an rng seeded from its text."""
         from .island import mock as island_mock
 
         prompt = messages[-1]["content"]
@@ -288,14 +362,37 @@ class MockBackend:
         return Completion(fn(prompt, rng))
 
 
+def _cache_file(cache_dir: Path, key: list) -> Path:
+    """The file a cache keeps `key`'s value in: named by the key's hash, in a folder of its first two
+    characters so that no folder grows huge.
+    """
+    digest = hashlib.sha256(json.dumps(key, sort_keys=True).encode()).hexdigest()
+    return cache_dir / digest[:2] / f"{digest}.json"
+
+
+def _models_file(config_path: Path | None) -> dict:
+    """The models file as a dict; empty when there is none."""
+    if config_path and Path(config_path).exists():
+        return yaml.safe_load(Path(config_path).read_text()) or {}
+    return {}
+
+
 class Cached:
     """Disk cache keyed on (model, prompt, sampling params, salt). The salt is the
     run seed, so the same seed replays a run for free and a new seed resamples. With `refresh`
     (`--no-cache`) nothing is read from the cache: every call is made, and its reply replaces
     whatever was kept for that prompt, so a later replay gets the new replies. An empty reply is
-    never kept or replayed: a resumed run asks again."""
+    never kept or replayed: a resumed run asks again.
+    """
 
-    def __init__(self, inner, cache_dir: Path, salt: str = "", refresh: bool = False):
+    def __init__(
+        self,
+        inner: ChatBackend,
+        cache_dir: Path,
+        salt: str = "",
+        refresh: bool = False,
+    ) -> None:
+        """Wrap `inner` so that its replies are kept under `cache_dir`."""
         self.refresh = refresh
         self.inner = inner
         self.name = inner.name
@@ -306,13 +403,8 @@ class Cached:
     def complete(
         self, messages: list[dict], temperature: float = 0.7, max_tokens: int = 600
     ) -> Completion:
-        key = hashlib.sha256(
-            json.dumps(
-                [self.model_id, messages, temperature, max_tokens, self.salt],
-                sort_keys=True,
-            ).encode()
-        ).hexdigest()
-        path = self.dir / key[:2] / f"{key}.json"
+        """The kept reply to this exact call when there is one, else a fresh one, which is then kept."""
+        path = self._path(messages, temperature, max_tokens)
         if path.exists() and not self.refresh:
             d = json.loads(path.read_text())
             if d["text"].strip():  # an empty one kept by an older version: ask again
@@ -327,18 +419,35 @@ class Cached:
         )
         if not c.text.strip():
             return c  # nothing to replay: the next run asks again
+        self.store(messages, temperature, max_tokens, c)
+        return c
+
+    def _path(self, messages: list[dict], temperature: float, max_tokens: int) -> Path:
+        """Where the reply to this exact call is kept."""
+        return _cache_file(
+            self.dir, [self.model_id, messages, temperature, max_tokens, self.salt]
+        )
+
+    def store(
+        self,
+        messages: list[dict],
+        temperature: float,
+        max_tokens: int,
+        reply: Completion,
+    ) -> None:
+        """Keep `reply` as the answer to this exact call, replacing any kept before."""
+        path = self._path(messages, temperature, max_tokens)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(
             json.dumps(
                 {
                     "model": self.model_id,
-                    "text": c.text,
-                    "reasoning": c.reasoning,
-                    "reasoning_tokens": c.reasoning_tokens,
+                    "text": reply.text,
+                    "reasoning": reply.reasoning,
+                    "reasoning_tokens": reply.reasoning_tokens,
                 }
             )
         )
-        return c
 
 
 def load_backends(
@@ -346,15 +455,13 @@ def load_backends(
     cache_dir: Path | None = None,
     salt: str = "",
     refresh: bool = False,
-) -> dict:
+) -> dict[str, ChatBackend]:
     """Returns {name: backend}. 'mock' is always present; 'default' aliases the configured default."""
-    backends: dict = {"mock": MockBackend()}
-    default = "mock"
-    if config_path and Path(config_path).exists():
-        cfg = yaml.safe_load(Path(config_path).read_text()) or {}
-        default = cfg.get("default", default)
-        for name, spec in (cfg.get("backends") or {}).items():
-            backends[name] = OpenAICompatible(name=name, **spec)
+    backends: dict[str, ChatBackend] = {"mock": MockBackend()}
+    cfg = _models_file(config_path)
+    default = cfg.get("default", "mock")
+    for name, spec in (cfg.get("backends") or {}).items():
+        backends[name] = OpenAICompatible(name=name, **spec)
     if cache_dir is not None:
         backends = {
             n: (
@@ -400,7 +507,16 @@ class Embeddings(OpenAICompatible):
         batch: int = 64,
         query_params: dict | None = None,
         passage_params: dict | None = None,
-    ):
+    ) -> None:
+        """Set up the embedder from its entry in the models file.
+
+        The arguments shared with `OpenAICompatible` mean the same here.
+
+        Args:
+            batch: Texts sent in one request.
+            query_params: Extra request fields when embedding a situation.
+            passage_params: Extra request fields when embedding a text to be matched.
+        """
         super().__init__(
             name,
             base_url,
@@ -422,6 +538,7 @@ class Embeddings(OpenAICompatible):
             self.model_id += "|" + json.dumps(self.role_params, sort_keys=True)
 
     def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+        """One unit vector per text, in order, asked for in batches."""
         headers = self._headers()
         out: list[list[float]] = []
         for i in range(0, len(texts), self.batch):
@@ -434,7 +551,12 @@ class Embeddings(OpenAICompatible):
             }
             budget = sum(len(t) for t in chunk) / 4
 
-            def read(data: dict, n=len(chunk), budget=budget):
+            def read(
+                data: dict,
+                n: int = len(chunk),  # noqa: B008  # bound now, to this chunk
+                budget: float = budget,
+            ) -> tuple[list[list[float]], int]:
+                """The chunk's vectors in the order sent, and the tokens used."""
                 rows = sorted(data["data"], key=lambda r: r.get("index", 0))
                 if len(rows) != n:
                     raise KeyError(f"{len(rows)} embeddings for {n} texts")
@@ -458,11 +580,13 @@ class HashEmbeddings:
 
     name = "hash"
 
-    def __init__(self, dims: int = 256):
+    def __init__(self, dims: int = 256) -> None:
+        """An embedder giving vectors of `dims` numbers."""
         self.dims = int(dims)
         self.model_id = f"hash-{self.dims}"
 
     def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+        """One unit vector per text; `role` makes no difference."""
         out = []
         for text in texts:
             words = _WORD.findall(text.lower())
@@ -491,7 +615,8 @@ class LocalEmbeddings:
         batch: int = 64,
         threads: int | None = None,
         query_prefix: str = "",
-    ):
+    ) -> None:
+        """Note which model to use; nothing is loaded or downloaded yet."""
         self.name, self.model, self.model_dir = name, model, model_dir
         self.batch, self.threads, self.query_prefix = (
             max(1, int(batch)),
@@ -501,9 +626,10 @@ class LocalEmbeddings:
         self.model_id = f"fastembed:{model}" + (
             f"|{query_prefix}" if query_prefix else ""
         )
-        self._model = None
+        self._model: Any = None
 
-    def _load(self):
+    def _load(self) -> Any:
+        """The fastembed model, loaded on first use; raises LLMError when it can't be."""
         if self._model is None:
             try:
                 from fastembed import TextEmbedding
@@ -526,6 +652,7 @@ class LocalEmbeddings:
         return self._model
 
     def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+        """One unit vector per text; a "query" gets `query_prefix` put before it."""
         if not texts:
             return []
         model = self._load()
@@ -541,9 +668,11 @@ class LocalEmbeddings:
 class CachedEmbeddings:
     """Keeps every vector on disk, keyed on (model, role, text). A text is embedded once: later runs, and a
     resume that replays a day, read the same vector back. There is no seed in the key, because an embedding
-    depends only on the text."""
+    depends only on the text.
+    """
 
-    def __init__(self, inner, cache_dir: Path):
+    def __init__(self, inner: Embedder, cache_dir: Path) -> None:
+        """Wrap `inner` so that its vectors are kept under `cache_dir`."""
         self.inner = inner
         self.name = inner.name
         self.model_id = inner.model_id
@@ -551,17 +680,14 @@ class CachedEmbeddings:
         self.dir = Path(cache_dir)
 
     def _path(self, role: str, text: str) -> Path:
-        key = hashlib.sha256(
-            json.dumps([self.model_id, role, text]).encode()
-        ).hexdigest()
-        return self.dir / key[:2] / f"{key}.json"
+        """Where the vector of this text in this role is kept."""
+        return _cache_file(self.dir, [self.model_id, role, text])
 
     def embed(self, texts: list[str], role: str = "passage") -> list[list[float]]:
+        """One vector per text: read back when kept, else embedded by `inner` and kept."""
         found: dict[str, list[float]] = {}
         missing: list[str] = []
-        for t in texts:
-            if t in found or t in missing:
-                continue
+        for t in dict.fromkeys(texts):  # each text once, in the order first seen
             path = self._path(role, t)
             if path.exists():
                 found[t] = json.loads(path.read_text())
@@ -580,14 +706,11 @@ class CachedEmbeddings:
 
 def load_embedder(
     config_path: Path | None, cache_dir: Path | None = None, name: str | None = None
-):
+) -> Embedder:
     """The embedder named `name`, or the models file's `embeddings.default`, or the hash embedder when
-    nothing is configured. `hash` and `mock` always mean the hash embedder."""
-    cfg = {}
-    if config_path and Path(config_path).exists():
-        cfg = (yaml.safe_load(Path(config_path).read_text()) or {}).get(
-            "embeddings"
-        ) or {}
+    nothing is configured. `hash` and `mock` always mean the hash embedder.
+    """
+    cfg = _models_file(config_path).get("embeddings") or {}
     name = name or cfg.get("default") or "hash"
     if name in ("hash", "mock"):
         return HashEmbeddings()

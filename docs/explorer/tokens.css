@@ -54,7 +54,7 @@
   --fail: #B8452A;           /* "failed" text and x marks; always paired with the word or icon */
   --chart-line: #E07A4F;     /* single-series line charts and sparklines */
 
-  /* map (tile colours, used by export_map.py) */
+  /* map (tile colours, used by the explorer's map) */
   --map-sea: #A9D3E3;
   --map-river: #7FBCDB;
   --map-sand: #F1E6C8;

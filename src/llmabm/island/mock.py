@@ -7,6 +7,10 @@ from __future__ import annotations
 import json
 import random
 import re
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .space import Action
 
 _ACTIONS = [
     ({"do": "mine_rock"}, 4),
@@ -29,6 +33,7 @@ _ACTIONS = [
 
 
 def _inventory(prompt: str) -> dict[str, int]:
+    """What the prompt says the villager carries, in whichever way its prompt version lists it."""
     m = re.search(r"^Inventory: (.*)$", prompt, re.M)
     if m:
         return (
@@ -38,7 +43,7 @@ def _inventory(prompt: str) -> dict[str, int]:
                 k.strip(): int(n) for k, n in re.findall(r"([^,]+?) x(\d+)", m.group(1))
             }
         )
-    inv = (
+    inv: dict[str, int] = (
         {}
     )  # prompt version 8: tools (a count only when more than one), then everything else
     for line in re.findall(r"^(?:Tools|Other things) you carry: (.*)$", prompt, re.M):
@@ -66,6 +71,7 @@ def _inventory(prompt: str) -> dict[str, int]:
 
 
 def _recipes(prompt: str) -> list[str]:
+    """The recipes the prompt says the villager knows."""
     m = re.search(r"^Recipes you know: (.*)$", prompt, re.M)
     return (
         []
@@ -75,11 +81,13 @@ def _recipes(prompt: str) -> list[str]:
 
 
 def _bells(prompt: str) -> int:
+    """The bells the prompt says the villager has; 0 when it has no such line."""
     m = re.search(r"^Bells: (\d+)", prompt, re.M)
     return int(m.group(1)) if m else 0
 
 
 def _neighbors(prompt: str) -> list[str]:
+    """The neighbors the prompt names, for someone to visit."""
     m = re.search(r"neighbors: ([^.]*)\. Carrying", prompt)
     return [x.strip() for x in m.group(1).split(",")] if m else []
 
@@ -103,6 +111,7 @@ def _picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
     places = re.findall(r"^Places: (.*)$", block, re.M)
     places = places[0].split(", ") if places else ["home"]
     out = []
+    pick: dict[str, Any]
     for h in hours:
         n = rng.choice(sorted(lines))
         pick, text = {"hour": h, "pick": n}, lines[n]
@@ -121,7 +130,8 @@ def _picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
 
 def _named_picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict]:
     """Prompt version 21: an action from the villager's list for each hour, written by name with the parts its
-    line lists: "items" from the pockets, "at" and "what" where there is a choice."""
+    line lists: "items" from the pockets, "at" and "what" where there is a choice.
+    """
     block = prompt.split('which one ("what"):\n', 1)[1].split("\n\n", 1)[0]
     lines = [ln[2:] for ln in block.splitlines() if ln.startswith("- ")]
     places = re.findall(r"^Places: (.*)$", block, re.M)
@@ -143,12 +153,23 @@ def _named_picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict
                 pick["items"] = {k: 1}
             elif key == "items" and (m := re.match(r"bells, 1 to (\d+)", val)):
                 pick["items"] = {"bells": rng.randint(1, int(m.group(1)))}
+            elif key == "at" and val.startswith("a home or building"):
+                pick["at"] = (
+                    "home"  # prompt version 22: exact tiles are steps from a door
+                )
             elif key == "at":
                 pick["at"] = (
                     rng.choice(places)
                     if val.startswith("a place from")
                     else rng.choice(val.split(" | "))
                 )
+            elif key.startswith("also") and '"tiles": ' in part:
+                x, y = rng.randint(-4, 2), rng.randint(1, 5)
+                run = rng.randint(1, 4) if "lay_path" in head else 1
+                pick["tiles"] = [
+                    {"south": y, **({"east": x + i} if x + i else {})}
+                    for i in range(run)
+                ]
             elif key == "what":
                 pick["what"] = rng.choice(
                     re.sub(r" \(for more than one.*$", "", val).split(" | ")
@@ -164,8 +185,14 @@ def _named_picks(prompt: str, hours: list[int], rng: random.Random) -> list[dict
 
 
 def plan_reply(prompt: str, rng: random.Random) -> str:
+    """A plan for the hours the prompt asks about, as JSON: picks from the villager's list where the
+    prompt gives one (prompt version 16 on), else actions drawn at random with a lean towards
+    replacing a missing tool. Sometimes with the optional parts the prompt offers.
+    """
+    if "the island couldn't read these picks" in prompt:
+        return json.dumps({"actions": []})  # prompt version 22: leaves them out
     m = re.search(r"Plan up to (\d+) actions between (\d+):00 and (\d+):00", prompt)
-    n, a, b = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    n, a, b = int(m.group(1)), int(m.group(2)), int(m.group(3))  # type: ignore[union-attr]  # every plan prompt has this line
     window = (
         list(range(a, b + 1)) if a <= b else list(range(a, 24)) + list(range(0, b + 1))
     )  # wraps past midnight
@@ -173,11 +200,17 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
     hours.sort(key=window.index)
     named = "each written as a pick" in prompt  # prompt version 21
     if named or "by picking numbers from the list" in prompt:  # prompt version 16
-        out = {
+        out: dict[str, Any] = {
             "thoughts": "picking from the list",
             "actions": (_named_picks if named else _picks)(prompt, hours, rng),
             "note": "" if rng.random() < 0.8 else "the rocks went fast today",
         }
+        if (
+            '"why": "<optional' in prompt
+        ):  # prompt version 22: what a pick is for, sometimes
+            for e in out["actions"]:
+                if rng.random() < 0.3:
+                    e["pick"]["why"] = "seemed like a good idea"
         if '"write": true | false' in prompt and rng.random() < 0.2:
             out["write"] = rng.random() < 0.6
         if '"energy": {"inward"' in prompt and rng.random() < 0.8:
@@ -187,7 +220,7 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
             }
         return json.dumps(out)
     inv, recipes, bells = _inventory(prompt), _recipes(prompt), _bells(prompt)
-    acts = []
+    acts: list[Action] = []
     missing = [t for t in _TOOLS if t not in inv]
     for t in missing[
         :1
@@ -399,10 +432,13 @@ def plan_reply(prompt: str, rng: random.Random) -> str:
 
 
 def evening_reply(prompt: str, rng: random.Random) -> str:
-    others = re.search(r"^Other villagers: (.*)$", prompt, re.M).group(1).split(", ")
-    inv, recipes = _inventory(prompt), _recipes(prompt)
+    """A turn at the plaza, as JSON: an answer to each offer made to them, and now and then a letter,
+    a board post, an offer or a parcel, in the shape the prompt's version asks for.
+    """
+    others = re.search(r"^Other villagers: (.*)$", prompt, re.M).group(1).split(", ")  # type: ignore[union-attr]  # every plaza prompt has this line
+    inv = _inventory(prompt)
     offer_ids = re.findall(r"^\[(o\d+)\]", prompt, re.M)
-    out = {
+    out: dict[str, Any] = {
         "letters": [],
         "board": "",
         "offers": [],
@@ -421,7 +457,6 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
             )
             if inv:
                 k = rng.choice(list(inv))
-                resp["want"] = {}
                 resp["give"] = {k: 1}
                 resp["want"] = {"bells": rng.choice([300, 800, 1500])}
         out["responses"].append(resp)
@@ -491,6 +526,7 @@ def evening_reply(prompt: str, rng: random.Random) -> str:
 
 
 def isabelle_reply(prompt: str, rng: random.Random) -> str:
+    """Isabelle's morning announcement or her report of the day, as fixed text marked as mock."""
     if "announce" in prompt.split("\n")[0]:
         return "Good morning, everyone! Another lovely day on the island. (mock announcement)"
     n_actions = prompt.count(" @")
@@ -501,6 +537,9 @@ def isabelle_reply(prompt: str, rng: random.Random) -> str:
 
 
 def encounter_reply(prompt: str, rng: random.Random) -> str:
+    """One turn of a conversation, as JSON: a line to say (or silence, one time in five), and now and
+    then accepting a trade, giving what was asked for, a gift, a request or a trade of their own.
+    """
     if rng.random() < 0.2:
         return json.dumps({"thoughts": "not in the mood", "say": ""})
     line = rng.choice(
@@ -513,7 +552,7 @@ def encounter_reply(prompt: str, rng: random.Random) -> str:
             "Ha, same here.",
         ]
     )
-    out = {"thoughts": "keep it friendly", "say": line}
+    out: dict[str, Any] = {"thoughts": "keep it friendly", "say": line}
     m = re.search(
         r"You ran into (.+?) (?:at |out on |around )|You are visiting (.+?) at their home|"
         r"^(.+?) has come to visit you",
@@ -588,7 +627,8 @@ def spot_reply(prompt: str, rng: random.Random) -> str:
 
 
 def notice_reply(prompt: str, rng: random.Random) -> str:
-    near = re.search(r"^Nearby: (.*)\.$", prompt, re.M).group(1).split(", ")
+    """Whether to walk up to someone nearby, as JSON: one of them and a greeting, six times in ten."""
+    near = re.search(r"^Nearby: (.*)\.$", prompt, re.M).group(1).split(", ")  # type: ignore[union-attr]  # every notice prompt has this line
     if rng.random() < 0.4:
         return json.dumps({"thoughts": "not now", "approach": "", "say": ""})
     return json.dumps(
@@ -601,6 +641,9 @@ def notice_reply(prompt: str, rng: random.Random) -> str:
 
 
 def reflect_reply(prompt: str, rng: random.Random) -> str:
+    """The nightly page: a sentence about themselves and, when the prompt offers a `Remember:`
+    section, up to two of today's lines and sometimes the number of an older memory.
+    """
     busy = prompt.count("\n- ") > 8
     me = rng.choice(
         [

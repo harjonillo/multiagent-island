@@ -25,16 +25,23 @@ pockets isn't planned. A part with only one possibility can be left out. Before,
 
 from __future__ import annotations
 
+import math
 import re
 from collections import Counter
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any
 
+from .fmt import article, items_x
+from .grid import AREAS
 from .npc import ROSTER
+from .space import version_of
 from .world import (
     AXES,
     BAIT,
+    BUG_PLACES,
     FOSSIL,
-    _a,
+    WHY_WORDS,
     category_of,
     clock,
     item_info,
@@ -42,17 +49,12 @@ from .world import (
     structures_cfg,
 )
 
-AREAS = [
-    "northwest",
-    "north",
-    "northeast",
-    "west",
-    "centre",
-    "east",
-    "southwest",
-    "south",
-    "southeast",
-]  # as in region()
+if TYPE_CHECKING:
+    from .body import Bodies
+    from .grid import GridSpace
+    from .space import Action, Cell, Point, Side
+    from .villager import Villager
+    from .world import Island
 
 
 # --- what a reply can add to an option ------------------------------------------------------------------
@@ -65,12 +67,14 @@ class Count:
     default: int | None = None
 
     def hint(self, name: str) -> str:
+        """How the list tells a villager to write it."""
         span = str(self.lo) if self.lo == self.hi else f"{self.lo} to {self.hi}"
         return f'"{name}": {span}' + (
             f" (or leave it out for {self.default})" if self.default is not None else ""
         )
 
-    def read(self, name: str, value):
+    def read(self, name: str, value: Any) -> tuple[int | None, str | None]:
+        """The number a reply gave, kept within lo and hi, or why it can't be read."""
         if value is None:
             return (
                 (self.default, None)
@@ -93,12 +97,14 @@ class Choice:
     label: str | None = None
 
     def hint(self, name: str) -> str:
+        """How the list tells a villager to write it."""
         what = self.label or " | ".join(self.values)
         return f'"{name}": {what}' + (
             f" (or leave it out for {self.default})" if self.default is not None else ""
         )
 
-    def read(self, name: str, value):
+    def read(self, name: str, value: Any) -> tuple[str | None, str | None]:
+        """The choice a reply named, whatever its case and with or without "the", or why it isn't one."""
         if value is None or str(value).strip() == "":
             return (
                 (self.default, None)
@@ -121,11 +127,13 @@ class Items:
     optional: bool = False  # version 21's send: a letter has no items
 
     def hint(self, name: str) -> str:
-        return f'"{name}": {{"<thing>": <how many>}} from ' + ", ".join(
-            f"{k} x{n}" for k, n in self.have.items()
-        )
+        """How the list tells a villager to write it."""
+        return f'"{name}": {{"<thing>": <how many>}} from ' + items_x(self.have)
 
-    def read(self, name: str, value):
+    def read(self, name: str, value: Any) -> tuple[Side | None, str | None]:
+        """The things a reply named, each at most what is carried, or why none of it can be used. A count
+        that isn't a number means all of them.
+        """
         if not isinstance(value, dict) or not value:
             return None, f'it needs "{name}": {{"<thing>": <how many>}}'
         out, unknown = {}, []
@@ -156,14 +164,79 @@ class Text:
     most: int
 
     def hint(self, name: str) -> str:
+        """How the list tells a villager to write it."""
         return f'"{name}": what you write (up to {self.most} characters)'
 
-    def read(self, name: str, value):
+    def read(self, name: str, value: Any) -> tuple[str, str | None]:
+        """What a reply wrote, cut to length; it can always be read."""
         return str(value or "").strip()[: self.most], None
 
 
 @dataclass
+class Tiles:
+    """Prompt version 22, exactly where: tiles named as steps from where the villager stands when the hour
+    comes ({"east": 2, "south": 1}), each within `reach` steps, which is as far as they see. `hi` is how many
+    they carry of what goes on a tile (None: nothing is used up). What is on a tile is only known when they
+    stand there, so that is said then. One tile can also be written as "steps": {...}.
+    """
+
+    reach: int
+    hi: int | None = None
+
+    def hint(self, name: str) -> str:
+        """How the list tells a villager to write it."""
+        from .grid import STEPS_SHAPE
+
+        return (
+            '"tiles": exactly which tiles, each as steps from where you stand when the hour comes (north is '
+            f"up the map): [{STEPS_SHAPE}, ...], any within {self.reach} steps of you, which is as far as you see"
+        )
+
+    def read(
+        self, name: str, value: Any, place: str | None = None
+    ) -> tuple[list[dict] | None, str | None]:
+        """The tiles a reply named, each as tidied steps, or why they can't be read: not steps, more tiles
+        than pieces carried, or a tile further than the villager sees.
+        """
+        from .grid import STEPS_SHAPE, read_steps, steps_words
+
+        if isinstance(value, dict):
+            value = [value]
+        if not isinstance(value, list) or not value:
+            return None, (
+                f'say exactly where, "tiles": [{STEPS_SHAPE}, ...], each as steps from where you stand then'
+            )
+        if self.hi is not None and len(value) > self.hi:
+            return None, f"that names {len(value)} tiles; you carry {self.hi}"
+        out = []
+        for v in value:
+            st, why = read_steps(v)
+            if why:
+                return None, why
+            assert (
+                st is not None
+            )  # read_steps gives the steps whenever it gives no reason
+            if (
+                math.hypot(
+                    st.get("east", 0) or st.get("west", 0),
+                    st.get("north", 0) or st.get("south", 0),
+                )
+                > self.reach
+            ):
+                return None, (
+                    f"{steps_words(st, 'here')} is further than you see: a tile has to be within "
+                    f"{self.reach} steps of where you stand"
+                )
+            out.append(st)
+        return out, None
+
+
+@dataclass
 class Option:
+    """One thing a villager can do in a plan: its line in the list, the action it stands for, and what
+    a reply can add to it.
+    """
+
     text: str  # the line in the list, without its number
     action: dict  # the action it stands for
     hours: frozenset | None = (
@@ -184,9 +257,11 @@ class Option:
 
     @property
     def kind(self) -> str:
+        """The kind of action it stands for (its "do")."""
         return self.action["do"]
 
     def line(self) -> str:
+        """Its line in the numbered list (version 16), with what a reply can add."""
         if not self.fields:
             return self.text
         return (
@@ -200,18 +275,26 @@ class Option:
 class _Reach:
     """Where a villager can walk from where they are, with the tools they carry (the grid's distances).
     The way across the island is the same in both directions, so this holds for the whole plan, unless a
-    ladder or pole breaks on the way. Without a grid, everywhere counts as reachable."""
+    ladder or pole breaks on the way. Without a grid, everywhere counts as reachable.
+    """
 
-    def __init__(self, space, start, tools):
+    def __init__(
+        self, space: GridSpace, start: Point | None, tools: frozenset[str]
+    ) -> None:
+        """Work out, once, how far every tile is from `start` with `tools`."""
         self.space = space
         grid = start is not None and hasattr(space, "distances")
-        self.dist = space.distances(tuple(start), frozenset(tools)) if grid else None
+        self.dist = (
+            space.distances(tuple(start), frozenset(tools))  # type: ignore[arg-type]  # `grid` means start is a tile
+            if grid
+            else None
+        )
 
-    def at(self, cell) -> bool:
+    def at(self, cell: Point | None) -> bool:
         """The cell itself (doors: where the body walks to for buildings and homes)."""
         return self.dist is None or (cell is not None and tuple(cell) in self.dist)
 
-    def near(self, cells) -> bool:
+    def near(self, cells: Iterable[Point | None]) -> bool:
         """Somewhere to stand next to any of `cells` (rocks, trees, water, bugs' spots)."""
         if self.dist is None:
             return True
@@ -219,10 +302,11 @@ class _Reach:
             a in self.dist
             for c in cells
             if c
-            for a in self.space.approach_cells(tuple(c))
+            for a in self.space.approach_cells(tuple(c))  # type: ignore[arg-type]  # on the grid a point is a tile
         )
 
-    def terrain(self, kind) -> bool:
+    def terrain(self, kind: int) -> bool:
+        """Whether any tile of this kind of ground (sand, grass) can be walked to."""
         if self.dist is None:
             return True
         t = self.space.terrain
@@ -230,13 +314,16 @@ class _Reach:
 
 
 # --- the list ---------------------------------------------------------------------------------------------
-def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option]:
+def plan_options(
+    isl: Island, bodies: Bodies, space: GridSpace, name: str, hours: list[int]
+) -> list[Option]:
     """Everything `name` can do in the hours of this plan, in a fixed order: out on the island, at home,
-    visiting, at the shops and services, then rest and the plaza."""
+    visiting, at the shops and services, then rest and the plaza.
+    """
     from .grid import GRASS, SAND
 
     vil, w = isl.v[name], isl.w
-    inv = Counter({k: n for k, n in vil.inventory.items() if n > 0})
+    inv = +vil.inventory  # only what they have at least one of
     room = isl.space(vil)
     fruit = w["island"]["native_fruit"]
     body = bodies.b[name]
@@ -247,10 +334,18 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
     out: list[Option] = []
     add = out.append
     spot = lambda p: (
-        space.landmark(isl, name, p, start) if hasattr(space, "landmark") else None
+        space.landmark(isl, name, p, start)  # type: ignore[arg-type]  # on the grid a point is a tile
+        if hasattr(space, "landmark")
+        else None
     )  # noqa: E731
     places = [p for p in place_names(isl, space, name) if reach.near([spot(p)])]
     near = Choice(places, "home", label="a place from the list below")
+    # Version 22: where something goes is said exactly, as steps from where they stand at that hour, within
+    # sight (as a bridge or stairs is proposed where they stand).
+    exact = version_of(isl) >= 22 and hasattr(space, "exact_tiles")
+    sight = int((w.get("sightings") or {}).get("sight_radius", 8))
+    tiles = lambda carried=None: Tiles(sight, carried)  # noqa: E731
+    SPOT = "a piece bigger than one tile is named by its north-west tile"
 
     # Out on the island: gathering needs room in the pockets.
     rock_cells = getattr(space, "rock_cells", None)
@@ -341,7 +436,7 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                 else [None]
             )
             if cells and reach.near(cells):
-                wat = {"at": label[4:], "aka": (key,)}
+                wat: dict[str, Any] = {"at": label[4:], "aka": (key,)}
                 add(
                     Option(
                         f"fish in {label}",
@@ -360,13 +455,7 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                         )
                     )
     if has("net") and room > 0:
-        for hab, label in (
-            ("flowers", "among the flowers"),
-            ("trees", "around the trees"),
-            ("stumps", "on the stumps"),
-            ("rocks", "by the rocks"),
-            ("ground", "in the grass"),
-        ):
+        for hab, label in BUG_PLACES.items():
             cells = (
                 space._habitat_cells(isl, "bug", hab)
                 if hasattr(space, "_habitat_cells")
@@ -417,7 +506,7 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
         )
 
     # Bridges and stairs, proposed where they stand (version 17).
-    if getattr(isl, "prompt_version", 1) >= 17 and hasattr(space, "structure_spots"):
+    if version_of(isl) >= 17 and hasattr(space, "structure_spots"):
         cfg = structures_cfg(w)
         count = len(isl.structures())
         if isl.proposal_problem(name) is None:
@@ -425,8 +514,21 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                 ("bridge", "a bridge across the river"),
                 ("stairs", "stairs up a cliff"),
             ):
+                # Version 22: only when a workable spot is within reach of where they stand, which is where
+                # it is proposed. Before, any spot they could walk to put it on the list, and it failed there.
+                in_range = version_of(isl) >= 22 and start is not None
+                spots = (
+                    space.structure_spots(isl, kind, tuple(start), cfg["near"])  # type: ignore[arg-type]  # in_range means start is a tile
+                    if in_range
+                    else space.structure_spots(isl, kind)
+                )
                 if any(
-                    reach.near(sp["ends"]) for sp in space.structure_spots(isl, kind)
+                    (
+                        any(reach.at(e) for e in sp["ends"])
+                        if in_range
+                        else reach.near(sp["ends"])
+                    )
+                    for sp in spots
                 ):
                     add(
                         Option(
@@ -447,8 +549,9 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                 Option(
                     f"plant {_one(k)} (you carry {inv[k]})",
                     {"do": "plant", "item": k},
-                    fields={"near": near},
+                    fields=({"tiles": tiles(inv[k])} if exact else {"near": near}),
                     uses={k: 1},
+                    tail="one for each tile" if exact else "",
                 )
             )
     for k in sorted(inv):
@@ -458,14 +561,20 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                 Option(
                     f"put {k} outside (you carry {inv[k]})",
                     {"do": "place", "item": k},
-                    fields={
-                        "near": near,
-                        **({"count": Count(1, inv[k], 1)} if inv[k] > 1 else {}),
-                    },
+                    fields=(
+                        {"tiles": tiles(inv[k])}
+                        if exact
+                        else {
+                            "near": near,
+                            **({"count": Count(1, inv[k], 1)} if inv[k] > 1 else {}),
+                        }
+                    ),
                     uses={k: 1},
+                    tail=f"one piece for each tile; {SPOT}" if exact else "",
                 )
             )
-            if info["kind"] == "fence" and home_cell is not None:
+            # Until version 22, fencing could also go round the home in one action, the island choosing where.
+            if info["kind"] == "fence" and home_cell is not None and not exact:
                 add(
                     Option(
                         f"fence off around your home with {k} (you carry {inv[k]}; one piece per tile)",
@@ -500,7 +609,18 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
         side = "a place from the list below" + (
             " on your side of the river" if len(ends) < len(places) else ""
         )
-        if len(ends) > 1:
+        if exact:
+            add(
+                Option(
+                    "lay a path",
+                    {"do": "lay_path"},
+                    fields={
+                        "style": Choice(styles, styles[0]),
+                        "tiles": tiles(),
+                    },
+                )
+            )
+        elif len(ends) > 1:
             add(
                 Option(
                     "lay a path",
@@ -512,6 +632,10 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                     },
                 )
             )
+        area: (
+            str | None
+        )  # a part of the island here, and further down where a villager's home is
+        p: Any  # a laid path tile here, and further down a price in a shop's stock
         laid: dict[str, tuple] = {}
         for c, p in sorted(space.paths.items()):
             if p["owner"] == name:
@@ -586,7 +710,7 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
             )
 
     # Sending someone a letter, things from the pockets, or both (version 21): it arrives the next morning.
-    if getattr(isl, "prompt_version", 1) >= 21:
+    if version_of(isl) >= 21:
         from .prompts import LETTER_CHARS
 
         sendable = {
@@ -615,6 +739,9 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
 
     # Shops and services, in their opening hours.
     def open_in(place: str, building: str) -> frozenset | None:
+        """The hours of this plan a shop or service is open, or None when it is shut throughout or its
+        door can't be walked to.
+        """
         if not reach.at(
             space.coords_of_place(building) if hasattr(space, "buildings") else None
         ):
@@ -648,9 +775,8 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                     at="Nook's Cranny",
                 )
             )
-        f = isl.price_factor()
         for k, p in isl.cranny_stock.items():
-            price = round(p * f)
+            price = isl.shop_price(p)
             if price <= vil.bells and room > 0:
                 add(
                     Option(
@@ -691,9 +817,8 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                     )
                 )
     if (ok := open_in("able", "Able Sisters")) and room > 0:
-        f = isl.price_factor()
         for k, p in isl.able_stock.items():
-            price = round(p * f)
+            price = isl.shop_price(p)
             if price <= vil.bells:
                 add(
                     Option(
@@ -758,7 +883,7 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                 )
             )
         if (
-            getattr(isl, "prompt_version", 1) >= 17
+            version_of(isl) >= 17
         ):  # every bridge and stairs still being funded, each its own line
             cost = structures_cfg(w)["cost"]
             for st in isl.structures():
@@ -821,20 +946,19 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
                     )
         move = int(w.get("move_house_cost", 10000))
         if vil.bells >= move and name not in isl.pending_moves:
-            for s in isl.free_sites():
-                if s not in isl.pending_moves.values():
-                    add(
-                        Option(
-                            f"pay Tom Nook {move} bells to move your home to {s} ({isl.sites[s]['area']}) "
-                            f"overnight{at}",
-                            {"do": "move_house", "to": s},
-                            ok,
-                            at="Resident Services",
-                            what=s,
-                            what_note=isl.sites[s]["area"],
-                            tail=f"you pay Tom Nook {move} bells; your home moves overnight",
-                        )
+            for s in isl.open_sites():
+                add(
+                    Option(
+                        f"pay Tom Nook {move} bells to move your home to {s} ({isl.sites[s]['area']}) "
+                        f"overnight{at}",
+                        {"do": "move_house", "to": s},
+                        ok,
+                        at="Resident Services",
+                        what=s,
+                        what_note=isl.sites[s]["area"],
+                        tail=f"you pay Tom Nook {move} bells; your home moves overnight",
                     )
+                )
 
     # Resting, getting home, the plaza.
     add(
@@ -854,7 +978,7 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
         )
     )
     rescued = (getattr(isl, "rescued", None) or {}).get(name) == isl.day
-    if getattr(isl, "prompt_version", 1) >= 15 and bodies.stuck(name) and not rescued:
+    if version_of(isl) >= 15 and bodies.stuck(name) and not rescued:
         add(
             Option(
                 "call the Rescue Service to take you home (once a day)",
@@ -874,32 +998,34 @@ def plan_options(isl, bodies, space, name: str, hours: list[int]) -> list[Option
     return out
 
 
-def place_names(isl, space, name: str) -> list[str]:
+def place_names(isl: Island, space: GridSpace, name: str) -> list[str]:
     """The places an option can be done near: home, other villagers' homes, the buildings and the nine parts
-    of the island, each in words the island's landmarks understand."""
+    of the island, each in words the island's landmarks understand.
+    """
     homes = [f"{n}'s home" for n in sorted(isl.v) if n != name and isl.home.get(n)]
     buildings = list(getattr(space, "buildings", {}) or {})
     return ["home"] + homes + buildings + AREAS
 
 
-def options_text(options: list[Option], isl, name: str, space) -> str:
+def options_text(options: list[Option], isl: Island, name: str) -> str:
     """The numbered list for a plan prompt, and the places when an option takes one."""
     lines = [f"{i}. {o.line()}" for i, o in enumerate(options, 1)]
-    named = [
+    named: list[list[str]] = [
         s.values
         for o in options
         for s in o.fields.values()
         if isinstance(s, Choice) and s.label
     ]
     if named:
-        lines.append("Places: " + ", ".join(max(named, key=len)))
+        lines.append("Places: " + ", ".join(max(named, key=len)))  # type: ignore[arg-type]  # mypy reads max's items as join's argument, which has no len
     return "\n".join(lines)
 
 
-def read_picks(options: list[Option], entries: list) -> tuple[list[dict], list[dict]]:
+def read_picks(options: list[Option], entries: list) -> tuple[list[Action], list[dict]]:
     """A plan reply's actions as the actions they stand for. Each entry is {"hour": h, "pick": n} plus any
     values the option takes. Returns (actions, each with "hour" and its hours as "_open"; what couldn't be
-    read, each with the pick and why)."""
+    read, each with the pick and why).
+    """
     acts, bad = [], []
     for e in entries:
         if not isinstance(e, dict):
@@ -996,18 +1122,54 @@ KINDS = {
 PICK_SHAPE = '{"action": "<action>", "items": {"<thing>": <how many>}, "at": "<where>", "what": "<which one>"}'
 
 
-def _norm(x) -> str:
+def _parts(cands: list[Option]) -> list[str]:
+    """The parts a pick of this kind of action can have, as its line in the list shows them."""
+    parts = []
+    if _takes_items(cands):
+        parts.append("items")
+    if any(o.at or "near" in o.fields for o in cands):
+        parts.append("at")
+    if any(o.what for o in cands):
+        parts.append("what")
+    parts += [
+        k
+        for k in cands[0].fields
+        if k not in ("items", "bells", "near", "count") and k not in parts
+    ]
+    return parts
+
+
+def _takes_items(cands: list[Option]) -> bool:
+    """Whether a pick of this kind can name anything from the pockets or the wallet."""
+    return any(
+        o.uses or any(k in o.fields for k in ("items", "bells", "count")) for o in cands
+    )
+
+
+def _no_such_part(part: str, cands: list[Option]) -> str:
+    """Version 22, why a pick with a part its action doesn't have isn't planned."""
+    parts = _parts(cands)
+    takes = (
+        "it takes only " + ", ".join(f'"{p}"' for p in parts)
+        if parts
+        else "it takes nothing more"
+    )
+    return f'it has no "{part}" ({takes}); what it is for can go in "why"'
+
+
+def _norm(x: Any) -> str:
     """A name as written, for comparing: lower case, no "the" in front."""
     return re.sub(
         r"\s+", " ", re.sub(r"^(?:the|a|an|your|my)\s+", "", str(x).strip().lower())
     ).strip()
 
 
-def _words(x) -> set:
+def _words(x: Any) -> set[str]:
+    """The words and numbers in a name as written, for comparing."""
     return set(re.findall(r"[a-z0-9]+", _norm(x))) - {"s"}
 
 
-def _which(given, names: dict[str, tuple]) -> str | None:
+def _which(given: Any, names: Mapping[str, tuple]) -> str | None:
     """The one of `names` (each with its other ways of saying it, the line's own wording among them) that
     `given` means, or None when none or several fit. The same words win, as written and then without anything
     in brackets after them; then the only name with all the words given ("3" is rock 3, "Bo" is Bo's home).
@@ -1036,7 +1198,8 @@ def _which(given, names: dict[str, tuple]) -> str | None:
 
 def _groups(options: list[Option]) -> list[tuple[str, list[Option]]]:
     """The options kind by kind, in the list's order; a kind done at several places with a choice at each
-    (buying, at Nook's Cranny and the Able Sisters) is one group per place."""
+    (buying, at Nook's Cranny and the Able Sisters) is one group per place.
+    """
     by: dict[tuple, list[Option]] = {}
     split = {
         k
@@ -1050,15 +1213,15 @@ def _groups(options: list[Option]) -> list[tuple[str, list[Option]]]:
 
 
 def _label(name: str, note: str) -> str:
+    """A choice as the menu shows it, with its note in brackets when it has one."""
     return f"{name} ({note})" if note and note != name else name
 
 
-def _items_part(opts: list[Option], inv) -> str:
+def _items_part(opts: list[Option], inv: Mapping[str, int]) -> str:
+    """What the menu says a kind of action takes from the pockets or the wallet; empty when nothing."""
     for o in opts:
         if isinstance(o.fields.get("items"), Items):
-            return "any of " + ", ".join(
-                f"{k} x{n}" for k, n in o.fields["items"].have.items()
-            )
+            return "any of " + items_x(o.fields["items"].have)
     bells = [
         o.fields["bells"] for o in opts if isinstance(o.fields.get("bells"), Count)
     ]
@@ -1085,7 +1248,8 @@ def _items_part(opts: list[Option], inv) -> str:
     return (f"{fixed} and " if fixed else "") + f"one of {extra}"
 
 
-def _menu_line(kind: str, opts: list[Option], inv) -> str:
+def _menu_line(kind: str, opts: list[Option], inv: Mapping[str, int]) -> str:
+    """One kind of action as its line in version 21's menu: its name, then the choices for each part."""
     parts = [_label(kind, KINDS.get(kind, ""))]
     if it := _items_part(opts, inv):
         parts.append("items: " + it)
@@ -1115,29 +1279,29 @@ def _menu_line(kind: str, opts: list[Option], inv) -> str:
     return "- " + ". ".join(parts)
 
 
-def menu_text(options: list[Option], isl, name: str, space) -> str:
+def menu_text(options: list[Option], isl: Island, name: str) -> str:
     """Version 21's list for a plan prompt: what is in the pockets, then one line for each kind of action the
     villager can do, with what it uses from the pockets, where, and which one; and the places.
     """
     vil = isl.v[name]
-    inv = Counter({k: n for k, n in vil.inventory.items() if n > 0})
-    carried = ", ".join(f"{k} x{n}" for k, n in sorted(inv.items())) or "nothing"
+    inv = +vil.inventory  # only what they have at least one of
+    carried = items_x(dict(sorted(inv.items())), "nothing")
     lines = [
         f'In your pockets (the only things that can go in "items"): {carried}; {vil.bells} bells in your wallet'
     ]
     lines += [_menu_line(kind, opts, inv) for kind, opts in _groups(options)]
-    named = [
+    named: list[list[str]] = [
         s.values
         for o in options
         for s in o.fields.values()
         if isinstance(s, Choice) and s.label
     ]
     if named:
-        lines.append("Places: " + ", ".join(max(named, key=len)))
+        lines.append("Places: " + ", ".join(max(named, key=len)))  # type: ignore[arg-type]  # mypy reads max's items as join's argument, which has no len
     return "\n".join(lines)
 
 
-def _as_items(x) -> dict:
+def _as_items(x: Any) -> dict[str, Any]:
     """What a reply wrote for "items" or "what", as {name: how many}."""
     if isinstance(x, dict):
         return {str(k): v for k, v in x.items()}
@@ -1146,7 +1310,8 @@ def _as_items(x) -> dict:
     return {str(x): None} if x not in (None, "") else {}
 
 
-def _num(x, default=None):
+def _num(x: Any, default: int | None = None) -> int | None:
+    """A whole number as a reply wrote it ("1,200", "3.0"), or `default` when it isn't one."""
     try:
         return int(float(str(x).replace(",", "").strip()))
     except (TypeError, ValueError):
@@ -1154,9 +1319,16 @@ def _num(x, default=None):
 
 
 def _read_one(
-    by_kind: dict, pick: dict, pockets, home
+    by_kind: dict[str, list[Option]],
+    pick: dict,
+    pockets: Mapping[str, int],
+    home: Mapping[str, int] | None,
+    strict: bool = False,
 ) -> tuple[Option | None, dict, str | None]:
-    """One pick as (the option it means, the values for that option's fields, or why it can't be read)."""
+    """One pick as (the option it means, the values for that option's fields, or why it can't be read).
+    `strict` (version 22): a "what" or "items" the action's line doesn't have isn't read as something else
+    or checked against the pockets; the pick isn't planned, and the reason says which parts the action takes.
+    """
     kind = re.sub(
         r"[\s-]+", "_", str(pick.get("action", pick.get("do")) or "").strip().lower()
     )
@@ -1179,6 +1351,18 @@ def _read_one(
     if pick.get("bells") is not None:
         items.setdefault("bells", pick["bells"])
     whats = {o.what: (_label(o.what, o.what_note),) for o in cands if o.what}
+    if strict and not whats and what:
+        # A "what" that only repeats the place or a thing already named adds nothing: left out.
+        echo = {_norm(at)} if at not in (None, "") else set()
+        echo |= {_norm(k) for k in items} | {_norm(o.at) for o in cands if o.at}
+        if all(_norm(k) in echo for k in what):
+            what = {}
+    takes: bool | list[str] = _takes_items(cands)
+    stray = None  # said after a place that isn't one of the choices, which matters more
+    if strict and not whats and what and (items or not takes):
+        stray, what = _no_such_part("what", cands), {}
+    if strict and items and not takes:
+        stray, items = stray or _no_such_part("items", cands), {}
     # Read as meant: the one thing named, in the other of "items" and "what".
     if not whats and what and not items:
         items, what = what, {}
@@ -1224,6 +1408,8 @@ def _read_one(
                 ),
             )
         cands = [o for o in cands if o.at == a]
+    if stray:
+        return None, {}, stray
 
     # Things named have to be in the pockets (crafting can also use what is kept at home).
     pool = Counter(pockets)
@@ -1291,7 +1477,7 @@ def _read_one(
         )
     opt = (exact or least)[0]
 
-    vals = {}
+    vals: dict[str, Any] = {}
     for k, spec in opt.fields.items():
         if k == "items":
             if not given and spec.optional:
@@ -1322,6 +1508,13 @@ def _read_one(
         elif k == "near":
             val, why = spec.read(k, at)
             why = why and why.replace('"near"', '"at"')
+        elif isinstance(spec, Tiles):
+            said = (
+                pick.get("tiles")
+                if pick.get("tiles") is not None
+                else pick.get("steps")
+            )
+            val, why = spec.read(k, said, vals.get("near"))
         else:
             val, why = spec.read(k, pick.get(k))
         if why:
@@ -1337,11 +1530,17 @@ def _read_one(
 
 
 def read_actions(
-    options: list[Option], entries: list, pockets, home=None
-) -> tuple[list[dict], list[dict]]:
+    options: list[Option],
+    entries: list,
+    pockets: Mapping[str, int],
+    home: Mapping[str, int] | None = None,
+    strict: bool = False,
+) -> tuple[list[Action], list[dict]]:
     """Version 21: a plan reply's actions as the actions they stand for. Each entry is {"hour": h, "pick":
     {"action", "items", "at", "what"}}; `pockets` is what the villager carries (and `home` what they keep there,
     for crafting). Returns what `read_picks` does: the actions, and what couldn't be read with why.
+    With `strict` (version 22) a pick can say what it is for in "why" (its first WHY_WORDS words are kept, as
+    the action's "for"), and a part its action doesn't have isn't planned.
     """
     by_kind: dict[str, list[Option]] = {}
     for o in options:
@@ -1365,7 +1564,7 @@ def read_actions(
                 }
             )
             continue
-        opt, vals, why = _read_one(by_kind, pick, pockets, home)
+        opt, vals, why = _read_one(by_kind, pick, pockets, home, strict)
         if why:
             name = re.sub(
                 r"[\s-]+",
@@ -1382,11 +1581,16 @@ def read_actions(
                 }
             )
             continue
+        assert opt is not None  # _read_one gives the option whenever it gives no reason
+        said = (
+            " ".join(str(pick.get("why") or "").split()[:WHY_WORDS]) if strict else ""
+        )
         acts.append(
             {
                 **({"hour": hour} if hour is not None else {}),
                 **opt.action,
                 **vals,
+                **({"for": said} if said else {}),
                 **({"_open": opt.hours} if opt.hours is not None else {}),
             }
         )
@@ -1400,49 +1604,42 @@ def unread_line(at: int, bad: dict) -> str:
 
 # --- helpers ------------------------------------------------------------------------------------------------
 def _one(thing: str) -> str:
-    """ "an apple", "a sapling", but "tulip seeds"."""
-    return thing if thing.endswith("seeds") else _a(thing)
+    """ "an apple", "a sapling", but "tulip seeds"."""  # noqa: D210  # the space keeps the quote apart from the docstring's own
+    return thing if thing.endswith("seeds") else article(thing)
 
 
 def _the(place: str) -> str:
-    """ "the museum", "the Able Sisters", but "Nook's Cranny" and "Tom Nook"."""
+    """ "the museum", "the Able Sisters", but "Nook's Cranny" and "Tom Nook"."""  # noqa: D210  # as above
     return (
         f"the {place}" if not place[:1].isupper() or place == "Able Sisters" else place
     )
 
 
 def _price_note(price: int, count: dict) -> str:
-    """ "300 bells each, up to 3" for something a plan can buy several of; "300 bells" for one."""
+    """ "300 bells each, up to 3" for something a plan can buy several of; "300 bells" for one."""  # noqa: D210  # as above
     return (
         f"{price} bells each, up to {count['count'].hi}" if count else f"{price} bells"
     )
 
 
-def _how_many(bells: int, price: int, room: int) -> dict:
+def _how_many(bells: int, price: int, room: int) -> dict[str, Count]:
+    """The "count" a buy can take: up to what the bells and the pockets allow, 10 at most; nothing to
+    add when that is one.
+    """
     most = min(10, bells // max(1, price), room)
     return {"count": Count(1, most, 1)} if most > 1 else {}
 
 
-def _can_craft(isl, vil, r: str, split: bool) -> bool:
+def _can_craft(isl: Island, vil: Villager, r: str, split: bool) -> bool:
     """The recipe's materials from the pockets, and from home when things are kept there (crafting is at home),
-    and room for what it makes, as the world's craft checks them."""
-    rec = isl.w["recipes"].get(r)
-    if not rec:
-        return False
-    needs = rec["needs"]
-    have = lambda k: vil.inventory[k] + (
-        vil.home_items[k] if split else 0
-    )  # noqa: E731
-    if any(have(k) < n for k, n in needs.items()):
-        return False
-    makes = int(rec.get("makes", 1))
-    free = isl.space(vil) + sum(min(n, vil.inventory[k]) for k, n in needs.items())
-    return free >= makes or (split and free + isl.home_space(vil) >= makes)
+    and room for what it makes, as the world's craft checks them.
+    """
+    return bool(isl.w["recipes"].get(r)) and isl.craft_problem(vil, r, split) is None
 
 
-def _placed_by(space, name: str) -> dict[str, list]:
+def _placed_by(space: GridSpace, name: str) -> dict[str, list[Cell]]:
     """Things `name` put outside, by item: one cell per piece, so pick_up can go to the first."""
-    out: dict[str, list] = {}
+    out: dict[str, list[Cell]] = {}
     seen = set()
     for c, o in sorted((getattr(space, "placed", None) or {}).items()):
         if o["owner"] == name and o["id"] not in seen:

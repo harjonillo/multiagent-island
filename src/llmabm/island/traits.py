@@ -17,8 +17,12 @@ from __future__ import annotations
 
 import csv
 import math
+import statistics
 from collections import Counter, defaultdict
+from collections.abc import Iterable, Sequence
 from pathlib import Path
+
+import numpy as np
 
 from ..analysis import Run
 from .analysis import activity_group, snapshots
@@ -53,15 +57,18 @@ METRICS = {
 
 
 def _profile_metrics(run: Run) -> dict[tuple[int, str], dict]:
+    """{(day, villager): {metric: value}} for every villager on every finished day. A metric with
+    nothing to count that day is left out (see `_val` for what it then reads as).
+    """
     names = list(run.manifest["villagers"])
     days = [s["day"] for s in snapshots(run)]
     m: dict[tuple[int, str], dict] = {
         (d, n): defaultdict(float) for d in days for n in names
     }
-    groups = defaultdict(Counter)
-    first = {}
+    groups: defaultdict[tuple[int, str], Counter[str]] = defaultdict(Counter)
+    first: dict[tuple[int, str], int] = {}
     places = defaultdict(set)
-    rocks_total = Counter()
+    rocks_total: Counter[int] = Counter()
     for e in run.of("action"):
         k = (e["day"], e["agent"])
         if k not in m:
@@ -95,8 +102,8 @@ def _profile_metrics(run: Run) -> dict[tuple[int, str], dict]:
     for k in m:
         tot = rocks_total[k[0]]
         m[k]["rock_share"] = m[k].pop("_rock_hits", 0.0) / tot if tot else 0.0
-    dec = Counter()
-    appr = Counter()
+    dec: Counter[tuple[int, str]] = Counter()
+    appr: Counter[tuple[int, str]] = Counter()
     for e in run.of("encounter_decision"):
         k = (e["day"], e["agent"])
         dec[k] += 1
@@ -163,7 +170,10 @@ def _profile_metrics(run: Run) -> dict[tuple[int, str], dict]:
     return m
 
 
-def _val(m, d, n, k):
+def _val(m: dict[tuple[int, str], dict], d: int, n: str, k: str) -> float:
+    """Metric `k` of villager `n` on day `d`. A metric not set that day is 0, except the two shares
+    that have no value without something to take a share of, which are NaN.
+    """
     v = m[(d, n)].get(k)
     if v is None:
         return math.nan if k in ("approach_rate", "talk_energy") else 0.0
@@ -200,7 +210,9 @@ def _env(run: Run) -> dict[str, dict]:
         # With a pole, everything on the lower ground is reachable: a fair measure of how central home is.
         env[n]["steps_to_resident_services"] = g.distances(
             door, frozenset({"vaulting pole"})
-        ).get(rs)
+        ).get(
+            rs  # type: ignore[arg-type]  # None when there is no Resident Services
+        )
         env[n]["buildings_reachable_without_tools"] = sum(
             1 for b in g.buildings.values() if b["door"] in bare
         )
@@ -211,54 +223,38 @@ def _env(run: Run) -> dict[str, dict]:
     return env
 
 
-def _rank(xs: list[float]) -> list[float]:
-    order = sorted(range(len(xs)), key=lambda i: xs[i])
-    r = [0.0] * len(xs)
-    i = 0
-    while i < len(order):
-        j = i
-        while j + 1 < len(order) and xs[order[j + 1]] == xs[order[i]]:
-            j += 1
-        for k in range(i, j + 1):
-            r[order[k]] = (i + j) / 2
-        i = j + 1
-    return r
+def _finite(xs: Iterable[float | None]) -> np.ndarray:
+    """The numbers among `xs` as an array, leaving out what is missing (None or NaN)."""
+    a = np.array(list(xs), dtype=float)
+    return a[~np.isnan(a)]
 
 
-def spearman(a: list[float], b: list[float]) -> float:
-    pairs = [
-        (x, y)
-        for x, y in zip(a, b)
-        if x is not None
-        and y is not None
-        and not (isinstance(x, float) and math.isnan(x))
-        and not (isinstance(y, float) and math.isnan(y))
-    ]
-    if len(pairs) < 4:
+def spearman(a: Sequence[float | None], b: Sequence[float | None]) -> float:
+    """Spearman's rank correlation of two lists, over the places where both have a value. NaN with
+    fewer than 4 such places, or when either side is the same everywhere.
+    """
+    x, y = np.array(a, dtype=float), np.array(b, dtype=float)
+    both = ~(np.isnan(x) | np.isnan(y))
+    if both.sum() < 4:
         return math.nan
-    ra, rb = _rank([p[0] for p in pairs]), _rank([p[1] for p in pairs])
-    ma, mb = sum(ra) / len(ra), sum(rb) / len(rb)
-    cov = sum((x - ma) * (y - mb) for x, y in zip(ra, rb))
-    va = math.sqrt(sum((x - ma) ** 2 for x in ra))
-    vb = math.sqrt(sum((y - mb) ** 2 for y in rb))
-    return cov / (va * vb) if va and vb else math.nan
-
-
-def _nanmean(xs):
-    xs = [
-        x for x in xs if x is not None and not (isinstance(x, float) and math.isnan(x))
-    ]
-    return sum(xs) / len(xs) if xs else math.nan
-
-
-def _std(xs):
-    xs = [
-        x for x in xs if x is not None and not (isinstance(x, float) and math.isnan(x))
-    ]
-    if len(xs) < 2:
+    try:
+        return statistics.correlation(
+            x[both].tolist(), y[both].tolist(), method="ranked"
+        )
+    except statistics.StatisticsError:
         return math.nan
-    mu = sum(xs) / len(xs)
-    return math.sqrt(sum((x - mu) ** 2 for x in xs) / (len(xs) - 1))
+
+
+def _nanmean(xs: Iterable[float | None]) -> float:
+    """The mean of the values that are there; NaN when none is."""
+    a = _finite(xs)
+    return float(a.mean()) if a.size else math.nan
+
+
+def _std(xs: Iterable[float | None]) -> float:
+    """The sample standard deviation (n - 1) of the values that are there; NaN with fewer than two."""
+    a = _finite(xs)
+    return float(a.std(ddof=1)) if a.size >= 2 else math.nan
 
 
 def recent_profile(run: Run, window: int = 5) -> dict[str, dict]:
@@ -273,6 +269,10 @@ def recent_profile(run: Run, window: int = 5) -> dict[str, dict]:
 
 
 def summary_lines(run: Run) -> list[str]:
+    """The summary's section on emergent traits: how the spread of each metric across villagers
+    changed from the first day to the last, and whether where a villager landed goes with how they
+    behave. Empty for a run with no nightly writing.
+    """
     if (
         not run.of("reflection")
         and run.manifest.get("scenario_config", {}).get("reflection", {}).get("enabled")
@@ -320,6 +320,7 @@ def summary_lines(run: Run) -> list[str]:
 
 
 def write_traits(run: Run, out_dir: Path) -> list[Path]:
+    """Write the outputs listed at the top of this file into `out_dir` and return their paths."""
     out_dir = Path(out_dir)
     m = _profile_metrics(run)
     names = list(run.manifest["villagers"])
@@ -353,12 +354,18 @@ def write_traits(run: Run, out_dir: Path) -> list[Path]:
     return paths
 
 
-def _plots(run, out_dir, m, names, days) -> list[Path]:
+def _plots(
+    run: Run,
+    out_dir: Path,
+    m: dict[tuple[int, str], dict],
+    names: list[str],
+    days: list[int],
+) -> list[Path]:
+    """Draw traits_divergence.png (each metric by day) and traits_profile.png (recent behaviour, z-scored)."""
     import matplotlib
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    import numpy as np
     from matplotlib.colors import LinearSegmentedColormap
 
     from ..analysis import SERIES
@@ -401,7 +408,7 @@ def _plots(run, out_dir, m, names, days) -> list[Path]:
     grid = np.array(
         [[prof[n].get(c, math.nan) for c in keys] for n in names], dtype=float
     )
-    mu, sd = np.nanmean(grid, axis=0), np.nanstd(grid, axis=0)
+    mu, sd = np.nanmean(grid, axis=0), np.nanstd(grid, axis=0, ddof=1)
     sd[sd == 0] = 1
     z = (grid - mu) / sd
     cmap = LinearSegmentedColormap.from_list("div", ["#2a78d6", "#f4f3f0", "#eb6834"])

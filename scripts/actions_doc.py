@@ -12,8 +12,16 @@ import json
 import random
 import re
 from pathlib import Path
+from typing import Any
 
-from llmabm.island.world import ORDINANCE_TEXT, Island, load_world, structures_cfg
+from llmabm.island.fmt import md_table, months_text
+from llmabm.island.world import (
+    ORDINANCE_TEXT,
+    Island,
+    fmt_window,
+    load_world,
+    structures_cfg,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 WALK = "you can walk to"
@@ -21,21 +29,14 @@ ROOM = "room in your pockets"
 
 
 def pct(x: float) -> str:
+    """A share as a percentage: whole when it is 10% or more or comes out even, else to one decimal."""
     p = 100 * x
     return f"{p:.0f}%" if p >= 9.5 or p == round(p) else f"{p:.1f}%"
 
 
-def n(x) -> str:
+def n(x: float) -> str:
+    """A number with commas between the thousands."""
     return f"{x:,}"
-
-
-def window(h) -> str:
-    return "all day" if list(h) == [0, 24] else f"{h[0]:02d}:00-{h[1]:02d}:00"
-
-
-def months(spec: dict) -> str:
-    m = spec.get("months")
-    return "all year" if not m else ", ".join(str(x) for x in m)
 
 
 def world_numbers(w: dict) -> dict:
@@ -64,7 +65,8 @@ def world_numbers(w: dict) -> dict:
 
 def entries(N: dict) -> list:
     """The groups of actions: each action with its line on the list, what it needs, and what comes of it.
-    Each is (name, line, in pockets, where, only if, gives, uses up, changes, still fails if, extra markdown)."""
+    Each is (name, line, in pockets, where, only if, gives, uses up, changes, still fails if, extra markdown).
+    """
     y = N["yields"]
     yields = "<br/>".join(" · ".join(f"{k} {pct(v)}" for k, v in list(y.items())[i:i + 2]) for i in range(0, len(y), 2))
     fail, got = pct(N["fail"]), pct(1 - N["fail"])
@@ -154,7 +156,8 @@ def entries(N: dict) -> list:
              [], [f"where you stand at that hour:<br/>the nearest spot within {st['near']} steps for<br/>{shape}"],
              [f"fewer than {st['max']} bridges and stairs<br/>on the island, built or proposed<br/>(the first bridge counts)",
               "no proposal of yours<br/>still being funded",
-              f"a spot like that somewhere<br/>you can walk to, its land clear<br/>(no tree, rock, home, building,<br/>"
+              f"a spot like that within {st['near']} steps<br/>of where you are when you plan<br/>(before version 22: anywhere<br/>"
+              f"you can walk to), its land clear<br/>(no tree, rock, home, building,<br/>"
               f"furniture or flowers), {st['spacing']} tiles<br/>from any other bridge or stairs"],
              [], [],
              [f"its own fund opens at Resident<br/>Services: 0 of {n(st['cost'])} bells",
@@ -175,17 +178,17 @@ def entries(N: dict) -> list:
              [f"{a(fruit)}: a sapling that is a<br/>fruit tree in {N['sapling']} days",
               f"a sapling: a hardwood tree<br/>in {N['sapling']} days",
               f"flower seeds: flowers in bloom in<br/>{N['bloom']} days, where bugs come"],
-             "no free spot near there", ""),
+             "no free spot near there (version 22: you say exactly<br/>which tiles, within sight, as steps from where you stand then,<br/>one for each; a tile that can't be used is said so)", ""),
             ("place", 'put the log stool outside (you carry 1); add "near": a place',
              ["furniture or fencing that<br/>can go outside; one line each"], [f"near a place you choose<br/>that {WALK}"], [],
              [], ["the pieces you put out<br/>(add a count for more than one)"],
              ["they stand outside near there,<br/>blocking the way; only you<br/>can pick them up"],
-             "no free space near there", ""),
+             "no free space near there (version 22: you say exactly<br/>which tiles, within sight, as steps from where you stand then,<br/>one piece for each; a tile that can't be used is said so)", ""),
             ("fence_off", "fence off around your home with simple wooden fence (you carry 5; one piece per tile)",
              ["fencing<br/>one line per kind"], ["around your home"], ["you have a home"],
              [], ["1 piece per tile fenced<br/>(as far as your pieces go)"],
              ["a fence round your home plot,<br/>the door left open"],
-             "nothing left to fence there", ""),
+             "nothing left to fence there (until version 22; after that<br/>fencing goes down with place, tile by tile)", ""),
             ("pick_up", "pick up log stool you put outside (lower ground, centre) (1 out)", [],
              ["where you put it"], [ROOM, "you put that thing outside<br/>one line per kind of thing"],
              ["the pieces, back in your pockets<br/>(add a count for more than one)"], [],
@@ -194,7 +197,7 @@ def entries(N: dict) -> list:
              [f"from one place to another,<br/>both on your side of the river<br/>and {WALK}"], ["at least two such places"],
              [], [], [f"up to {N['path']} tiles of path along<br/>the way (dirt, stone, brick, sand<br/>or terracotta); "
                       "do it again<br/>to go on", "walking on paths is no faster"],
-             "that stretch is already paved", ""),
+             "that stretch is already paved (version 22: you say exactly<br/>which tiles, within sight, as steps from where you stand then;<br/>a tile that can't be used is said so)", ""),
             ("remove_path", "take up path tiles you laid around lower ground, centre", [],
              ["a part of the island<br/>one line per part"], ["you laid path tiles there"],
              [], [], ["your path tiles near there<br/>are taken up"], "they were taken up already", ""),
@@ -237,35 +240,35 @@ def entries(N: dict) -> list:
             ("ask", "ask Tom Nook what they do and what it costs (at Resident Services)", [],
              [f"Resident Services (Tom Nook, Isabelle),<br/>the museum (Blathers), Nook's Cranny<br/>(Timmy and Tommy) or the Able Sisters<br/>"
               f"{WALK}; one line per person"],
-             [f"it's open during the plan<br/>Nook's Cranny {window(N['hours']['cranny'])},<br/>Able Sisters "
-              f"{window(N['hours']['able'])},<br/>the others all day"],
+             [f"it's open during the plan<br/>Nook's Cranny {fmt_window(N['hours']['cranny'])},<br/>Able Sisters "
+              f"{fmt_window(N['hours']['able'])},<br/>the others all day"],
              ["Tom Nook or Isabelle, when you<br/>carry no map and have room:<br/>an island map"], [],
              ["you hear what they do and what<br/>it costs (houses, moves, bridges<br/>and stairs; ordinances; the museum;<br/>prices; clothes)",
               "Timmy and Tommy: what they'd pay<br/>for what you carry joins the<br/>prices you've heard"],
              "nothing", ""),
             ("sell", 'sell at Nook\'s Cranny; add "items": what and how many', ["things Timmy and Tommy buy"],
-             [f"Nook's Cranny, {WALK}"], [f"open during the plan<br/>{window(N['hours']['cranny'])}"],
+             [f"Nook's Cranny, {WALK}"], [f"open during the plan<br/>{fmt_window(N['hours']['cranny'])}"],
              ["bells: each thing's Cranny price<br/>(more under Bell Boom)"], ["the things sold"],
              ["their prices join the<br/>prices you've heard"],
              "none of it is in your pockets any more", ""),
             ("buy (a thing)", 'buy fishing bait at Nook\'s Cranny, 300 bells each; add "count"', ["bells for one<br/>(in your wallet)"],
-             [f"Nook's Cranny, {WALK}"], [f"open during the plan<br/>{window(N['hours']['cranny'])}",
+             [f"Nook's Cranny, {WALK}"], [f"open during the plan<br/>{fmt_window(N['hours']['cranny'])}",
                                          "it's in today's stock<br/>one line per thing", ROOM],
              ["the thing; up to 10 at once,<br/>as many as you can pay<br/>for and carry"], ["its price in bells, each"], [],
              "bells spent since; pockets full", ""),
             ("buy (a tool)", f"buy a new shovel at Nook's Cranny, {tool_eg} bells each", ["bells for one<br/>(in your wallet)"],
-             [f"Nook's Cranny, {WALK}"], [f"open during the plan<br/>{window(N['hours']['cranny'])}",
+             [f"Nook's Cranny, {WALK}"], [f"open during the plan<br/>{fmt_window(N['hours']['cranny'])}",
                                          "one line per tool<br/>(always in stock)", ROOM],
              [f"a new tool with {N['uses']} uses"], ["its price in bells, each"], [],
              "bells spent since; pockets full", ""),
             ("buy (a recipe card)", "buy the shovel recipe card at Nook's Cranny, 200 bells", ["bells for it<br/>(in your wallet)"],
-             [f"Nook's Cranny, {WALK}"], [f"open during the plan<br/>{window(N['hours']['cranny'])}",
+             [f"Nook's Cranny, {WALK}"], [f"open during the plan<br/>{fmt_window(N['hours']['cranny'])}",
                                          "it's for sale today<br/>(tool cards always, plus one)",
                                          "room in your pockets,<br/>only if you already know it"],
              ["a card for a recipe you<br/>already know: the card"], ["its price in bells"],
              ["you learn the recipe, and<br/>what it needs"], "bells spent since", ""),
             ("buy (clothes)", "buy the kimono at the Able Sisters, 4800 bells", ["bells for it<br/>(in your wallet)"],
-             [f"the Able Sisters, {WALK}"], [f"open during the plan<br/>{window(N['hours']['able'])}",
+             [f"the Able Sisters, {WALK}"], [f"open during the plan<br/>{fmt_window(N['hours']['able'])}",
                                              "it's in today's stock<br/>one line per piece", ROOM],
              ["the piece of clothing"], ["its price in bells"], [], "bells spent since; pockets full", ""),
             ("assess", "have Blathers assess your fossils (1) at the museum", ["an unassessed fossil"],
@@ -352,18 +355,22 @@ PLAN = {
     "propose_stairs": ("propose_stairs. stairs up a cliff, at the nearest spot within 8 steps of where you are then; "
                        "built once 98000 bells are donated at Resident Services; 2 of 10 on the island so far",
                        {"action": "propose_stairs"}),
-    "plant": ("plant. items: one of apple x3, sapling x1. at: a place from the list below (home if left out)",
-              {"action": "plant", "items": {"apple": 1}, "at": "north"}),
+    "plant": ("plant. items: one of apple x3, sapling x1. "
+              'also "tiles": exactly which tiles, each as steps from where you stand when the hour comes (north is up the map): [{"east": 2, "south": 1}, ...], any within 8 steps of you, which is as far as you see. one for each tile',
+              {"action": "plant", "items": {"apple": 1}, "tiles": [{"south": 3}]}),
     "place": ("place (put furniture or fencing outside). items: one of log stool x1, simple wooden fence x5. "
-              "at: a place from the list below (home if left out)",
-              {"action": "place", "items": {"simple wooden fence": 3}, "at": "home"}),
+              'also "tiles": exactly which tiles, each as steps from where you stand when the hour comes (north is up the map): [{"east": 2, "south": 1}, ...], any within 8 steps of you, which is as far as you see. one piece for each tile; a piece bigger than one tile is named by its north-west tile',
+              {"action": "place", "items": {"simple wooden fence": 1},
+               "tiles": [{"east": 2, "south": 1}, {"east": 2, "south": 2}]}),
     "fence_off": ("fence_off (fence off around your home). items: simple wooden fence. at: home. one piece per tile, "
                   "as far as your pieces go", {"action": "fence_off"}),
     "pick_up": ("pick_up (something you put outside). what: log stool (1 out, lower ground, centre)",
                 {"action": "pick_up", "what": "log stool"}),
-    "lay_path": ('lay_path. also "style": dirt | stone | brick | sand | terracotta (or leave it out for dirt), "from": '
-                 'a place from the list below (or leave it out for home), "to": a place from the list below',
-                 {"action": "lay_path", "style": "stone", "to": "museum"}),
+    "lay_path": ('lay_path. also "style": dirt | stone | brick | sand | terracotta (or leave it out for dirt), '
+                 '"tiles": exactly which tiles, each as steps from where you stand when the hour comes (north is up '
+                 'the map): [{"east": 2, "south": 1}, ...], any within 8 steps of you, which is as far as you see',
+                 {"action": "lay_path", "style": "stone",
+                  "tiles": [{"south": 1}, {"south": 2}, {"south": 2, "east": 1}]}),
     "remove_path": ("remove_path (take up path tiles you laid). at: lower ground, centre", {"action": "remove_path"}),
     "craft": ("craft. at: home. what: log stool | shovel", {"action": "craft", "what": "log stool"}),
     "decorate": ("decorate (put furniture inside your home). items: log stool. at: home", {"action": "decorate"}),
@@ -413,7 +420,8 @@ STYLE = """    classDef act fill:#e3f4e8,stroke:#2e8b57,color:#0b0b0b
     classDef change fill:#eef0f2,stroke:#6b7280,color:#0b0b0b"""
 
 
-def graph(name, pockets, where, only, gives, uses, changes) -> str:
+def graph(name: str, pockets: list[str], where: list[str], only: list[str], gives: list[str], uses: list[str],
+          changes: list[str]) -> str:
     """The action in the centre: what it takes on the left (arrows into it), what comes of it on the right."""
     lines = ["```mermaid", "flowchart LR", STYLE, f'    A(["{name}"])']
     ids: dict[str, list] = {k: [] for k in ("item", "place", "cond", "gain", "spend", "change")}
@@ -455,7 +463,7 @@ def species_tables(w: dict, kind: str) -> str:
         out += [f"**{label[0].upper()}{label[1:]}**", "", head, "|" + "---|" * (head.count("|") - 1)]
         for k, v in sorted(rows.items(), key=lambda kv: -kv[1]["weight"]):
             cols = [k, str(v["weight"]), pct(v["weight"] / total)] + ([str(v.get("shadow", ""))] if kind == "FISH" else [])
-            cols += [window(v["hours"]), months(v), v.get("weather", "any")]
+            cols += [fmt_window(v["hours"]), months_text(v), v.get("weather", "any")]
             out.append("| " + " | ".join(cols) + " |")
         out.append("")
     note = ("Which fish are out changes hour by hour: only those whose hours, months and weather fit, and a fish "
@@ -466,6 +474,8 @@ def species_tables(w: dict, kind: str) -> str:
 
 
 def extra(w: dict, N: dict, key: str) -> str:
+    """The extra markdown under an action's chart: the table or notes that `key` names, "" for none."""
+    rows: list[Any]  # rows of cells for md_table in some branches, whole table lines in the last
     if key in ("FISH", "BUGS"):
         return species_tables(w, key)
     if key == "SEND":
@@ -493,13 +503,13 @@ action on the plan's list; the other two are part of that turn's reply.
   `how: "in person"`."""
     if key == "SHELLS":
         total = sum(v[1] for v in w["shells"].values())
-        rows = [f"| {k} | {v[1]} | {pct(v[1] / total)} |" for k, v in sorted(w["shells"].items(), key=lambda kv: -kv[1][1])]
-        return "\n".join(["| shell | weight | chance each |", "|---|---|---|"] + rows)
+        rows = [[k, v[1], pct(v[1] / total)] for k, v in sorted(w["shells"].items(), key=lambda kv: -kv[1][1])]
+        return md_table(["shell", "weight", "chance each"], rows)
     if key == "FOSSILS":
-        return ("Each of these equally likely (1 in %d): " % len(N["fossils"])) + ", ".join(sorted(N["fossils"])) + "."
+        return ("Each of these equally likely (1 in %d): " % len(N["fossils"])) + ", ".join(sorted(N["fossils"])) + "."  # noqa: UP031  # the text of a generated doc: left exactly as written
     if key == "HOUSES":
-        rows = [f"| {lv['name']} | {n(lv['cost'])} | {lv['storage']} | {lv.get('interior', '')} |" for lv in N["levels"]]
-        return "\n".join(["| house | loan (bells) | storage at home | furniture inside |", "|---|---|---|---|"] + rows)
+        rows = [[lv["name"], n(lv["cost"]), lv["storage"], lv.get("interior", "")] for lv in N["levels"]]
+        return md_table(["house", "loan (bells)", "storage at home", "furniture inside"], rows)
     if key == "ORDINANCES":
         types = w["ordinances"]["types"]
         rows = [f"| {o.replace('_', ' ')} | {ORDINANCE_TEXT.get(o, o).split(': ', 1)[-1]} | "
@@ -511,7 +521,7 @@ action on the plan's list; the other two are part of that turn's reply.
 
 HEAD = """# Every action, what it takes and what comes of it
 
-Prompt version 21 on. Each plan lists the actions a villager can do then, one line per kind of
+Prompt version 21 on (what version 22 adds is marked). Each plan lists the actions a villager can do then, one line per kind of
 action; this file shows, for every action in the game, what puts it on that list and what comes of
 doing it. How plans fit into a day and an hour is in [day_flow.md](day_flow.md); the code is
 `options.py` (the list) and `world.py` (what happens). Generated by `scripts/actions_doc.py` from
@@ -577,6 +587,14 @@ choices for `"at"` and `"what"`. The reply is asked for as
 | an `"at"` that doesn't fit, for an action done in only one place | ignored |
 | a `"what"` that isn't one of the line's | not planned; their day gives the choices |
 | a bare number, as before version 21 | not planned; their day shows how a pick is written |
+| `"why"` (version 22) | up to 10 words of their own on what the pick is for. Kept with the action, shown back with what they planned and, on a visit, when they get there. The island doesn't act on it |
+| a `"what"` or `"items"` the action's line doesn't have (version 22) | not planned; the reason gives the parts the action takes (`visit: it has no "what" (it takes only "at")`). A `"what"` that only repeats the place or the thing named is left out and the pick is read. In version 21 it was read as something from the pockets: `visit` with `"what": "ask for bait"` came back as "you have no ask for bait in your pockets" |
+
+**From version 22 the island answers at once.** Picks that can't be read come straight back, each
+with its hour and the reason above, and the villager can write those picks again or leave them out.
+This happens once per plan and costs no mental energy; the rest of the plan stands. What still
+can't be read isn't planned, and their day says why, as before. The `plan` event keeps what was sent
+back and what was answered under `retry`. Before, a villager found out at their next plan, hours later.
 
 Their day's line reads `08:00 in your plan, sell: you have no dace in your pockets; for this you
 carry sea bass x2, wood x4, so it wasn't planned`. It states what they have and what the action
@@ -587,7 +605,7 @@ chart in how:
 
 | action | how |
 |---|---|
-| `lay_path` | takes `"style"`, `"from"` and `"to"` next to `"action"`: two places don't fit in one `"at"` |
+| `lay_path`, `place`, `plant` | from version 22 they take `"tiles"` next to `"action"` and no `"at"`: exactly which tiles, each as steps from where they stand when the hour comes, `[{{"east": 2, "south": 1}}, ...]`, any within the 8 steps they see; one tile can be `"steps": {{...}}`. Until then `lay_path` took `"style"`, `"from"` and `"to"`, and the island chose the tiles |
 | `craft` | the chart's blue box is the recipe's materials, but the pick names the recipe in `"what"`; the materials are taken from the pockets, then from home, without being named |
 | `buy`, `set_ordinance`, `move_house` | the blue box is bells from the wallet, but the price is fixed, so no `"bells"` in the pick; the thing chosen is `"what"` |
 | `pay_loan`, `contribute_bridge` | the bells are `"items": {{"bells": <how many>}}`; `pay_loan` pays all it can if they're left out |
@@ -671,13 +689,14 @@ flowchart TD
 
 
 def main() -> None:
+    """Write docs/actions.md from the world file."""
     w = load_world(ROOT / "data/island_world.yaml")
     N = world_numbers(w)
     out = [HEAD.format(uses=N["uses"], near=N["st"]["near"])]
     k = 0
     for title, actions in entries(N):
         out.append(f"## {title}\n")
-        for name, line, pockets, where, only, gives, uses, changes, fails, more in actions:
+        for name, _line, pockets, where, only, gives, uses, changes, fails, more in actions:
             k += 1
             out.append(f"### {k}. `{name}`\n")
             menu, pick = PLAN[name]

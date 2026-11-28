@@ -10,32 +10,48 @@ from __future__ import annotations
 import argparse
 import random
 from collections import Counter, deque
+from collections.abc import Iterable
 from pathlib import Path
 
-from llmabm.island.grid import POND, RIVER, ROCKY, SAND, SEA, TIER_NAME, WATER, GridSpace
+from llmabm.island.fmt import md_table as table
+from llmabm.island.fmt import months_text
+from llmabm.island.grid import (
+    POND,
+    RIVER,
+    ROCKY,
+    SAND,
+    SEA,
+    TIER_NAME,
+    WATER,
+    GridSpace,
+)
 from llmabm.island.grid_render import render_grid_map
-from llmabm.island.world import ORDINANCE_TEXT, Island, clock, fmt_window, load_world, structures_cfg
+from llmabm.island.world import (
+    ORDINANCE_TEXT,
+    Island,
+    clock,
+    fmt_window,
+    load_world,
+    structures_cfg,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS = [("no tools", frozenset()), ("vaulting pole", frozenset({"vaulting pole"})),
          ("ladder", frozenset({"ladder"})), ("both", frozenset({"vaulting pole", "ladder"}))]
 
 
-def table(head: list[str], rows: list[list]) -> str:
-    out = ["| " + " | ".join(head) + " |", "|" + "|".join("---" for _ in head) + "|"]
-    out += ["| " + " | ".join(str(c) for c in r) + " |" for r in rows]
-    return "\n".join(out)
-
-
 def n(x: float) -> str:
+    """A number rounded to a whole one, with commas between the thousands."""
     return f"{x:,.0f}"
 
 
 def needs(d: dict) -> str:
+    """What a recipe takes: {"wood": 3, "stone": 1} -> "3 wood, 1 stone"."""
     return ", ".join(f"{q} {k}" for k, q in d.items())
 
 
-def build(seed: int):
+def build(seed: int) -> tuple[dict, GridSpace, Island]:
+    """The world file, the island's grid for `seed`, and an island with nobody on it on the morning of day 0."""
     w = load_world(ROOT / "data/island_world.yaml")
     g = GridSpace(w, seed)
     isl = Island(w, [], random.Random(seed))
@@ -47,7 +63,8 @@ def build(seed: int):
 
 def river_widths(g: GridSpace) -> list[int]:
     """How many river tiles across the river is at each river tile: the shorter of its run across and down."""
-    def run(x, y, dx, dy):
+    def run(x: int, y: int, dx: int, dy: int) -> int:
+        """How many river tiles in a row pass through (x, y) along the direction (dx, dy)."""
         k = 1
         for s in (1, -1):
             cx, cy = x + s * dx, y + s * dy
@@ -81,8 +98,9 @@ def mouths(g: GridSpace) -> int:
 
 
 def map_section(w: dict, g: GridSpace, isl: Island, seed: int) -> str:
+    """The doc's section on the map: what the island is made of, tile by tile, and what can be reached with which tools."""
     cells = [(x, y) for y in range(g.H) for x in range(g.W)]
-    kind = Counter()
+    kind: Counter[str] = Counter()
     for x, y in cells:
         t = g.terrain[y][x]
         if t == SEA:
@@ -103,7 +121,7 @@ def map_section(w: dict, g: GridSpace, isl: Island, seed: int) -> str:
     tiles = table(["tile", "count", "share"], [[k, n(kind[k]), share(k)] for k in order if kind[k]])
 
     trees = [t for t in isl.trees if t.pos]
-    by_tier = Counter((TIER_NAME[g.tier[t.pos[1]][t.pos[0]]], t.kind) for t in trees)
+    by_tier = Counter((TIER_NAME[g.tier[t.pos[1]][t.pos[0]]], t.kind) for t in trees)  # type: ignore[index]  # `trees` holds only trees with a position
     tree_rows = [[tier, by_tier[(tier, "hardwood")], by_tier[(tier, "fruit")]] for tier in TIER_NAME.values()]
     rocks = [[i + 1, g.region(c)] for i, c in enumerate(g.rock_cells) if c]
     buildings = [[name, f"{len({x for x, _ in b['cells']})} x {len({y for _, y in b['cells']})}", g.region(b["door"]),
@@ -118,7 +136,7 @@ def map_section(w: dict, g: GridSpace, isl: Island, seed: int) -> str:
         reach.append([label, f"{sum(1 for c in land if c in dist) / len(land):.0%}",
                       f"{sum(1 for c in g.rock_cells if c and any(a in dist for a in g.approach_cells(c)))} of "
                       f"{sum(1 for c in g.rock_cells if c)}",
-                      f"{sum(1 for t in trees if any(a in dist for a in g.approach_cells(t.pos)))} of {len(trees)}",
+                      f"{sum(1 for t in trees if any(a in dist for a in g.approach_cells(t.pos)))} of {len(trees)}",  # type: ignore[arg-type, misc]  # as above (misc: the same error, as mypy reports it for sum)
                       f"{sum(1 for b in g.buildings.values() if b['door'] in dist)} of {len(g.buildings)}",
                       f"{sum(1 for s in g.sites.values() if s['door'] in dist)} of {len(g.sites)}"])
     gc, br = g.cfg, w["bridge"]
@@ -203,6 +221,7 @@ morning, and a villager only knows the ones they have seen. Fish and bugs come a
 
 
 def daily_section(w: dict) -> str:
+    """The doc's section on what the island gives each day and when each thing refills."""
     i = w["island"]
     yields = ", ".join(f"{k} {v:.0%}" for k, v in i["rock_yields"].items())
     rows = [
@@ -222,6 +241,7 @@ def daily_section(w: dict) -> str:
 
 
 def items_section(w: dict) -> str:
+    """The doc's section on things: materials, what the shops sell, the collectibles and the recipes."""
     mats = w["materials"]
     src = {"wood": "chop_wood", "softwood": "chop_wood", "hardwood": "chop_wood",
            "stone": "mine_rock", "clay": "mine_rock", "iron nugget": "mine_rock", "gold nugget": "mine_rock, rarely",
@@ -254,17 +274,18 @@ def items_section(w: dict) -> str:
             if info.get("outdoor") is False:
                 what += ", indoor only"
             shop_rows.append([k, "Nook's Cranny", note, n(v), what])
-    shop_rows.append([f"every tool's recipe card", "Nook's Cranny", "always in stock", n(cr["tool_recipe_price"]),
+    shop_rows.append(["every tool's recipe card", "Nook's Cranny", "always in stock", n(cr["tool_recipe_price"]),
                       "learn to make that tool"])
     if cr.get("tool_markup"):
         shop_rows.append(["every tool, ready-made", "Nook's Cranny", "always in stock",
                           f"{cr['tool_markup']}x its sell value", "a new tool"])
-    shop_rows.append([f"one other recipe card", "Nook's Cranny", "1 a day, never a tool", n(cr["recipe_price"]),
+    shop_rows.append(["one other recipe card", "Nook's Cranny", "1 a day, never a tool", n(cr["recipe_price"]),
                       "learn the recipe"])
     for k, v in (w.get("clothing") or {}).items():
         shop_rows.append([k, "Able Sisters", f"{ab['sells_daily']} a day", n(v["price"]), f"{v['slot']}: {v['description']}"])
 
-    def rng_(vals):
+    def rng_(vals: Iterable[float]) -> str:
+        """The lowest and highest of `vals`, as "low-high"."""
         vals = list(vals)
         return f"{n(min(vals))}-{n(max(vals))}"
 
@@ -274,11 +295,11 @@ def items_section(w: dict) -> str:
            ["shells", len(w["shells"]), rng_(v[0] for v in w["shells"].values()), "beachcomb"]]
     fish = table(["fish", "sells for", "shadow", "where", "hours", "months", "weather"],
                  [[k, n(v["price"]), v["shadow"], v["where"], fmt_window(v["hours"]),
-                   ", ".join(map(str, v["months"])) if v.get("months") else "all year", v.get("weather", "any")]
+                   months_text(v), v.get("weather", "any")]
                   for k, v in w["fish"].items()])
     bugs = table(["bug", "sells for", "habitat", "hours", "months", "weather"],
                  [[k, n(v["price"]), v.get("habitat", "ground"), fmt_window(v["hours"]),
-                   ", ".join(map(str, v["months"])) if v.get("months") else "all year", v.get("weather", "any")]
+                   months_text(v), v.get("weather", "any")]
                   for k, v in w["bugs"].items()])
     fossils = table(["fossil", "sells for"], [[k, n(v)] for k, v in w["fossils"].items()])
     fa = w["fossil_assessment"]
@@ -333,6 +354,7 @@ between {n(fa['min_price'])} and {n(fa['max_price'])}.
 
 
 def tools_section(w: dict) -> str:
+    """The doc's section on tools: what each is for, what wears it out and how to get one."""
     t, rec = w["tools"], w["recipes"]
     wears = {"shovel": "mine_rock, dig_fossil, dig_stump, break_rock", "stone axe": "chop_wood (the tree stays)",
              "axe": "chop_wood; brings the tree down with its last wood (a fruit tree drops its fruit)",
@@ -358,6 +380,7 @@ or mailed, and a worn tool stays worn.
 
 
 def services_section(w: dict) -> str:
+    """The doc's section on the buildings and who runs them: opening hours, houses and loans, the bridge and the ordinances."""
     hrs = w["hours"]
     houses = table(["house", "storage", "furniture inside", "costs (Tom Nook loan)"],
                    [[h["name"], h["storage"], h.get("interior", ""), n(h["cost"])] for h in w["house_levels"]])
@@ -385,6 +408,7 @@ Ordinances (one at a time):
 
 
 def perturb_section() -> str:
+    """The doc's section on what a run's seed changes about the world."""
     return """## What changes from run to run
 
 Runs perturb the world with the seed, so models can't lean on what they remember about ACNH:
@@ -398,6 +422,7 @@ from the seed too, so it changes with every seed.
 
 
 def main() -> None:
+    """Write docs/world.md and docs/island_grid.png for the seed given on the command line."""
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
@@ -411,7 +436,7 @@ def main() -> None:
         "",
         "Everything on the island, for you. Villagers never see this page: they learn the island by",
         "trying things, asking the NPCs and talking to each other (see the README). Generated by",
-        f"`scripts/world_doc.py` from `data/island_world.yaml` and the island generator; rerun it after",
+        "`scripts/world_doc.py` from `data/island_world.yaml` and the island generator; rerun it after",
         "changing either. Day starts at " + clock(w["calendar"]["day_start"]) + ".",
         "",
         map_section(w, g, isl, args.seed),

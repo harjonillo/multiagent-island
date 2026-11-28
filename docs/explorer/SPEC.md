@@ -61,7 +61,7 @@ to 2, 30 to 3, 34 to 4.
 
 ## The map
 
-Generated per run from the seed, not a stored image. `export_map.py` shows the approach: build
+Generated per run from the seed, not a stored image. `map_data` in `src/llmabm/island/site_data.py` does it: build
 `GridSpace(manifest["world"], manifest["seed"])`, paint one pixel per tile (terrain, tier, buildings,
 homesites, paths, trees, rocks from the latest `snapshot.objects`), and scale it up 8x with nearest
 neighbour. The page draws it with `image-rendering: pixelated` and overlays HTML labels positioned in
@@ -116,7 +116,7 @@ each in a 300px column with its card below.
   fossils, wild flower patches), then a muted note that wood, rocks, shells and fossils refill each
   morning. Bells come from the scenario config, tools and recipes from the run's world in
   `manifest.json`, the island's counts from day 0's `day_start` event (`pools`).
-- **An empty slot** after the last door keeps the earlier code-drawn door from `door_sprites.py` (SVG
+- **An empty slot** after the last door keeps the earlier code-drawn door from `site_doors.py` (SVG
   `<rect>`s with `shape-rendering="crispEdges"`: the frame with a dark doorway and a stone step, and the
   door panel with planks, two braces, a sign board and a handle backplate), faded (grayscale 60%, opacity
   0.55, `EMPTY_DOOR` colours), with its sign showing the next number (`EXP NN`, Silkscreen 15px) and

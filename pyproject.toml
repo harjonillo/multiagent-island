@@ -6,11 +6,11 @@ build-backend = "setuptools.build_meta"
 name = "llm-abm"
 version = "0.1.0"
 description = "An agent-based model of an island where the villagers are LLMs"
-requires-python = ">=3.10"
-dependencies = ["pyyaml>=6", "matplotlib>=3.7", "fastembed>=0.5"]
+requires-python = ">=3.12"
+dependencies = ["pyyaml>=6", "numpy>=1.26", "matplotlib>=3.7", "fastembed>=0.5", "python-dotenv>=1"]
 
 [project.optional-dependencies]
-dev = ["pytest>=7"]
+dev = ["pytest>=7", "mypy>=1.10", "ruff>=0.6", "types-PyYAML"]
 
 [project.scripts]
 llmabm = "llmabm.cli:main"
@@ -20,3 +20,48 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "llmabm.island" = ["site_template.html", "site_experiments.html", "site_tokens.css", "changelog.yaml", "door_art/*.png"]
+
+# Code quality: `ruff check .` (docstrings, annotations, imports, likely bugs) and `mypy` (types).
+[tool.ruff]
+target-version = "py312"
+extend-exclude = ["runs", "_site", "Claude outputs"]
+
+[tool.ruff.lint]
+# D: every module, class and function has a docstring. ANN: every argument and return is annotated.
+select = ["D", "ANN", "F", "I", "UP", "B", "SIM"]
+ignore = [
+    "D105",   # magic methods say what they are by their name
+    "D107",   # __init__ is described by its class
+    "D205",   # a summary may run over more than one line
+    "D212",   # (with D213) either place for the first line of a docstring
+    "D213",
+    "D203",   # (conflicts with D211) no blank line before a class docstring
+    "D4",     # section and wording style of docstrings is left to the writer
+    "ANN401", # Any is the honest type of a parsed JSON value
+    "SIM108", # a ternary is not always the clearer form
+    "B905",   # zip() stops at the shorter list on purpose in several places
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src", "scripts", "tests", "docs/explorer/door_art"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+
+[[tool.mypy.overrides]]
+module = ["fastembed.*", "matplotlib.*", "PIL.*"]
+ignore_missing_imports = true
+
+# The tests reach into private state, swap methods for stand-ins and hand over values a caller never
+# would, on purpose. They are checked for complete signatures; these kinds of error are not reported.
+[[tool.mypy.overrides]]
+module = ["test_island"]
+disable_error_code = [
+    "arg-type", "index", "func-returns-value", "attr-defined", "method-assign",
+    "assignment", "union-attr", "dict-item", "misc",
+]

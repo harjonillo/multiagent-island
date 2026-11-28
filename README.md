@@ -13,6 +13,15 @@ conda env create -f environment.yml     # Python 3.12, the package (editable) an
 conda activate multiagent_island_env
 ```
 
+To work on the code, also `pip install -e ".[dev]"` (pytest, ruff and mypy), and before committing:
+
+```bash
+pytest                  # about 4 minutes
+ruff check .            # docstrings, annotations, imports, likely bugs
+mypy                    # types (settings in pyproject.toml)
+black src               # the package is black-formatted; tests and scripts are not
+```
+
 In an environment made before `fastembed` was added, run `pip install -e .` once. The first run
 on a real backend downloads a small embedding model (about 70 MB) into `.cache/fastembed/`, for
 villagers' memory; after that nothing about memory needs the network.
@@ -340,6 +349,41 @@ Something named in `"items"` that isn't in their pockets isn't planned, and thei
 they do carry for that action. What each action does is unchanged: donating, planting and wearing
 still take one thing an hour, and selling any mix.
 
+**From prompt version 22 the island answers a plan at once.** In `runs/test1` on day 16, the first
+day of picks by name, 7 of 82 picks were dropped for a part their action doesn't have, usually the
+reason for going (`visit` at Fen's home with `"what": "ask for bait"`). It was read as something
+from the pockets, so the villager was told "you have no ask for bait in your pockets", hours later
+at their next plan. Now the reason says which parts the action takes
+(`visit: it has no "what" (it takes only "at")`), it comes straight back, and the villager can write
+those picks again, once, for no mental energy. A pick can say what it is for in `"why"` (up to 10
+words of their own): the island doesn't act on it, and it is shown back with what they planned and,
+on a visit, when they get there. Version 22 also makes a plan cost a set number of points of mental
+energy whatever its length (24; charged by length, plans had grown from about 22 points to 34 while
+villagers were told 24), makes asking for the same thing twice in one conversation do nothing,
+tells a villager who spots a bug or fish how full their pockets are (18 of 66 such chases on days
+12 to 16 were decided with full pockets, which the prompt didn't show; one caught with no room is
+now named and let go), and lists proposing a bridge or stairs only within reach of a spot (10 of 13
+proposals had failed for being too far from one).
+
+**Also from version 22, a villager says exactly where things go.** Paths, fencing, furniture,
+saplings and flower seeds go on the tiles the villager names, and nowhere else:
+`{"action": "lay_path", "style": "stone", "tiles": [{"south": 1}, {"south": 2}, {"south": 2, "east": 1}]}`.
+Each tile is written as steps from where they stand when that hour comes, as a bridge is proposed
+where they stand, and has to be within the 8 steps they see (`sightings.sight_radius`). That is the
+only limit on an hour's work, with one piece, sapling or packet of seeds for each tile. They end
+the hour at the last tile, so the next action carries on from there. Before, they named a place
+(two for a path) and the island chose the tiles: the walking route for a path, the nearest free
+tiles for the rest, and the ring round the home for `fence_off`, which is no longer on the list.
+
+- The plan lists what is in sight of where they are now, in the same words
+  (`hardwood tree: 4 south, 1 east`): trees, stumps, rocks, things put outside, flowers, path and
+  the nearest water.
+- What is on a tile is only known once they stand there. A tile that can't be used is left out,
+  the rest is done, and the result says why
+  (`; not done: 3 east of where you stand is the river`).
+- When planning, the island checks only what it can: the shape, the 8 steps, and that they carry
+  enough pieces. Those come back at once like any other unread pick.
+
 **Sending, also from version 21,** is one thing written one way wherever it happens: `"send"`, with
 `"items"` from the pockets, a `"note"`, or both. It is a new action on the plan's list
 (`{"action": "send", "at": "Fen", "items": {"wood": 2}, "note": "for your fence"}`), to any villager
@@ -588,15 +632,18 @@ open. The tables below are the actions as the island runs them.
 
 | action | parameters | what it does |
 |---|---|---|
-| `plant` | `item`: apple, sapling or flower seeds; `near` | a new tree, or flowers that bloom in 3 days |
+| `plant` | `item`: apple, sapling or flower seeds; `near` (prompt version 22: `tiles`) | a new tree, or flowers that bloom in 3 days |
 | `chop_wood` with `"axe": "axe"` | `kind`: hardwood or fruit | takes the tree's wood and, with its last wood, brings it down, leaving a stump; a fruit tree also drops its fruit (prompt version 4; earlier runs have `chop_down_tree`) |
 | `dig_stump` | `near` | clears the stump |
 | `break_rock` | `rock` | eat an apple first; the rock is gone and turns up elsewhere in 3 days |
-| `lay_path` | `style`: dirt, stone, brick, sand, terracotta; `from`, `to` | up to 30 tiles an hour; repeat to continue. Paths don't change walking speed by default |
+| `lay_path` | `style`: dirt, stone, brick, sand, terracotta; `from`, `to` (prompt version 22: `tiles`) | up to 30 tiles an hour along the walk between the two; repeat to continue. From version 22, the tiles named, within sight. Paths don't change walking speed by default |
 | `remove_path` | `near` | your own path tiles only |
-| `place` | `item`, `near`, `count` | put furniture or fences outside, within 12 tiles of the landmark |
-| `fence_off` | `item`, `around: "home"` | fence your home plot, leaving the door open |
+| `place` | `item`, `near`, `count` (prompt version 22: `tiles`) | put furniture or fences outside, within 12 tiles of the landmark. From version 22, on the tiles named, within sight |
+| `fence_off` | `item`, `around: "home"` | fence your home plot, leaving the door open (until prompt version 22) |
 | `pick_up` | `item`, `near`, `count` | take back things you put outside |
+
+From prompt version 22, `tiles` is a list of tiles, each as steps from where the villager stands
+(`[{"east": 2, "south": 1}, ...]`); see "a villager says exactly where things go" above.
 
 Only the villager who placed something can pick it up or remove it (`owner_only_pickup`). An
 action that fails (closed shop, rock mined out, out of reach, pockets full) still uses the
@@ -1122,7 +1169,7 @@ reading anything into a run.
 ## Layout
 
 ```
-docs/                   day_flow.md (flowcharts of a run), memory.md (flowcharts of what villagers keep and for how long), token_design.md (why the token budget works as it does),
+docs/                   legacy_removal.md (what to delete once the old prompt versions are retired), day_flow.md (flowcharts of a run), memory.md (flowcharts of what villagers keep and for how long), token_design.md (why the token budget works as it does),
                         recall_examples.md (generated: what retrieval brings to mind, with scores), world.md and island_grid.png (generated), the grid spec
 scenarios/              island scenarios
 villagers/              island villager templates and casts
@@ -1132,6 +1179,7 @@ scripts/daily.sh        start or resume an island run by one day
 scripts/world_doc.py    regenerate docs/world.md and docs/island_grid.png
 scripts/actions_doc.py  regenerate docs/actions.md (every action: what it takes, what comes of it)
 scripts/recall_doc.py   regenerate docs/recall_examples.md from a run
+scripts/seed_cache_from_prompts.py  put the replies saved in a run's prompt files back into the reply cache
 src/llmabm/
   cli.py                run, resume, analyze
   agent.py              villager file format (frontmatter + persona)
@@ -1146,7 +1194,8 @@ src/llmabm/
     options.py          version 16: each villager's numbered list of what they can do, and reading picks
     body.py             a villager's body (position, tools, walking, acting) and who arrives first
     memory.py           long-term memory: picks and fading; from version 20, everything kept and retrieved
-    space.py            the Space interface
+    space.py            the Space interface, and the shapes passed between modules (Cell, Side, Action, ...)
+    fmt.py              how lists of things are written out (items, sides of a trade, Markdown tables)
     grid.py             the tile island: generation, pathfinding, sight, building
     energy.py           mental energy
     traits.py           emergence metrics for reflection runs

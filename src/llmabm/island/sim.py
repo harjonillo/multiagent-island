@@ -29,59 +29,33 @@ from collections.abc import MutableMapping
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, cast
 
 import yaml
 
 from ..agent import AgentSpec, load_agent_file
+from ..analysis import read_events
 from ..llm import DailyLimit, HashEmbeddings, LLMError
-from .prompts import (
-    PROMPT_CHANGES,
-    PROMPT_VERSION,
-    BOARD_CHARS,
-    TRADE_TRIES,
-    _count,
-    keep_chat,
-    open_trade,
-    problem_text,
-    trade_tries,
-    INBOX_SHOWN,
-    LETTER_CHARS,
-    OFFER_DAYS,
-    REQUEST_DAYS,
-    act_record,
-    at_place,
-    trade_sides,
-    turn_act_text,
-    encounter_prompt,
-    evening_prompt,
-    plaza_prompt,
-    spot_prompt,
-    action_text,
-    announcement_text,
-    inbox_text,
-    request_lines,
-    light_system_prompt,
-    notice_prompt,
-    reflect_prompt,
-    plan_prompt,
-    system_prompt,
-    island_101,
-    island_101_closed,
-    island_101_open,
-)
+from .body import Bodies
 from .energy import EnergyAccount, MentalEnergy
-from .villager_files import prompt_dir
+from .fmt import items_n
+from .grid import GridSpace
 from .memory import (
     DEFAULTS as MEMORY_DEFAULTS,
+)
+from .memory import (
     consolidate,
     consolidate_recalled,
     forget,
     recall,
     record_key,
     retrieval,
-    settings as memory_settings,
     split_picks,
 )
+from .memory import (
+    settings as memory_settings,
+)
+from .npc import ISABELLE
 from .options import (
     menu_text,
     options_text,
@@ -90,29 +64,87 @@ from .options import (
     read_picks,
     unread_line,
 )
-from .grid import GridSpace
-from .body import Bodies
-from .npc import ISABELLE
+from .prompts import (
+    BOARD_CHARS,
+    INBOX_SHOWN,
+    LETTER_CHARS,
+    OFFER_DAYS,
+    PROMPT_CHANGES,
+    PROMPT_VERSION,
+    REQUEST_DAYS,
+    TRADE_TRIES,
+    act_record,
+    action_text,
+    announcement_text,
+    asked_already,
+    at_place,
+    encounter_prompt,
+    evening_prompt,
+    inbox_text,
+    island_101,
+    island_101_closed,
+    island_101_open,
+    keep_chat,
+    last_chat_before,
+    light_system_prompt,
+    notice_prompt,
+    open_trade,
+    plan_prompt,
+    plan_retry_prompt,
+    plaza_prompt,
+    problem_text,
+    reflect_prompt,
+    request_lines,
+    spot_prompt,
+    system_prompt,
+    trade_sides,
+    trade_tries,
+    turn_act_text,
+)
+from .space import version_of
 from .villager import Villager
+from .villager_files import prompt_dir, user_part
 from .world import Island, clock, load_world, to_game_hour
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator, Mapping
+
+    from ..llm import ChatBackend, Completion, Embedder
+    from .body import Body
+    from .options import Option
+    from .space import Action, Side
+
+    # What `_call` gives back: the reply, the JSON object read from it, and what went wrong, if anything.
+    _Reply = tuple[Completion | None, dict | None, str | None]
 
 _PROMPT_LOCK = threading.Lock()
 
 
 class EventLog:
-    def __init__(self, path: Path, mode: str = "w"):
-        self.f = open(path, mode, encoding="utf-8")
+    """A run's events.jsonl: one line of JSON for each thing that happens, written as it happens."""
 
-    def __call__(self, type_: str, **data) -> None:
+    def __init__(self, path: Path, mode: str = "w") -> None:
+        """Open the file, new for a run ("w") or to carry on a resumed one ("a")."""
+        self.f = open(  # noqa: SIM115  # kept open for the whole run; `close` shuts it
+            path, mode, encoding="utf-8"
+        )
+
+    def __call__(self, type_: str, **data: Any) -> None:
+        """Write one event of this type at once, so a run that stops has lost nothing."""
         self.f.write(json.dumps({"type": type_, **data}, ensure_ascii=False) + "\n")
         self.f.flush()
 
     def close(self) -> None:
+        """Shut the file when the run ends."""
         self.f.close()
 
 
 @dataclass
 class IslandScenario:
+    """A scenario as read from its file: the world, the cast, how many days, and the settings for the
+    LLM calls, Isabelle, the nightly page, mental energy and memory.
+    """
+
     name: str
     description: str
     world: dict
@@ -136,6 +168,11 @@ class IslandScenario:
 
 
 def load_island_scenario(path: Path, seed: int = 0) -> IslandScenario:
+    """Read a scenario file: the cast (written in it, or in a cast file it names), each villager from their
+    template, and the world with the scenario's own calendar, encounter, grid and mental-energy settings
+    laid over it. The world's species names and prices are changed using `seed`, so the same seed gives the
+    same island.
+    """
     path = Path(path)
     root = path.parent.parent if path.parent.name == "scenarios" else path.parent
     cfg = yaml.safe_load(path.read_text())
@@ -192,11 +229,19 @@ def load_island_scenario(path: Path, seed: int = 0) -> IslandScenario:
 
 
 class RunAborted(RuntimeError):
+    """The run can't go on (a provider's daily cap, too many failed calls in a row, no embeddings); the
+    message says how to carry on from the last checkpoint.
+    """
+
     pass
 
 
 @dataclass
 class Offer:
+    """A trade offered at the plaza (before prompt version 12): what the sender gives, what they want
+    back, and how it stands.
+    """
+
     id: str
     day: int
     sender: str
@@ -212,14 +257,15 @@ class Offer:
 
 def _failed_give(items: dict, taker: str, p: dict) -> str:
     """What both villagers see when a gift in person doesn't go through (prompt versions 8 to 11), from
-    `Island.give_problem`: what was missing, said the same way to both of them."""
+    `Island.give_problem`: what was missing, said the same way to both of them.
+    """
     if p.get("room"):
-        return f"tried to give {_count(items)} but {taker} had no room"
+        return f"tried to give {items_n(items)} but {taker} had no room"
     short = f"had only {p['have']}" if p["have"] else f"had no {p['item']}"
     return f"tried to give {items[p['item']]} {p['item']} but {short}"
 
 
-def _query(*parts) -> str:
+def _query(*parts: Any) -> str:
     """The text a villager's memories are compared with: pieces of the prompt they are about to read."""
     out = []
     for p in parts:
@@ -231,17 +277,14 @@ def _query(*parts) -> str:
     return "\n".join(x for x in out if x.strip())
 
 
-def _last_chat_skip(isl, me: str, other: str):
+def _last_chat_skip(isl: Island, me: str, other: str) -> Callable[[dict], bool] | None:
     """Which of `me`'s records are the last conversation with `other` before today: `last_chat_with` shows
-    it in full in a conversation's prompt, so it isn't retrieved as well."""
-    chats = [
-        c
-        for c in getattr(isl, "last_chats", {}).get(frozenset((me, other)), [])
-        if c["day"] < isl.day
-    ]
-    if not chats:
+    it in full in a conversation's prompt, so it isn't retrieved as well.
+    """
+    last = last_chat_before(isl, me, other, isl.day)
+    if last is None:
         return None
-    day, at = chats[-1]["day"], clock(chats[-1]["hour"])
+    day, at = last["day"], clock(last["hour"])
     return (
         lambda r: r.get("kind") == "chat"
         and r["day"] == day
@@ -254,8 +297,7 @@ def _section(path: Path, heading: str) -> list[str] | None:
     """The "- " lines under `heading` in a saved prompt, or None if the file or the heading isn't there."""
     if not path.exists():
         return None
-    text = path.read_text()
-    user = text.split("=== USER ===", 1)[-1].split("\n=== REASONING", 1)[0]
+    user = user_part(path.read_text())
     if f"\n{heading}\n" not in user:
         return None
     body = user.split(f"\n{heading}\n", 1)[1].split("\n\n", 1)[0]
@@ -269,9 +311,7 @@ def _notes_in_prompts(folder: Path) -> list[tuple[int, str]]:
     """Every note a villager's saved plans show them, with its day, in the order first seen."""
     out: list[tuple[int, str]] = []
     for path in sorted(folder.glob("d*_p*.txt")) if folder.exists() else []:
-        user = (
-            path.read_text().split("=== USER ===", 1)[-1].split("\n=== REASONING", 1)[0]
-        )
+        user = user_part(path.read_text())
         m = re.search(r"\nYour notes[^\n]*:\n((?:- .*\n?)*)", user)
         for ln in (m.group(1).splitlines() if m else []):
             hit = _NOTE_LINE.match(ln)
@@ -280,23 +320,32 @@ def _notes_in_prompts(folder: Path) -> list[tuple[int, str]]:
     return out
 
 
+# Reasoning a model wrote into its reply instead of the reasoning field: never part of the answer.
+_THINK = re.compile(r"<think>.*?</think>", re.S | re.I)
+# The most a quick decision can say (the scenario's max_tokens is for everything else).
+QUICK_TOKENS = {"notice": 500, "spot": 400}
+
 MAX_CHAT_LINES = 40  # a conversation with no set length still stops here (it matters only without mental energy)
 
 
 def _turn_cap(cfg: dict) -> int | None:
     """Lines a conversation can have: `turns` from the world's encounter settings; none (null) means no set
-    number, so it goes on until someone leaves, says nothing or runs out of energy."""
+    number, so it goes on until someone leaves, says nothing or runs out of energy.
+    """
     n = cfg.get("turns", 2)
     return None if n is None else int(n)
 
 
-def _ref_id(x, prefix: str = "o") -> str:
+def _ref_id(x: Any, prefix: str = "o") -> str:
     """An offer or board-post id as villagers write it: "o18", "[o18]", "18" or 18 are all offer o18."""
     x = str(x or "").strip().strip("[]").strip().lower()
     return f"{prefix}{x}" if x.isdigit() else x
 
 
-def _clean_side(d) -> dict:
+def _clean_side(d: Any) -> Side:
+    """One side of a hand-over as a reply wrote it, tidied: names in lower case, whole numbers above zero.
+    Anything else is left out; something that isn't a dict is nothing.
+    """
     if not isinstance(d, dict):
         return {}
     out = {}
@@ -313,37 +362,49 @@ def _clean_side(d) -> dict:
 class _PerVillager(MutableMapping):
     """One attribute of every villager, read and written by name: `sim.choices["Ari"]` is
     `sim.isl.v["Ari"].choices`. The simulation used to keep these as dicts of its own; they now live on
-    each `Villager`, and this keeps the old spelling working."""
+    each `Villager`, and this keeps the old spelling working.
+    """
 
-    def __init__(self, villagers: dict, attr: str):
+    def __init__(self, villagers: dict[str, Villager], attr: str) -> None:
+        """Look at the attribute `attr` of these villagers."""
         self._v, self._attr = villagers, attr
 
-    def __getitem__(self, name):
+    def __getitem__(self, name: str) -> Any:
+        """That villager's value."""
         if name not in self._v:
             raise KeyError(name)
         return getattr(self._v[name], self._attr)
 
-    def __setitem__(self, name, value):
+    def __setitem__(self, name: str, value: Any) -> None:
+        """Give that villager a new value."""
         setattr(self._v[name], self._attr, value)
 
-    def __delitem__(self, name):
+    def __delitem__(self, name: str) -> None:
+        """Refused: every villager always has the attribute."""
         raise TypeError("a villager's attribute can't be deleted")
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
+        """The villagers' names."""
         return iter(self._v)
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """How many villagers there are."""
         return len(self._v)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Shown as the plain dict it used to be."""
         return repr(dict(self))
 
 
-def _per_villager(attr: str):
-    def get(self):
+def _per_villager(attr: str) -> property:
+    """A property of the simulation that reads and writes one attribute of every villager, by name."""
+
+    def get(self: IslandSimulation) -> _PerVillager:
+        """The attribute for every villager, by name."""
         return _PerVillager(self.isl.v, attr)
 
-    def set_(self, values):
+    def set_(self: IslandSimulation, values: Mapping[str, Any]) -> None:
+        """Hand each villager named their value."""
         for name, value in values.items():
             setattr(self.isl.v[name], attr, value)
 
@@ -365,26 +426,32 @@ _REBUILT = {
 
 
 class IslandSimulation:
+    """One run of the island: the world, the villagers' bodies and minds, and the loop that plays the days
+    hour by hour, logging everything that happens and saving a checkpoint each night.
+    """
+
+    # Changes patched into a checkpoint by hand, each (what, details): recorded at the next resume.
+    pending_interventions: list[tuple[str, list[str]]]
     choices = _per_villager("choices")
     yesterday = _per_villager("yesterday")
     noticed = _per_villager("noticed")
     arrival_hour = _per_villager("arrival_hour")
     systems = _per_villager("system")
     talk_systems = _per_villager("talk_system")
-    light_systems = _per_villager("light_system")
 
     def __init__(
         self,
         sc: IslandScenario,
-        backends: dict,
+        backends: dict[str, ChatBackend],
         run_dir: Path,
         seed: int = 0,
         backend_override: str | None = None,
         concurrency: int = 1,
         log_prompts: bool = False,
         verbose: bool = True,
-        embedder=None,
-    ):
+        embedder: Embedder | None = None,
+    ) -> None:
+        """Build the island for a new run from the scenario and the seed. Nothing is played yet."""
         self.sc = sc
         self.backends = backends
         # Text -> vector, for retrieving memories (prompt version 20). Without one, the offline word-hashing
@@ -436,13 +503,14 @@ class IslandSimulation:
             vil.arrival_hour = start
 
     # --- persistence -------------------------------------------------------
-    def __getstate__(self):
+    def __getstate__(self) -> dict[str, Any]:
+        """What a checkpoint keeps: everything but the backends, the open log, and what a resume makes again."""
         state = dict(self.__dict__)
         for k in ("backends", "log", "_raw_log", "_prompt_seq", "embedder", "_vecs"):
             state.pop(k, None)
         return state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict[str, Any]) -> None:
         """Checkpoints from before villagers held their own choices, yesterday, what they noticed and arrival
         hour kept them here, by name: hand each villager theirs. System prompts are rebuilt, never loaded.
         """
@@ -461,8 +529,9 @@ class IslandSimulation:
         """
         for name, vil in self.isl.v.items():
             vil.isl = self.isl
-            vil.spec = self.sc.villagers.get(name)
-            vil.body = self.bodies.b.get(name)
+            # Every villager is in the cast and has a body: the island and the bodies were made from the cast.
+            vil.spec = cast(AgentSpec, self.sc.villagers.get(name))
+            vil.body = cast("Body", self.bodies.b.get(name))
             vil.energy = EnergyAccount(self.energy, name)
             vil.keeps_page = bool(self.sc.reflection.get("enabled"))
 
@@ -471,7 +540,8 @@ class IslandSimulation:
         villagers/<name>/prompts/<tag>.txt for the first call with that tag (a day, an hour and a kind of
         call), then <tag>_2.txt and so on, so their several turns in one conversation are all kept. Calls
         that are nobody's (Isabelle's) go in prompts/<tag>_<name>.txt. The count starts again in each
-        process, so a resume that replays a day writes the same files again."""
+        process, so a resume that replays a day writes the same files again.
+        """
         with _PROMPT_LOCK:
             seq = self.__dict__.setdefault("_prompt_seq", Counter())
             seq[(tag, name)] += 1
@@ -516,6 +586,9 @@ class IslandSimulation:
         self.isl.favors_done_today = []
 
     def _checkpoint(self) -> None:
+        """End of a day: save the whole simulation, the new checkpoint taking the old one's place in one step,
+        and write in the manifest how many days are done.
+        """
         self._log_offset = (
             self._raw_log.f.tell()
         )  # where the log ends for this checkpoint
@@ -537,13 +610,13 @@ class IslandSimulation:
     def resume(
         cls,
         run_dir: Path,
-        backends: dict,
+        backends: dict[str, ChatBackend],
         days: int = 1,
         backend_override: str | None = None,
         concurrency: int | None = None,
         verbose: bool = True,
         prompt_version: int | str | None = None,
-        embedder=None,
+        embedder: Embedder | None = None,
     ) -> Path:
         """Continue a run from its last checkpoint for `days` more days, appending to the same logs.
         The run keeps the prompt wording it started with; `prompt_version` (a number, or "latest")
@@ -672,7 +745,7 @@ class IslandSimulation:
         try:
             sim._run_days(days)
         finally:
-            sim.hour = None
+            sim.hour = None  # type: ignore[assignment]  # no hour once the days are over
             sim.log(
                 "run_end",
                 time=time.time(),
@@ -686,9 +759,10 @@ class IslandSimulation:
     def _build_systems(self) -> None:
         """System prompts: persona, what the villager wrote last night (if reflection is on) and
         the island rules. Plans also get the action menu; conversations and the plaza don't.
-        Rebuilt after every nightly reflection."""
+        Rebuilt after every nightly reflection.
+        """
         sc = self.sc
-        v = getattr(self, "prompt_version", 1)
+        v = self.prompt_version
         for n, spec in sc.villagers.items():
             vil = self.isl.v[n]
             page = vil.page()
@@ -700,12 +774,10 @@ class IslandSimulation:
             )
             vil.light_system = light_system_prompt(spec, page)
 
-    def _self_doc(self, name: str) -> str | None:
-        return self.isl.v[name].page()
-
     def _reflect(self, d: int) -> None:
         """Nightly: each villager writes a free-form private page that replaces the last one,
-        unless they chose not to write tonight."""
+        unless they chose not to write tonight.
+        """
         cfg = self.sc.reflection
         if not cfg.get("enabled"):
             return
@@ -724,7 +796,8 @@ class IslandSimulation:
             )
         who = [n for n in who if self.isl.v[n].choices["write"]]
 
-        def reflect(name):
+        def reflect(name: str) -> _Reply | tuple[str]:
+            """One villager's page for tonight, or TIRED when they can't read the prompt."""
             user = reflect_prompt(
                 isl, isl.v[name], max_words, isl.memory, list(self.offers.values())
             )
@@ -763,12 +836,7 @@ class IslandSimulation:
                 )
                 continue
             reply, _, err = results[name]
-            text = re.sub(
-                r"<think>.*?</think>",
-                "",
-                reply.text if reply else "",
-                flags=re.S | re.I,
-            ).strip()
+            text = _THINK.sub("", reply.text if reply else "").strip()
             kept = {}
             if isl.memory:  # the page, then what they chose to hold on to
                 text, picks = split_picks(text)
@@ -790,7 +858,9 @@ class IslandSimulation:
                 if retrieval(
                     isl
                 ):  # the page is kept too; the latest one is never retrieved (it is in the prompt)
-                    isl.v[name].memory.add_page(d, text, isl.memory)
+                    isl.v[name].memory.add_page(
+                        d, text, cast("dict[str, Any]", isl.memory)
+                    )
             self.log(
                 "reflection",
                 day=d,
@@ -859,11 +929,12 @@ class IslandSimulation:
         situation brings to mind and put it on `vil.recalled`, where the prompt builders read it. A query is
         text already in that villager's prompt, nothing else. Done here, on the main thread and in name order,
         so calls made in parallel only read the result and a resumed run retrieves exactly the same. Each
-        villager draws only on their own records."""
+        villager draws only on their own records.
+        """
         isl = self.isl
         if not retrieval(isl) or not queries:
             return
-        cfg, day = isl.memory, isl.day
+        cfg, day = cast("dict[str, Any]", isl.memory), isl.day
         vecs = self.__dict__.setdefault("_vecs", {})
         cands = {
             n: isl.v[n].memory.candidates(
@@ -902,7 +973,7 @@ class IslandSimulation:
                 got=[[record_key(r), score] for score, r in top],
             )
 
-    def _recall_done(self, names) -> None:
+    def _recall_done(self, names: list[str]) -> None:
         """The prompts are written: what came to mind for them is not carried into the next ones."""
         for n in names:
             self.isl.v[n].recalled = None
@@ -914,17 +985,15 @@ class IslandSimulation:
         then missing); notes from the notes shown in its prompts; pages from the nightly records. A day
         already kept is left alone, so this adds nothing the second time. Returns what was filled in.
         """
-        isl, cfg = self.isl, self.isl.memory
+        isl, cfg = self.isl, cast("dict[str, Any]", self.isl.memory)
         if isl.day < 0 or all(
             vil.memory.has_day(d) for vil in isl.v.values() for d in range(isl.day + 1)
         ):
             return []
-        events = [
-            json.loads(line)
-            for line in (self.run_dir / "events.jsonl").read_text().splitlines()
-            if line.strip()
-        ]
+        events = read_events(self.run_dir / "events.jsonl")
         done = [e for e in events if e.get("day") is not None and e["day"] <= isl.day]
+        counts: Counter[str]
+        sources: Counter[str]
         counts, sources = Counter(), Counter()
         for name, vil in isl.v.items():
             folder = prompt_dir(self.run_dir, name)
@@ -935,6 +1004,7 @@ class IslandSimulation:
             for d in range(isl.day + 1):
                 if vil.memory.has_day(d):
                     continue
+                lines: list[str] | None
                 if d == isl.day:
                     lines, src = list(vil.yesterday), "the checkpoint"
                 else:
@@ -987,18 +1057,14 @@ class IslandSimulation:
         ]
 
     def _open_log(self, mode: str) -> None:
+        """Open events.jsonl and make `self.log`, which writes each event with the hour it happened at."""
         self._raw_log = EventLog(self.run_dir / "events.jsonl", mode)
-        self.hour = None
+        # The in-game hour being played. Between days there is none, and events are logged with null.
+        self.hour: int = None  # type: ignore[assignment]  # set at the start of each day, before it is read
         # Every event carries the in-game hour it happened at.
         self.log = lambda type_, **k: self._raw_log(type_, **{"hour": self.hour, **k})
 
     # --- llm plumbing ------------------------------------------------------
-    def _need(self, name: str, user: str) -> float:
-        """Points of mental energy it takes to read this prompt: what changes from call to call
-        (the situation, and the villager's own nightly page), not the fixed rules and persona.
-        """
-        return self.isl.v[name].need(user)
-
     def _call(
         self,
         name: str,
@@ -1013,7 +1079,7 @@ class IslandSimulation:
         social: str = "",
         open_101: bool = False,
         free: str = "",
-    ):
+    ) -> _Reply:
         """One LLM call. `social` is the part of the prompt that is other villagers' mail: reading it
         is booked as talking, whatever kind of call carries it. With `open_101` (prompt version 19: plans, the
         plaza, conversations) a reply that opens the Island 101 is answered with the same prompt, the
@@ -1024,10 +1090,10 @@ class IslandSimulation:
             name
         )  # None when the caller is an NPC (Isabelle)
         if backend_name is None:
-            backend_name = self.override or vil.model
+            backend_name = self.override or cast(Villager, vil).model
         backend = self.backends[backend_name]
         msgs = [
-            {"role": "system", "content": system or vil.system},
+            {"role": "system", "content": system or cast(Villager, vil).system},
             {"role": "user", "content": user},
         ]
         if self.log_prompts:
@@ -1091,7 +1157,7 @@ class IslandSimulation:
                 )
                 self._looked_up(
                     name,
-                    "plaza" if what == "evening" else what,
+                    {"evening": "plaza", "plan_retry": "plan"}.get(what, what),
                     len(island_101(self.isl)),
                 )
                 return self._call(
@@ -1106,7 +1172,22 @@ class IslandSimulation:
                     social=social,
                     free=opened,
                 )
-        if vil is not None:  # NPCs spend no mental energy
+        flat = getattr(self.energy, "plan_cost", None) if what == "plan" else None
+        if vil is not None and flat is not None:
+            # Version 22: a plan costs the same whatever its prompt's length, all of it planning. What was
+            # really read and written still counts toward the tokens on record.
+            real = self.energy.points(msgs[0]["content"], user, reply.text)
+            vil.energy.record(
+                kind,
+                what,
+                flat,
+                0.0,
+                0.0,
+                immediate=threading.current_thread() is threading.main_thread(),
+                fixed=real - flat,
+                hidden=reply.reasoning_tokens / self.energy.tpp,
+            )
+        elif vil is not None:  # NPCs spend no mental energy
             read = max(0.0, vil.need(user) - self.energy.points(free))
             vil.energy.record(
                 kind,
@@ -1123,7 +1204,8 @@ class IslandSimulation:
 
     def _looked_up(self, name: str, during: str, entries: int) -> None:
         """Record that a villager opened the Island 101. Calls made in parallel are recorded afterwards, in
-        name order, so a resumed run logs exactly the same."""
+        name order, so a resumed run logs exactly the same.
+        """
         if threading.current_thread() is threading.main_thread():
             self.log(
                 "lookup", day=self.isl.day, agent=name, during=during, entries=entries
@@ -1132,7 +1214,11 @@ class IslandSimulation:
             with _PROMPT_LOCK:
                 self.__dict__.setdefault("_lookups", []).append((name, during, entries))
 
-    def _parallel(self, fn, names):
+    def _parallel(self, fn: Callable[[str], Any], names: list[str]) -> dict[str, Any]:
+        """Run `fn` for each name, up to `concurrency` at a time, and give each result by name. Afterwards the
+        energy the calls used is settled and the times they opened the Island 101 are logged, both in name
+        order, so a resumed run comes out exactly the same.
+        """
         with ThreadPoolExecutor(self.concurrency) as pool:
             out = dict(zip(names, pool.map(fn, names)))
         self.energy.settle()
@@ -1144,6 +1230,9 @@ class IslandSimulation:
 
     # --- main loop ---------------------------------------------------------
     def run(self, days: int | None = None) -> Path:
+        """Play a new run from day 0 for `days` days (the scenario's number when not given), writing the
+        manifest, the events and a checkpoint each night. Returns the run's folder.
+        """
         days = days or self.sc.days
         self.run_dir.mkdir(parents=True, exist_ok=True)
         self._write_manifest(days)
@@ -1159,7 +1248,7 @@ class IslandSimulation:
         try:
             self._run_days(days)
         finally:
-            self.hour = None
+            self.hour = None  # type: ignore[assignment]  # no hour once the days are over
             self.log(
                 "run_end",
                 time=time.time(),
@@ -1171,6 +1260,7 @@ class IslandSimulation:
         return self.run_dir
 
     def _run_days(self, days: int) -> None:
+        """Play `days` days, saving a checkpoint after each."""
         self._t0 = time.monotonic()
         self._tokens0 = (
             self.provider_tokens
@@ -1182,7 +1272,8 @@ class IslandSimulation:
 
     def _progress(self, what: str, quiet_ok: bool = False) -> None:
         """One line of progress: island day and clock, what just happened, calls, tokens, time taken.
-        With quiet_ok, nothing is printed if no call was made since the last line."""
+        With quiet_ok, nothing is printed if no call was made since the last line.
+        """
         if not self.verbose or (
             quiet_ok and self.calls == getattr(self, "_last_calls", None)
         ):
@@ -1208,6 +1299,11 @@ class IslandSimulation:
             )
 
     def _day(self) -> None:
+        """Play one day. Morning: the island's new day, offers and requests that have waited too long, the
+        mail. Then hour by hour: the plans made at that hour, and what everyone does. Night: the day is kept
+        (yesterday's lines, memories, notes), the snapshot, nightly pages, forgetting, the energy record and
+        Isabelle's report.
+        """
         isl, log = self.isl, self.log
         cal = self.sc.world["calendar"]
         isl.new_day()
@@ -1229,7 +1325,7 @@ class IslandSimulation:
         self.decisions_today = {n: 0 for n in isl.v}
         self.spots_today = {n: 0 for n in isl.v}
         if (
-            getattr(self, "prompt_version", 1) >= 6
+            self.prompt_version >= 6
         ):  # the plaza is opt-in: nobody is going until a plan says so
             for n in isl.v:
                 self.isl.v[n].choices["plaza"] = False
@@ -1255,9 +1351,7 @@ class IslandSimulation:
         )
         if self.verbose:
             print(f"day {d} ({isl.date_text()})", flush=True)
-        if (
-            getattr(self, "prompt_version", 1) >= 7
-        ):  # offers wait OFFER_DAYS days for an answer
+        if self.prompt_version >= 7:  # offers wait OFFER_DAYS days for an answer
             for o in self.offers.values():
                 if o.status == "pending" and o.day <= d - OFFER_DAYS:
                     o.status = "expired"
@@ -1284,13 +1378,16 @@ class IslandSimulation:
                 self._progress("plans made")
             self._run_hour(d, h)
             self._progress("hour over", quiet_ok=True)
-        for n, vil in isl.v.items():
+        for _, vil in isl.v.items():
             vil.yesterday = list(vil.today)
             if retrieval(
                 isl
             ):  # version 20: the whole day is kept, and the notes written during it
                 vil.memory.add_day(
-                    d, vil.today, [t for nd, t in vil.notes if nd == d], isl.memory
+                    d,
+                    vil.today,
+                    [t for nd, t in vil.notes if nd == d],
+                    cast("dict[str, Any]", isl.memory),
                 )
             if isl.memory:  # notes last a few days unless picked at night
                 vil.notes = [
@@ -1335,7 +1432,7 @@ class IslandSimulation:
         taker: str,
         items: dict,
         got: dict | None = None,
-        **extra,
+        **extra: Any,
     ) -> None:
         """Remember something changing hands between two villagers: a gift in person, a parcel, or a trade
         (`got` is what the giver received back). `asked`: the items answered a request of the taker's;
@@ -1370,10 +1467,10 @@ class IslandSimulation:
         """What each villager has as the day begins, to tell them at night what changed."""
         self.isl.morning_state = {
             n: {
-                "inventory": Counter({k: c for k, c in v.inventory.items() if c > 0}),
+                "inventory": +v.inventory,
                 "bells": v.bells,
                 "recipes": set(v.recipes),
-                "home_items": Counter({k: c for k, c in v.home_items.items() if c > 0}),
+                "home_items": +v.home_items,
                 "home_bells": v.home_bells,
             }
             for n, v in self.isl.v.items()
@@ -1382,7 +1479,8 @@ class IslandSimulation:
     # --- mail ----------------------------------------------------------------
     def _deliver_mail(self, d: int) -> None:
         """Morning: letters and parcels sent before today arrive. A parcel that doesn't fit in
-        the recipient's pockets waits for them, and they are told."""
+        the recipient's pockets waits for them, and they are told.
+        """
         isl, waiting = self.isl, []
         for m in isl.mail:
             if m["sent_day"] >= d:
@@ -1400,7 +1498,7 @@ class IslandSimulation:
                     d,
                     m,
                     got,
-                    f"(sent day {m['sent_day']}) parcel from {m['from']}: {_count(got)}"
+                    f"(sent day {m['sent_day']}) parcel from {m['from']}: {items_n(got)}"
                     + (f' ("{m["note"]}")' if m.get("note") else ""),
                 )
             if (
@@ -1413,7 +1511,7 @@ class IslandSimulation:
                         m,
                         stored,
                         f"(sent day {m['sent_day']}) parcel from {m['from']}, left at "
-                        f"your home (no room in your pockets): {_count(stored)}",
+                        f"your home (no room in your pockets): {items_n(stored)}",
                         " (left at home)",
                     )
             if left:
@@ -1429,7 +1527,8 @@ class IslandSimulation:
         self, d: int, m: dict, items: dict, line: str, where: str = ""
     ) -> None:
         """A parcel (or the part of it that fit) reached its recipient: tell them, close requests it answers,
-        and record the gift."""
+        and record the gift.
+        """
         self.isl.v[m["to"]].inbox.append(line)
         self.isl._settle_favors(m["from"], m["to"], items)
         self._exchange(d, "by mail", m["from"], m["to"], items, sent_day=m["sent_day"])
@@ -1441,7 +1540,7 @@ class IslandSimulation:
             items=items,
             ok=True,
             how="by mail",
-            result=_count(items) + where,
+            result=items_n(items) + where,
             sent_day=m["sent_day"],
         )
         self._log_favors_done(d)
@@ -1449,7 +1548,8 @@ class IslandSimulation:
     # --- arrivals ----------------------------------------------------------
     def _settle_all(self, d: int) -> None:
         """Day 0: everyone lands at once, and Tom Nook has a tent ready for each of them on a
-        homesite drawn at random. Moving later costs bells (move_house)."""
+        homesite drawn at random. Moving later costs bells (move_house).
+        """
         isl, h = self.isl, self.hour
         names = sorted(isl.v)
         self.rng.shuffle(names)
@@ -1472,6 +1572,7 @@ class IslandSimulation:
 
     # --- encounters --------------------------------------------------------
     def _radius(self) -> float:
+        """How near two villagers have to be to notice each other, in tiles (`encounters.grid_radius`)."""
         cfg = self.sc.world.get("encounters") or {}
         return float(cfg.get("grid_radius", 6))
 
@@ -1480,7 +1581,8 @@ class IslandSimulation:
     ) -> None:
         """(1) Bodies notice who is near whom. (2) Each such villager decides, in a small LLM
         call, whether to approach one of them; approaching includes the opening line.
-        (3) Approaches are taken in random order and become one-on-one chats."""
+        (3) Approaches are taken in random order and become one-on-one chats.
+        """
         cfg = self.sc.world.get("encounters") or {}
         if not cfg:
             return
@@ -1507,7 +1609,8 @@ class IslandSimulation:
         if not deciders:
             return
 
-        def decide(name):
+        def decide(name: str) -> _Reply | tuple[str]:
+            """Whether this villager goes up to someone nearby (a small call), or TIRED."""
             place = self.isl.v[name].body.place
             user = notice_prompt(isl, isl.v[name], place, h, near[name])
             if not self.isl.v[name].can_read(user):
@@ -1517,7 +1620,7 @@ class IslandSimulation:
                 user,
                 f"d{d:03d}_h{h % 24:02d}_notice",
                 system=self.isl.v[name].light_system,
-                max_tokens=500,
+                max_tokens=QUICK_TOKENS["notice"],
                 kind="talking",
                 what="notice",
             )
@@ -1579,6 +1682,7 @@ class IslandSimulation:
                 raw=reply.text if reply else None,
             )
             if outcome.startswith("approached"):
+                assert target is not None  # only approaching someone sets that outcome
                 busy |= {name, target}
                 self._chat(
                     d,
@@ -1641,7 +1745,8 @@ class IslandSimulation:
         if not cands:
             return
 
-        def decide(name):
+        def decide(name: str) -> _Reply | tuple[str]:
+            """Whether this villager goes after what they just saw (a small call), or TIRED."""
             p = planned[name]
             user = spot_prompt(
                 isl,
@@ -1660,7 +1765,7 @@ class IslandSimulation:
                 user,
                 f"d{d:03d}_h{h % 24:02d}_spot",
                 system=self.isl.v[name].light_system,
-                max_tokens=400,
+                max_tokens=QUICK_TOKENS["spot"],
                 kind="thinking",
                 what="spot",
             )
@@ -1671,7 +1776,7 @@ class IslandSimulation:
                 n: _query(
                     [c["text"] for c in finds[n]],
                     f"at the {self.isl.v[n].body.place}",
-                    action_text(planned[n]) if planned[n] else "",
+                    action_text(cast("Action", planned[n])) if planned[n] else "",
                 )
                 for n in cands
             },
@@ -1755,14 +1860,15 @@ class IslandSimulation:
         visit: bool = False,
     ) -> None:
         """A one-on-one conversation. `a` speaks first. On a visit, `a` is the guest and `b` the host.
-        Each turn can also hand something over ("give") or ask for something ("ask")."""
+        Each turn can also hand something over ("give") or ask for something ("ask").
+        """
         isl = self.isl
         turns: list[dict] = []
         if opener:
             obj0 = opener.pop("_obj", None) or {}
             self._chat_acts(d, a, b, obj0, opener, turns)
             turns.append(opener)
-        v9 = getattr(self, "prompt_version", 1) >= 9
+        v9 = self.prompt_version >= 9
         if (
             n_turns is None
         ):  # no set length needs a way to leave (prompt version 9); before it, the old 2 lines
@@ -1846,7 +1952,7 @@ class IslandSimulation:
             )
             self._recall_done([speaker])
             say = str((obj or {}).get("say") or "").strip()[:500]
-            turn = {
+            turn: dict[str, Any] = {
                 "speaker": speaker,
                 "text": say,
                 "thoughts": _thoughts(obj),
@@ -1939,8 +2045,11 @@ class IslandSimulation:
         turns: list | None = None,
     ) -> None:
         """In-person gifts, requests and (from prompt version 12) trades made during a conversation. `turns` is
-        the conversation so far, for the trade on the table."""
+        the conversation so far, for the trade on the table.
+        """
         isl = self.isl
+        acts: list[str]
+        said: list[dict[str, Any]]
         acts, said = (
             [],
             [],
@@ -1974,7 +2083,7 @@ class IslandSimulation:
                 self._exchange(d, "in person", speaker, other, items)
                 acts.append(f"gave {what}")
                 said.append({"kind": "gave", "items": dict(items)})
-            elif getattr(self, "prompt_version", 1) >= 8:
+            elif self.prompt_version >= 8:
                 problem = isl.give_problem(speaker, other, items)
                 acts.append(_failed_give(items, other, problem))
                 said.append(
@@ -1996,6 +2105,17 @@ class IslandSimulation:
             said.append(
                 {"kind": "asked", "items": _clean_side(ask), "unknown": unknown}
             )
+        elif (
+            self.prompt_version >= 22
+            and isinstance(ask, dict)
+            and (again := isl.resolve_side(other, _clean_side(ask)))
+            and all(
+                n <= asked_already(turns or [], speaker).get(k, 0)
+                for k, n in again.items()
+            )
+        ):  # already asked in this conversation: nothing new, and both are told so
+            acts.append("had already asked for " + items_n(again, ""))
+            said.append({"kind": "asked", "items": dict(again), "again": True})
         elif isinstance(ask, dict) and _clean_side(ask):
             before = len(isl.favors)
             f = isl.ask_favor(speaker, other, _clean_side(ask))
@@ -2007,9 +2127,7 @@ class IslandSimulation:
                         **{k: v for k, v in f.items() if k != "day"},
                         asked_day=f["day"],
                     )
-                acts.append(
-                    "asked for " + ", ".join(f"{n} {k}" for k, n in f["items"].items())
-                )
+                acts.append("asked for " + items_n(f["items"], ""))
                 said.append({"kind": "asked", "items": dict(f["items"])})
         trade = obj.get("trade")
         if self.v12 and isinstance(
@@ -2078,7 +2196,7 @@ class IslandSimulation:
             or isl.room_problem(speaker, give, want)
         ):
             acts.append(
-                f"tried to offer a trade: {_count(give)} for {_count(want)}, but {problem_text(problem)}"
+                f"tried to offer a trade: {items_n(give)} for {items_n(want)}, but {problem_text(problem)}"
             )
             said.append(
                 {"kind": "proposed", "give": give, "want": want, "problem": problem}
@@ -2093,7 +2211,7 @@ class IslandSimulation:
                 problem=problem,
             )
         else:
-            acts.append(f"offered a trade: {_count(give)} for {_count(want)}")
+            acts.append(f"offered a trade: {items_n(give)} for {items_n(want)}")
             said.append({"kind": "proposed", "give": give, "want": want})
             self.log(
                 "trade_proposed",
@@ -2114,7 +2232,8 @@ class IslandSimulation:
         said: list,
     ) -> None:
         """Prompt version 12: the speaker accepts the trade `other` put on the table: both sides change hands at
-        once, or nothing does."""
+        once, or nothing does.
+        """
         isl = self.isl
         if not table or table["proposer"] != other:
             acts.append("accepted, but there was no trade on the table")
@@ -2136,7 +2255,7 @@ class IslandSimulation:
                 give_cranny_value=isl.cranny_value(give),
                 want_cranny_value=isl.cranny_value(want),
             )
-            acts.append(f"accepted the trade: {_count(give)} for {_count(want)}")
+            acts.append(f"accepted the trade: {items_n(give)} for {items_n(want)}")
             said.append(
                 {"kind": "traded", "proposer": other, "give": give, "want": want}
             )
@@ -2151,7 +2270,7 @@ class IslandSimulation:
                 problem=problem,
             )
             acts.append(
-                f"accepted the trade, but it fell through: {problem_text(problem)}"
+                f"accepted the trade, but it fell through: {problem_text(problem)}"  # type: ignore[arg-type]  # a trade that fails says why
             )
             said.append(
                 {
@@ -2165,7 +2284,8 @@ class IslandSimulation:
 
     def _visits(self, d: int, h: int, doing: dict, ok_by: dict, busy: set) -> None:
         """Guests who walked to someone's home this hour: if the host is in and awake, they talk,
-        and the guest sees inside. Otherwise nobody answers."""
+        and the guest sees inside. Otherwise nobody answers.
+        """
         isl = self.isl
         guests = [
             n for n, act in doing.items() if act.get("do") == "visit" and ok_by.get(n)
@@ -2193,6 +2313,9 @@ class IslandSimulation:
                     answered=True,
                     interior=list(isl.v[host].interior),
                 )
+                isl.v[g].came_for = doing[g].get(
+                    "for"
+                )  # version 22: their plan's "why"
                 self._chat(
                     d,
                     h,
@@ -2202,6 +2325,7 @@ class IslandSimulation:
                     _turn_cap(self.sc.world["encounters"]),
                     visit=True,
                 )
+                isl.v[g].came_for = None
             else:
                 isl.v[g].today.append(
                     f"{clock(h)} knocked at {host}'s home, but nobody answered"
@@ -2215,6 +2339,9 @@ class IslandSimulation:
 
     # --- Isabelle ----------------------------------------------------------
     def _isabelle(self, d: int) -> None:
+        """End of the day: Isabelle (an LLM call of her own) writes her report of the day from the log, and,
+        where the scenario has her announce, tomorrow morning's announcement from what everyone could know.
+        """
         cfg = self.sc.isabelle
         if not (cfg.get("summary") or cfg.get("announce")):
             return
@@ -2223,9 +2350,7 @@ class IslandSimulation:
         isabelle = ISABELLE  # the one NPC that is also an LLM: her system prompt and prompts are hers
         backend_name = isabelle.backend_name(self.override, cfg)
         events = [
-            json.loads(line)
-            for line in (self.run_dir / "events.jsonl").read_text().splitlines()
-            if line.strip() and json.loads(line).get("day") == d
+            e for e in read_events(self.run_dir / "events.jsonl") if e.get("day") == d
         ]
         if cfg.get("summary"):
             digest = day_digest(events, self.isl)
@@ -2255,9 +2380,7 @@ class IslandSimulation:
             pub = public_digest(self.isl, events)
             reply, _, err = self._call(
                 isabelle.key,
-                isabelle.announce_prompt(
-                    d + 1, pub, getattr(self, "prompt_version", 1)
-                ),
+                isabelle.announce_prompt(d + 1, pub, self.prompt_version),
                 f"d{d:03d}_announce",
                 system=isabelle.system,
                 backend_name=backend_name,
@@ -2280,7 +2403,8 @@ class IslandSimulation:
         get up, then at even intervals, each plan covering an equal share of the hours they are
         awake. So early risers and late sleepers get the same number of plans of the same length.
         Runs started before personal schedules have fixed windows (`plans: [[a, b], ...]`), the
-        same for everyone; they keep them, so a resumed run plans as it started."""
+        same for everyone; they keep them, so a resumed run plans as it started.
+        """
         isl, cal = self.isl, self.sc.world["calendar"]
         start = cal["day_start"]
         slots: dict[int, list[tuple]] = {}
@@ -2313,11 +2437,12 @@ class IslandSimulation:
         Before prompt version 7, those who chose habit for this planning time, or have no energy left,
         repeat what they did yesterday at this time. From version 7 there is no habit: a villager with
         no energy left keeps what they already planned and plans nothing new. Plans also set free hours
-        aside for the plaza, and the first plan of the day splits the day's energy."""
+        aside for the plaza, and the first plan of the day splits the day's energy.
+        """
         isl, log = self.isl, self.log
         budget = self.sc.world["calendar"]["actions_per_day"]
         fixed = "plans" in self.sc.world["calendar"]
-        v7 = getattr(self, "prompt_version", 1) >= 7
+        v7 = self.prompt_version >= 7
         slot = {n: (phase, hours, window, k) for n, phase, hours, window, k in slots}
         # From version 7 everyone plans, even with no actions left: they can still go to the plaza.
         who = [n for n in slot if v7 or self.used[n] < budget]
@@ -2325,13 +2450,16 @@ class IslandSimulation:
         for n in who:
             isl.where_notes[n] = self.bodies.where_note(n)
         isl.at_home = {n: self.bodies.at_home(n) for n in isl.v}
-        if getattr(isl, "prompt_version", 1) >= 3:
+        if version_of(isl) >= 3:
             isl.map_text = self.space.map_text(isl)
         # From version 16 each villager picks from a list of what they can do, made here, before anyone acts.
-        v16 = getattr(self, "prompt_version", 1) >= 16
+        v16 = self.prompt_version >= 16
         v21 = (
-            getattr(self, "prompt_version", 1) >= 21
+            self.prompt_version >= 21
         )  # the same list, picked by name: action, items, at, what
+        # Version 22: the island answers a pick it can't read at once, and a plan costs a set number of points.
+        v22 = self.prompt_version >= 22
+        self.energy.plan_cost = self._plan_cost()
         options = (
             {n: plan_options(isl, self.bodies, self.space, n, slot[n][1]) for n in who}
             if v16
@@ -2348,7 +2476,8 @@ class IslandSimulation:
             for n in who
         }
 
-        def plan(name):
+        def plan(name: str) -> _Reply | tuple[str]:
+            """One villager's plan for this planning time; HABIT or TIRED when no call is made."""
             vil = isl.v[name]
             phase, awake, _, k = slot[name]
             left = budget - self.used[name]
@@ -2365,19 +2494,23 @@ class IslandSimulation:
                 noticed=self.isl.v[name].noticed[-8:],
                 choices=self.isl.v[name].choices,
                 options=(
-                    (menu_text if v21 else options_text)(
-                        options[name], isl, name, self.space
-                    )
+                    (menu_text if v21 else options_text)(options[name], isl, name)
+                    + (self._in_sight(name, options[name]) if v22 else "")
                     if v16
                     else None
                 ),
             )
-            if not self.isl.v[name].can_read(user):
+            flat = self.energy.plan_cost
+            if (
+                (self.energy.enabled and vil.energy.left < flat)
+                if flat is not None
+                else not vil.can_read(user)
+            ):
                 return TIRED
             self.first_plan[name] = False
             mail = inbox_text(vil) if vil.inbox else ""
             vil.inbox = vil.inbox[INBOX_SHOWN:]  # what was shown has been read
-            return self._call(
+            reply, obj, err = self._call(
                 name,
                 user,
                 f"d{d:03d}_p{phase}",
@@ -2386,6 +2519,11 @@ class IslandSimulation:
                 social=mail,
                 open_101=True,
             )
+            if v22 and isinstance(obj, dict):
+                obj = self._plan_retry(
+                    name, user, obj, options[name], f"d{d:03d}_p{phase}"
+                )
+            return reply, obj, err
 
         # Version 20: what the morning brings to mind. Yesterday is in the plan in full, so it isn't drawn on.
         self._recall(
@@ -2476,13 +2614,14 @@ class IslandSimulation:
                 if obj
                 else []
             )
-            unread = []
+            unread: list[dict] = []
             if v21:  # picks by name; what they name from their pockets has to be there
                 acts, unread = read_actions(
                     options[name],
                     acts,
                     isl.v[name].inventory,
                     isl.v[name].home_items if isl.split_home() else None,
+                    strict=v22,
                 )
                 isl.v[name].today.extend(unread_line(a, u) for u in unread)
             elif v16:  # picks by number, as the actions they stand for
@@ -2521,11 +2660,79 @@ class IslandSimulation:
                 choices=chosen,
                 **({"energy_plan": split} if split else {}),
                 **({"home": stashed} if stashed else {}),
+                **({"retry": obj["_retry"]} if (obj or {}).get("_retry") else {}),
                 raw=reply.text if reply else None,
                 cached=reply.cached if reply else False,
             )
 
-    def _stash(self, d: int, name: str, at: int, home) -> list[str]:
+    def _in_sight(self, name: str, options: list[Option]) -> str:
+        """Prompt version 22: for a villager who can put something on an exact tile, what stands within sight
+        of where they are now, each as steps from where they stand.
+        """
+        if not any("tiles" in o.fields for o in options) or not hasattr(
+            self.space, "in_sight"
+        ):
+            return ""
+        pos = self.bodies.b[name].pos or self.bodies.home_point(name)
+        if pos is None:
+            return ""
+        lines = self.space.in_sight(self.isl, name, pos, ["here"])
+        return "\nIn sight of where you are now, as steps from where you stand:\n" + (
+            "\n".join(f"  {x}" for x in lines) if lines else "  nothing but open ground"
+        )
+
+    def _plan_cost(self) -> float | None:
+        """Prompt version 22: what a plan costs in mental energy, whatever its prompt's length
+        (`mental_energy.plan_cost`, 24 unless set). Before, a plan was charged for what it read and wrote.
+        """
+        if self.prompt_version < 22:
+            return None
+        return float((self.sc.mental_energy or {}).get("plan_cost", 24))
+
+    def _plan_retry(
+        self, name: str, user: str, obj: dict, options: list[Option], tag: str
+    ) -> dict:
+        """Prompt version 22: picks the island can't read are answered at once. The villager gets the same
+        prompt again with each of those picks and why it wasn't planned, and can write them again, once, for
+        no mental energy. Returns the reply with those picks replaced by what came back, and under "_retry"
+        what was sent back and what was answered, for the record.
+        """
+        isl, vil = self.isl, self.isl.v[name]
+        pockets = vil.inventory
+        home = vil.home_items if isl.split_home() else None
+        entries = [x for x in obj.get("actions") or [] if isinstance(x, dict)]
+        kept: list[dict]
+        unread: list[dict]
+        kept, unread = [], []
+        for e in entries:
+            bad = read_actions(options, [e], pockets, home, strict=True)[1]
+            (unread if bad else kept).extend(bad or [e])
+        if not unread:
+            return obj
+        reply, again, err = self._call(
+            name,
+            plan_retry_prompt(user, unread),
+            tag,
+            kind=None,
+            what="plan_retry",
+            open_101=True,  # the Island 101 can be opened here as in any plan
+        )
+        new = [
+            x
+            for x in ((again or {}).get("actions") or [])
+            if isinstance(again, dict) and isinstance(x, dict)
+        ]
+        return {
+            **obj,
+            "actions": kept + new,
+            "_retry": {
+                "rejected": unread,
+                "raw": reply.text if reply else None,
+                "error": err,
+            },
+        }
+
+    def _stash(self, d: int, name: str, at: int, home: Any) -> list[str]:
         """Prompt version 12: a plan made at home can put things away there or take them out. It takes no time."""
         isl = self.isl
         if not (isl.split_home() and isinstance(home, dict) and isl.at_home.get(name)):
@@ -2545,12 +2752,13 @@ class IslandSimulation:
         energy, only the plaza is a choice, and only in prompt version 6. From version 7 the plaza is in the
         plan itself and there is no habit, so writing tonight is the only choice left.
         """
-        v = getattr(self, "prompt_version", 1)
+        v = self.prompt_version
         keys = (("plaza",) if v == 6 or (v < 7 and self.energy.enabled) else ()) + (
             ("write",) if self.energy.enabled else ()
         )
         if not keys:
             return {}
+        changed: dict[str, Any]
         ch, changed = self.isl.v[name].choices, {}
         for key in keys:
             val = obj.get(key)
@@ -2569,15 +2777,18 @@ class IslandSimulation:
         return changed
 
     def _assign_hours(
-        self, name: str, acts: list[dict], a: int, b: int, cap: int | None = None
-    ):
+        self, name: str, acts: list[Action], a: int, b: int, cap: int | None = None
+    ) -> tuple[list[tuple[int, Action]], list[dict]]:
         """Place each action at its requested hour, or the next free hour in the window.
         One action per hour; stops when the day's action budget, or this plan's share of it
         (`cap`), runs out. From prompt version 7 an hour at the plaza takes an hour but isn't an action:
-        it doesn't count against either."""
+        it doesn't count against either.
+        """
         budget = self.sc.world["calendar"]["actions_per_day"]
-        v7 = getattr(self, "prompt_version", 1) >= 7
+        v7 = self.prompt_version >= 7
         taken = {h for h, lst in self.schedule.items() for n, _ in lst if n == name}
+        out: list[tuple[int, Action]]
+        dropped: list[dict]
         out, dropped, cursor, n_acts = [], [], a, 0
         for act in acts:
             open_ = act.get(
@@ -2647,10 +2858,14 @@ class IslandSimulation:
         return sorted(out, key=lambda x: x[0]), dropped
 
     def _run_hour(self, d: int, h: int) -> None:
+        """Play one hour. The old social round if this is one of its hours; then what everyone planned for
+        the hour, in the order they get there; the plaza; free time; what each villager sees; who notices
+        whom; visits, conversations and things spotted; and where everyone ended up, for the log.
+        """
         isl, log = self.isl, self.log
         cal = self.sc.world["calendar"]
         social = cal.get("social_hours", [])
-        v7 = getattr(self, "prompt_version", 1) >= 7
+        v7 = self.prompt_version >= 7
         spoke = set()
         if h in social and not v7:  # from version 7 the plaza is open all day instead
             spoke = self._social_round(d, social.index(h))
@@ -2691,7 +2906,7 @@ class IslandSimulation:
                 delta=self._delta(vil, before_v),
                 pools_delta=_pools_delta(before_p, isl.pools()),
                 at=(
-                    list(self.isl.v[name].body.pos)
+                    list(self.isl.v[name].body.pos)  # type: ignore[arg-type]  # only when they have a position: next line
                     if self.isl.v[name].body.pos
                     else None
                 ),
@@ -2732,7 +2947,7 @@ class IslandSimulation:
             stay_in = self.rng.random() < float(
                 self.sc.world.get("grid", {}).get("wander_home_chance", 0.5)
             )
-            if (
+            if (  # noqa: SIM102  # two steps on purpose: who is free to wander, then the walk itself
                 isl.is_awake(n, h)
                 and self.sc.free_time == "wander"
                 and n not in spoke
@@ -2788,7 +3003,7 @@ class IslandSimulation:
         busy: set[str] = set()
         self._visits(d, h, doing, ok_by, busy)
         self._encounters(d, h, [n for n in out if n not in busy], near)
-        if getattr(self, "prompt_version", 1) >= 14:
+        if self.prompt_version >= 14:
             self._spot_decisions(d, h)
         villagers = {}
         for n, vil in isl.v.items():
@@ -2820,7 +3035,10 @@ class IslandSimulation:
         log("hour_state", day=d, pools=isl.pools(), villagers=villagers)
 
     @staticmethod
-    def _delta(vil, before) -> dict:
+    def _delta(vil: Villager, before: tuple) -> dict:
+        """What an action changed for the villager who did it: bells, loan, items, recipes and house, each
+        only if it changed.
+        """
         bells, loan, inv, nrec, house = before
         items = {
             k: vil.inventory[k] - inv[k]
@@ -2844,7 +3062,8 @@ class IslandSimulation:
         """From prompt version 7: villagers who set this free hour aside walk to the plaza and take one turn
         there (board, offers to anyone, letters, parcels). They aren't told who else is there; being there
         together, they can notice each other afterwards like anywhere else. Returns who got there, and the
-        line in each one's day that says so."""
+        line in each one's day that says so.
+        """
         isl, log = self.isl, self.log
         line: dict[str, int] = {}
         for n in sorted(names):
@@ -2868,7 +3087,8 @@ class IslandSimulation:
             line[n] = len(isl.v[n].today) - 1
         there = sorted(line)
 
-        def turn(name):
+        def turn(name: str) -> _Reply | tuple[str]:
+            """One villager's turn at the plaza, or TIRED when they can't read the prompt."""
             vil = isl.v[name]
             waiting = [
                 o
@@ -2897,10 +3117,7 @@ class IslandSimulation:
             "plaza",
             {
                 n: _query(
-                    [
-                        f"{p[1]}: {p[2]}"
-                        for p in (isl.board if self.v12 else isl.board)[-8:]
-                    ],
+                    [f"{p[1]}: {p[2]}" for p in isl.board[-8:]],
                     inbox_text(isl.v[n]) if isl.v[n].inbox else "",
                     isl.v[n].today[-5:],
                 )
@@ -2948,7 +3165,8 @@ class IslandSimulation:
 
     def _social_round(self, d: int, r: int) -> set:
         """Evening at the plaza. Round 0 includes everyone; later rounds only villagers
-        with new offers waiting. Returns who took part."""
+        with new offers waiting. Returns who took part.
+        """
         isl, log = self.isl, self.log
         if r == 0:
             for o in self.offers.values():
@@ -2978,7 +3196,8 @@ class IslandSimulation:
             return set()
         before = set(self.offers)
 
-        def turn(name):
+        def turn(name: str) -> _Reply | tuple[str]:
+            """One villager's turn in this round of the evening, or TIRED."""
             vil = isl.v[name]
             waiting = [
                 o
@@ -3034,11 +3253,17 @@ class IslandSimulation:
         return {n for n in speak if results[n] is not TIRED}
 
     def _apply_evening(self, d: int, r: int, name: str, obj: dict) -> None:
+        """Carry out what a villager did in a turn at the plaza: answers to offers, letters and parcels (they
+        arrive tomorrow morning), board posts taken down and put up, new offers, and a note to themselves.
+        From prompt version 12 there are no offers at the plaza: trades are made in person.
+        """
         isl, log = self.isl, self.log
         vil = isl.v[name]
         lower = {n.lower(): n for n in isl.v}
+        post: Any  # a post on the board being taken down, then the words of a new one
 
-        def who(x):
+        def who(x: Any) -> str | None:
+            """The villager a reply named, however it wrote the capitals; None if there is no such villager."""
             return lower.get(str(x or "").strip().lower())
 
         v12 = self.v12  # no plaza trade offers: trades happen in person
@@ -3221,7 +3446,19 @@ class IslandSimulation:
         if note:
             vil.note(d, note)
 
-    def _new_offer(self, d, sender, recipient, give, want, note, parent=None):
+    def _new_offer(
+        self,
+        d: int,
+        sender: str,
+        recipient: str,
+        give: Side,
+        want: Side,
+        note: str,
+        parent: str | None = None,
+    ) -> None:
+        """Put a plaza offer from `sender` to `recipient` on record (`parent`: the offer it counters). One that
+        names something that doesn't exist on the island isn't made, and the sender is told.
+        """
         give, want = self.isl.resolve_side(sender, give), self.isl.resolve_side(
             recipient, want
         )
@@ -3254,26 +3491,20 @@ class IslandSimulation:
         self.log("offer", **asdict(o))
 
     def _execute(self, o: Offer, d: int) -> None:
+        """A plaza offer was accepted: both sides change hands at once. If either no longer has the things or
+        the room, nothing moves, the offer has failed, and both are told why.
+        """
         isl = self.isl
         a, b = isl.v[o.sender], isl.v[o.recipient]
 
-        def has(vil, side):
-            return all(
-                (vil.bells if k == "bells" else vil.inventory[k]) >= n
-                for k, n in side.items()
-            )
-
-        def items(side):
-            return sum(n for k, n in side.items() if k != "bells")
-
         problem = None
-        if not has(a, o.give):
+        if isl.lacking(a.name, o.give):
             problem = f"{a.name} no longer has what they offered"
-        elif not has(b, o.want):
+        elif isl.lacking(b.name, o.want):
             problem = f"{b.name} doesn't have what was asked for"
-        elif isl.space(b) + items(o.want) < items(o.give):
+        elif isl.room_problem(b.name, o.want, o.give):
             problem = f"{b.name} has no room"
-        elif isl.space(a) + items(o.give) < items(o.want):
+        elif isl.room_problem(a.name, o.give, o.want):
             problem = f"{a.name} has no room"
         if problem:
             o.status = "failed"
@@ -3316,6 +3547,9 @@ class IslandSimulation:
         a.inbox.append(f"(day {d}) {b.name} accepted your offer [{o.id}]")
 
     def _write_manifest(self, days: int) -> None:
+        """Write manifest.json as a run starts: what is being run, with which models, world, cast and system
+        prompts.
+        """
         m = {
             "type": "island",
             "scenario": self.sc.name,
@@ -3428,14 +3662,14 @@ HABIT = (
 )  # marker: the villager chose habit for this planning time, so no call was made
 
 
-def _thoughts(obj) -> str:
+def _thoughts(obj: Any) -> str:
     """A villager's private reasoning. Logged for the observer; never shown to other villagers."""
     return str((obj or {}).get("thoughts") or "").strip()
 
 
 def _pools_delta(before: dict, after: dict) -> dict:
     """Only the public resources this action changed, as [before, after]."""
-    out = {}
+    out: dict[str, Any] = {}
     for k, v in after.items():
         if before.get(k) != v:
             if k == "rocks":
@@ -3451,7 +3685,8 @@ def _pools_delta(before: dict, after: dict) -> dict:
 
 def _open_braces(s: str) -> str | None:
     """The brackets `s` leaves open, outermost first; None if it closes one it never opened or
-    ends inside a string."""
+    ends inside a string.
+    """
     stack, in_str, esc = [], False, False
     for ch in s:
         if in_str:
@@ -3465,19 +3700,20 @@ def _open_braces(s: str) -> str | None:
             in_str = True
         elif ch in "{[":
             stack.append(ch)
-        elif ch in "}]":
+        elif ch in "}]":  # noqa: SIM102  # a branch per kind of character
             if not stack or stack.pop() != "{["["}]".index(ch)]:
                 return None
     return None if in_str else "".join(stack)
 
 
-def _loads_lenient(s: str, whole: bool):
+def _loads_lenient(s: str, whole: bool) -> Any:
     """json.loads, forgiving the slips small models make in an otherwise complete reply:
     - a last key wrapped in braces of its own: {..., "home": {...}}, {"note": "..."}
     - the final closing brace left off. Only when the reply ended on a brace (`whole`): one that
       stops mid-way was cut off, and half a plan isn't the plan.
-    Raises the first JSONDecodeError if none of these is what went wrong."""
-    first = None
+    Raises the first JSONDecodeError if none of these is what went wrong.
+    """
+    first: json.JSONDecodeError | None = None
     for _ in range(4):
         try:
             return json.loads(s)
@@ -3494,25 +3730,23 @@ def _loads_lenient(s: str, whole: bool):
                 obj, rest = json.loads(s[:at]), s[at:].lstrip().lstrip(",").lstrip()
                 more = _loads_lenient(rest, whole) if rest.startswith("{") else None
                 if not isinstance(obj, dict) or not isinstance(more, dict):
-                    raise first
+                    raise first  # noqa: B904  # the first error is the one reported, as it was raised
                 return {**more, **obj}
             elif whole and at >= len(s.rstrip()):
                 left = _open_braces(s)
                 if not left or set(left) != {"{"}:
-                    raise first
+                    raise first  # noqa: B904  # as above
                 s = s + "}" * len(left)
             else:
-                raise first
-    raise first
+                raise first  # noqa: B904  # as above
+    raise first  # type: ignore[misc]  # the loop always runs, so there is a first error
 
 
-def parse_action_obj(text: str):
+def parse_action_obj(text: str) -> tuple[dict | None, str | None]:
     """Pull the first JSON object out of a reply. Free models are messy, so this tolerates
     code fences, reasoning blocks, trailing chatter and a misplaced or missing closing brace.
     """
-    import re
-
-    t = re.sub(r"<think>.*?</think>", "", text or "", flags=re.S | re.I)
+    t = _THINK.sub("", text or "")
     s, e = t.find("{"), t.rfind("}")
     if s < 0 or e <= s:
         return None, "no JSON object in reply"

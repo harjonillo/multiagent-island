@@ -32,6 +32,16 @@ from __future__ import annotations
 
 import math
 import re
+from collections.abc import Callable
+from typing import TYPE_CHECKING
+
+import numpy as np
+
+from .space import version_of
+
+if TYPE_CHECKING:
+    from .villager import Villager
+    from .world import Island
 
 DEFAULTS = {
     "picks": 3,
@@ -60,14 +70,63 @@ def settings(cfg: dict | None) -> dict | None:
 
 
 def strength(m: dict, day: int) -> float:
+    """How strongly a memory still stands on `day`: 1 when last gone over, fading with its stability."""
     return math.exp(-(day - m["last"]) / m["stability"])
+
+
+def _next_id(records: list[dict]) -> int:
+    """The id for a new record in `records`: one past the highest so far."""
+    return 1 + max((x["id"] for x in records), default=0)
+
+
+def _new_pick(memories: list[dict], day: int, text: str, cfg: dict, last: int) -> dict:
+    """Add a pick (something a villager chose to hold on to) to `memories` and return it."""
+    m = {
+        "id": _next_id(memories),
+        "day": day,
+        "text": text[: int(cfg["max_chars"])],
+        "stability": float(cfg["stability"]),
+        "last": last,
+        "times": 1,
+    }
+    memories.append(m)
+    return m
+
+
+_PICK_REF = re.compile(r"#?\s*(\d+)\.?(?:\s.*)?")
+
+
+def _referred(pick: str, shown: list[dict]) -> dict | None:
+    """The record in tonight's list that a pick names by its number ("2", "#2", "2. ..."), if it does."""
+    ref = _PICK_REF.fullmatch(pick)
+    if ref and 1 <= int(ref.group(1)) <= len(shown):
+        return shown[int(ref.group(1)) - 1]
+    return None
+
+
+def _rehearse(m: dict, day: int) -> None:
+    """Go over a pick again: it lasts twice as long from `day`."""
+    m["stability"] *= 2
+    m["last"] = day
+    m["times"] += 1
+
+
+def _listed(lines: list[str], numbered: bool) -> str:
+    """Lines as a numbered or bulleted list for a prompt."""
+    return (
+        "\n".join(
+            f"{f'{i}. ' if numbered else '- '}{ln}" for i, ln in enumerate(lines, 1)
+        )
+        or "(nothing yet)"
+    )
 
 
 def recalled(
     memories: list[dict], day: int, cfg: dict, limit: int | None = None
 ) -> list[dict]:
     """What comes to mind on `day`: memories still above the threshold, strongest first up to
-    the limit, then in the order they happened."""
+    the limit, then in the order they happened.
+    """
     alive = [m for m in memories if strength(m, day) >= cfg["threshold"]]
     top = sorted(alive, key=lambda m: (-strength(m, day), -m["day"]))[
         : limit or cfg["shown"]
@@ -82,10 +141,11 @@ def memory_lines(
     limit: int | None = None,
     numbered: bool = False,
 ) -> str:
-    out = []
-    for i, m in enumerate(recalled(memories, day, cfg, limit), 1):
-        out.append(f"{f'{i}. ' if numbered else '- '}(day {m['day']}) {m['text']}")
-    return "\n".join(out) or "(nothing yet)"
+    """What comes to mind on `day` (see `recalled`) as a list for a prompt, each with the day it is from."""
+    return _listed(
+        [f"(day {m['day']}) {m['text']}" for m in recalled(memories, day, cfg, limit)],
+        numbered,
+    )
 
 
 _REMEMBER = re.compile(r"^\W*remember\W*:\s*(.*)$", re.I | re.M)
@@ -104,32 +164,19 @@ def split_picks(text: str) -> tuple[str, list[str]]:
 def consolidate(
     memories: list[dict], picks: list[str], day: int, cfg: dict
 ) -> tuple[list[dict], list[dict]]:
-    """Apply one night's picks. A pick that is a number (\"2\" or \"#2\") rehearses the memory with
+    """Apply one night's picks. A pick that is a number ("2" or "#2") rehearses the memory with
     that number in tonight's list; anything else becomes a new memory. Returns (new, rehearsed).
     """
     shown = recalled(memories, day, cfg)
     new, rehearsed = [], []
     for p in picks[: int(cfg["picks"])]:
-        ref = re.fullmatch(r"#?\s*(\d+)\.?(?:\s.*)?", p)
-        if ref and 1 <= int(ref.group(1)) <= len(shown):
-            m = shown[int(ref.group(1)) - 1]
-            if m in rehearsed:
-                continue
-            m["stability"] *= 2
-            m["last"] = day
-            m["times"] += 1
-            rehearsed.append(m)
+        m = _referred(p, shown)
+        if m is not None:
+            if m not in rehearsed:
+                _rehearse(m, day)
+                rehearsed.append(m)
             continue
-        m = {
-            "id": 1 + max((x["id"] for x in memories), default=0),
-            "day": day,
-            "text": p[: int(cfg["max_chars"])],
-            "stability": float(cfg["stability"]),
-            "last": day,
-            "times": 1,
-        }
-        memories.append(m)
-        new.append(m)
+        new.append(_new_pick(memories, day, p, cfg, day))
     return new, rehearsed
 
 
@@ -143,12 +190,9 @@ def forget(memories: list[dict], day: int, cfg: dict) -> list[dict]:
 # --- prompt version 20: everything is kept, and retrieved by what it is about -------------------
 
 
-def retrieval(isl) -> bool:
+def retrieval(isl: Island) -> bool:
     """Whether this island retrieves memories (long-term memory on, prompt version 20 or later)."""
-    return (
-        bool(getattr(isl, "memory", None))
-        and getattr(isl, "prompt_version", 1) >= RETRIEVAL_VERSION
-    )
+    return bool(getattr(isl, "memory", None)) and version_of(isl) >= RETRIEVAL_VERSION
 
 
 _AT = re.compile(r"^(\d\d:\d\d) ")
@@ -193,17 +237,19 @@ class MemoryStore:
     up by text (llm.CachedEmbeddings), so changing the embedding model needs no change to a checkpoint.
     """
 
-    def __init__(self, vil):
+    def __init__(self, vil: Villager) -> None:
+        """The memory of `vil`, kept on the villager itself."""
         self.vil = vil
 
     # --- writing ---------------------------------------------------------------
     def _add(self, day: int, kind: str, text: str, cfg: dict, seq: int) -> list[dict]:
-        out = []
+        """Keep one line as a record, or as several when it is longer than `chunk_chars`, and return them."""
+        out: list[dict] = []
         for piece in chunks(text, int(cfg["chunk_chars"])):
             exp = self.vil.experience
             at = _AT.match(piece)
             r = {
-                "id": 1 + max((x["id"] for x in exp), default=0),
+                "id": _next_id(exp),
                 "day": day,
                 "at": at.group(1) if at else None,
                 "seq": seq,
@@ -219,6 +265,7 @@ class MemoryStore:
         return out
 
     def has_day(self, day: int) -> bool:
+        """Whether what happened on `day` has been kept already."""
         return any(
             r["day"] == day and r["kind"] in ("event", "chat")
             for r in self.vil.experience
@@ -255,7 +302,8 @@ class MemoryStore:
     # --- reading ---------------------------------------------------------------
     def corpus(self) -> list[dict]:
         """Everything that can come to mind: the picks, and what was lived through and not since picked
-        (a record they chose to hold on to lives on as the pick)."""
+        (a record they chose to hold on to lives on as the pick).
+        """
         return list(self.vil.memories) + [
             r for r in self.vil.experience if not r.get("promoted")
         ]
@@ -266,13 +314,14 @@ class MemoryStore:
         cfg: dict,
         skip_yesterday: bool = False,
         night: bool = False,
-        skip=None,
+        skip: Callable[[dict], bool] | None = None,
     ) -> list[dict]:
         """The records a prompt on `day` can draw on: not what that prompt already shows in full. Today is
         always shown (and is only kept at the end of the day); the notes still in `vil.notes` are shown
         (the last `notes_days` days; by `night` the oldest of those days has been dropped); the latest page
         is in the system prompt; a plan also shows yesterday. `skip(record)` leaves out anything else the
-        caller shows (the last conversation with the person they are talking to)."""
+        caller shows (the last conversation with the person they are talking to).
+        """
         notes_from = (
             day - int(cfg["notes_days"]) + (1 if night else 0)
         )  # the first day whose notes are shown
@@ -297,22 +346,14 @@ class MemoryStore:
 
     def promote(self, r: dict, day: int, cfg: dict) -> dict:
         """They chose to hold on to something they lived through: it becomes a pick, in the same words."""
-        mem = self.vil.memories
-        m = {
-            "id": 1 + max((x["id"] for x in mem), default=0),
-            "day": r["day"],
-            "text": r["text"][: int(cfg["max_chars"])],
-            "stability": float(cfg["stability"]),
-            "last": day,
-            "times": 1,
-            "from": r["id"],
-        }
-        mem.append(m)
+        m = _new_pick(self.vil.memories, r["day"], r["text"], cfg, day)
+        m["from"] = r["id"]
         r["promoted"] = m["id"]
         return m
 
 
 def is_pick(r: dict) -> bool:
+    """Whether a record is something the villager chose to hold on to, not just lived through."""
     return r.get("kind") is None
 
 
@@ -321,22 +362,25 @@ def record_key(r: dict) -> str:
     return f"{'m' if is_pick(r) else 'e'}{r['id']}"
 
 
-def _order(r: dict) -> tuple:
+def _order(r: dict) -> tuple[int, int, int, int]:
+    """Sort key putting records in the order they happened; a pick comes after that day's lines."""
     return (r["day"], r.get("seq", 10**7), 0 if not is_pick(r) else 1, r["id"])
 
 
-def score_records(
+def score_parts(
     cands: list[dict], sims: list[float] | None, day: int, cfg: dict
-) -> list[tuple[float, dict]]:
-    """(score, record) for each candidate, best first. `sims` is each one's similarity to the situation
-    (None when there is nothing to compare with: then only recency and picks count). Ties go to the later
-    record, then to its id, so the order is the same on every run."""
-    if not cands:
-        return []
+) -> list[tuple[float, float, float, float]]:
+    """What each candidate's score is made of, in the order given: (score, relevance, recency, pick
+    weight), where the score is the other three multiplied, to 6 places.
+
+    Relevance is the similarity to the situation, stretched so the least similar candidate gets the floor
+    and the most similar 1 (1 for all when `sims` is None or all the same). Recency is the record's
+    strength on `day`, never below its floor. A pick counts `pick_weight` times as much.
+    """
     if sims is None:
         rel = [1.0] * len(cands)
     else:
-        lo, hi = min(sims), max(sims)
+        lo, hi = min(sims, default=0.0), max(sims, default=0.0)
         rel = [
             max(float(cfg["relevance_floor"]), (s - lo) / (hi - lo)) if hi > lo else 1.0
             for s in sims
@@ -344,9 +388,19 @@ def score_records(
     out = []
     for r, x in zip(cands, rel):
         rec = max(float(cfg["recency_floor"]), strength(r, day))
-        out.append(
-            (round(x * rec * (float(cfg["pick_weight"]) if is_pick(r) else 1.0), 6), r)
-        )
+        weight = float(cfg["pick_weight"]) if is_pick(r) else 1.0
+        out.append((round(x * rec * weight, 6), x, rec, weight))
+    return out
+
+
+def score_records(
+    cands: list[dict], sims: list[float] | None, day: int, cfg: dict
+) -> list[tuple[float, dict]]:
+    """(score, record) for each candidate, best first. `sims` is each one's similarity to the situation
+    (None when there is nothing to compare with: then only recency and picks count). Ties go to the later
+    record, then to its id, so the order is the same on every run.
+    """
+    out = [(p[0], r) for p, r in zip(score_parts(cands, sims, day, cfg), cands)]
     out.sort(
         key=lambda t: (-t[0], -t[1]["day"], -t[1].get("seq", 10**7), record_key(t[1]))
     )
@@ -354,7 +408,15 @@ def score_records(
 
 
 def dot(a: list[float], b: list[float]) -> float:
-    return math.fsum(x * y for x, y in zip(a, b))
+    """The dot product of two vectors: their cosine similarity when both have length 1."""
+    return float(np.dot(a, b))
+
+
+def similarities(qvec: list[float], vecs: list[list[float]]) -> list[float]:
+    """How close each of `vecs` is to the query vector (the dot product with each, in one go)."""
+    if not vecs:
+        return []
+    return (np.asarray(vecs, dtype=float) @ np.asarray(qvec, dtype=float)).tolist()
 
 
 def recall(
@@ -366,7 +428,13 @@ def recall(
     k: int,
 ) -> list[tuple[float, dict]]:
     """The `k` records that come to mind, in the order they happened, each with its score."""
-    sims = None if qvec is None else [dot(qvec, vectors[r["text"]]) for r in cands]
+    sims = (
+        None
+        if qvec is None
+        else similarities(qvec, [vectors[r["text"]] for r in cands])
+    )
+    top: list[tuple[float, dict]]
+    per_line: dict[int, int]
     top, per_line = [], {}
     for score, r in score_records(cands, sims, day, cfg):
         if len(top) >= max(0, int(k)):
@@ -381,6 +449,7 @@ def recall(
 
 
 def record_label(r: dict) -> str:
+    """What a prompt puts before a retrieved record: its day, and what kind it is when not a plain line."""
     what = {"note": ", a note", "page": ", from your page", None: ", held on to"}.get(
         r.get("kind"), ""
     )
@@ -388,45 +457,31 @@ def record_label(r: dict) -> str:
 
 
 def recall_lines(records: list[dict] | None, numbered: bool = False) -> str:
-    out = [
-        f"{f'{i}. ' if numbered else '- '}{record_label(r)} {r['text']}"
-        for i, r in enumerate(records or [], 1)
-    ]
-    return "\n".join(out) or "(nothing yet)"
+    """Retrieved records as a list for a prompt, each with its label."""
+    return _listed([f"{record_label(r)} {r['text']}" for r in records or []], numbered)
 
 
 def consolidate_recalled(
-    vil, picks: list[str], day: int, cfg: dict, shown: list[dict]
+    vil: Villager, picks: list[str], day: int, cfg: dict, shown: list[dict]
 ) -> tuple[list[dict], list[dict]]:
     """One night's picks under retrieval. A number names something in tonight's list (`shown`): a pick is
     rehearsed, as before (its stability doubles); something lived through and not yet picked becomes a
-    pick. Anything else is a new pick in their own words. Returns (new, rehearsed)."""
-    mem = vil.memories
+    pick. Anything else is a new pick in their own words. Returns (new, rehearsed).
+    """
+    new: list[dict]
+    rehearsed: list[dict]
     new, rehearsed = [], []
     for p in picks[: int(cfg["picks"])]:
-        ref = re.fullmatch(r"#?\s*(\d+)\.?(?:\s.*)?", p)
-        if ref and 1 <= int(ref.group(1)) <= len(shown):
-            r = shown[int(ref.group(1)) - 1]
+        r = _referred(p, shown)
+        if r is not None:
             if not is_pick(r):
                 if not r.get("promoted"):
                     new.append(vil.memory.promote(r, day, cfg))
-                continue
-            if any(r is x for x in rehearsed) or any(r is x for x in new):
-                continue
-            r["stability"] *= 2
-            r["last"] = day
-            r["times"] += 1
-            rehearsed.append(r)
+            elif not any(r is x for x in rehearsed + new):
+                _rehearse(r, day)
+                rehearsed.append(r)
             continue
-        m = {
-            "id": 1 + max((x["id"] for x in mem), default=0),
-            "day": day,
-            "text": p[: int(cfg["max_chars"])],
-            "stability": float(cfg["stability"]),
-            "last": day,
-            "times": 1,
-        }
-        mem.append(m)
+        m = _new_pick(vil.memories, day, p, cfg, day)
         new.append(m)
         # Written out word for word from one of today's lines: that line lives on as this pick, so the
         # same words don't come to mind twice.

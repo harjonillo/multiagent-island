@@ -2,6 +2,24 @@
 # version for new runs. The doors page changelog shows them with each experiment's start and its
 # mid-run changes, all newest first. A run keeps the wording it started with unless switched on
 # purpose, and that switch shows up under the run.
+- time: 2026-11-26 18:00
+  what: Prompt version 22, the island answers a plan at once
+  when: new runs from now on, or a run resumed with --prompt-version 22
+  details:
+    - "why: on day 16 of test1, the first day of picks by name, 7 of 82 picks were dropped for a part their action doesn't have, usually the reason for going (visit at Fen's home with \"what\": \"ask for bait\"). The part was read as something from the pockets, so the villager was told \"you have no ask for bait in your pockets\", at their next plan, hours later. Ari and Ike each planned to visit the other, three times in all, and never met"
+    - "a pick the island can't read comes straight back with the reason, and the villager can write that pick again or leave it out. Once per plan, for no mental energy; the rest of the plan stands. What still can't be read isn't planned and their day says why, as before. The plan's record keeps what was sent back and what was answered"
+    - "the reason is the true one: a \"what\" or \"items\" an action's line doesn't have is no longer checked against the pockets. \"visit: it has no \"what\" (it takes only \"at\")\". A \"what\" that only repeats the place or the thing named is left out and the pick is read"
+    - "a pick can say what it is for in \"why\", up to 10 words of their own. The island doesn't act on it. It is shown back with what they planned when they spot a bug or fish, and to a visitor when they get there; nobody else sees it"
+    - "a plan costs 24 points of mental energy whatever its length (mental_energy.plan_cost), and the rules say so. Charged for what it read and wrote, a plan had grown from about 22 points on day 7 to 34 on day 16 as prompts got longer, while villagers were told 24; 11 of 30 plans on day 16 weren't made for lack of energy. Every other call is charged as before"
+    - "in a conversation, asking for the same thing twice does nothing, and each turn says what you have already asked for (like the three trade offers of version 13). On days 12 to 16, 29 turns repeated the speaker's own earlier ask or offer; Dax asked Gus for bait four times in one conversation"
+    - "a villager who spots a bug or fish is told how full their pockets are (\"In your pockets: 40 of 40 slots used\"); the choice stays theirs. On days 12 to 16, 18 of 66 such chases were decided with full pockets, which that prompt didn't show, and ended in \"pockets full\""
+    - "a bug or fish caught with no room is named and let go, as in ACNH but with nothing to swap: \"caught a loka fish, but with your pockets full you let it go\". Before, it failed with \"pockets full\" before anything was caught. The hour is still used"
+    - "where something goes is said exactly, and done where they stand, as a bridge is proposed. lay_path, place (furniture and fencing) and plant (a sapling, fruit or flower seeds) take \"tiles\": each tile as steps from where they stand when the hour comes, [{\"east\": 2, \"south\": 1}, ...], any within 8 steps, which is as far as they see (sightings.sight_radius). One piece or seed for each tile; one tile can be written \"steps\": {...}. They end the hour at the last tile, so the next action goes on from there. Before, the villager named a place (or two, for a path) and the island chose the tiles: the walking route for a path, up to 30 tiles an hour, and the nearest free tiles for the rest"
+    - "what is on a tile is only known when they stand there: a tile that can't be used is left out and the result says why (\"; not done: 3 east of where you stand is the river\"), and the rest is done. When planning, only the shape and the 8 steps are checked, and answered at once like any other pick"
+    - "fence_off (fencing round the home in one action, the island choosing the tiles) is off the list: fencing goes down with place, tile by tile. These three actions no longer take a place in \"at\""
+    - "the plan says what is in sight of where they are now, as steps from where they stand: trees, stumps, rocks, things put outside, flowers, path, and the nearest water"
+    - "proposing a bridge or stairs is on the list only when there is a spot within 8 steps of where they are when they plan. Before, any spot they could walk to put it there; it is proposed where they stand, and 10 of 13 proposals failed for being too far from one"
+    - "not changed, on purpose: a misunderstanding is still theirs (visiting a shop, asking a villager what they do, sending to a place) and is answered with the choices there are, never with what to pick; nothing says what to want"
 - time: 2026-11-25 13:00
   what: Replies with a misplaced closing brace are read
   when: every run, from its next day

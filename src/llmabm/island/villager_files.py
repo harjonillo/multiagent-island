@@ -20,13 +20,29 @@ import math
 import pickle
 from collections import Counter
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
+from .analysis import assets
+from .fmt import items_x
 from .memory import retrieval, strength
+from .space import version_of
 from .world import clock
+
+if TYPE_CHECKING:
+    from ..analysis import Run
+    from .sim import IslandSimulation
 
 
 def villager_dir(run_dir: Path, name: str) -> Path:
+    """A villager's own folder in a run directory."""
     return Path(run_dir) / "villagers" / name
+
+
+def user_part(prompt_text: str) -> str:
+    """The situation a saved prompt file showed the model: its USER section, without the reasoning and
+    reply that follow once the call has come back.
+    """
+    return prompt_text.split("=== USER ===", 1)[-1].split("\n=== REASONING", 1)[0]
 
 
 def prompt_dir(run_dir: Path, name: str | None) -> Path:
@@ -37,12 +53,14 @@ def prompt_dir(run_dir: Path, name: str | None) -> Path:
 
 
 def _count(d: dict) -> str:
-    return ", ".join(f"{k} x{n}" for k, n in sorted(d.items()) if n) or "nothing"
+    """Things and how many of each, in alphabetical order."""
+    return items_x(dict(sorted(d.items())), "nothing")
 
 
-def _load_checkpoint(run_dir: Path):
+def _load_checkpoint(run_dir: Path) -> IslandSimulation | None:
     """The simulation as it stood at the end of the last finished day, or None. Only the run's own
-    checkpoint is loaded (pickle files can run code when loaded)."""
+    checkpoint is loaded (pickle files can run code when loaded).
+    """
     p = Path(run_dir) / "checkpoint.pkl"
     if not p.exists():
         return None
@@ -58,7 +76,8 @@ def _load_checkpoint(run_dir: Path):
 # --- profile -----------------------------------------------------------------
 
 
-def profile_text(run, name: str) -> str:
+def profile_text(run: Run, name: str) -> str:
+    """The text of profile.md: the villager's model, hours, arrival and home, then their persona."""
     m = run.manifest
     spec = m["villagers"][name]
     snaps = run.of("snapshot")
@@ -110,7 +129,7 @@ def _last_shown(m: dict, cfg: dict) -> int:
     return m["last"] + int(m["stability"] * math.log(1 / cfg["threshold"]) + 1e-9)
 
 
-def _nights(run, name: str, upto: int | None) -> list[str]:
+def _nights(run: Run, name: str, upto: int | None) -> list[str]:
     """Night by night: the page, what was held on to, come back to and forgotten."""
     gone = {
         e["day"]: e.get("forgotten") or []
@@ -143,7 +162,7 @@ def _nights(run, name: str, upto: int | None) -> list[str]:
     return out
 
 
-def _page(run, name: str, upto: int | None) -> tuple[str, int | None]:
+def _page(run: Run, name: str, upto: int | None) -> tuple[str, int | None]:
     """(the latest nightly page, the night it was written)."""
     text, day = "", None
     for e in run.of("reflection"):
@@ -154,9 +173,10 @@ def _page(run, name: str, upto: int | None) -> tuple[str, int | None]:
     return text, day
 
 
-def memory_text(run, name: str, sim=None) -> str:
+def memory_text(run: Run, name: str, sim: IslandSimulation | None = None) -> str:
     """What `name` carries from earlier days. With `sim` (the checkpoint), the state itself; without,
-    only what the events tell: the page and the night-by-night record."""
+    only what the events tell: the page and the night-by-night record.
+    """
     isl = getattr(sim, "isl", None)
     done = isl.day if isl is not None else None  # the last finished day
     page, page_day = _page(run, name, done)
@@ -196,11 +216,13 @@ def memory_text(run, name: str, sim=None) -> str:
             LAST_CHAT_LINES,
             at_place,
             exchange_line,
+            exchanges_between,
+            last_chat_before,
             turn_act_text,
         )
 
-        vil, wake = isl.v[name], done + 1
-        version = getattr(isl, "prompt_version", 1)
+        vil, wake = isl.v[name], cast(int, done) + 1
+        version = version_of(isl)
         cfg = getattr(isl, "memory", None)
         out += ["## Things they remember", ""]
         if not cfg:
@@ -296,13 +318,8 @@ def memory_text(run, name: str, sim=None) -> str:
         others = [o for o in isl.v if o != name]
         talks, hands = [], []
         for o in others:
-            chats = [
-                c
-                for c in getattr(isl, "last_chats", {}).get(frozenset((name, o)), [])
-                if c["day"] < wake
-            ]
-            if chats:
-                c = chats[-1]
+            c = last_chat_before(isl, name, o, wake)
+            if c:
                 where = (
                     f"at {c['b']}'s home" if c.get("visit") else at_place(c["place"])
                 )
@@ -315,11 +332,7 @@ def memory_text(run, name: str, sim=None) -> str:
                     )
                     talks.append(f"- **{t['speaker']}:** {t['text'][:200]}{act}")
                 talks.append("")
-            ex = [
-                e
-                for e in getattr(isl, "exchanges", [])
-                if {e["from"], e["to"]} == {name, o}
-            ]
+            ex = exchanges_between(isl, name, o)
             if ex:
                 more = len(ex) - len(ex[-EXCHANGES_SHOWN:])
                 hands += [
@@ -368,16 +381,10 @@ def memory_text(run, name: str, sim=None) -> str:
 # --- assets ------------------------------------------------------------------
 
 
-def _worth(v: dict) -> int:
-    return (
-        v["bells"]
-        + v.get("home_bells", 0)
-        + v.get("inventory_value", 0)
-        + v.get("home_value", 0)
-    )
-
-
-def assets_text(run, name: str, sim=None) -> str:
+def assets_text(run: Run, name: str, sim: IslandSimulation | None = None) -> str:
+    """The text of assets.md: what the villager owned at the end of the last finished day, then a
+    row for each day. With `sim` (the checkpoint), also how worn their tools are.
+    """
     world = run.manifest["world"]
     snaps = [s for s in run.of("snapshot") if name in s["villagers"]]
     out = [f"# {name}'s assets", ""]
@@ -401,7 +408,7 @@ def assets_text(run, name: str, sim=None) -> str:
         f"- Kept at home (worth {v.get('home_value', 0):,}): {_count(v.get('home_items') or {})}",
     ]
     vil = getattr(getattr(sim, "isl", None), "v", {}).get(name)
-    if vil is not None and sim.isl.day == last["day"]:
+    if vil is not None and sim.isl.day == last["day"]:  # type: ignore[union-attr]  # there is a vil only when there is a sim
         wear = {
             **{t: u for t, u in vil.wear.items() if u},
             **{f"{t} (at home)": u for t, u in vil.home_wear.items() if u},
@@ -418,7 +425,7 @@ def assets_text(run, name: str, sim=None) -> str:
         f"- Wearing: {', '.join(f'{i} ({s})' for s, i in sorted((v.get('wearing') or {}).items())) or 'nothing special'}",
         f"- Furniture inside: {', '.join(v.get('interior') or []) or 'none'}",
         f"- Recipes known: {', '.join(v.get('recipes') or []) or 'none'}",
-        f"- Net worth (bells and things at Cranny prices, less the loan): {_worth(v) - v['loan']:,}",
+        f"- Net worth (bells and things at Cranny prices, less the loan): {assets(v) - v['loan']:,}",
         "",
         "## Day by day",
         "",
@@ -432,13 +439,13 @@ def assets_text(run, name: str, sim=None) -> str:
         out.append(
             f"| {s['day']} | {x['bells']:,} | {x.get('home_bells', 0):,} | {x['items']} "
             f"| {x.get('inventory_value', 0):,} | {x.get('home_value', 0):,} "
-            f"| {world['house_levels'][x['house']]['name']} | {x['loan']:,} | {_worth(x) - x['loan']:,} |"
+            f"| {world['house_levels'][x['house']]['name']} | {x['loan']:,} | {assets(x) - x['loan']:,} |"
         )
     out.append("")
     return "\n".join(out)
 
 
-def write_pages(run, out_dir: Path | None = None) -> list[Path]:
+def write_pages(run: Run, out_dir: Path | None = None) -> list[Path]:
     """Write pages.md for every villager who has had a night: what they wrote to themselves, night by night."""
     by: dict[str, list[dict]] = {}
     for e in run.of("reflection"):
@@ -455,7 +462,7 @@ def write_pages(run, out_dir: Path | None = None) -> list[Path]:
     return paths
 
 
-def write(run) -> list[Path]:
+def write(run: Run) -> list[Path]:
     """Write profile.md, memory.md and assets.md for every villager of `run`. Returns the folders."""
     sim = _load_checkpoint(run.dir)
     dirs = []

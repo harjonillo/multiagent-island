@@ -11,7 +11,7 @@ same size, with image-rendering: pixelated. The opening steps the sheet's backgr
 every FRAME_MS.
 
 The empty "next experiment" slot keeps the earlier code-drawn door, as SVG <rect>s with
-shape-rendering="crispEdges" (from docs/explorer/door_sprites.py), faded:
+shape-rendering="crispEdges", faded:
 
   frame_svg()       24 x 42 cells: wooden frame, dark doorway, stone step
   door_svg(...)     20 x 38 cells: the door panel with its sign board, laid over the doorway at cells (2, 2)
@@ -22,6 +22,7 @@ Positions of its overlays, in percent of their parent, are in PANEL and SIGN.
 from __future__ import annotations
 
 import base64
+from itertools import groupby
 from pathlib import Path
 
 ART = Path(__file__).with_name("door_art")
@@ -36,6 +37,7 @@ BOX_W, BOX_H = (RIGHT - LEFT) * SCALE, (GROUND - TOP) * SCALE
 
 
 def _pct(a: int, n: int) -> str:
+    """`a` out of `n` as a CSS percentage."""
     return f"{100 * a / n:.4g}%"
 
 
@@ -82,6 +84,7 @@ EMPTY_DOOR = {
 
 
 def _data_uri(name: str) -> str:
+    """A PNG from door_art/ as a data URI."""
     return "data:image/png;base64," + base64.b64encode(
         (ART / name).read_bytes()
     ).decode("ascii")
@@ -89,7 +92,8 @@ def _data_uri(name: str) -> str:
 
 def sprite_css() -> str:
     """CSS for the drawn door: the closed sprite, the hover sprite, and one rule per opening frame
-    (set by the page's script as data-frame on the link)."""
+    (set by the page's script as data-frame on the link).
+    """
     px, left, top = SIZE * SCALE, LEFT * SCALE, TOP * SCALE
     rules = [
         f".door, .door-box {{ width: {BOX_W}px; height: {BOX_H}px; }}",
@@ -110,22 +114,20 @@ def sprite_css() -> str:
 
 
 def _svg(grid: list[list[str]], colours: dict) -> str:
+    """A grid of colour letters as an SVG, one unit per cell."""
     h, w = len(grid), len(grid[0])
     rects = []
     for r, row in enumerate(grid):
         c = 0
-        while c < w:
-            ch = row[c]
-            if ch == ".":
-                c += 1
-                continue
-            e = c
-            while e + 1 < w and row[e + 1] == ch:
-                e += 1
-            rects.append(
-                f'<rect x="{c}" y="{r}" width="{e - c + 1}" height="1" fill="{colours[ch]}"></rect>'
-            )
-            c = e + 1
+        for ch, run in groupby(
+            row
+        ):  # one rect for each run of the same colour; "." is see-through
+            n = len(list(run))
+            if ch != ".":
+                rects.append(
+                    f'<rect x="{c}" y="{r}" width="{n}" height="1" fill="{colours[ch]}"></rect>'
+                )
+            c += n
     return (
         f'<svg viewBox="0 0 {w} {h}" width="100%" shape-rendering="crispEdges" aria-hidden="true" '
         f'style="display: block">{"".join(rects)}</svg>'
@@ -133,6 +135,7 @@ def _svg(grid: list[list[str]], colours: dict) -> str:
 
 
 def frame_svg() -> str:
+    """The empty slot's doorway: a wooden frame round a dark opening, on a stone step."""
     w, h = 24, 42
     g = [["."] * w for _ in range(h)]
     for r in range(40):

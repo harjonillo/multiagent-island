@@ -22,11 +22,25 @@ import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
 from types import SimpleNamespace
+from typing import TYPE_CHECKING, Any
 
-from llmabm.island.memory import DEFAULTS, MemoryStore, dot, is_pick, recall, record_key, score_records, strength
+from llmabm.island.memory import (
+    DEFAULTS,
+    MemoryStore,
+    recall,
+    record_key,
+    score_parts,
+    score_records,
+    similarities,
+)
 from llmabm.island.sim import _last_chat_skip, _query
 from llmabm.island.villager_files import prompt_dir
+from llmabm.island.villager_files import user_part as prompt_user_part
 from llmabm.llm import load_embedder
+
+if TYPE_CHECKING:
+    from llmabm.island.sim import IslandSimulation
+    from llmabm.island.villager import Villager
 
 ROOT = Path(__file__).resolve().parent.parent
 FILE = re.compile(r"d(\d+)_(?:h(\d+)_)?(p|chat|notice|spot|plaza|reflect)(?:_?\d+)?\.txt$")
@@ -42,7 +56,8 @@ KINDS = {  # kind -> (what it is, which setting says how many records, what the 
 
 
 def user_part(path: Path) -> str:
-    return path.read_text().split("=== USER ===", 1)[-1].split("\n=== REASONING", 1)[0]
+    """The situation a saved prompt file showed the model."""
+    return prompt_user_part(path.read_text())
 
 
 def block(user: str, heading: str) -> list[str]:
@@ -60,16 +75,19 @@ def block(user: str, heading: str) -> list[str]:
 
 
 def bullets(user: str, heading: str) -> list[str]:
+    """The bulleted lines under `heading`, without their "- "."""
     return [ln[2:] for ln in block(user, heading) if ln.startswith("- ")]
 
 
 def line(user: str, start: str) -> str:
+    """The first line of the prompt that starts with `start`, or ""."""
     return next((ln for ln in user.splitlines() if ln.startswith(start)), "")
 
 
 def situation(kind: str, user: str) -> tuple[list[tuple[str, list[str]]], str | None]:
     """(the parts of the query, each with a name and its lines; the villager they are talking to if any),
-    from a saved prompt. The query is these parts in this order, joined into one text."""
+    from a saved prompt. The query is these parts in this order, joined into one text.
+    """
     at = re.search(r"You are \w+, at (.+?)\.\n", user)
     here = [f"at {at.group(1)}"] if at else []
     one = lambda start: [ln for ln in [line(user, start)] if ln]
@@ -89,6 +107,7 @@ def situation(kind: str, user: str) -> tuple[list[tuple[str, list[str]]], str | 
         return [("what they spotted", [re.sub(r"^\d+\. ", "", ln) for ln in block(user, "You just spotted:")]),
                 ("where they are", here), ("what they had planned", [planned.group(1)] if planned else [])], None
     if kind == "chat":
+        other: Any  # first the match, then the name in it
         other = re.search(r"Only (\w+) hears it", user)
         other = other.group(1) if other else None
         lines = user.splitlines()
@@ -109,7 +128,7 @@ def situation(kind: str, user: str) -> tuple[list[tuple[str, list[str]]], str | 
     return [("what happened today", bullets(user, "What happened today:"))], None
 
 
-def query_lines(parts, limit: int) -> list[str]:
+def query_lines(parts: list[tuple[str, list[str]]], limit: int) -> list[str]:
     """The query as it is shown here: one line for each part, in order, up to where the query is cut."""
     out, room = [], limit
     for label, lines in parts:
@@ -126,9 +145,10 @@ def query_lines(parts, limit: int) -> list[str]:
     return out
 
 
-def load(run_dir: Path):
+def load(run_dir: Path) -> IslandSimulation:
     """The run's last checkpoint with every lived day in memory, as switching it to version 20 would leave it.
-    Nothing is written back."""
+    Nothing is written back.
+    """
     with open(run_dir / "checkpoint.pkl", "rb") as f:
         sim = pickle.load(f)
     sim.run_dir = run_dir
@@ -149,9 +169,10 @@ def rehearsals(run_dir: Path) -> dict[str, list[tuple[int, str]]]:
     return out
 
 
-def as_of(vil, day: int, cfg: dict, named_again: list[tuple[int, str]]):
+def as_of(vil: Villager, day: int, cfg: dict, named_again: list[tuple[int, str]]) -> MemoryStore:
     """The villager's memory as it stood on the morning of `day`: nothing from that day on, and each pick as
-    fresh as it was then (the nights it was named again since are undone)."""
+    fresh as it was then (the nights it was named again since are undone).
+    """
     picks = []
     for m in vil.memories:
         if m["day"] >= day:
@@ -161,38 +182,40 @@ def as_of(vil, day: int, cfg: dict, named_again: list[tuple[int, str]]):
             if m["day"] <= night < day and text == m["text"]:
                 m.update(stability=m["stability"] * 2, last=night, times=m["times"] + 1)
         picks.append(m)
-    return MemoryStore(SimpleNamespace(memories=picks, experience=[r for r in vil.experience if r["day"] < day]))
+    return MemoryStore(SimpleNamespace(memories=picks, experience=[r for r in vil.experience if r["day"] < day]))  # type: ignore[arg-type]  # a stand-in with the two lists a MemoryStore reads
 
 
-def scored(cands, qvec, vecs, day, cfg, k):
+def scored(cands: list[dict], qvec: list[float], vecs: dict[str, list[float]], day: int, cfg: dict,
+           k: int) -> tuple[list[dict], set[str]]:
     """Every candidate with the parts of its score, best first, and the keys of the ones a prompt would show."""
-    sims = [dot(qvec, vecs[r["text"]]) for r in cands]
-    lo, hi = min(sims), max(sims)
-    raw = {record_key(r): s for r, s in zip(cands, sims)}
+    sims = similarities(qvec, [vecs[r["text"]] for r in cands])
+    parts = {record_key(r): (s, *p) for r, s, p in zip(cands, sims, score_parts(cands, sims, day, cfg))}
     rows = []
-    for score, r in score_records(cands, sims, day, cfg):
-        s = raw[record_key(r)]
-        rel = max(cfg["relevance_floor"], (s - lo) / (hi - lo)) if hi > lo else 1.0
-        rec = max(cfg["recency_floor"], strength(r, day))
-        rows.append({"score": score, "cos": s, "rel": rel, "rec": rec, "pick": cfg["pick_weight"] if is_pick(r) else 1.0, "r": r})
+    for _, r in score_records(cands, sims, day, cfg):
+        cos, score, rel, rec, pick = parts[record_key(r)]
+        rows.append({"score": score, "cos": cos, "rel": rel, "rec": rec, "pick": pick, "r": r})
     shown = {record_key(r) for _, r in recall(cands, qvec, {r["text"]: vecs[r["text"]] for r in cands}, day, cfg, k)}
     return rows, shown
 
 
 def what(r: dict) -> str:
+    """What kind of record this is, in the words of the doc's tables."""
     return {None: "held on to", "event": "happened", "chat": "conversation", "note": "note", "page": "nightly page"}[r.get("kind")]
 
 
 def cell(text: str, n: int = 150) -> str:
+    """Text for a table cell: on one line, bars escaped, cut to `n` characters with an ellipsis."""
     text = " ".join(str(text).split()).replace("|", "\\|")
     return text if len(text) <= n else text[: n - 1].rstrip() + "…"
 
 
-def med(xs) -> str:
+def med(xs: list[float]) -> str:
+    """The median to two places, or a dash when there is nothing."""
     return f"{statistics.median(xs):.2f}" if xs else "–"
 
 
 def main() -> None:
+    """Write docs/recall_examples.md (or `--out`) for the run named on the command line."""
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("run_dir", type=Path)
     ap.add_argument("--embeddings", default=None, help="the embedder to show (default: the models file's default)")
@@ -206,11 +229,13 @@ def main() -> None:
     emb = load_embedder(args.config, ROOT / ".cache/embed", args.embeddings)
     other = load_embedder(args.config, ROOT / ".cache/embed", args.beside)
     sim = load(args.run_dir)
-    isl, cfg = sim.isl, sim.isl.memory
+    cfg: dict[str, Any]
+    isl, cfg = sim.isl, sim.isl.memory  # type: ignore[assignment]  # load() has set the memory settings
     last = isl.day
     days = range(max(1, last - args.days + 1), last + 1)
 
     # Every prompt of those days, with its situation and the records it could draw on.
+    in_run: Counter[str]
     found, in_run, named_again = [], Counter(), rehearsals(args.run_dir)
     for name in sorted(isl.v):
         for path in sorted(prompt_dir(args.run_dir, name).glob("d*.txt")):
@@ -221,6 +246,7 @@ def main() -> None:
                 found.append((name, int(m.group(1)), kind, path))
     # A kind with no prompt in those days (nobody went to the plaza, say) is taken from the last day it has.
     latest = {k: max(d for _, d, kind, _ in found if kind == k) for k in in_run}
+    cases: list[dict[str, Any]]
     cases, earlier = [], {}
     for name, day, kind, path in found:
         if day not in days:
@@ -229,7 +255,8 @@ def main() -> None:
             earlier[kind] = day
         parts, talking_to = situation(kind, user_part(path))
         query = " ".join(_query(*[lines for _, lines in parts]).split())[: int(cfg["query_chars"])]
-        skip = _last_chat_skip(SimpleNamespace(last_chats=getattr(isl, "last_chats", {}), day=day), name, talking_to) \
+        skip = _last_chat_skip(SimpleNamespace(last_chats=getattr(isl, "last_chats", {}), day=day),  # type: ignore[arg-type]  # a stand-in with the island as it was that day
+                               name, talking_to) \
             if talking_to else None
         cands = as_of(isl.v[name], day, cfg, named_again[name]).candidates(
             day, cfg, skip_yesterday=kind == "plan", night=kind == "reflect", skip=skip)
@@ -239,14 +266,12 @@ def main() -> None:
     texts = list(dict.fromkeys(r["text"] for c in cases for r in c["cands"]))
     queries = list(dict.fromkeys(c["query"] for c in cases))
     for e in (emb, other):
-        e.p = dict(zip(texts, e.embed(texts, "passage")))
-        e.q = dict(zip(queries, e.embed(queries, "query")))
+        e.p = dict(zip(texts, e.embed(texts, "passage")))  # type: ignore[attr-defined]  # this script hangs its vectors on the embedder
+        e.q = dict(zip(queries, e.embed(queries, "query")))  # type: ignore[attr-defined]  # as above
     for c in cases:
         k = int(cfg[KINDS[c["kind"]][1]])
-        c["rows"], c["shown"] = scored(c["cands"], emb.q[c["query"]], emb.p, c["day"], cfg, k)
-        _, c["other"] = scored(c["cands"], other.q[c["query"]], other.p, c["day"], cfg, k)
-        for row in c["rows"]:
-            assert abs(row["rel"] * row["rec"] * row["pick"] - row["score"]) < 1e-5  # the columns are the score
+        c["rows"], c["shown"] = scored(c["cands"], emb.q[c["query"]], emb.p, c["day"], cfg, k)  # type: ignore[attr-defined]  # as above
+        _, c["other"] = scored(c["cands"], other.q[c["query"]], other.p, c["day"], cfg, k)  # type: ignore[attr-defined]  # as above
 
     by_kind = defaultdict(list)
     for c in cases:
